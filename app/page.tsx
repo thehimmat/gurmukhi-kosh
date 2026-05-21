@@ -1,65 +1,178 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import type { Word } from "@/lib/supabase";
+
+export default function HomePage() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Word[]>([]);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+        const data = await res.json();
+        setResults(data.words ?? []);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+  }, [query]);
+
+  function handleSubmit(e: React.SyntheticEvent) {
+    e.preventDefault();
+    if (results[0]) {
+      router.push(`/word/${encodeURIComponent(results[0].gurmukhi)}`);
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div
+      style={{
+        maxWidth: "860px",
+        margin: "0 auto",
+        padding: "4rem 1.5rem",
+      }}
+    >
+      <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+        <h1
+          className="gurmukhi-xl"
+          style={{ marginBottom: "0.5rem", color: "var(--text-primary)" }}
+        >
+          ਗੁਰਮੁਖੀ ਕੋਸ਼
+        </h1>
+        <p
+          style={{
+            fontSize: "1.2rem",
+            color: "var(--text-secondary)",
+            fontStyle: "italic",
+          }}
+        >
+          A dictionary of every word in Sri Guru Granth Sahib Ji
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} style={{ position: "relative", marginBottom: "0.5rem" }}>
+        <input
+          className="gurmukhi"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="ਸ਼ਬਦ ਖੋਜੋ — search a word…"
+          autoFocus
+          style={{
+            width: "100%",
+            fontSize: "1.4rem",
+            padding: "0.85rem 1.2rem",
+            border: "2px solid var(--border)",
+            borderRadius: "6px",
+            background: "white",
+            color: "var(--text-primary)",
+            outline: "none",
+            boxSizing: "border-box",
+          }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </form>
+
+      {loading && (
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontFamily: '"Inter", sans-serif',
+            fontSize: "0.875rem",
+            padding: "0.5rem 0.25rem",
+          }}
+        >
+          Searching…
+        </p>
+      )}
+
+      {results.length > 0 && (
+        <ul
+          style={{
+            listStyle: "none",
+            margin: "0.5rem 0 0",
+            padding: 0,
+            border: "1px solid var(--border)",
+            borderRadius: "6px",
+            background: "white",
+            overflow: "hidden",
+          }}
+        >
+          {results.map((word, i) => (
+            <li key={word.id}>
+              <a
+                href={`/word/${encodeURIComponent(word.gurmukhi)}`}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "1rem",
+                  padding: "0.85rem 1.2rem",
+                  borderTop: i === 0 ? "none" : "1px solid var(--border)",
+                  color: "var(--text-primary)",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor =
+                    "var(--accent-light)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent")
+                }
+              >
+                <span className="gurmukhi-lg" style={{ flex: 1 }}>
+                  {word.gurmukhi}
+                </span>
+                <span
+                  className="badge"
+                  style={{ flexShrink: 0 }}
+                  title="occurrences in SGGS"
+                >
+                  {word.frequency.toLocaleString()}×
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {!loading && query && results.length === 0 && (
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontFamily: '"Inter", sans-serif',
+            fontSize: "0.9rem",
+            padding: "1rem 0.25rem",
+          }}
+        >
+          No words found for &ldquo;{query}&rdquo;
+        </p>
+      )}
+
+      {!query && (
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontFamily: '"Inter", sans-serif',
+            fontSize: "0.875rem",
+            marginTop: "1rem",
+          }}
+        >
+          Type Gurmukhi text directly, or browse by{" "}
+          <a href="/browse">frequency</a>.
+        </p>
+      )}
     </div>
   );
 }
