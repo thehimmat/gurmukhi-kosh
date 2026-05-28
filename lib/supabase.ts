@@ -70,3 +70,68 @@ export type MahanKoshRef = {
 export type OccurrenceWithLine = WordOccurrence & {
   lines: Line & { shabads: Shabad | null };
 };
+
+// --- New word-feature types (002_word_features) ---
+
+export type DictSource = {
+  id: number;
+  code: string;
+  name: string;
+  language: string | null;
+  url: string | null;
+  notes: string | null;
+  ingested_at: string | null;
+};
+
+export type Definition = {
+  id: number;
+  word_id: number;
+  dict_source_id: number;
+  entry_gurmukhi: string | null;
+  sense_number: number | null;
+  definition_text: string;
+  definition_en: string | null;
+  cross_refs: Record<string, string> | null;
+  source_url: string | null;
+  notes: string | null;
+};
+
+export type DefinitionWithSource = Definition & {
+  dict_sources: DictSource | null;
+};
+
+export type Etymology = {
+  id: number;
+  word_id: number;
+  order_index: number;
+  origin_language: string;
+  root_form: string | null;
+  root_form_roman: string | null;
+  derivation_note: string | null;
+  source_text: string | null;
+};
+
+export type WordGrammar = {
+  id: number;
+  word_id: number;
+  definition_id: number | null;
+  pos: string | null;
+  gender: string | null;
+  number: string | null;
+  gram_case: string | null;
+  notes: string | null;
+};
+
+export type Lexeme = {
+  id: number;
+  root_word_id: number;
+  gloss_en: string | null;
+  notes: string | null;
+};
+
+export type WordForm = {
+  id: number;
+  lexeme_id: number;
+  word_id: number;
+  inflection_desc: string | null;
+};
