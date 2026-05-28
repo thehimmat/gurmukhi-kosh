@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3004",
     "build": "next build",
     "start": "next start",
-    "ingest": "tsx scripts/ingest.ts",
-    "ingest:range": "tsx scripts/ingest.ts"
+    "ingest": "tsx pipeline/sggs/ingest.ts",
+    "ingest:sggs": "tsx pipeline/sggs/ingest.ts",
+    "ingest:sggs:range": "tsx pipeline/sggs/ingest.ts",
+    "ingest:mahankosh": "tsx pipeline/mahan-kosh/ingest.ts",
+    "ingest:manual": "tsx pipeline/manual/ingest.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
