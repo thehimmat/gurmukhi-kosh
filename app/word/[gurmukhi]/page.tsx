@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
+import type { DefinitionWithSource, Etymology, WordGrammar } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -15,61 +16,170 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// ─── Shared style helpers ────────────────────────────────────────────────────
+
+const SECTION_HEADING: React.CSSProperties = {
+  fontSize: "0.875rem",
+  fontFamily: '"Inter", sans-serif',
+  fontWeight: 600,
+  letterSpacing: "0.07em",
+  textTransform: "uppercase",
+  color: "var(--text-secondary)",
+  marginBottom: "0.85rem",
+};
+
+const CARD: React.CSSProperties = {
+  background: "var(--card-bg, #fff)",
+  border: "1px solid var(--border)",
+  borderRadius: "8px",
+  padding: "1rem 1.25rem",
+  marginBottom: "0.75rem",
+};
+
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 style={SECTION_HEADING}>{children}</h2>
+  );
+}
+
+function CrossRefTags({ refs }: { refs: Record<string, string> | null }) {
+  if (!refs || Object.keys(refs).length === 0) return null;
+  const display: Record<string, string> = {
+    ar_fa: "Arabic / Farsi",
+    sa:    "Sanskrit",
+    hi:    "Hindi",
+    fa:    "Farsi",
+    ar:    "Arabic",
+    ur:    "Urdu",
+    pa:    "Punjabi",
+  };
+  return (
+    <span style={{ display: "inline-flex", gap: "0.35rem", flexWrap: "wrap", marginLeft: "0.4rem" }}>
+      {Object.entries(refs).map(([key, val]) =>
+        key !== "origin_lang" ? (
+          <span
+            key={key}
+            title={display[key] ?? key}
+            style={{
+              background: "var(--accent-bg, #f5ede6)",
+              color: "var(--accent)",
+              borderRadius: "4px",
+              padding: "0 5px",
+              fontSize: "0.8rem",
+              fontFamily: '"Inter", sans-serif',
+              direction: "rtl",
+            }}
+          >
+            {val}
+          </span>
+        ) : null
+      )}
+    </span>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 export default async function WordPage({ params }: Props) {
   const { gurmukhi: encoded } = await params;
   const word = decodeURIComponent(encoded);
 
-  // Fetch word record
+  // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("*")
+    .select("id, gurmukhi, frequency, word_grammar(*)")
     .eq("gurmukhi", word)
     .single();
 
   if (!wordRow) notFound();
 
-  // Fetch occurrences with line + shabad data (paginated — first 100)
-  const { data: occurrences } = await supabase
-    .from("word_occurrences")
-    .select(
-      `
-      id, position,
-      lines (
-        id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-        shabads ( id, raag_english, writer_english, ang_start )
-      )
-    `
-    )
-    .eq("word_id", wordRow.id)
-    .order("id", { ascending: true })
-    .limit(100);
+  const wordId = wordRow.id;
+  const grammar = ((wordRow as unknown as { word_grammar: WordGrammar[] }).word_grammar ?? []);
 
-  // Fetch Mahan Kosh refs
-  const { data: mahanKosh } = await supabase
-    .from("mahan_kosh_refs")
-    .select("*")
-    .eq("word_id", wordRow.id);
+  // Step 2: fire remaining queries in parallel
+  const [defsResult, etymResult, occsResult, lexemeFormResult] = await Promise.all([
+    // Definitions with source info
+    supabase
+      .from("definitions")
+      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, dict_sources(code, name, language, url)")
+      .eq("word_id", wordId)
+      .order("dict_source_id", { ascending: true })
+      .order("sense_number", { ascending: true }),
 
+    // Etymology
+    supabase
+      .from("etymology")
+      .select("*")
+      .eq("word_id", wordId)
+      .order("order_index", { ascending: true }),
+
+    // Occurrences with line + shabad
+    supabase
+      .from("word_occurrences")
+      .select(`
+        id, position,
+        lines (
+          id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
+          shabads ( id, raag_english, writer_english, ang_start )
+        )
+      `)
+      .eq("word_id", wordId)
+      .order("id", { ascending: true })
+      .limit(100),
+
+    // Morphological variants: find the lexeme this word belongs to (if any)
+    supabase
+      .from("word_forms")
+      .select("lexeme_id, inflection_desc")
+      .eq("word_id", wordId)
+      .maybeSingle(),
+  ]);
+
+  const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
+  const etymology = (etymResult.data ?? []) as Etymology[];
+
+  // Step 3: if lexeme found, fetch all sibling forms
+  let morphForms: Array<{ gurmukhi: string; inflection_desc: string | null }> = [];
+  if (lexemeFormResult.data?.lexeme_id) {
+    const lexemeId = lexemeFormResult.data.lexeme_id as number;
+    const { data: formRows } = await supabase
+      .from("word_forms")
+      .select("inflection_desc, words(id, gurmukhi)")
+      .eq("lexeme_id", lexemeId);
+
+    morphForms = ((formRows ?? []) as unknown as Array<{ inflection_desc: string | null; words: { id: number; gurmukhi: string } | null }>)
+      .filter((f) => f.words?.gurmukhi && f.words.gurmukhi !== word)
+      .map((f) => ({ gurmukhi: f.words!.gurmukhi, inflection_desc: f.inflection_desc }));
+  }
+
+  // Group definitions by source
+  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; defs: DefinitionWithSource[] }>();
+  for (const def of definitions) {
+    const src = def.dict_sources as unknown as { code: string; name: string; url: string | null } | null;
+    const key = src?.code ?? "unknown";
+    if (!defsBySource.has(key)) {
+      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, defs: [] });
+    }
+    defsBySource.get(key)!.defs.push(def);
+  }
+
+  // Occurrences — group by raag
   type OccRow = {
     id: number;
     position: number;
     lines: {
-      id: number;
-      ang: number;
-      line_no: number;
-      gurmukhi: string;
-      translation_en: string | null;
-      transliteration_en: string | null;
+      id: number; ang: number; line_no: number; gurmukhi: string;
+      translation_en: string | null; transliteration_en: string | null;
       shabad_id: number;
       shabads: { id: number; raag_english: string | null; writer_english: string | null } | null;
     } | null;
   };
-  const rows = (occurrences ?? []) as unknown as OccRow[];
-
-  // Group occurrences by raag for display
+  const rows = (occsResult.data ?? []) as unknown as OccRow[];
   const grouped = new Map<string, OccRow[]>();
   for (const occ of rows) {
-    const raag = occ.lines?.shabads?.raag_english ?? "Unknown Raag";
+    const raag = occ.lines?.shabads?.raag_english ?? "Unknown";
     if (!grouped.has(raag)) grouped.set(raag, []);
     grouped.get(raag)!.push(occ);
   }
@@ -79,119 +189,180 @@ export default async function WordPage({ params }: Props) {
     if (idx === -1) return text;
     return (
       text.slice(0, idx) +
-      `<mark style="background:var(--accent-light);border-radius:3px;padding:0 2px;">${target}</mark>` +
+      `<mark style="background:var(--accent-light,#f5e5d0);border-radius:3px;padding:0 2px;">${target}</mark>` +
       text.slice(idx + target.length)
     );
   }
 
+  // Grammar display helpers
+  const GRAMMAR_LABELS: Record<string, string> = {
+    noun: "Noun", verb: "Verb", adjective: "Adjective", adverb: "Adverb",
+    pronoun: "Pronoun", particle: "Particle", postposition: "Postposition",
+    conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
+  };
+
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
-      {/* Back nav */}
-      <a
-        href="/"
-        style={{
-          fontFamily: '"Inter", sans-serif',
-          fontSize: "0.875rem",
-          color: "var(--text-secondary)",
-          textDecoration: "none",
-          display: "inline-block",
-          marginBottom: "2rem",
-        }}
-      >
+
+      {/* ── Back nav ── */}
+      <a href="/" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none", display: "inline-block", marginBottom: "2rem" }}>
         ← back to search
       </a>
 
-      {/* Word header */}
+      {/* ── 1. Header ── */}
       <div style={{ marginBottom: "2.5rem" }}>
         <h1 className="gurmukhi-xl" style={{ marginBottom: "0.25rem" }}>
           {word}
         </h1>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "1rem",
-            marginTop: "0.5rem",
-          }}
-        >
-          <span className="badge">{wordRow.frequency.toLocaleString()} occurrences in SGGS</span>
-        </div>
+        <span className="badge" style={{ marginTop: "0.5rem" }}>
+          {wordRow.frequency.toLocaleString()} occurrences in SGGS
+        </span>
       </div>
 
-      {/* Mahan Kosh section */}
-      {mahanKosh && mahanKosh.length > 0 && (
+      {/* ── 2. Morphological variants ── */}
+      {morphForms.length > 0 && (
+        <section style={{ marginBottom: "2rem" }}>
+          <SectionHeading>Forms</SectionHeading>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              Related forms:
+            </span>
+            {morphForms.map((f) => (
+              <a
+                key={f.gurmukhi}
+                href={`/word/${encodeURIComponent(f.gurmukhi)}`}
+                title={f.inflection_desc ?? undefined}
+                className="gurmukhi"
+                style={{ color: "var(--accent)", textDecoration: "none", fontSize: "1.1rem" }}
+              >
+                {f.gurmukhi}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── 3. Definitions ── */}
+      {defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
-          <h2
-            style={{
-              fontSize: "1rem",
-              fontFamily: '"Inter", sans-serif',
-              fontWeight: 600,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: "var(--text-secondary)",
-              marginBottom: "0.75rem",
-            }}
-          >
-            Mahan Kosh
-          </h2>
-          {mahanKosh.map((ref) => (
-            <div key={ref.id} className="card" style={{ marginBottom: "0.75rem" }}>
-              {ref.entry_gurmukhi && (
-                <p className="gurmukhi" style={{ fontWeight: 600, marginBottom: "0.4rem" }}>
-                  {ref.entry_gurmukhi}
-                </p>
+          <SectionHeading>Definitions</SectionHeading>
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, defs }]) => (
+            <div key={code} style={{ marginBottom: "1.25rem" }}>
+              {/* Source name */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
+                  {sourceName}
+                </span>
+                {sourceUrl && (
+                  <a href={sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                    ↗
+                  </a>
+                )}
+              </div>
+
+              {/* Senses */}
+              {defs.map((def) => (
+                <div key={def.id} style={{ ...CARD, paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
+                  <div style={{ display: "flex", gap: "0.6rem", alignItems: "baseline" }}>
+                    {defs.length > 1 && (
+                      <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "1.2rem" }}>
+                        {def.sense_number}.
+                      </span>
+                    )}
+                    <p className="gurmukhi" style={{ margin: 0, lineHeight: 1.7 }}>
+                      {def.definition_text}
+                      <CrossRefTags refs={def.cross_refs as Record<string, string> | null} />
+                    </p>
+                  </div>
+                  {def.definition_en && (
+                    <p style={{ margin: "0.35rem 0 0", color: "var(--text-secondary)", fontSize: "0.95rem", fontStyle: "italic" }}>
+                      {def.definition_en}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* ── 4. Grammar ── */}
+      {grammar.length > 0 && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Grammar</SectionHeading>
+          {grammar.map((g) => (
+            <div key={g.id} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+              {g.pos && (
+                <span className="badge">
+                  {GRAMMAR_LABELS[g.pos.toLowerCase()] ?? g.pos}
+                </span>
               )}
-              {ref.definition && (
-                <p style={{ color: "var(--text-secondary)", marginBottom: "0.25rem" }}>
-                  {ref.definition}
-                </p>
+              {g.gender && (
+                <span className="badge">
+                  {g.gender.charAt(0).toUpperCase() + g.gender.slice(1)}
+                </span>
               )}
-              {ref.notes && (
-                <p
-                  style={{
-                    fontStyle: "italic",
-                    color: "var(--text-secondary)",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {ref.notes}
-                </p>
+              {g.number && (
+                <span className="badge">
+                  {g.number.charAt(0).toUpperCase() + g.number.slice(1)}
+                </span>
               )}
-              {ref.source_url && (
-                <a
-                  href={ref.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontSize: "0.875rem", fontFamily: '"Inter", sans-serif' }}
-                >
-                  Source ↗
-                </a>
+              {g.gram_case && (
+                <span className="badge">
+                  {g.gram_case.charAt(0).toUpperCase() + g.gram_case.slice(1)}
+                </span>
+              )}
+              {g.notes && (
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
+                  {g.notes}
+                </span>
               )}
             </div>
           ))}
         </section>
       )}
 
-      {/* Occurrences */}
+      {/* ── 5. Etymology ── */}
+      {etymology.length > 0 && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Etymology</SectionHeading>
+          <div style={CARD}>
+            {etymology.map((e, i) => (
+              <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: i < etymology.length - 1 ? "0.5rem" : 0 }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)", minWidth: "5rem" }}>
+                  {e.origin_language}
+                </span>
+                <div>
+                  {e.root_form && (
+                    <span className="gurmukhi" style={{ marginRight: "0.4rem" }}>{e.root_form}</span>
+                  )}
+                  {e.root_form_roman && (
+                    <span style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem", marginRight: "0.4rem" }}>
+                      ({e.root_form_roman})
+                    </span>
+                  )}
+                  {e.derivation_note && (
+                    <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                      {e.derivation_note}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── 6. Occurrences ── */}
       <section>
-        <h2
-          style={{
-            fontSize: "1rem",
-            fontFamily: '"Inter", sans-serif',
-            fontWeight: 600,
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-            color: "var(--text-secondary)",
-            marginBottom: "1.25rem",
-          }}
-        >
+        <SectionHeading>
           Occurrences in Sri Guru Granth Sahib Ji
           {rows.length >= 100 && (
-            <span style={{ fontWeight: 400, marginLeft: "0.5rem" }}>
+            <span style={{ fontWeight: 400, marginLeft: "0.5rem", textTransform: "none", letterSpacing: 0 }}>
               (showing first 100)
             </span>
           )}
-        </h2>
+        </SectionHeading>
 
         {grouped.size === 0 && (
           <p style={{ color: "var(--text-secondary)", fontStyle: "italic" }}>
@@ -201,85 +372,30 @@ export default async function WordPage({ params }: Props) {
 
         {Array.from(grouped.entries()).map(([raag, occs]) => (
           <div key={raag} style={{ marginBottom: "2rem" }}>
-            <h3
-              style={{
-                fontSize: "1rem",
-                fontStyle: "italic",
-                color: "var(--text-secondary)",
-                marginBottom: "0.75rem",
-                borderBottom: "1px solid var(--border)",
-                paddingBottom: "0.25rem",
-              }}
-            >
+            <h3 style={{ fontSize: "1rem", fontStyle: "italic", color: "var(--text-secondary)", marginBottom: "0.75rem", borderBottom: "1px solid var(--border)", paddingBottom: "0.25rem" }}>
               {raag}
             </h3>
-            {occs?.map((occ) => {
+            {occs.map((occ) => {
               const line = occ.lines;
               if (!line) return null;
-
               return (
-                <div
-                  key={occ.id}
-                  className="card"
-                  style={{ marginBottom: "0.75rem" }}
-                >
-                  {/* Ang reference */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      marginBottom: "0.6rem",
-                    }}
-                  >
-                    <a
-                      href={`/ang/${line.ang}`}
-                      style={{
-                        fontFamily: '"Inter", sans-serif',
-                        fontSize: "0.8rem",
-                        color: "var(--accent)",
-                        fontWeight: 500,
-                      }}
-                    >
+                <div key={occ.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
+                    <a href={`/ang/${line.ang}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
                       Ang {line.ang}
                     </a>
                     {line.shabads?.writer_english && (
-                      <span
-                        style={{
-                          fontFamily: '"Inter", sans-serif',
-                          fontSize: "0.8rem",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
+                      <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>
                         {line.shabads.writer_english}
                       </span>
                     )}
                   </div>
-
-                  {/* Gurmukhi line with word highlighted */}
-                  <p
-                    className="gurmukhi-lg"
-                    style={{ marginBottom: "0.4rem" }}
-                    dangerouslySetInnerHTML={{
-                      __html: highlightWord(line.gurmukhi, word),
-                    }}
-                  />
-
-                  {/* Transliteration */}
+                  <p className="gurmukhi-lg" style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: highlightWord(line.gurmukhi, word) }} />
                   {line.transliteration_en && (
-                    <p
-                      style={{
-                        fontStyle: "italic",
-                        color: "var(--text-secondary)",
-                        fontSize: "0.95rem",
-                        marginBottom: "0.4rem",
-                      }}
-                    >
+                    <p style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "0.4rem" }}>
                       {line.transliteration_en}
                     </p>
                   )}
-
-                  {/* Translation */}
                   {line.translation_en && (
                     <p style={{ color: "var(--text-secondary)", fontSize: "1rem" }}>
                       {line.translation_en}
