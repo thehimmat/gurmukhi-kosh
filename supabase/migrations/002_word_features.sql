@@ -28,8 +28,13 @@ create table definitions (
   created_at      timestamptz default now()
 );
 create index definitions_word_id on definitions (word_id);
-create unique index definitions_word_source_sense
-  on definitions (word_id, dict_source_id, coalesce(sense_number, 0));
+-- sense_number is required (defaults to 1 for single-sense entries)
+alter table definitions
+  alter column sense_number set default 1,
+  alter column sense_number set not null;
+alter table definitions
+  add constraint definitions_word_source_sense_uq
+  unique (word_id, dict_source_id, sense_number);
 
 -- Etymology chain (one word can have multiple origin notes)
 create table etymology (
