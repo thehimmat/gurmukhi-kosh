@@ -253,8 +253,15 @@ export default async function WordPage({ params }: Props) {
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
                   {sourceName}
                 </span>
-                {sourceUrl && (
-                  <a href={sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                {(sourceUrl || code === "mahan_kosh") && (
+                  <a
+                    href={code === "mahan_kosh"
+                      ? `https://www.searchgurbani.com/sggs-kosh/view?Word=${encodeURIComponent(word)}`
+                      : sourceUrl!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}
+                  >
                     ↗
                   </a>
                 )}

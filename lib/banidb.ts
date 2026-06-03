@@ -21,8 +21,8 @@ export type BaniDBVerse = {
     gurmukhi?: string;
   };
   raag: {
-    nameEnglish?: string;
-    nameGurmukhi?: string;
+    english?: string;
+    unicode?: string;
   };
 };
 

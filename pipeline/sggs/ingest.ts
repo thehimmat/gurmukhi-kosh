@@ -48,8 +48,8 @@ async function upsertShabad(db: ReturnType<typeof supabaseAdmin>, verse: BaniDBV
   const { error } = await db.from("shabads").upsert(
     {
       id: verse.shabadId,
-      raag_english: verse.raag?.nameEnglish ?? null,
-      raag_gurmukhi: verse.raag?.nameGurmukhi ?? null,
+      raag_english: verse.raag?.english ?? null,
+      raag_gurmukhi: verse.raag?.unicode ?? null,
       writer_english: verse.writer?.english ?? null,
       writer_id: verse.writer?.writerId ?? null,
       ang_start: verse.pageNo,
