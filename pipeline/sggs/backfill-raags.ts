@@ -19,21 +19,33 @@ const DELAY_MS = 150;
 async function main() {
   const db = supabaseAdmin();
 
-  // Get one representative ang per shabad (the lowest ang it appears on)
-  const { data: shabadAngs, error } = await db
-    .from("lines")
-    .select("shabad_id, ang")
-    .order("ang", { ascending: true });
+  // Get one representative ang per shabad (the lowest ang it appears on), via SQL to avoid row limits
+  const { data: shabadAngs, error } = await db.rpc("get_shabad_ang_map" as any);
+
+  // Fallback: if RPC doesn't exist, use a raw query approach via paginated fetch
+  let shabadToAng = new Map<number, number>();
 
   if (error || !shabadAngs) {
-    console.error("Failed to fetch shabad/ang pairs:", error?.message);
-    process.exit(1);
-  }
-
-  // Deduplicate — one ang per shabad_id
-  const shabadToAng = new Map<number, number>();
-  for (const row of shabadAngs) {
-    if (!shabadToAng.has(row.shabad_id)) shabadToAng.set(row.shabad_id, row.ang);
+    console.log("RPC not available, using paginated fetch...");
+    let page = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data: batch, error: batchErr } = await db
+        .from("lines")
+        .select("shabad_id, ang")
+        .order("ang", { ascending: true })
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+      if (batchErr || !batch || batch.length === 0) break;
+      for (const row of batch) {
+        if (!shabadToAng.has(row.shabad_id)) shabadToAng.set(row.shabad_id, row.ang);
+      }
+      if (batch.length < pageSize) break;
+      page++;
+    }
+  } else {
+    for (const row of shabadAngs as { shabad_id: number; ang: number }[]) {
+      shabadToAng.set(row.shabad_id, row.ang);
+    }
   }
 
   // Deduplicate angs — one fetch per ang covers all shabads on that ang

@@ -10,7 +10,8 @@
     "ingest:sggs": "tsx pipeline/sggs/ingest.ts",
     "ingest:sggs:range": "tsx pipeline/sggs/ingest.ts",
     "ingest:mahankosh": "tsx pipeline/mahan-kosh/ingest.ts",
-    "ingest:manual": "tsx pipeline/manual/ingest.ts"
+    "ingest:manual": "tsx pipeline/manual/ingest.ts",
+    "test": "vitest run tests/"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
@@ -26,6 +27,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.6"
   }
 }
