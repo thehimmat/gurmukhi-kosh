@@ -12,6 +12,7 @@
     "ingest:mahankosh": "tsx pipeline/mahan-kosh/ingest.ts",
     "ingest:manual": "tsx pipeline/manual/ingest.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
+    "pronounce": "tsx pipeline/pronounce/populate.ts",
     "test": "vitest run tests/"
   },
   "dependencies": {
