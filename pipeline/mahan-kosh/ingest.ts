@@ -151,17 +151,25 @@ async function main() {
     }
   }
 
+  // Dedupe by conflict key (word_id, sense_number): a malformed Mahan Kosh
+  // description can parse into two senses sharing a sense_number, which makes the
+  // batch upsert fail ("cannot affect row a second time"). Keep the last.
+  const byKey = new Map<string, DefRow>();
+  for (const r of rows) byKey.set(`${r.word_id}:${r.sense_number}`, r);
+  const dedupedRows = [...byKey.values()];
+
   console.log(
-    `\nUpserting ${rows.length} definition rows ` +
-      `(${skipped} words skipped — not in words table)...`
+    `\nUpserting ${dedupedRows.length} definition rows ` +
+      `(${rows.length - dedupedRows.length} duplicate senses collapsed, ` +
+      `${skipped} words skipped — not in words table)...`
   );
 
   const t0 = Date.now();
   let done = 0;
   let errors = 0;
 
-  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-    const batch = rows.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < dedupedRows.length; i += BATCH_SIZE) {
+    const batch = dedupedRows.slice(i, i + BATCH_SIZE);
     const { error } = await db
       .from("definitions")
       .upsert(batch, { onConflict: "word_id,dict_source_id,sense_number", ignoreDuplicates: false });
@@ -172,7 +180,7 @@ async function main() {
     }
 
     done += batch.length;
-    progress(done, rows.length, t0, "Defs ");
+    progress(done, dedupedRows.length, t0, "Defs ");
     if (i + BATCH_SIZE < rows.length) await sleep(20);
   }
 
