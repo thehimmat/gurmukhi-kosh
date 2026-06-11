@@ -28,6 +28,18 @@ export type Word = {
   id: number;
   gurmukhi: string;
   frequency: number;
+  ipa_display?: string | null;       // faithful display IPA (NOT the phonetic_ipa fuzzy key)
+  roman_iso15919?: string | null;
+  roman_practical?: string | null;
+};
+
+// Provenance + review fields present on every enrichment table (migration 003).
+export type Provenance =
+  | "scraped" | "imported" | "rule_derived" | "computed" | "ai_draft" | "human_verified";
+export type ReviewStatus = "unreviewed" | "approved" | "needs_work" | "rejected";
+export type Curated = {
+  provenance?: Provenance | null;
+  review_status?: ReviewStatus | null;
 };
 
 export type Shabad = {
@@ -83,7 +95,7 @@ export type DictSource = {
   ingested_at: string | null;
 };
 
-export type Definition = {
+export type Definition = Curated & {
   id: number;
   word_id: number;
   dict_source_id: number;
@@ -100,7 +112,7 @@ export type DefinitionWithSource = Definition & {
   dict_sources: DictSource | null;
 };
 
-export type Etymology = {
+export type Etymology = Curated & {
   id: number;
   word_id: number;
   order_index: number;
@@ -111,7 +123,7 @@ export type Etymology = {
   source_text: string | null;
 };
 
-export type WordGrammar = {
+export type WordGrammar = Curated & {
   id: number;
   word_id: number;
   definition_id: number | null;
@@ -120,6 +132,10 @@ export type WordGrammar = {
   number: string | null;
   gram_case: string | null;
   notes: string | null;
+  rule_code: string | null;
+  confidence: number | null;
+  person: string | null;
+  verb_form: string | null;
 };
 
 export type Lexeme = {

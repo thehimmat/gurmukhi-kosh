@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import type { DefinitionWithSource, Etymology, WordGrammar } from "@/lib/supabase";
+import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -89,13 +90,14 @@ export default async function WordPage({ params }: Props) {
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, word_grammar(*)")
+    .select("id, gurmukhi, frequency, ipa_display, word_grammar(*)")
     .eq("gurmukhi", word)
     .single();
 
   if (!wordRow) notFound();
 
   const wordId = wordRow.id;
+  const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
   const grammar = ((wordRow as unknown as { word_grammar: WordGrammar[] }).word_grammar ?? []);
 
   // Step 2: fire remaining queries in parallel
@@ -103,7 +105,7 @@ export default async function WordPage({ params }: Props) {
     // Definitions with source info
     supabase
       .from("definitions")
-      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, dict_sources(code, name, language, url)")
+      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
       .eq("word_id", wordId)
       .order("dict_source_id", { ascending: true })
       .order("sense_number", { ascending: true }),
@@ -155,12 +157,12 @@ export default async function WordPage({ params }: Props) {
   }
 
   // Group definitions by source
-  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; defs: DefinitionWithSource[] }>();
+  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
   for (const def of definitions) {
     const src = def.dict_sources as unknown as { code: string; name: string; url: string | null } | null;
     const key = src?.code ?? "unknown";
     if (!defsBySource.has(key)) {
-      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, defs: [] });
+      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, provenance: def.provenance ?? null, reviewStatus: def.review_status ?? null, defs: [] });
     }
     defsBySource.get(key)!.defs.push(def);
   }
@@ -214,6 +216,19 @@ export default async function WordPage({ params }: Props) {
         <h1 className="gurmukhi-xl" style={{ marginBottom: "0.25rem" }}>
           {word}
         </h1>
+        {ipaDisplay && (
+          <p
+            title="Display IPA (rule-derived from Gurmukhi phoneme rules)"
+            style={{
+              fontFamily: '"Inter", sans-serif',
+              color: "var(--text-secondary)",
+              fontSize: "1.05rem",
+              margin: "0.15rem 0 0.4rem",
+            }}
+          >
+            /{ipaDisplay}/
+          </p>
+        )}
         <span className="badge" style={{ marginTop: "0.5rem" }}>
           {wordRow.frequency.toLocaleString()} occurrences in SGGS
         </span>
@@ -246,13 +261,14 @@ export default async function WordPage({ params }: Props) {
       {defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
-          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, defs }]) => (
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, provenance, reviewStatus, defs }]) => (
             <div key={code} style={{ marginBottom: "1.25rem" }}>
               {/* Source name */}
-              <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
                   {sourceName}
                 </span>
+                <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />
                 {(sourceUrl || code === "mahan_kosh") && (
                   <a
                     href={code === "mahan_kosh"
