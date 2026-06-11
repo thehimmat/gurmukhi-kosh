@@ -99,9 +99,11 @@ async function main() {
   const gurmukhiSet = [...new Set(foundEntries.map((e) => e.gurmukhi))];
   console.log(`Resolving ${gurmukhiSet.length} unique words from DB...`);
 
+  // Resolve in small batches: a long `.in()` of Unicode headwords blows the
+  // GET URL length limit and surfaces as "fetch failed".
   const wordMap = new Map<string, number>();
-  for (let i = 0; i < gurmukhiSet.length; i += 1000) {
-    const batch = gurmukhiSet.slice(i, i + 1000);
+  for (let i = 0; i < gurmukhiSet.length; i += 100) {
+    const batch = gurmukhiSet.slice(i, i + 100);
     const { data, error } = await db
       .from("words")
       .select("id, gurmukhi")

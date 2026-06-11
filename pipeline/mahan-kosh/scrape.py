@@ -25,7 +25,7 @@ import requests
 
 OUTPUT_PATH = "pipeline/mahan-kosh/output/entries.jsonl"
 MK_API_BASE = "https://backend.searchgurbani.com/api/res/mahan-kosh/view"
-DELAY_S = 0.30   # polite delay between requests
+DELAY_S = 0.50   # polite delay between requests (backoff handles 429 bursts)
 PAGE_SIZE = 1000  # Supabase batch size
 
 
@@ -142,12 +142,22 @@ def lookup_word(word: str) -> dict | None:
       2. Normalized match: strip trailing short vowels from both sides
     """
     url = f"{MK_API_BASE}?keyword={requests.utils.quote(word)}&alpha=alpha&page=0"
-    try:
-        resp = SESSION.get(url, timeout=20)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        raise RuntimeError(f"API error for '{word}': {e}") from e
+    data = None
+    backoff = 2.0
+    for _ in range(4):
+        try:
+            resp = SESSION.get(url, timeout=20)
+            if resp.status_code == 429:  # rate limited — back off and retry
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            break
+        except Exception as e:
+            raise RuntimeError(f"API error for '{word}': {e}") from e
+    if data is None:
+        raise RuntimeError(f"API error for '{word}': rate-limited (429) after retries")
 
     lines = data.get("lines") or []
     if not lines:
