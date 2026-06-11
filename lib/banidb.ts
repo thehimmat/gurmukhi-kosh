@@ -46,3 +46,26 @@ export async function fetchShabad(shabadId: number) {
   if (!res.ok) throw new Error(`BaniDB fetch failed for shabad ${shabadId}: ${res.status}`);
   return res.json();
 }
+
+// A bani (e.g. Japji Sahib) groups verses across angs. Each entry nests the
+// verse under a `verse` key; `verseId` matches our `lines.verse_id`.
+export type BaniDBBaniVerse = {
+  verse: {
+    verseId: number;
+    pageNo: number;
+    lineNo: number;
+  };
+};
+
+export type BaniDBBani = {
+  baniInfo: unknown;
+  verses: BaniDBBaniVerse[];
+};
+
+export async function fetchBani(baniId: number): Promise<BaniDBBani> {
+  const res = await fetch(`${BASE_URL}/banis/${baniId}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`BaniDB fetch failed for bani ${baniId}: ${res.status}`);
+  return res.json();
+}

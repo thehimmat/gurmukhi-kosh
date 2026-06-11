@@ -22,6 +22,19 @@ export function parseArgs(defaults: { start?: number; end?: number; source?: str
   return { start, end, sourceCode };
 }
 
+/**
+ * Generic `--key=value` reader. Returns the value, "" for a bare `--key`,
+ * or undefined if absent. Used for flags like `--word-set=japji`, `--set=...`.
+ */
+export function getArg(name: string): string | undefined {
+  const prefix = `--${name}=`;
+  for (const arg of process.argv.slice(2)) {
+    if (arg.startsWith(prefix)) return arg.slice(prefix.length);
+    if (arg === `--${name}`) return "";
+  }
+  return undefined;
+}
+
 export function progress(current: number, total: number, startTime: number, label = "") {
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(0);
   const pct = ((current / total) * 100).toFixed(1);

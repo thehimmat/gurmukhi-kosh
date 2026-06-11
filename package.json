@@ -11,9 +11,11 @@
     "ingest:sggs:range": "tsx pipeline/sggs/ingest.ts",
     "ingest:mahankosh": "tsx pipeline/mahan-kosh/ingest.ts",
     "ingest:manual": "tsx pipeline/manual/ingest.ts",
+    "wordset:build": "tsx pipeline/word-sets/build.ts",
     "test": "vitest run tests/"
   },
   "dependencies": {
+    "@atthebunga/gurmukhi-input": "^1.1.1",
     "@supabase/supabase-js": "^2.106.1",
     "dotenv": "^17.4.2",
     "next": "16.2.6",
