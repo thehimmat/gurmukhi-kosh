@@ -3,10 +3,14 @@ import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import type { DefinitionWithSource, Etymology, WordGrammar } from "@/lib/supabase";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
+import { TabNav } from "@/components/word/TabNav";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ gurmukhi: string }> };
+type Props = {
+  params: Promise<{ gurmukhi: string }>;
+  searchParams: Promise<{ tab?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { gurmukhi } = await params;
@@ -83,8 +87,9 @@ function CrossRefTags({ refs }: { refs: Record<string, string> | null }) {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default async function WordPage({ params }: Props) {
+export default async function WordPage({ params, searchParams }: Props) {
   const { gurmukhi: encoded } = await params;
+  const { tab = "overview" } = await searchParams;
   const word = decodeURIComponent(encoded);
 
   // Step 1: fetch word + grammar together
@@ -233,6 +238,9 @@ export default async function WordPage({ params }: Props) {
           {wordRow.frequency.toLocaleString()} occurrences in SGGS
         </span>
       </div>
+
+      {/* ── Tab Navigation ── */}
+      <TabNav gurmukhi={word} currentTab={tab} />
 
       {/* ── 2. Morphological variants ── */}
       {morphForms.length > 0 && (
