@@ -85,6 +85,14 @@ function CrossRefTags({ refs }: { refs: Record<string, string> | null }) {
   );
 }
 
+function EmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ color: "var(--text-secondary)", fontStyle: "italic", fontFamily: '"Inter", sans-serif', fontSize: "0.95rem", padding: "1rem 0" }}>
+      {children}
+    </p>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function WordPage({ params, searchParams }: Props) {
@@ -95,7 +103,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, ipa_display, word_grammar(*)")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*)")
     .eq("gurmukhi", word)
     .single();
 
@@ -103,6 +111,8 @@ export default async function WordPage({ params, searchParams }: Props) {
 
   const wordId = wordRow.id;
   const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
+  const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
+  const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
   const grammar = ((wordRow as unknown as { word_grammar: WordGrammar[] }).word_grammar ?? []);
 
   // Step 2: fire remaining queries in parallel
@@ -242,8 +252,8 @@ export default async function WordPage({ params, searchParams }: Props) {
       {/* ── Tab Navigation ── */}
       <TabNav gurmukhi={word} currentTab={tab} />
 
-      {/* ── 2. Morphological variants ── */}
-      {morphForms.length > 0 && (
+      {/* ── 2. Morphological variants (overview) ── */}
+      {tab === "overview" && morphForms.length > 0 && (
         <section style={{ marginBottom: "2rem" }}>
           <SectionHeading>Forms</SectionHeading>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
@@ -265,8 +275,8 @@ export default async function WordPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* ── 3. Definitions ── */}
-      {defsBySource.size > 0 && (
+      {/* ── 3. Definitions (overview + meanings) ── */}
+      {(tab === "overview" || tab === "meanings") && defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
           {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, provenance, reviewStatus, defs }]) => (
@@ -317,8 +327,45 @@ export default async function WordPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* ── 4. Grammar ── */}
-      {grammar.length > 0 && (
+      {/* ── Meanings empty state ── */}
+      {tab === "meanings" && defsBySource.size === 0 && (
+        <EmptyState>No dictionary definitions ingested for this word yet.</EmptyState>
+      )}
+
+      {/* ── Pronunciation (overview + pronunciation) ── */}
+      {(tab === "overview" || tab === "pronunciation") && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Pronunciation</SectionHeading>
+          <div style={CARD}>
+            {ipaDisplay ? (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: romanIso || romanPractical ? "0.5rem" : 0 }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>IPA</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "1.05rem" }}>/{ipaDisplay}/</span>
+              </div>
+            ) : (
+              <EmptyState>No IPA generated yet.</EmptyState>
+            )}
+            {romanIso && (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: romanPractical ? "0.5rem" : 0 }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>ISO 15919</span>
+                <span style={{ fontStyle: "italic" }}>{romanIso}</span>
+              </div>
+            )}
+            {romanPractical && (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline" }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>Practical</span>
+                <span style={{ fontStyle: "italic" }}>{romanPractical}</span>
+              </div>
+            )}
+          </div>
+          {tab === "pronunciation" && (
+            <EmptyState>Audio pronunciation is planned for a later phase.</EmptyState>
+          )}
+        </section>
+      )}
+
+      {/* ── 4. Grammar (grammar tab) ── */}
+      {tab === "grammar" && grammar.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Grammar</SectionHeading>
           {grammar.map((g) => (
@@ -353,8 +400,13 @@ export default async function WordPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* ── 5. Etymology ── */}
-      {etymology.length > 0 && (
+      {/* ── Grammar empty state ── */}
+      {tab === "grammar" && grammar.length === 0 && (
+        <EmptyState>No grammatical analysis yet. Rule-based grammar candidates arrive in a later phase.</EmptyState>
+      )}
+
+      {/* ── 5. Etymology (etymology tab) ── */}
+      {tab === "etymology" && etymology.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Etymology</SectionHeading>
           <div style={CARD}>
@@ -384,7 +436,21 @@ export default async function WordPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* ── 6. Occurrences ── */}
+      {/* ── Etymology empty state ── */}
+      {tab === "etymology" && etymology.length === 0 && (
+        <EmptyState>No etymology recorded yet. Cross-dictionary roots (Sanskrit, Farsi, Arabic) arrive in a later phase.</EmptyState>
+      )}
+
+      {/* ── Usage (usage tab) ── */}
+      {tab === "usage" && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Common phrases &amp; collocations</SectionHeading>
+          <EmptyState>Collocations and writer-usage stats are computed in this phase once the collocation job has run corpus-wide.</EmptyState>
+        </section>
+      )}
+
+      {/* ── 6. Occurrences (occurrences tab) ── */}
+      {tab === "occurrences" && (
       <section>
         <SectionHeading>
           Occurrences in Sri Guru Granth Sahib Ji
@@ -438,6 +504,29 @@ export default async function WordPage({ params, searchParams }: Props) {
           </div>
         ))}
       </section>
+      )}
+
+      {/* ── 7. Sources & provenance (sources tab) ── */}
+      {tab === "sources" && (
+        <section>
+          <SectionHeading>Sources &amp; provenance</SectionHeading>
+          {defsBySource.size === 0 ? (
+            <EmptyState>No sourced data yet for this word.</EmptyState>
+          ) : (
+            Array.from(defsBySource.entries()).map(([key, group]) => (
+              <div key={key} style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                <div>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>{group.sourceName}</span>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", marginLeft: "0.5rem" }}>
+                    {group.defs.length} {group.defs.length === 1 ? "sense" : "senses"}
+                  </span>
+                </div>
+                <ProvenanceBadge provenance={group.provenance} reviewStatus={group.reviewStatus} />
+              </div>
+            ))
+          )}
+        </section>
+      )}
     </div>
   );
 }
