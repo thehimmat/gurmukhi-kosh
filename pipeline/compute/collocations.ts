@@ -103,9 +103,53 @@ export function filterCollocationsByPMI(
   return minFiltered.filter((c) => kept.has(`${c.word_a_id}:${c.word_b_id}`));
 }
 
+interface Occurrence {
+  word_id: number;
+  line_id: number;
+  position: number;
+}
+
 /**
- * Main job: compute bigrams + collocations for all SGGS lines.
- * Populates bigrams and collocations tables. Lazy-loads Supabase client.
+ * Page through an entire table with .range(). Supabase caps each response at
+ * ~1000 rows, so a bare .select() silently truncates large tables — this loops
+ * until a short page is returned.
+ */
+async function fetchAllRows<T>(
+  build: () => any,
+  pageSize = 1000
+): Promise<T[]> {
+  const all: T[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await build().range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+  }
+  return all;
+}
+
+/** Upsert in bounded chunks so a single request never exceeds payload limits. */
+async function upsertInChunks(
+  supabase: any,
+  table: string,
+  rows: any[],
+  onConflict: string,
+  chunk = 500
+): Promise<void> {
+  for (let i = 0; i < rows.length; i += chunk) {
+    const { error } = await supabase
+      .from(table)
+      .upsert(rows.slice(i, i + chunk), { onConflict, ignoreDuplicates: false });
+    if (error) throw error;
+  }
+}
+
+/**
+ * Main job: compute bigrams + collocations for the whole corpus.
+ * Fetches every word occurrence (paginated), groups by line, tallies pairs and
+ * per-word frequencies in one pass, then upserts bigrams (count ≥ 3) and the
+ * top collocations (PMI, count ≥ 5). Lazy-loads the Supabase client.
  */
 export async function computeCollocationsCorpusWide() {
   const { createClient } = await import('@supabase/supabase-js');
@@ -114,110 +158,71 @@ export async function computeCollocationsCorpusWide() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  console.log('Computing bigrams and collocations for SGGS...');
+  console.log('Fetching all word occurrences (paginated)...');
+  const occs = await fetchAllRows<Occurrence>(() =>
+    supabase
+      .from('word_occurrences')
+      .select('word_id, line_id, position')
+      .order('line_id', { ascending: true })
+      .order('position', { ascending: true })
+  );
+  console.log(`Fetched ${occs.length} occurrences across the corpus.`);
 
-  const { data: lineData, error: lineError } = await supabase
-    .from('lines')
-    .select('id, shabad_id')
-    .limit(10000);
+  // Group by line (rows arrive ordered by line_id, position) and tally per-word
+  // frequencies + total token count in the same pass.
+  const byLine = new Map<number, WordPosition[]>();
+  const wordFreqs = new Map<number, number>();
+  for (const o of occs) {
+    let arr = byLine.get(o.line_id);
+    if (!arr) { arr = []; byLine.set(o.line_id, arr); }
+    arr.push({ word_id: o.word_id, position: o.position });
+    wordFreqs.set(o.word_id, (wordFreqs.get(o.word_id) || 0) + 1);
+  }
+  const totalTokens = occs.length;
 
-  if (lineError) throw lineError;
-
-  const bigramBatch: BigramRow[] = [];
   const bigramCounts = new Map<string, number>();
   const collocationCounts = new Map<string, number>();
-
-  for (const line of lineData || []) {
-    const { data: occurrences, error: occError } = await supabase
-      .from('word_occurrences')
-      .select('word_id, position')
-      .eq('line_id', line.id)
-      .order('position', { ascending: true });
-
-    if (occError) throw occError;
-
-    const wordPositions = (occurrences || []).map((o: any) => ({
-      word_id: o.word_id,
-      position: o.position,
-    }));
-
-    const bigrams = extractBigrams(wordPositions);
-    for (const b of bigrams) {
+  for (const wordPositions of byLine.values()) {
+    for (const b of extractBigrams(wordPositions)) {
       const key = `${b.w1_id}:${b.w2_id}`;
       bigramCounts.set(key, (bigramCounts.get(key) || 0) + 1);
     }
-
-    const collocations = extractCollocations(wordPositions, 3);
-    for (const c of collocations) {
+    for (const c of extractCollocations(wordPositions, 3)) {
       const key = `${c.word_a_id}:${c.word_b_id}`;
       collocationCounts.set(key, (collocationCounts.get(key) || 0) + 1);
     }
   }
 
-  for (const [key] of bigramCounts) {
+  // Bigrams: keep recurrent pairs (count ≥ 3) and store the count.
+  const bigramBatch: Array<{ w1_id: number; w2_id: number; pair_count: number }> = [];
+  for (const [key, pair_count] of bigramCounts) {
+    if (pair_count < 3) continue;
     const [w1_id, w2_id] = key.split(':').map(Number);
-    bigramBatch.push({ w1_id, w2_id });
+    bigramBatch.push({ w1_id, w2_id, pair_count });
   }
 
-  const wordFreqs = await fetchWordFrequencies(supabase);
-  const totalPairs = (lineData || []).length;
-
+  // Collocations: PMI from true corpus-wide frequencies, then top-50/word, count ≥ 5.
   const collocationWithPMI = [];
   for (const [key, pair_count] of collocationCounts) {
     const [word_a_id, word_b_id] = key.split(':').map(Number);
-    const count_a = wordFreqs.get(word_a_id) || 1;
-    const count_b = wordFreqs.get(word_b_id) || 1;
     const pmi = computePMI({
       pair_count,
-      count_a,
-      count_b,
-      total: totalPairs,
+      count_a: wordFreqs.get(word_a_id) || 1,
+      count_b: wordFreqs.get(word_b_id) || 1,
+      total: totalTokens,
     });
-    collocationWithPMI.push({
-      word_a_id,
-      word_b_id,
-      window_size: 3,
-      pair_count,
-      pmi,
-    });
+    collocationWithPMI.push({ word_a_id, word_b_id, window_size: 3, pair_count, pmi });
   }
-
   const filtered = filterCollocationsByPMI(collocationWithPMI, 50, 5);
 
-  console.log(`Upserting ${bigramBatch.length} bigrams...`);
-  if (bigramBatch.length > 0) {
-    const { error: bigramError } = await supabase
-      .from('bigrams')
-      .upsert(bigramBatch, { onConflict: 'w1_id,w2_id', ignoreDuplicates: false });
-    if (bigramError) throw bigramError;
-  }
+  console.log(`Upserting ${bigramBatch.length} bigrams (count >= 3)...`);
+  await upsertInChunks(supabase, 'bigrams', bigramBatch, 'w1_id,w2_id');
 
   console.log(`Upserting ${filtered.length} collocations...`);
-  if (filtered.length > 0) {
-    const { error: collError } = await supabase
-      .from('collocations')
-      .upsert(filtered, {
-        onConflict: 'word_a_id,word_b_id,window_size',
-        ignoreDuplicates: false,
-      });
-    if (collError) throw collError;
-  }
+  await upsertInChunks(supabase, 'collocations', filtered, 'word_a_id,word_b_id,window_size');
 
-  console.log('Done. Refreshing computed stats...');
+  console.log('Refreshing computed stats...');
   const { error: refreshError } = await supabase.rpc('refresh_computed_stats');
   if (refreshError) throw refreshError;
-}
-
-async function fetchWordFrequencies(supabase: any): Promise<Map<number, number>> {
-  const { data, error } = await supabase
-    .from('word_occurrences')
-    .select('word_id');
-
-  if (error) throw error;
-
-  const freqs = new Map<number, number>();
-  for (const row of data || []) {
-    freqs.set(row.word_id, (freqs.get(row.word_id) || 0) + 1);
-  }
-  return freqs;
+  console.log('Done.');
 }

@@ -1,4 +1,7 @@
+import { config } from 'dotenv';
 import { computeCollocationsCorpusWide } from './collocations';
+
+config({ path: '.env.local' });
 
 async function main() {
   try {
