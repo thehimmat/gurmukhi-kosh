@@ -65,8 +65,8 @@ pipeline/
 ## Shared Gurmukhi Input Package
 Keyboard transliteration lives in the suite-level shared package.
 
-- Package: `@gurmukhi/input` — linked via npm workspaces from `../shared/gurmukhi-input/`
-- Import: `import { useGurmukhiInput, GurmukhiInput } from '@gurmukhi/input'`
+- Package: `@atthebunga/gurmukhi-input` — linked via npm workspaces from `../shared/gurmukhi-input/`
+- Import: `import { useGurmukhiInput, GurmukhiInput } from '@atthebunga/gurmukhi-input'`
 - Source files: `../shared/gurmukhi-input/` (keymap, hook, component)
 - To modify the keyboard mapping: edit `../shared/gurmukhi-input/keymap.ts`
 - The search input on `app/page.tsx` uses `useGurmukhiInput` — transliteration is always-on.

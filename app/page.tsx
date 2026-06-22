@@ -3,12 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Word } from "@/lib/supabase";
+import { useGurmukhiInput } from "@atthebunga/gurmukhi-input";
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Word[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { onKeyDown: gurmukhiKeyDown, onPaste: gurmukhiPaste } = useGurmukhiInput({
+    value: query,
+    onChange: setQuery,
+  });
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -67,6 +72,8 @@ export default function HomePage() {
           className="gurmukhi"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={gurmukhiKeyDown}
+          onPaste={gurmukhiPaste}
           placeholder="ਸ਼ਬਦ ਖੋਜੋ — search a word…"
           autoFocus
           style={{
