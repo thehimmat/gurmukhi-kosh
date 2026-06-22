@@ -218,6 +218,35 @@ export default async function WordPage({ params, searchParams }: Props) {
     conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
   };
 
+  // Usage tab: common phrases (bigrams) + statistical collocations. Fetch the
+  // pair rows, then resolve partner word_ids to Gurmukhi in one follow-up query.
+  let phrases: Array<{ w1: string; w2: string; count: number }> = [];
+  let collocates: Array<{ partner: string; count: number; pmi: number | null }> = [];
+  if (tab === "usage") {
+    const [bgRes, colRes] = await Promise.all([
+      supabase.from("bigrams").select("w1_id, w2_id, pair_count")
+        .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
+        .order("pair_count", { ascending: false }).limit(15),
+      supabase.from("collocations").select("word_a_id, word_b_id, pair_count, pmi")
+        .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
+        .order("pmi", { ascending: false }).limit(15),
+    ]);
+    const bgRows = (bgRes.data ?? []) as Array<{ w1_id: number; w2_id: number; pair_count: number }>;
+    const colRows = (colRes.data ?? []) as Array<{ word_a_id: number; word_b_id: number; pair_count: number; pmi: number | null }>;
+    const partnerIds = new Set<number>();
+    for (const r of bgRows) { partnerIds.add(r.w1_id); partnerIds.add(r.w2_id); }
+    for (const r of colRows) { partnerIds.add(r.word_a_id); partnerIds.add(r.word_b_id); }
+    const { data: partnerWords } = partnerIds.size
+      ? await supabase.from("words").select("id, gurmukhi").in("id", [...partnerIds])
+      : { data: [] };
+    const idToGur = new Map(((partnerWords ?? []) as Array<{ id: number; gurmukhi: string }>).map((w) => [w.id, w.gurmukhi]));
+    phrases = bgRows.map((r) => ({ w1: idToGur.get(r.w1_id) ?? "?", w2: idToGur.get(r.w2_id) ?? "?", count: r.pair_count }));
+    collocates = colRows.map((r) => {
+      const partnerId = r.word_a_id === wordId ? r.word_b_id : r.word_a_id;
+      return { partner: idToGur.get(partnerId) ?? "?", count: r.pair_count, pmi: r.pmi };
+    });
+  }
+
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
 
@@ -443,10 +472,48 @@ export default async function WordPage({ params, searchParams }: Props) {
 
       {/* ── Usage (usage tab) ── */}
       {tab === "usage" && (
-        <section style={{ marginBottom: "2.5rem" }}>
-          <SectionHeading>Common phrases &amp; collocations</SectionHeading>
-          <EmptyState>Collocations and writer-usage stats are computed in this phase once the collocation job has run corpus-wide.</EmptyState>
-        </section>
+        <>
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Common phrases</SectionHeading>
+            {phrases.length === 0 ? (
+              <EmptyState>No recurring two-word phrases for this word.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {phrases.map((p, i) => (
+                  <div key={i} style={{ ...CARD, marginBottom: 0, display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "0.6rem 1rem" }}>
+                    <span className="gurmukhi" style={{ fontSize: "1.2rem" }}>
+                      <span style={{ color: p.w1 === word ? "var(--accent)" : "inherit", fontWeight: p.w1 === word ? 600 : 400 }}>{p.w1}</span>
+                      {" "}
+                      <span style={{ color: p.w2 === word ? "var(--accent)" : "inherit", fontWeight: p.w2 === word ? 600 : 400 }}>{p.w2}</span>
+                    </span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>{p.count}×</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Frequently appears near</SectionHeading>
+            {collocates.length === 0 ? (
+              <EmptyState>No strong collocations (within 3 words) for this word.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                {collocates.map((c, i) => (
+                  <a
+                    key={i}
+                    href={`/word/${encodeURIComponent(c.partner)}`}
+                    title={`${c.count}× nearby${c.pmi != null ? ` · PMI ${c.pmi.toFixed(1)}` : ""}`}
+                    style={{ ...CARD, marginBottom: 0, padding: "0.4rem 0.8rem", textDecoration: "none", display: "inline-flex", alignItems: "baseline", gap: "0.4rem" }}
+                  >
+                    <span className="gurmukhi" style={{ fontSize: "1.1rem", color: "var(--accent)" }}>{c.partner}</span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}>{c.count}×</span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
       )}
 
       {/* ── 6. Occurrences (occurrences tab) ── */}
