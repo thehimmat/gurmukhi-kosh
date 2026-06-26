@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ gurmukhi: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -97,7 +97,9 @@ function EmptyState({ children }: { children: React.ReactNode }) {
 
 export default async function WordPage({ params, searchParams }: Props) {
   const { gurmukhi: encoded } = await params;
-  const { tab = "overview" } = await searchParams;
+  const { tab = "overview", page: pageParam } = await searchParams;
+  const OCC_PAGE_SIZE = 50;
+  const occPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const word = decodeURIComponent(encoded);
 
   // Step 1: fetch word + grammar together
@@ -144,7 +146,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       `)
       .eq("word_id", wordId)
       .order("id", { ascending: true })
-      .limit(100),
+      .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1),
 
     // Morphological variants: find the lexeme this word belongs to (if any)
     supabase
@@ -222,14 +224,20 @@ export default async function WordPage({ params, searchParams }: Props) {
   // pair rows, then resolve partner word_ids to Gurmukhi in one follow-up query.
   let phrases: Array<{ w1: string; w2: string; count: number }> = [];
   let collocates: Array<{ partner: string; count: number; pmi: number | null }> = [];
+  let writerStats: Array<{ writer: string; count: number }> = [];
   if (tab === "usage") {
-    const [bgRes, colRes] = await Promise.all([
+    const [bgRes, colRes, wsRes] = await Promise.all([
       supabase.from("bigrams").select("w1_id, w2_id, pair_count")
         .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
         .order("pair_count", { ascending: false }).limit(15),
       supabase.from("collocations").select("word_a_id, word_b_id, pair_count, pmi")
         .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
         .order("pmi", { ascending: false }).limit(15),
+      // writer_english requires migration 008; before it is applied this errors
+      // and degrades to an empty list (we only read .data).
+      supabase.from("word_writer_stats").select("writer_english, occurrence_count")
+        .eq("word_id", wordId)
+        .order("occurrence_count", { ascending: false }).limit(8),
     ]);
     const bgRows = (bgRes.data ?? []) as Array<{ w1_id: number; w2_id: number; pair_count: number }>;
     const colRows = (colRes.data ?? []) as Array<{ word_a_id: number; word_b_id: number; pair_count: number; pmi: number | null }>;
@@ -245,6 +253,9 @@ export default async function WordPage({ params, searchParams }: Props) {
       const partnerId = r.word_a_id === wordId ? r.word_b_id : r.word_a_id;
       return { partner: idToGur.get(partnerId) ?? "?", count: r.pair_count, pmi: r.pmi };
     });
+    writerStats = ((wsRes.data ?? []) as Array<{ writer_english: string | null; occurrence_count: number }>)
+      .filter((r) => r.writer_english)
+      .map((r) => ({ writer: r.writer_english!, count: r.occurrence_count }));
   }
 
   return (
@@ -513,6 +524,22 @@ export default async function WordPage({ params, searchParams }: Props) {
               </div>
             )}
           </section>
+
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Most used by</SectionHeading>
+            {writerStats.length === 0 ? (
+              <EmptyState>No writer breakdown available yet.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {writerStats.map((ws, i) => (
+                  <div key={i} style={{ ...CARD, marginBottom: 0, display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "0.6rem 1rem" }}>
+                    <span style={{ fontFamily: '"Inter", sans-serif' }}>{ws.writer}</span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>{ws.count.toLocaleString()}×</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </>
       )}
 
@@ -521,9 +548,9 @@ export default async function WordPage({ params, searchParams }: Props) {
       <section>
         <SectionHeading>
           Occurrences in Sri Guru Granth Sahib Ji
-          {rows.length >= 100 && (
+          {wordRow.frequency > 0 && (
             <span style={{ fontWeight: 400, marginLeft: "0.5rem", textTransform: "none", letterSpacing: 0 }}>
-              (showing first 100)
+              ({((occPage - 1) * OCC_PAGE_SIZE + 1).toLocaleString()}–{Math.min(occPage * OCC_PAGE_SIZE, wordRow.frequency).toLocaleString()} of {wordRow.frequency.toLocaleString()})
             </span>
           )}
         </SectionHeading>
@@ -570,6 +597,20 @@ export default async function WordPage({ params, searchParams }: Props) {
             })}
           </div>
         ))}
+
+        {wordRow.frequency > OCC_PAGE_SIZE && (
+          <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", fontFamily: '"Inter", sans-serif', fontSize: "0.9rem" }}>
+            {occPage > 1 ? (
+              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage - 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>← Previous</a>
+            ) : <span />}
+            <span style={{ color: "var(--text-secondary)" }}>
+              Page {occPage} of {Math.max(1, Math.ceil(wordRow.frequency / OCC_PAGE_SIZE)).toLocaleString()}
+            </span>
+            {occPage * OCC_PAGE_SIZE < wordRow.frequency ? (
+              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage + 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>Next →</a>
+            ) : <span />}
+          </nav>
+        )}
       </section>
       )}
 
