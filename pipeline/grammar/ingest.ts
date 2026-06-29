@@ -24,7 +24,7 @@ config({ path: ".env.local" });
 import { supabaseAdmin } from "../shared/db";
 import { fetchWordSet } from "../shared/word-sets";
 import { getArg, progress } from "../shared/utils";
-import { buildGrammar } from "./build";
+import { buildGrammar, buildInheritedGrammar } from "./build";
 import { groupLexemes } from "./lexeme";
 import { stem } from "./viakaran";
 
@@ -88,14 +88,56 @@ async function main() {
     provenance: string;
   };
   const grammarRows: GrammarInsert[] = [];
+  const primaryPosByWord = new Map<number, string>();
   for (const m of members) {
     const senses = sensesByWord.get(m.word_id);
     if (!senses?.length) continue;
-    for (const g of buildGrammar(m.gurmukhi, senses)) {
+    const rows = buildGrammar(m.gurmukhi, senses);
+    for (const g of rows) {
       grammarRows.push({ word_id: m.word_id, ...g, provenance: PROVENANCE });
     }
+    if (rows[0]?.pos) primaryPosByWord.set(m.word_id, rows[0].pos);
   }
-  console.log(`Grammar rows to write: ${grammarRows.length}`);
+  const directCount = grammarRows.length;
+
+  // Group the set's surface forms into lexemes (by shared stem) up front: the
+  // grouping is the inheritance source below as well as the lexeme/word_forms data.
+  const groups = groupLexemes(members.map((m) => m.gurmukhi));
+
+  // Inheritance pass: an inflected form with no marker of its own (e.g. ਹੁਕਮਿ)
+  // inherits its POS from its lexeme root, then takes its own case/number from
+  // the form. The stem grouping is more reliable than Mahan Kosh "ਦੇਖੋ" redirects,
+  // which can point sideways to a derived word (ਹੁਕਮਿ redirects to the adjective
+  // ਹੁਕਮੀ, not the base noun ਹੁਕਮ).
+  let inheritedCount = 0;
+  for (const grp of groups) {
+    // The group's POS: prefer the stem/root form's direct POS, else any member's.
+    const rootForm = grp.forms.find((f) => f.gurmukhi === grp.stem)?.gurmukhi;
+    const rootWordId = rootForm != null ? wordIdByForm.get(rootForm) : undefined;
+    let groupPos = rootWordId != null ? primaryPosByWord.get(rootWordId) : undefined;
+    if (!groupPos) {
+      for (const f of grp.forms) {
+        const p = primaryPosByWord.get(wordIdByForm.get(f.gurmukhi)!);
+        if (p) {
+          groupPos = p;
+          break;
+        }
+      }
+    }
+    if (!groupPos) continue;
+
+    for (const f of grp.forms) {
+      const wid = wordIdByForm.get(f.gurmukhi)!;
+      if (primaryPosByWord.has(wid)) continue; // already has a direct POS
+      const g = buildInheritedGrammar(f.gurmukhi, groupPos, grp.stem);
+      grammarRows.push({ word_id: wid, ...g, provenance: PROVENANCE });
+      primaryPosByWord.set(wid, groupPos); // avoid double-inheriting within a group
+      inheritedCount++;
+    }
+  }
+  console.log(
+    `Grammar rows to write: ${grammarRows.length} (${directCount} direct, ${inheritedCount} inherited)`
+  );
 
   // Idempotent replace: drop only rule-derived rows for this set's words.
   const { error: delGramErr } = await db
@@ -122,8 +164,7 @@ async function main() {
   }
   console.log("");
 
-  // 3. Build lexemes + word_forms by grouping the set's surface forms by stem.
-  const groups = groupLexemes(members.map((m) => m.gurmukhi));
+  // 3. Build lexemes + word_forms from the groups computed above.
   console.log(`Lexeme groups (>=2 related forms): ${groups.length}`);
 
   // Resolve a root_word_id per group: prefer the member whose form equals the
