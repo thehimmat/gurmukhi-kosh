@@ -44,7 +44,7 @@ function grammarRowForPos(
     const notes = [form.notes, extraNote].filter(Boolean).join(' ') || null;
     return {
       pos,
-      gender: null,
+      gender: form.gender,
       number: form.number,
       gram_case: form.gram_case,
       rule_code: form.rule_code,

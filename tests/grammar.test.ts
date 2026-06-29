@@ -27,12 +27,21 @@ describe('viakaran', () => {
   });
 
   describe('analyzeNounForm', () => {
-    it('ਨਾਮੁ (aunkar) → nominative singular', () => {
+    it('ਨਾਮੁ (aunkar) → nominative singular, masculine', () => {
       const a = analyzeNounForm('ਨਾਮੁ');
       expect(a.gram_case).toBe('nominative');
       expect(a.number).toBe('singular');
+      expect(a.gender).toBe('masculine');
       expect(a.rule_code).toBe('AUNKAR_NOM_SG');
       expect(a.confidence).toBeGreaterThan(0.7);
+    });
+
+    it('does not guess gender for an oblique form (sihari)', () => {
+      expect(analyzeNounForm('ਹੁਕਮਿ').gender).toBeNull();
+    });
+
+    it('does not guess gender for a mukta form', () => {
+      expect(analyzeNounForm('ਗੁਰ').gender).toBeNull();
     });
 
     it('ਹੁਕਮੁ (aunkar) → nominative singular', () => {

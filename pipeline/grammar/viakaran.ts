@@ -63,6 +63,7 @@ export function stem(gurmukhi: string): string {
 export interface FormAnalysis {
   gram_case: string | null; // 'nominative' | 'oblique' | 'vocative' | null
   number: string | null; // 'singular' | 'plural' | null
+  gender: string | null; // 'masculine' | 'feminine' | null
   rule_code: string | null;
   confidence: number; // 0..1
   notes?: string;
@@ -71,6 +72,7 @@ export interface FormAnalysis {
 const UNDECIDED: FormAnalysis = {
   gram_case: null,
   number: null,
+  gender: null,
   rule_code: null,
   confidence: 0.2,
   notes: 'No high-confidence Viakaran rule matched this ending.',
@@ -87,9 +89,14 @@ export function analyzeNounForm(gurmukhi: string): FormAnalysis {
 
   switch (vowel) {
     case 'ੁ': // ੁ aunkar → nominative (kartaa kaarak) singular masc.
+      // The aunkar-ending nominative singular is the canonical masculine noun
+      // form, so gender is reliably masculine here. Other endings are ambiguous
+      // for gender (Mahan Kosh carries no gender marker in this corpus), so we
+      // decline rather than guess.
       return {
         gram_case: 'nominative',
         number: 'singular',
+        gender: 'masculine',
         rule_code: 'AUNKAR_NOM_SG',
         confidence: 0.85,
         notes: 'Final aunkar marks the nominative singular of a masculine noun.',
@@ -99,6 +106,7 @@ export function analyzeNounForm(gurmukhi: string): FormAnalysis {
       return {
         gram_case: 'oblique',
         number: 'singular',
+        gender: null,
         rule_code: 'SIHARI_OBL_SG',
         confidence: 0.8,
         notes: 'Final sihari marks an oblique singular (instrumental/locative sense).',
@@ -108,6 +116,7 @@ export function analyzeNounForm(gurmukhi: string): FormAnalysis {
       return {
         gram_case: 'oblique',
         number: 'singular',
+        gender: null,
         rule_code: 'MUKTA_OBL_SG',
         confidence: 0.7,
         notes: 'Mukta (bare) form is oblique singular, often preceding a sambandhak.',

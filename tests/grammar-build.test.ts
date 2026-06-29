@@ -12,16 +12,22 @@ const verb = (g = '') => ({ definition_text: `ਕ੍ਰਿ- ${g}` });
 const particle = (g = '') => ({ definition_text: `ਵ੍ਯ- ${g}` });
 
 describe('buildGrammar', () => {
-  it('ਨਾਮੁ as a noun → nominative singular row', () => {
+  it('ਨਾਮੁ as a noun → nominative singular masculine row', () => {
     const rows = buildGrammar('ਨਾਮੁ', [noun('ਪ੍ਰਭੂ ਦਾ ਨਾਮ')]);
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       pos: 'noun',
       gram_case: 'nominative',
       number: 'singular',
+      gender: 'masculine',
       rule_code: 'AUNKAR_NOM_SG',
     });
     expect(rows[0].confidence).toBeGreaterThan(0.6);
+  });
+
+  it('does not assign gender to a verb', () => {
+    const rows = buildGrammar('ਲਿਖਿ', [verb('ਲਿਖਣਾ')]);
+    expect(rows[0].gender).toBeNull();
   });
 
   it('ਹੁਕਮਿ as a noun → oblique singular row', () => {
