@@ -11,6 +11,7 @@
     "ingest:sggs:range": "tsx pipeline/sggs/ingest.ts",
     "ingest:mahankosh": "tsx pipeline/mahan-kosh/ingest.ts",
     "ingest:manual": "tsx pipeline/manual/ingest.ts",
+    "ingest:grammar": "tsx pipeline/grammar/ingest.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",
     "compute:collocations": "tsx pipeline/compute/run.ts",
