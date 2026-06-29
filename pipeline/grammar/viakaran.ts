@@ -48,6 +48,18 @@ export function finalVowel(gurmukhi: string): string | null {
   return null;
 }
 
+/**
+ * Returns the consonant stem of a form by stripping its final vowel sign and any
+ * trailing nasal/gemination marks. Internal vowels are preserved. Inflected forms
+ * of one lexeme share a stem (ਹੁਕਮੁ / ਹੁਕਮਿ / ਹੁਕਮ → ਹੁਕਮ).
+ */
+export function stem(gurmukhi: string): string {
+  const chars = Array.from(gurmukhi.trim());
+  while (chars.length && TRAILING_MARKS.has(chars[chars.length - 1])) chars.pop();
+  if (chars.length && VOWEL_SIGNS.has(chars[chars.length - 1])) chars.pop();
+  return chars.join('');
+}
+
 export interface FormAnalysis {
   gram_case: string | null; // 'nominative' | 'oblique' | 'vocative' | null
   number: string | null; // 'singular' | 'plural' | null
