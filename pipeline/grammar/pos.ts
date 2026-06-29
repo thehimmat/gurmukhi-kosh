@@ -25,22 +25,30 @@ export interface PosResult {
   confidence: number;
 }
 
-// Strip an optional leading Gurmukhi/Arabic sense number and surrounding
-// whitespace/punctuation so "੨. ਸੰਗ੍ਯਾ- …" resolves the same as "ਸੰਗ੍ਯਾ- …".
-const LEADING_NUMBER_RE = /^[\s੦-੯0-9]+[.)\s]+/;
+// A POS marker is a known abbreviation written as a standalone token followed by
+// a hyphen ("…ਸੰਗ੍ਯਾ- …"). It may not lead the sense: Mahan Kosh often redirects
+// an inflected form first ("ਦੇਖੋ, ਸਚ. ਸੰਗ੍ਯਾ- …"), so we scan for the earliest
+// known marker rather than only inspecting the leading token. Requiring a
+// non-Gurmukhi boundary before the marker and a hyphen after keeps this precise.
+const GURMUKHI = '਀-੿';
 
 /**
- * Returns the part of speech implied by a Mahan Kosh sense's leading marker,
- * or null if the sense has no recognized POS marker.
+ * Returns the part of speech implied by the earliest Mahan Kosh POS marker in the
+ * sense, or null if none is present. A pure redirect such as "ਦੇਖੋ, ਨਾਮ." (no
+ * marker on the surface form) yields null.
  */
 export function parsePosFromDefinition(definitionText: string): PosResult | null {
-  const text = definitionText.trim().replace(LEADING_NUMBER_RE, '');
-  const dash = text.indexOf('-');
-  if (dash <= 0) return null;
+  const text = definitionText.trim();
 
-  const marker = text.slice(0, dash).trim();
-  const pos = POS_MARKERS[marker];
-  if (!pos) return null;
+  let best: { pos: string; marker: string; index: number } | null = null;
+  for (const [marker, pos] of Object.entries(POS_MARKERS)) {
+    const re = new RegExp(`(?:^|[^${GURMUKHI}])(${marker})-`);
+    const m = re.exec(text);
+    if (!m) continue;
+    const index = m.index + m[0].indexOf(marker);
+    if (!best || index < best.index) best = { pos, marker, index };
+  }
 
-  return { pos, marker, confidence: 0.9 };
+  if (!best) return null;
+  return { pos: best.pos, marker: best.marker, confidence: 0.9 };
 }

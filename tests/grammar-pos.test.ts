@@ -50,4 +50,18 @@ describe('parsePosFromDefinition', () => {
     const r = parsePosFromDefinition('੨. ਸੰਗ੍ਯਾ- ਦੂਜਾ ਅਰਥ…');
     expect(r?.pos).toBe('noun');
   });
+
+  it('finds a marker after a "ਦੇਖੋ, X." cross-reference prefix (e.g. ਸਚੁ)', () => {
+    const r = parsePosFromDefinition('ਦੇਖੋ, ਸਚ. ਸੰਗ੍ਯਾ- ਸਤ੍ਯ. ਝੂਠ ਦਾ ਅਭਾਵ…');
+    expect(r?.pos).toBe('noun');
+  });
+
+  it('returns null for a pure redirect with no marker (e.g. ਨਾਮੁ → "ਦੇਖੋ, ਨਾਮ.")', () => {
+    expect(parsePosFromDefinition('ਦੇਖੋ, ਨਾਮ. "ਐਸਾ ਨਾਮੁ ਨਿਰੰਜਨੁ ਹੋਇ."')).toBeNull();
+  });
+
+  it('picks the earliest marker when several appear (primary POS wins)', () => {
+    const r = parsePosFromDefinition('ਸੰਗ੍ਯਾ- ਸੱਤਾ. ੨. ਵਿ- ਸੱਚਾ…');
+    expect(r?.pos).toBe('noun');
+  });
 });
