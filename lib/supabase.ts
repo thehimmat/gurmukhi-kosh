@@ -138,6 +138,22 @@ export type WordGrammar = Curated & {
   verb_form: string | null;
 };
 
+// Registry (migration 009) explaining each rule_code: its plain-English basis,
+// scholarly citation, tier, and whether it's been verified against the source.
+export type GrammarRule = {
+  rule_code: string;
+  title: string;
+  explanation: string;
+  citation: string | null;
+  tier: "codified_rule" | "source_extraction" | "heuristic";
+  verified: boolean;
+};
+
+// word_grammar row with its rule registry entry embedded (FK rule_code).
+export type WordGrammarWithRule = WordGrammar & {
+  grammar_rules: GrammarRule | null;
+};
+
 export type Lexeme = {
   id: number;
   root_word_id: number;

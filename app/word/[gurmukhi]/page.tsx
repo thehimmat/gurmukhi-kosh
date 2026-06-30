@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
-import type { DefinitionWithSource, Etymology, WordGrammar } from "@/lib/supabase";
+import type { DefinitionWithSource, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { TabNav } from "@/components/word/TabNav";
 
@@ -105,7 +105,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*)")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*, grammar_rules(*))")
     .eq("gurmukhi", word)
     .single();
 
@@ -115,7 +115,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
   const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
-  const grammar = ((wordRow as unknown as { word_grammar: WordGrammar[] }).word_grammar ?? []);
+  const grammar = ((wordRow as unknown as { word_grammar: WordGrammarWithRule[] }).word_grammar ?? []);
 
   // Step 2: fire remaining queries in parallel
   const [defsResult, etymResult, occsResult, lexemeFormResult] = await Promise.all([
@@ -218,6 +218,21 @@ export default async function WordPage({ params, searchParams }: Props) {
     noun: "Noun", verb: "Verb", adjective: "Adjective", adverb: "Adverb",
     pronoun: "Pronoun", particle: "Particle", postposition: "Postposition",
     conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
+  };
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  // Honest label for how a datum was obtained.
+  const TIER_LABELS: Record<string, string> = {
+    codified_rule: "Established grammar rule",
+    source_extraction: "Read from a cited source",
+    heuristic: "Our grouping heuristic",
+  };
+  // Where a row's part of speech came from: extracted from Mahan Kosh's own marker
+  // (Tier 1), or inferred by inheriting from a related form (Tier 2 heuristic).
+  const posBasis = (g: WordGrammarWithRule): string | null => {
+    if (!g.pos) return null;
+    if (g.notes?.includes("inherited"))
+      return "Part of speech inferred by inheriting from a related form (grouped by shared stem). This is our heuristic, not a cited source.";
+    return "Part of speech read from the grammatical marker in this word's Mahan Kosh entry.";
   };
 
   // Usage tab: common phrases (bigrams) + statistical collocations. Fetch the
@@ -408,33 +423,55 @@ export default async function WordPage({ params, searchParams }: Props) {
       {tab === "grammar" && grammar.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Grammar</SectionHeading>
+
+          {/* Honest framing: this is rule-derived, not a per-word AI guess. */}
+          <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
+            This analysis is produced by applying established Gurbani grammar rules
+            (Prof. Sahib Singh&apos;s Viakaran) to each word&apos;s form, alongside the
+            part-of-speech markers in its Mahan Kosh entry. It is rule-derived and
+            deterministic, not a per-word guess; where a word&apos;s ending is ambiguous we
+            leave a field blank rather than assume. Expand &ldquo;How we determined this&rdquo;
+            on any entry to see the exact rule and its source. These rules are pending
+            page-level verification against the published text.
+          </p>
+
           {grammar.map((g) => (
-            <div key={g.id} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
-              {g.pos && (
-                <span className="badge">
-                  {GRAMMAR_LABELS[g.pos.toLowerCase()] ?? g.pos}
+            <div key={g.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+                {g.pos && <span className="badge">{GRAMMAR_LABELS[g.pos.toLowerCase()] ?? g.pos}</span>}
+                {g.gender && <span className="badge">{cap(g.gender)}</span>}
+                {g.number && <span className="badge">{cap(g.number)}</span>}
+                {g.gram_case && <span className="badge">{cap(g.gram_case)}</span>}
+                <span style={{ marginLeft: "auto" }}>
+                  <ProvenanceBadge provenance={g.provenance ?? null} reviewStatus={g.review_status ?? null} />
                 </span>
-              )}
-              {g.gender && (
-                <span className="badge">
-                  {g.gender.charAt(0).toUpperCase() + g.gender.slice(1)}
-                </span>
-              )}
-              {g.number && (
-                <span className="badge">
-                  {g.number.charAt(0).toUpperCase() + g.number.slice(1)}
-                </span>
-              )}
-              {g.gram_case && (
-                <span className="badge">
-                  {g.gram_case.charAt(0).toUpperCase() + g.gram_case.slice(1)}
-                </span>
-              )}
-              {g.notes && (
-                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
-                  {g.notes}
-                </span>
-              )}
+              </div>
+
+              <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
+                <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
+                  How we determined this
+                </summary>
+                <div style={{ marginTop: "0.55rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+                  {posBasis(g) && <div>{posBasis(g)}</div>}
+                  {g.grammar_rules && (
+                    <div>
+                      <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>{g.grammar_rules.title}</div>
+                      <div>{g.grammar_rules.explanation}</div>
+                      {g.grammar_rules.citation && (
+                        <div style={{ fontStyle: "italic", marginTop: "0.25rem" }}>Source: {g.grammar_rules.citation}</div>
+                      )}
+                      <div style={{ marginTop: "0.3rem", fontSize: "0.78rem" }}>
+                        {TIER_LABELS[g.grammar_rules.tier] ?? g.grammar_rules.tier}
+                        {" · "}
+                        {g.grammar_rules.verified ? "Verified against source" : "Not yet scholar-verified"}
+                      </div>
+                    </div>
+                  )}
+                  {typeof g.confidence === "number" && (
+                    <div style={{ fontSize: "0.78rem" }}>Engine confidence: {Math.round(g.confidence * 100)}%</div>
+                  )}
+                </div>
+              </details>
             </div>
           ))}
         </section>
@@ -618,9 +655,10 @@ export default async function WordPage({ params, searchParams }: Props) {
       {tab === "sources" && (
         <section>
           <SectionHeading>Sources &amp; provenance</SectionHeading>
-          {defsBySource.size === 0 ? (
+          {defsBySource.size === 0 && grammar.length === 0 && (
             <EmptyState>No sourced data yet for this word.</EmptyState>
-          ) : (
+          )}
+          {defsBySource.size > 0 &&
             Array.from(defsBySource.entries()).map(([key, group]) => (
               <div key={key} style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
                 <div>
@@ -631,8 +669,29 @@ export default async function WordPage({ params, searchParams }: Props) {
                 </div>
                 <ProvenanceBadge provenance={group.provenance} reviewStatus={group.reviewStatus} />
               </div>
-            ))
+            ))}
+
+          {/* Grammar provenance: be explicit that grammar is rule-derived. */}
+          {grammar.length > 0 && (
+            <div style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+              <div>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Grammar analysis</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", marginLeft: "0.5rem" }}>
+                  rule-derived from Sahib Singh&apos;s Viakaran + Mahan Kosh markers (see the Grammar tab for each rule and its source)
+                </span>
+              </div>
+              <ProvenanceBadge provenance="rule_derived" reviewStatus="unreviewed" />
+            </div>
           )}
+
+          {/* Planned source, pending permission (reminder + public transparency). */}
+          <div style={{ ...CARD, borderStyle: "dashed" }}>
+            <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Planned: SikhRI — The Guru Granth Sahib Dictionary</span>
+            <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.6, marginTop: "0.35rem", marginBottom: 0 }}>
+              We intend to incorporate SikhRI&apos;s per-word meanings and grammar, with full attribution,
+              once we receive their permission. Not yet integrated.
+            </p>
+          </div>
         </section>
       )}
     </div>
