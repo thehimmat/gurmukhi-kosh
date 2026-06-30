@@ -486,8 +486,8 @@ export default async function WordPage({ params, searchParams }: Props) {
                     </span>
                   )}
                   {av.conflict && (
-                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#8a6100", background: "#f8edd2", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
-                      Sources differ
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.68rem", fontWeight: 500, color: "var(--text-secondary)", opacity: 0.75 }}>
+                      · other readings differ
                     </span>
                   )}
                   {av.polysemy && (
