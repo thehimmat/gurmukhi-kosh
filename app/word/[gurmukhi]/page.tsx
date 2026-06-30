@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import type { DefinitionWithSource, Etymology, WordGrammarWithRule } from "@/lib/supabase";
+import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { TabNav } from "@/components/word/TabNav";
 
@@ -116,11 +117,10 @@ export default async function WordPage({ params, searchParams }: Props) {
   const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
   const grammar = ((wordRow as unknown as { word_grammar: WordGrammarWithRule[] }).word_grammar ?? []);
-  // Surface cited facts (read from a scholar) before rule-derived/heuristic
-  // candidates, so the strongest-provenance grammar reads first.
-  const grammarRank = (g: WordGrammarWithRule) =>
-    g.provenance === "imported" ? 0 : g.grammar_rules?.tier === "codified_rule" ? 1 : 2;
-  grammar.sort((a, b) => grammarRank(a) - grammarRank(b));
+  // Regroup the raw rows into one view per attribute: each value with its
+  // distinct sources (cited scholar > dictionary > rule > heuristic), so the UI
+  // can corroborate agreement and flag conflicts instead of stacking raw rows.
+  const grammarView = buildGrammarView(grammar);
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
@@ -246,19 +246,20 @@ export default async function WordPage({ params, searchParams }: Props) {
     const i = COMMENTARY_ORDER.indexOf(code ?? "");
     return i === -1 ? 99 : i;
   };
-  // Honest label for how a datum was obtained.
-  const TIER_LABELS: Record<string, string> = {
-    codified_rule: "Established grammar rule",
-    source_extraction: "Read from a cited source",
-    heuristic: "Our grouping heuristic",
+  // Display a grammar value: POS uses the long label table, others just capitalize.
+  const fmtGrammar = (attribute: string, value: string) =>
+    attribute === "pos" ? GRAMMAR_LABELS[value.toLowerCase()] ?? value : cap(value);
+  // Map a source kind to the existing provenance pill, an honest tier label, and
+  // the adjective used when noting a disagreeing reading.
+  const KIND_PROVENANCE: Record<string, string> = {
+    scholar: "imported", dictionary: "scraped", rule: "rule_derived", heuristic: "computed",
   };
-  // Where a row's part of speech came from: extracted from Mahan Kosh's own marker
-  // (Tier 1), or inferred by inheriting from a related form (Tier 2 heuristic).
-  const posBasis = (g: WordGrammarWithRule): string | null => {
-    if (!g.pos) return null;
-    if (g.notes?.includes("inherited"))
-      return "Part of speech inferred by inheriting from a related form (grouped by shared stem). This is our heuristic, not a cited source.";
-    return "Part of speech read from the grammatical marker in this word's Mahan Kosh entry.";
+  const KIND_TIER: Record<string, string> = {
+    scholar: "Read from a cited source", dictionary: "Read from a cited source",
+    rule: "Established grammar rule", heuristic: "Our grouping heuristic",
+  };
+  const KIND_WORD: Record<string, string> = {
+    scholar: "cited", dictionary: "dictionary", rule: "rule-derived", heuristic: "heuristic",
   };
 
   // Usage tab: common phrases (bigrams) + statistical collocations. Fetch the
@@ -468,45 +469,77 @@ export default async function WordPage({ params, searchParams }: Props) {
             page-level verification against the published text.
           </p>
 
-          {grammar.map((g) => (
-            <div key={g.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
-                {g.pos && <span className="badge">{GRAMMAR_LABELS[g.pos.toLowerCase()] ?? g.pos}</span>}
-                {g.gender && <span className="badge">{cap(g.gender)}</span>}
-                {g.number && <span className="badge">{cap(g.number)}</span>}
-                {g.gram_case && <span className="badge">{cap(g.gram_case)}</span>}
-                <span style={{ marginLeft: "auto" }}>
-                  <ProvenanceBadge provenance={g.provenance ?? null} reviewStatus={g.review_status ?? null} />
-                </span>
-              </div>
+          {grammarView.map((av: AttributeView) => {
+            const lead: AttributeReading = av.readings[0];
+            const others = av.readings.slice(1);
+            const leadSource = lead.attestations[0];
+            return (
+              <div key={av.attribute} style={{ ...CARD, marginBottom: "0.75rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
+                    {av.label}
+                  </span>
+                  <span className="badge">{fmtGrammar(av.attribute, lead.value)}</span>
+                  {lead.attestations.length > 1 && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#1d7333", background: "#e1f1e6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
+                      Corroborated by {lead.attestations.length} sources
+                    </span>
+                  )}
+                  {av.conflict && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#8a6100", background: "#f8edd2", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
+                      Sources differ
+                    </span>
+                  )}
+                  <span style={{ marginLeft: "auto" }}>
+                    <ProvenanceBadge provenance={KIND_PROVENANCE[leadSource.sourceKind]} reviewStatus={leadSource.verified ? "approved" : "unreviewed"} />
+                  </span>
+                </div>
 
-              <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
-                <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
-                  How we determined this
-                </summary>
-                <div style={{ marginTop: "0.55rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", flexDirection: "column", gap: "0.55rem" }}>
-                  {posBasis(g) && <div>{posBasis(g)}</div>}
-                  {g.grammar_rules && (
-                    <div>
-                      <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>{g.grammar_rules.title}</div>
-                      <div>{g.grammar_rules.explanation}</div>
-                      {g.grammar_rules.citation && (
-                        <div style={{ fontStyle: "italic", marginTop: "0.25rem" }}>Source: {g.grammar_rules.citation}</div>
-                      )}
-                      <div style={{ marginTop: "0.3rem", fontSize: "0.78rem" }}>
-                        {TIER_LABELS[g.grammar_rules.tier] ?? g.grammar_rules.tier}
-                        {" · "}
-                        {g.grammar_rules.verified ? "Verified against source" : "Not yet scholar-verified"}
+                {/* Conflict: show the disagreeing reading(s), demoted, and invite feedback.
+                    Distinguish OUR reading being overruled from two real sources differing. */}
+                {others.map((r) => {
+                  const kind = r.attestations[0].sourceKind;
+                  const ours = kind === "rule" || kind === "heuristic";
+                  return (
+                    <div key={r.value} style={{ marginTop: "0.55rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                      <span style={{ textDecoration: "line-through", opacity: 0.7, marginRight: "0.4rem" }}>{fmtGrammar(av.attribute, r.value)}</span>
+                      {ours
+                        ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
+                        : `${r.attestations[0].sourceLabel} reads this differently; the lead source takes precedence, but the sources genuinely differ here.`}
+                      <div style={{ marginTop: "0.2rem", fontStyle: "italic", opacity: 0.8 }}>
+                        Think this is wrong, or know a source? Word-level feedback is coming soon.
                       </div>
                     </div>
-                  )}
-                  {typeof g.confidence === "number" && (
-                    <div style={{ fontSize: "0.78rem" }}>Engine confidence: {Math.round(g.confidence * 100)}%</div>
-                  )}
-                </div>
-              </details>
-            </div>
-          ))}
+                  );
+                })}
+
+                <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
+                  <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
+                    How we determined this
+                  </summary>
+                  <div style={{ marginTop: "0.55rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
+                    {av.readings.map((r) => (
+                      <div key={r.value}>
+                        <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>{fmtGrammar(av.attribute, r.value)}</div>
+                        {r.attestations.map((a, i) => (
+                          <div key={i} style={{ marginTop: "0.35rem" }}>
+                            <div style={{ fontWeight: 600 }}>{a.sourceLabel}</div>
+                            {a.explanation && <div>{a.explanation}</div>}
+                            {a.citation && <div style={{ fontStyle: "italic", marginTop: "0.2rem" }}>Source: {a.citation}</div>}
+                            <div style={{ marginTop: "0.25rem", fontSize: "0.78rem" }}>
+                              {KIND_TIER[a.sourceKind]}
+                              {" · "}
+                              {a.verified ? "Verified against source" : a.confidenceLabel ? `Confidence: ${a.confidenceLabel}` : "Not yet scholar-verified"}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              </div>
+            );
+          })}
         </section>
       )}
 
