@@ -9,7 +9,7 @@
 // not be analyzed as an oblique noun, so its case/number stay null.
 
 import { parsePosFromDefinition } from './pos';
-import { analyzeNounForm } from './viakaran';
+import { analyzeNounForm, analyzeVerbForm } from './viakaran';
 
 const NOMINAL_POS = new Set(['noun', 'adjective', 'pronoun']);
 
@@ -18,6 +18,7 @@ export interface GrammarRow {
   gender: string | null;
   number: string | null;
   gram_case: string | null;
+  verb_form: string | null;
   rule_code: string | null;
   confidence: number | null;
   notes: string | null;
@@ -47,9 +48,27 @@ function grammarRowForPos(
       gender: form.gender,
       number: form.number,
       gram_case: form.gram_case,
+      verb_form: null,
       rule_code: form.rule_code,
       confidence,
       notes,
+    };
+  }
+  if (pos === 'verb') {
+    // Classify the non-finite verb form from its ending, same gating principle as
+    // nouns: only the verb POS is fed to the verb morphology rules.
+    const v = analyzeVerbForm(gurmukhi);
+    const confidence = Number((posConfidence * v.confidence).toFixed(3));
+    const notes = [v.notes, extraNote].filter(Boolean).join(' ') || null;
+    return {
+      pos,
+      gender: null,
+      number: null,
+      gram_case: null,
+      verb_form: v.verb_form,
+      rule_code: v.rule_code,
+      confidence: v.verb_form ? confidence : posConfidence,
+      notes: v.verb_form ? notes : extraNote ?? null,
     };
   }
   return {
@@ -57,6 +76,7 @@ function grammarRowForPos(
     gender: null,
     number: null,
     gram_case: null,
+    verb_form: null,
     rule_code: null,
     confidence: posConfidence,
     notes: extraNote ?? null,

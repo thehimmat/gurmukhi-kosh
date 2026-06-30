@@ -15,7 +15,7 @@
 
 import type { WordGrammarWithRule } from "./supabase";
 
-export type GrammarAttribute = "pos" | "gender" | "number" | "gram_case";
+export type GrammarAttribute = "pos" | "gender" | "number" | "gram_case" | "verb_form";
 
 // How a single source supports a value. Ordered by authority (highest first).
 export type SourceKind = "scholar" | "dictionary" | "rule" | "heuristic";
@@ -61,9 +61,10 @@ const ATTRIBUTE_LABEL: Record<GrammarAttribute, string> = {
   gender: "Gender",
   number: "Number",
   gram_case: "Case",
+  verb_form: "Verb form",
 };
 
-const ATTRIBUTE_ORDER: GrammarAttribute[] = ["pos", "gender", "number", "gram_case"];
+const ATTRIBUTE_ORDER: GrammarAttribute[] = ["pos", "gender", "number", "gram_case", "verb_form"];
 
 /**
  * Maps an internal confidence (0..1) to a qualitative band. We deliberately do
@@ -151,7 +152,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
     ruleCode: g.rule_code ?? null,
   });
 
-  for (const attribute of ["gender", "number", "gram_case"] as const) {
+  for (const attribute of ["gender", "number", "gram_case", "verb_form"] as const) {
     const value = g[attribute];
     if (!value) continue;
     facts.push({ attribute, value, att: sourced ? scholarAtt() : ruleAtt() });

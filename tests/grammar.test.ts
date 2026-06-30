@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { finalVowel, analyzeNounForm } from '../pipeline/grammar/viakaran';
+import { finalVowel, analyzeNounForm, analyzeVerbForm } from '../pipeline/grammar/viakaran';
 
 // Sahib Singh's Gurbani Viakaran: the trailing vowel sign (laga/matra) on a
 // noun in Gurbani encodes its kaarak (case). These golden cases use textbook
@@ -71,6 +71,28 @@ describe('viakaran', () => {
       const a = analyzeNounForm('ਰਾਜਾ');
       expect(a.gram_case).toBeNull();
       expect(a.confidence).toBeLessThan(0.5);
+    });
+  });
+
+  describe('analyzeVerbForm', () => {
+    it('classifies -ਣਾ / -ਨਾ as the infinitive (ਕਰਣਾ, ਕਥਨਾ)', () => {
+      expect(analyzeVerbForm('ਕਰਣਾ').verb_form).toBe('infinitive');
+      expect(analyzeVerbForm('ਕਥਨਾ').rule_code).toBe('VERB_INFINITIVE');
+    });
+
+    it('classifies -ਣੁ / -ਨੁ / -ਣੈ / -ਨੇ as a verbal noun (ਆਖਣੁ, ਕਥਨੁ, ਕਰਣੈ, ਕਥਨੇ)', () => {
+      expect(analyzeVerbForm('ਆਖਣੁ').verb_form).toBe('verbal noun');
+      expect(analyzeVerbForm('ਕਥਨੁ').verb_form).toBe('verbal noun');
+      expect(analyzeVerbForm('ਕਰਣੈ').rule_code).toBe('VERB_VERBAL_NOUN');
+      expect(analyzeVerbForm('ਕਥਨੇ').verb_form).toBe('verbal noun');
+    });
+
+    it('declines endings it cannot classify rather than guessing (ਮਾਹਿ, ਲਿਖਿ, ਲਿਖੇ)', () => {
+      for (const w of ['ਮਾਹਿ', 'ਲਿਖਿ', 'ਲਿਖੇ']) {
+        const a = analyzeVerbForm(w);
+        expect(a.verb_form).toBeNull();
+        expect(a.confidence).toBeLessThan(0.5);
+      }
     });
   });
 });

@@ -82,6 +82,7 @@ async function main() {
     gender: string | null;
     number: string | null;
     gram_case: string | null;
+    verb_form: string | null;
     rule_code: string | null;
     confidence: number | null;
     notes: string | null;

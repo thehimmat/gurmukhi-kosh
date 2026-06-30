@@ -126,3 +126,45 @@ export function analyzeNounForm(gurmukhi: string): FormAnalysis {
       return { ...UNDECIDED };
   }
 }
+
+export interface VerbAnalysis {
+  verb_form: string | null; // 'infinitive' | 'verbal noun' | null
+  rule_code: string | null;
+  confidence: number;
+  notes?: string;
+}
+
+const NOT_A_VERB_FORM: VerbAnalysis = {
+  verb_form: null,
+  rule_code: null,
+  confidence: 0.2,
+  notes: 'No high-confidence non-finite verb ending matched.',
+};
+
+/**
+ * Classifies a NON-FINITE verb form from its ending (Sahib Singh's Viakaran kriya
+ * morphology). Only the unambiguous ਣ/ਨ-stem forms are recognized — the
+ * infinitive (-ਣਾ/-ਨਾ, "to do") and the verbal noun (-ਣੁ/-ਨੁ/-ਣੇ/-ਨੇ/-ਣੈ/-ਨੈ,
+ * "the act of doing"). Anything else (finite endings, bare conjunctives) returns
+ * a low-confidence decline rather than guessing. Consulted only for verb POS.
+ */
+export function analyzeVerbForm(gurmukhi: string): VerbAnalysis {
+  const g = gurmukhi.trim();
+  if (/(ਣਾ|ਨਾ)$/.test(g)) {
+    return {
+      verb_form: 'infinitive',
+      rule_code: 'VERB_INFINITIVE',
+      confidence: 0.8,
+      notes: 'The -ਣਾ/-ਨਾ ending marks the infinitive (the "to ___" form of the verb).',
+    };
+  }
+  if (/(ਣੁ|ਨੁ|ਣੇ|ਨੇ|ਣੈ|ਨੈ)$/.test(g)) {
+    return {
+      verb_form: 'verbal noun',
+      rule_code: 'VERB_VERBAL_NOUN',
+      confidence: 0.7,
+      notes: 'The -ਣੁ/-ਨੁ (and oblique -ਣੇ/-ਣੈ) ending marks a verbal noun (the act of the verb).',
+    };
+  }
+  return { ...NOT_A_VERB_FORM };
+}
