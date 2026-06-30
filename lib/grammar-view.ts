@@ -47,7 +47,13 @@ export interface AttributeView {
   attribute: GrammarAttribute;
   label: string;
   readings: AttributeReading[]; // sorted by authority desc; [0] is the lead
-  conflict: boolean; // more than one distinct value across sources
+  // Two ways multiple values can arise, which must NOT be conflated:
+  //   conflict  — different sources disagree (e.g. pad-arth says adjective, Mahan
+  //               Kosh says noun). One reading is wrong, or the sources differ.
+  //   polysemy  — a SINGLE source lists several values (Mahan Kosh giving a word
+  //               both a noun and an adjective sense). Both are valid; not an error.
+  conflict: boolean;
+  polysemy: boolean;
 }
 
 const ATTRIBUTE_LABEL: Record<GrammarAttribute, string> = {
@@ -192,11 +198,19 @@ export function buildGrammarView(rows: WordGrammarWithRule[]): AttributeView[] {
     // Lead = highest-authority value; tiebreak by number of corroborating sources.
     readings.sort((a, b) => authorityOf(b) - authorityOf(a) || b.attestations.length - a.attestations.length);
 
+    // Multiple values: a conflict iff the values are led by DIFFERENT source kinds
+    // (cross-source disagreement); otherwise the same source is offering several
+    // senses (polysemy), which is not an error.
+    const multiValue = readings.length > 1;
+    const leadKinds = new Set(readings.map((r) => r.attestations[0].sourceKind));
+    const conflict = multiValue && leadKinds.size > 1;
+
     views.push({
       attribute,
       label: ATTRIBUTE_LABEL[attribute],
       readings,
-      conflict: readings.length > 1,
+      conflict,
+      polysemy: multiValue && !conflict,
     });
   }
 

@@ -490,14 +490,28 @@ export default async function WordPage({ params, searchParams }: Props) {
                       Sources differ
                     </span>
                   )}
+                  {av.polysemy && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#5c574f", background: "#eceae6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
+                      Multiple senses
+                    </span>
+                  )}
                   <span style={{ marginLeft: "auto" }}>
                     <ProvenanceBadge provenance={KIND_PROVENANCE[leadSource.sourceKind]} reviewStatus={leadSource.verified ? "approved" : "unreviewed"} />
                   </span>
                 </div>
 
-                {/* Conflict: show the disagreeing reading(s), demoted, and invite feedback.
+                {/* Polysemy: the same source simply lists more than one value (senses).
+                    Shown neutrally, with no "we may be wrong" framing. */}
+                {av.polysemy && others.map((r) => (
+                  <div key={r.value} style={{ marginTop: "0.5rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                    <span className="badge" style={{ marginRight: "0.4rem", opacity: 0.85 }}>{fmtGrammar(av.attribute, r.value)}</span>
+                    Also recorded by {r.attestations[0].sourceLabel} as a separate sense.
+                  </div>
+                ))}
+
+                {/* Conflict: a disagreeing reading, demoted, with feedback invited.
                     Distinguish OUR reading being overruled from two real sources differing. */}
-                {others.map((r) => {
+                {av.conflict && others.map((r) => {
                   const kind = r.attestations[0].sourceKind;
                   const ours = kind === "rule" || kind === "heuristic";
                   return (

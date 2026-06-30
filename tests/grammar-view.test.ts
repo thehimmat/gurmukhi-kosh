@@ -132,6 +132,29 @@ describe("buildGrammarView", () => {
     expect(nounReading.attestations[0].sourceKind).toBe("dictionary");
   });
 
+  it("treats one source listing several values as polysemy, not a conflict (ਇਕ noun/adjective)", () => {
+    // Mahan Kosh gives ਇਕ both a noun and an adjective sense; both decompose to
+    // the dictionary as POS source, so it's polysemy — not a contradiction.
+    const view = buildGrammarView([
+      row({ provenance: "rule_derived", pos: "noun", confidence: 0.7, rule_code: "MUKTA_OBL_SG", grammar_rules: rule({ rule_code: "MUKTA_OBL_SG" }) }),
+      row({ provenance: "rule_derived", pos: "adjective", confidence: 0.7, rule_code: "MUKTA_OBL_SG", grammar_rules: rule({ rule_code: "MUKTA_OBL_SG" }) }),
+    ]);
+    const pos = view.find((v) => v.attribute === "pos")!;
+    expect(pos.polysemy).toBe(true);
+    expect(pos.conflict).toBe(false);
+    expect(pos.readings).toHaveLength(2);
+  });
+
+  it("a scholar-vs-dictionary disagreement is a conflict, not polysemy (ਕੋਟਿ)", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", pos: "adjective", rule_code: "SS_PADARTH_POS", grammar_rules: rule({ rule_code: "SS_PADARTH_POS", tier: "source_extraction", verified: true }) }),
+      row({ provenance: "rule_derived", pos: "noun", confidence: 0.8, rule_code: "SIHARI_OBL_SG", grammar_rules: rule({ rule_code: "SIHARI_OBL_SG" }) }),
+    ]);
+    const pos = view.find((v) => v.attribute === "pos")!;
+    expect(pos.conflict).toBe(true);
+    expect(pos.polysemy).toBe(false);
+  });
+
   it("labels an inherited POS as a heuristic with a confidence band", () => {
     const view = buildGrammarView([
       row({ provenance: "rule_derived", pos: "noun", confidence: 0.6, notes: "POS inherited from lemma ਹੁਕਮ." }),
