@@ -136,6 +136,10 @@ export type WordGrammar = Curated & {
   confidence: number | null;
   person: string | null;
   verb_form: string | null;
+  // Per-datum citation (migration 011): a sourced grammar fact points at the
+  // exact line it was read from (e.g. Sahib Singh's pad-arth).
+  source_code: string | null;
+  source_line_id: number | null;
 };
 
 // Registry (migration 009) explaining each rule_code: its plain-English basis,

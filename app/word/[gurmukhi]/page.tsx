@@ -116,6 +116,12 @@ export default async function WordPage({ params, searchParams }: Props) {
   const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
   const grammar = ((wordRow as unknown as { word_grammar: WordGrammarWithRule[] }).word_grammar ?? []);
+  // Surface cited facts (read from a scholar) before rule-derived/heuristic
+  // candidates, so the strongest-provenance grammar reads first.
+  const grammarRank = (g: WordGrammarWithRule) =>
+    g.provenance === "imported" ? 0 : g.grammar_rules?.tier === "codified_rule" ? 1 : 2;
+  grammar.sort((a, b) => grammarRank(a) - grammarRank(b));
+  const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
   const [defsResult, etymResult, occsResult, lexemeFormResult] = await Promise.all([
@@ -444,14 +450,21 @@ export default async function WordPage({ params, searchParams }: Props) {
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Grammar</SectionHeading>
 
-          {/* Honest framing: this is rule-derived, not a per-word AI guess. */}
+          {/* Honest framing: distinguish facts read from a scholar from rule-derived ones. */}
           <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
-            This analysis is produced by applying established Gurbani grammar rules
-            (Prof. Sahib Singh&apos;s Viakaran) to each word&apos;s form, alongside the
-            part-of-speech markers in its Mahan Kosh entry. It is rule-derived and
+            {hasSourcedGrammar && (
+              <>
+                Entries marked <em>Imported</em> are read directly from a cited scholarly
+                source: Prof. Sahib Singh&apos;s explicit grammar notes in his <em>Sri Guru
+                Granth Sahib Darpan</em> pad-arth, with the line cited.{" "}
+              </>
+            )}
+            The remaining analysis is produced by applying established Gurbani grammar
+            rules (Prof. Sahib Singh&apos;s Viakaran) to each word&apos;s form, alongside the
+            part-of-speech markers in its Mahan Kosh entry. That part is rule-derived and
             deterministic, not a per-word guess; where a word&apos;s ending is ambiguous we
             leave a field blank rather than assume. Expand &ldquo;How we determined this&rdquo;
-            on any entry to see the exact rule and its source. These rules are pending
+            on any entry to see the exact rule or source. Unverified rules are pending
             page-level verification against the published text.
           </p>
 
