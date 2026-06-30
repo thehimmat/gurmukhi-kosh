@@ -141,7 +141,11 @@ export default async function WordPage({ params, searchParams }: Props) {
         id, position,
         lines (
           id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-          shabads ( id, raag_english, writer_english, ang_start )
+          shabads ( id, raag_english, writer_english, ang_start ),
+          line_translations (
+            body_unicode, language, caveat,
+            translation_sources ( code, name, author, kind, notes, url )
+          )
         )
       `)
       .eq("word_id", wordId)
@@ -185,6 +189,15 @@ export default async function WordPage({ params, searchParams }: Props) {
   }
 
   // Occurrences — group by raag
+  type LineCommentary = {
+    body_unicode: string;
+    language: string;
+    caveat: string | null;
+    translation_sources: {
+      code: string; name: string; author: string | null; kind: string;
+      notes: string | null; url: string | null;
+    } | null;
+  };
   type OccRow = {
     id: number;
     position: number;
@@ -193,6 +206,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       translation_en: string | null; transliteration_en: string | null;
       shabad_id: number;
       shabads: { id: number; raag_english: string | null; writer_english: string | null } | null;
+      line_translations: LineCommentary[] | null;
     } | null;
   };
   const rows = (occsResult.data ?? []) as unknown as OccRow[];
@@ -220,6 +234,12 @@ export default async function WordPage({ params, searchParams }: Props) {
     conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
   };
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  // Order per-line commentaries: Sahib Singh first, Faridkot (archaic) last.
+  const COMMENTARY_ORDER = ["ss_darpan", "ss_padarth", "manmohan_pa", "manmohan_en", "faridkot"];
+  const commentaryRank = (code: string | undefined) => {
+    const i = COMMENTARY_ORDER.indexOf(code ?? "");
+    return i === -1 ? 99 : i;
+  };
   // Honest label for how a datum was obtained.
   const TIER_LABELS: Record<string, string> = {
     codified_rule: "Established grammar rule",
@@ -628,6 +648,43 @@ export default async function WordPage({ params, searchParams }: Props) {
                     <p style={{ color: "var(--text-secondary)", fontSize: "1rem" }}>
                       {line.translation_en}
                     </p>
+                  )}
+
+                  {line.line_translations && line.line_translations.length > 0 && (
+                    <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif' }}>
+                      <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600, fontSize: "0.82rem" }}>
+                        Commentaries &amp; translations ({line.line_translations.length})
+                      </summary>
+                      <div style={{ marginTop: "0.6rem", display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                        {[...line.line_translations]
+                          .sort((a, b) => commentaryRank(a.translation_sources?.code) - commentaryRank(b.translation_sources?.code))
+                          .map((c, i) => {
+                            const src = c.translation_sources;
+                            return (
+                              <div key={i} style={{ borderLeft: "2px solid var(--border)", paddingLeft: "0.7rem" }}>
+                                <div style={{ fontSize: "0.76rem", color: "var(--text-secondary)", fontWeight: 600, marginBottom: "0.2rem" }}>
+                                  {src?.name}{src?.author ? ` · ${src.author}` : ""}
+                                  {src?.kind === "padarth" ? " · word meanings" : ""}
+                                </div>
+                                <p
+                                  className={c.language === "pa" ? "gurmukhi" : undefined}
+                                  style={{ margin: 0, color: "var(--text-primary)", lineHeight: 1.7, fontSize: c.language === "pa" ? "1.05rem" : "0.95rem" }}
+                                >
+                                  {c.body_unicode}
+                                </p>
+                                {(c.caveat ?? src?.notes) && (
+                                  <p style={{ margin: "0.25rem 0 0", fontSize: "0.72rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
+                                    {c.caveat ?? src?.notes}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--text-secondary)" }}>
+                          Punjabi commentaries are shown in the original, not machine-translated. Sourced via BaniDB.
+                        </p>
+                      </div>
+                    </details>
                   )}
                 </div>
               );
