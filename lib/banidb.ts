@@ -8,7 +8,11 @@ export type BaniDBVerse = {
     unicode: string;
   };
   translation: {
-    en?: { bdb?: string; ms?: string };
+    en?: { bdb?: string; ms?: string; ssk?: string };
+    // Punjabi teekas/commentaries; each is { gurmukhi, unicode }.
+    //   ss = Sahib Singh (Darpan arth), pss = Sahib Singh pad-arth,
+    //   ft = Faridkot Teeka, ms = Manmohan Singh.
+    pu?: Record<string, { gurmukhi?: string; unicode?: string } | undefined>;
   };
   transliteration: {
     english: string;
