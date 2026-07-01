@@ -578,23 +578,31 @@ export default async function WordPage({ params, searchParams }: Props) {
           <SectionHeading>Etymology</SectionHeading>
           <div style={CARD}>
             {etymology.map((e, i) => (
-              <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: i < etymology.length - 1 ? "0.5rem" : 0 }}>
+              <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", flexWrap: "wrap", marginBottom: i < etymology.length - 1 ? "0.75rem" : 0 }}>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)", minWidth: "5rem" }}>
                   {e.origin_language}
                 </span>
-                <div>
-                  {e.root_form && (
-                    <span className="gurmukhi" style={{ marginRight: "0.4rem" }}>{e.root_form}</span>
-                  )}
-                  {e.root_form_roman && (
-                    <span style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem", marginRight: "0.4rem" }}>
-                      ({e.root_form_roman})
-                    </span>
-                  )}
+                <div style={{ flex: 1, minWidth: "12rem" }}>
+                  <div>
+                    {e.root_form && (
+                      <span className="gurmukhi" style={{ marginRight: "0.4rem" }}>{e.root_form}</span>
+                    )}
+                    {e.root_form_roman && (
+                      <span style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem", marginRight: "0.4rem" }}>
+                        ({e.root_form_roman})
+                      </span>
+                    )}
+                    <ProvenanceBadge provenance={e.provenance ?? null} reviewStatus={e.review_status ?? null} />
+                  </div>
                   {e.derivation_note && (
-                    <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", margin: "0.3rem 0 0" }}>
                       {e.derivation_note}
-                    </span>
+                    </p>
+                  )}
+                  {e.source_text && (
+                    <p className="gurmukhi" style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.3rem 0 0", fontStyle: "italic" }}>
+                      {e.source_text}
+                    </p>
                   )}
                 </div>
               </div>

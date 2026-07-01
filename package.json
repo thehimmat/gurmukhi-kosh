@@ -14,6 +14,7 @@
     "ingest:grammar": "tsx pipeline/grammar/ingest.ts",
     "ingest:grammar:padarth": "tsx pipeline/grammar/ingest-padarth.ts",
     "ingest:grammar:autoflag": "tsx pipeline/grammar/auto-flag.ts",
+    "ingest:etymology": "tsx pipeline/etymology/ingest.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@atthebunga/gurmukhi-input": "^1.1.1",
+    "@indic-transliteration/sanscript": "^1.3.3",
     "@supabase/supabase-js": "^2.106.1",
     "dotenv": "^17.4.2",
     "next": "16.2.6",
