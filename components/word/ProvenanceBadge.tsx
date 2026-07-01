@@ -3,6 +3,9 @@
  * been reviewed. Reused across the word page and the upcoming entry tabs.
  *
  * Color encodes provenance; an open dot marks rows still awaiting review.
+ * needs_work/rejected override the provenance color entirely — a human
+ * reviewed this and found a problem, which is a stronger signal than "where
+ * did this come from" and must not look identical to plain unreviewed.
  */
 
 type Provenance =
@@ -24,6 +27,15 @@ const STYLES: Record<Provenance, { bg: string; fg: string; label: string }> = {
   human_verified: { bg: "#e1f1e6", fg: "#1d7333", label: "Verified" },
 };
 
+// Deliberately NOT reusing rule_derived's amber (#f8edd2/#8a6100) for
+// needs_work — most of the rows this applies to (grammar, etymology) ARE
+// rule_derived, so that collision would make a disputed row look identical to
+// a plain unreviewed one, exactly the bug this component exists to avoid.
+const DISPUTED_STYLE: Partial<Record<ReviewStatus, { bg: string; fg: string; label: string }>> = {
+  needs_work: { bg: "#fbe4cf", fg: "#a15c00", label: "needs work" },
+  rejected:   { bg: "#f7e6e0", fg: "#a13f2b", label: "rejected" },
+};
+
 export function ProvenanceBadge({
   provenance,
   reviewStatus,
@@ -34,6 +46,11 @@ export function ProvenanceBadge({
   const style = STYLES[(provenance as Provenance) ?? "scraped"] ?? STYLES.scraped;
   const status = (reviewStatus as ReviewStatus) ?? "unreviewed";
   const verified = status === "approved" || provenance === "human_verified";
+  const disputed = DISPUTED_STYLE[status];
+
+  const bg = disputed ? disputed.bg : style.bg;
+  const fg = disputed ? disputed.fg : style.fg;
+  const label = disputed ? `${style.label} · ${disputed.label}` : style.label;
 
   return (
     <span
@@ -42,8 +59,8 @@ export function ProvenanceBadge({
         display: "inline-flex",
         alignItems: "center",
         gap: "0.3rem",
-        background: style.bg,
-        color: style.fg,
+        background: bg,
+        color: fg,
         borderRadius: "999px",
         padding: "0.05rem 0.5rem",
         fontFamily: '"Inter", sans-serif',
@@ -59,12 +76,12 @@ export function ProvenanceBadge({
           width: "0.45rem",
           height: "0.45rem",
           borderRadius: "999px",
-          background: verified ? style.fg : "transparent",
-          border: `1.5px solid ${style.fg}`,
+          background: verified || disputed ? fg : "transparent",
+          border: `1.5px solid ${fg}`,
           boxSizing: "border-box",
         }}
       />
-      {style.label}
+      {label}
     </span>
   );
 }
