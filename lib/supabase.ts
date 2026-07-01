@@ -171,3 +171,25 @@ export type WordForm = {
   word_id: number;
   inflection_desc: string | null;
 };
+
+// Community flagging (migration 014). Write-only from the public side (insert
+// RLS only) — read/actioned only via the key-gated /admin/flags surface.
+export type FlagTargetTable = "word_grammar" | "definitions" | "etymology";
+export type FlagType = "incorrect" | "unclear" | "has_better_source" | "other";
+export type FlagStatus = "open" | "resolved" | "dismissed";
+
+export type Flag = {
+  id: number;
+  word_id: number;
+  target_table: FlagTargetTable | null;
+  target_id: number | null;
+  flag_type: FlagType;
+  message: string;
+  suggested_source: string | null;
+  reporter_name: string | null;
+  reporter_email: string | null;
+  status: FlagStatus;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  created_at: string;
+};

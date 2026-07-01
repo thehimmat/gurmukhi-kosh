@@ -5,6 +5,7 @@ import type { DefinitionWithSource, Etymology, WordGrammarWithRule } from "@/lib
 import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { TabNav } from "@/components/word/TabNav";
+import { FlagForm } from "@/components/word/FlagForm";
 
 export const dynamic = "force-dynamic";
 
@@ -402,6 +403,12 @@ export default async function WordPage({ params, searchParams }: Props) {
                       {def.definition_en}
                     </p>
                   )}
+                  <FlagForm
+                    wordId={wordId}
+                    targetTable="definitions"
+                    targetId={def.id}
+                    contextLabel={`Definition${defs.length > 1 ? ` ${def.sense_number}` : ""} (${sourceName})`}
+                  />
                 </div>
               ))}
             </div>
@@ -520,12 +527,15 @@ export default async function WordPage({ params, searchParams }: Props) {
                       {ours
                         ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
                         : `${r.attestations[0].sourceLabel} reads this differently; the lead source takes precedence, but the sources genuinely differ here.`}
-                      <div style={{ marginTop: "0.2rem", fontStyle: "italic", opacity: 0.8 }}>
-                        Think this is wrong, or know a source? Word-level feedback is coming soon.
-                      </div>
                     </div>
                   );
                 })}
+
+                <FlagForm
+                  wordId={wordId}
+                  targetTable="word_grammar"
+                  contextLabel={`Grammar — ${av.label}: ${fmtGrammar(av.attribute, lead.value)}`}
+                />
 
                 <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
                   <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
