@@ -23,4 +23,10 @@ export const WORD_SETS: Record<string, WordSetSpec> = {
     description: "Japji Sahib (SGGS angs 1-8), BaniDB bani 2 — V1 deep-dictionary pilot set.",
     definition: { type: "banidb_bani", baniId: 2 },
   },
+  all: {
+    code: "all",
+    name: "Full corpus",
+    description: "Every ang (1-1430) — widens rule-derived grammar past the Japji pilot.",
+    definition: { type: "ang_range", start: 1, end: 1430 },
+  },
 };

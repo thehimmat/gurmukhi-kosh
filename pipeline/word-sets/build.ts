@@ -58,14 +58,26 @@ async function resolveLineIds(
     return lineIdsByVerseIds(db, sourceId, verseIds);
   }
   if (def.type === "ang_range") {
-    const { data, error } = await db
-      .from("lines")
-      .select("id")
-      .eq("source_fk", sourceId)
-      .gte("ang", def.start)
-      .lte("ang", def.end);
-    if (error) throw new Error(`resolveLineIds(ang_range): ${error.message}`);
-    return (data ?? []).map((r) => r.id as number);
+    // Paginated: an unpaginated .select() silently caps at Supabase's 1000-row
+    // default, which for a wide ang_range (e.g. the full 1-1430 corpus) would
+    // return only the first 1000 of 60k+ lines with no error.
+    const ids: number[] = [];
+    const PAGE = 1000;
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await db
+        .from("lines")
+        .select("id")
+        .eq("source_fk", sourceId)
+        .gte("ang", def.start)
+        .lte("ang", def.end)
+        .order("id", { ascending: true })
+        .range(offset, offset + PAGE - 1);
+      if (error) throw new Error(`resolveLineIds(ang_range): ${error.message}`);
+      const batch = data ?? [];
+      for (const r of batch) ids.push(r.id as number);
+      if (batch.length < PAGE) break;
+    }
+    return ids;
   }
   // shabad_ids
   const ids: number[] = [];
@@ -84,12 +96,21 @@ async function resolveLineIds(
 async function wordCounts(db: SupabaseClient, lineIds: number[]): Promise<Map<number, number>> {
   const rows: { word_id: number }[] = [];
   for (const batch of chunk(lineIds, IN_CHUNK)) {
-    const { data, error } = await db
-      .from("word_occurrences")
-      .select("word_id")
-      .in("line_id", batch);
-    if (error) throw new Error(`wordCounts: ${error.message}`);
-    for (const r of data ?? []) rows.push({ word_id: r.word_id as number });
+    // Paginated per chunk too: 300 lines average ~6.6 words/line (~2000 rows),
+    // comfortably over the 1000-row default cap that bit resolveLineIds above.
+    const PAGE = 1000;
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await db
+        .from("word_occurrences")
+        .select("word_id")
+        .in("line_id", batch)
+        .order("id", { ascending: true })
+        .range(offset, offset + PAGE - 1);
+      if (error) throw new Error(`wordCounts: ${error.message}`);
+      const page = data ?? [];
+      for (const r of page) rows.push({ word_id: r.word_id as number });
+      if (page.length < PAGE) break;
+    }
   }
   return aggregateWordCounts(rows);
 }

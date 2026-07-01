@@ -13,6 +13,7 @@
     "ingest:manual": "tsx pipeline/manual/ingest.ts",
     "ingest:grammar": "tsx pipeline/grammar/ingest.ts",
     "ingest:grammar:padarth": "tsx pipeline/grammar/ingest-padarth.ts",
+    "ingest:grammar:autoflag": "tsx pipeline/grammar/auto-flag.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",

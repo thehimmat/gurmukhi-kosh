@@ -141,14 +141,19 @@ async function main() {
   );
 
   // Idempotent replace: drop only rule-derived rows for this set's words.
-  const { error: delGramErr } = await db
-    .from("word_grammar")
-    .delete()
-    .in("word_id", wordIds)
-    .eq("provenance", PROVENANCE);
-  if (delGramErr) {
-    console.error("word_grammar delete error:", delGramErr.message);
-    process.exit(1);
+  // Chunked — a single .in() with tens of thousands of ids overflows the URL
+  // (Cloudflare 414) once a word set gets past a few hundred members.
+  for (let i = 0; i < wordIds.length; i += 300) {
+    const batch = wordIds.slice(i, i + 300);
+    const { error: delGramErr } = await db
+      .from("word_grammar")
+      .delete()
+      .in("word_id", batch)
+      .eq("provenance", PROVENANCE);
+    if (delGramErr) {
+      console.error("word_grammar delete error:", delGramErr.message);
+      process.exit(1);
+    }
   }
 
   let gramDone = 0;
@@ -181,13 +186,14 @@ async function main() {
   });
 
   // Idempotent replace: drop rule-derived lexemes rooted at this set's words
-  // (word_forms cascade on lexeme delete).
+  // (word_forms cascade on lexeme delete). Chunked for the same reason as above.
   const rootIds = lexemeInserts.map((l) => l.root_word_id);
-  if (rootIds.length) {
+  for (let i = 0; i < rootIds.length; i += 300) {
+    const batch = rootIds.slice(i, i + 300);
     const { error: delLexErr } = await db
       .from("lexemes")
       .delete()
-      .in("root_word_id", rootIds)
+      .in("root_word_id", batch)
       .eq("provenance", PROVENANCE);
     if (delLexErr) {
       console.error("lexemes delete error:", delLexErr.message);
