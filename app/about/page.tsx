@@ -73,6 +73,27 @@ const SOURCES: Source[] = [
     note: "Shown verbatim in the original Punjabi, never machine-translated. Mined only for grammar statements the scholar makes explicitly.",
   },
   {
+    name: "Monier-Williams Sanskrit-English Dictionary (1899)",
+    role: "Cited glosses for Sanskrit roots on the etymology tab.",
+    status: "in-use",
+    url: "https://www.sanskrit-lexicon.uni-koeln.de/scans/MWScan/2020/web/index.php",
+    note: "Public domain. Looked up per root via the Cologne Digital Sanskrit Dictionaries (C-SALT) API, University of Cologne.",
+  },
+  {
+    name: "Steingass, A Comprehensive Persian-English Dictionary (1892)",
+    role: "Cited glosses for Persian and Arabic roots on the etymology tab.",
+    status: "in-use",
+    url: "https://dsal.uchicago.edu/dictionaries/steingass/",
+    note: "The 1892 work is public domain; the digitization is served by the Digital Dictionaries of South Asia (University of Chicago), whose pages carry a CC BY-NC-ND notice. We use attributed per-word glosses only, strictly non-commercially, have notified DSAL of this use, and will remove the glosses on their request.",
+  },
+  {
+    name: "Platts, A Dictionary of Urdu, Classical Hindi, and English (1884)",
+    role: "Cited glosses for Urdu (and some Arabic) roots on the etymology tab.",
+    status: "in-use",
+    url: "https://dsal.uchicago.edu/dictionaries/platts/",
+    note: "Same basis as Steingass above: public-domain work, DSAL digitization, attributed per-word glosses only, removable on request.",
+  },
+  {
     name: "The Guru Granth Sahib Dictionary (SikhRI)",
     role: "Per-word meanings and grammar — the strongest candidate for citable, scholar-verified grammar.",
     status: "pending-permission",
