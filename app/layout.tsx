@@ -92,6 +92,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/about" style={{ color: "var(--accent)", textDecoration: "none" }}>
               Sources &amp; licensing
             </a>
+            {" · "}
+            <a href="/health" style={{ color: "var(--accent)", textDecoration: "none" }}>
+              Data health
+            </a>
           </p>
         </footer>
       </body>
