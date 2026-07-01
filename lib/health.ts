@@ -63,6 +63,10 @@ type HealthStats = {
   orphan_definitions: number;
   provenance_breakdown: { table_name: string; provenance: string; rows: number }[];
   review_status_breakdown: { table_name: string; review_status: string; rows: number }[];
+
+  open_flags_total: number;
+  open_flags_by_target: { target: string; rows: number }[];
+  open_flags_by_type: { flag_type: string; rows: number }[];
 };
 
 function pct(part: number, whole: number): string {
@@ -224,6 +228,28 @@ export async function computeHealth(): Promise<HealthReport> {
       label: "Review status breakdown",
       group: "Integrity",
       value: s.review_status_breakdown.map((r) => ({ table: r.table_name, status: r.review_status, rows: r.rows })),
+    },
+
+    // Curation (P4 — community flagging)
+    {
+      key: "open_flags_total",
+      label: "Open flags awaiting review",
+      group: "Curation",
+      value: s.open_flags_total,
+      status: s.open_flags_total > 0 ? "info" : "ok",
+      note: "Submitted via the word page; review at /admin/flags.",
+    },
+    {
+      key: "open_flags_by_target",
+      label: "Open flags by target",
+      group: "Curation",
+      value: s.open_flags_by_target.map((r) => ({ target: r.target, count: r.rows })),
+    },
+    {
+      key: "open_flags_by_type",
+      label: "Open flags by type",
+      group: "Curation",
+      value: s.open_flags_by_type.map((r) => ({ type: r.flag_type, count: r.rows })),
     },
   ];
 
