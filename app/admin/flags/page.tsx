@@ -28,6 +28,81 @@ const TARGET_LABEL: Record<string, string> = {
 
 type FlagWithWord = Flag & { words: { gurmukhi: string; frequency: number } | null };
 
+// Must match pipeline/grammar/auto-flag.ts's SYSTEM_REPORTER. A "doubt" flag is
+// an automated one raised for an unverified rule; those dominate at corpus scale
+// (thousands, from ~2 rules) and would bury the handful of genuinely reviewable
+// conflicts + real user submissions, so they live behind their own filter.
+const SYSTEM_REPORTER = "Rule engine (automated)";
+function isDoubtFlag(f: FlagWithWord): boolean {
+  return f.reporter_name === SYSTEM_REPORTER && f.flag_type === "unclear";
+}
+
+type FilterView = "review" | "doubt" | "all";
+
+// Cap how many word-groups we render. The doubt view can be thousands of
+// near-identical rows; frequency-sorted, so the capped set is the highest-impact
+// slice. Fetching stays complete (for accurate counts); only rendering is capped.
+const MAX_GROUPS_RENDERED = 150;
+
+// Paginated so the fetch never hits Supabase's silent 1000-row cap — with the
+// corpus-wide auto-flag pass this table holds thousands of open flags, and an
+// unpaginated select would quietly drop everything past the first 1000.
+async function fetchAllOpenFlags(db: ReturnType<typeof supabaseAdmin>): Promise<FlagWithWord[]> {
+  const rows: FlagWithWord[] = [];
+  const PAGE = 1000;
+  for (let offset = 0; ; offset += PAGE) {
+    const { data, error } = await db
+      .from("flags")
+      .select("*, words(gurmukhi, frequency)")
+      .eq("status", "open")
+      .order("created_at", { ascending: true })
+      .range(offset, offset + PAGE - 1);
+    if (error) throw new Error(`fetchAllOpenFlags: ${error.message}`);
+    const batch = (data ?? []) as unknown as FlagWithWord[];
+    rows.push(...batch);
+    if (batch.length < PAGE) break;
+  }
+  return rows;
+}
+
+function FilterTabs({ current, flagKey, counts }: {
+  current: FilterView;
+  flagKey: string;
+  counts: Record<FilterView, number>;
+}) {
+  const tabs: { view: FilterView; label: string }[] = [
+    { view: "review", label: "To review" },
+    { view: "doubt", label: "Rule doubt" },
+    { view: "all", label: "All" },
+  ];
+  return (
+    <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+      {tabs.map(({ view, label }) => {
+        const active = view === current;
+        return (
+          <a
+            key={view}
+            href={`/admin/flags?key=${encodeURIComponent(flagKey)}&filter=${view}`}
+            style={{
+              fontFamily: '"Inter", sans-serif',
+              fontSize: "0.8rem",
+              fontWeight: active ? 600 : 400,
+              padding: "0.3rem 0.7rem",
+              borderRadius: "999px",
+              textDecoration: "none",
+              background: active ? "var(--accent)" : "var(--bg-alt)",
+              color: active ? "white" : "var(--text-secondary)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {label} ({counts[view].toLocaleString()})
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 function FlagCard({ flag, flagKey }: { flag: FlagWithWord; flagKey: string }) {
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: "8px", padding: "0.85rem 1.1rem", background: "white" }}>
@@ -111,31 +186,35 @@ function FlagCard({ flag, flagKey }: { flag: FlagWithWord; flagKey: string }) {
 export default async function FlagQueuePage({
   searchParams,
 }: {
-  searchParams: Promise<{ key?: string }>;
+  searchParams: Promise<{ key?: string; filter?: string }>;
 }) {
-  const { key } = await searchParams;
+  const { key, filter: filterParam } = await searchParams;
   if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
     notFound();
   }
+  const filter: FilterView = filterParam === "doubt" ? "doubt" : filterParam === "all" ? "all" : "review";
 
   const db = supabaseAdmin();
-  const [{ data: flagRows }, { data: heatmapData }] = await Promise.all([
-    db
-      .from("flags")
-      .select("*, words(gurmukhi, frequency)")
-      .eq("status", "open")
-      .order("created_at", { ascending: true }),
-    db.rpc("flag_heatmap"),
+  const [allFlags, heatmapData] = await Promise.all([
+    fetchAllOpenFlags(db),
+    db.rpc("flag_heatmap").then((r) => r.data),
   ]);
-
-  const flags = (flagRows ?? []) as unknown as FlagWithWord[];
   const heatmap = (heatmapData ?? []) as { ang: number; weight: number }[];
+
+  const doubtFlags = allFlags.filter(isDoubtFlag);
+  const reviewFlags = allFlags.filter((f) => !isDoubtFlag(f));
+  const counts: Record<FilterView, number> = {
+    review: reviewFlags.length,
+    doubt: doubtFlags.length,
+    all: allFlags.length,
+  };
+  const shown = filter === "doubt" ? doubtFlags : filter === "all" ? allFlags : reviewFlags;
 
   // Group by word, sorted by that word's corpus frequency — a flag on a word
   // occurring 400 times matters far more than one occurring once, and grouping
   // surfaces every flag on that word together instead of scattering them.
   const byWord = new Map<number, { gurmukhi: string; frequency: number; flags: FlagWithWord[] }>();
-  for (const flag of flags) {
+  for (const flag of shown) {
     const entry = byWord.get(flag.word_id) ?? {
       gurmukhi: flag.words?.gurmukhi ?? `word #${flag.word_id}`,
       frequency: flag.words?.frequency ?? 0,
@@ -144,20 +223,30 @@ export default async function FlagQueuePage({
     entry.flags.push(flag);
     byWord.set(flag.word_id, entry);
   }
-  const groups = Array.from(byWord.entries()).sort((a, b) => b[1].frequency - a[1].frequency);
+  const allGroups = Array.from(byWord.entries()).sort((a, b) => b[1].frequency - a[1].frequency);
+  const groups = allGroups.slice(0, MAX_GROUPS_RENDERED);
+  const hiddenWords = allGroups.length - groups.length;
 
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
       <h1 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.25rem" }}>Flag queue</h1>
-      <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-        {flags.length} open flag{flags.length === 1 ? "" : "s"} across {groups.length} word{groups.length === 1 ? "" : "s"}, sorted by corpus frequency
+      <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: "1.25rem" }}>
+        {shown.length.toLocaleString()} flag{shown.length === 1 ? "" : "s"} in this view across {allGroups.length.toLocaleString()} word{allGroups.length === 1 ? "" : "s"}, sorted by corpus frequency
       </p>
 
-      {heatmap.length > 0 && <AngHeatmap data={heatmap} />}
+      <FilterTabs current={filter} flagKey={key!} counts={counts} />
 
-      {flags.length === 0 && (
+      {filter === "doubt" && (
+        <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.82rem", color: "var(--text-secondary)", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: "6px", padding: "0.6rem 0.85rem", marginBottom: "1.25rem" }}>
+          These are readings the rule engine produced from grammar rules not yet verified against the published Gurbani Viakaran (mostly two: mukta&nbsp;→&nbsp;oblique and sihari&nbsp;→&nbsp;oblique). Verifying those rules at the source resolves most of these at once — reviewing them one by one is not the intended workflow.
+        </p>
+      )}
+
+      {filter !== "review" && heatmap.length > 0 && <AngHeatmap data={heatmap} />}
+
+      {shown.length === 0 && (
         <p style={{ fontFamily: '"Inter", sans-serif', color: "var(--text-secondary)", fontStyle: "italic" }}>
-          Nothing to review.
+          Nothing to review here.
         </p>
       )}
 
@@ -189,6 +278,12 @@ export default async function FlagQueuePage({
           </div>
         ))}
       </div>
+
+      {hiddenWords > 0 && (
+        <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.82rem", color: "var(--text-secondary)", fontStyle: "italic", marginTop: "1.75rem" }}>
+          Showing the top {groups.length.toLocaleString()} words by frequency · {hiddenWords.toLocaleString()} more not shown.
+        </p>
+      )}
     </div>
   );
 }
