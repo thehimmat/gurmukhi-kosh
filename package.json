@@ -24,7 +24,7 @@
     "test": "vitest run tests/"
   },
   "dependencies": {
-    "@atthebunga/gurmukhi-input": "^1.1.1",
+    "@atthebunga/gurmukhi-input": "^1.3.0",
     "@indic-transliteration/sanscript": "^1.3.3",
     "@supabase/supabase-js": "^2.106.1",
     "dotenv": "^17.4.2",
