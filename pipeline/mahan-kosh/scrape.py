@@ -25,7 +25,7 @@ import requests
 
 OUTPUT_PATH = "pipeline/mahan-kosh/output/entries.jsonl"
 MK_API_BASE = "https://backend.searchgurbani.com/api/res/mahan-kosh/view"
-DELAY_S = 0.30   # polite delay between requests
+DELAY_S = 0.50   # polite delay between requests (backoff handles 429 bursts)
 PAGE_SIZE = 1000  # Supabase batch size
 
 
@@ -79,6 +79,45 @@ def fetch_all_words(supabase_url: str, anon_key: str) -> list[dict]:
     return words
 
 
+def fetch_word_set_words(supabase_url: str, anon_key: str, code: str) -> list[dict]:
+    """Fetch the words belonging to a named word set (e.g. 'japji'),
+    returning [{id, gurmukhi}] to match fetch_all_words()."""
+    headers = {"apikey": anon_key, "Authorization": f"Bearer {anon_key}"}
+
+    set_resp = requests.get(
+        f"{supabase_url}/rest/v1/word_sets?select=id&code=eq.{code}",
+        headers=headers, timeout=30,
+    )
+    set_resp.raise_for_status()
+    set_rows = set_resp.json()
+    if not set_rows:
+        print(f"ERROR: word set '{code}' not found. Build it: npm run wordset:build -- --set={code}")
+        sys.exit(1)
+    set_id = set_rows[0]["id"]
+
+    words = []
+    offset = 0
+    while True:
+        url = (
+            f"{supabase_url}/rest/v1/word_set_members"
+            f"?select=word_id,words(gurmukhi)"
+            f"&word_set_id=eq.{set_id}"
+            f"&order=occurrence_count.desc"
+            f"&offset={offset}&limit={PAGE_SIZE}"
+        )
+        resp = requests.get(url, headers=headers, timeout=30)
+        resp.raise_for_status()
+        batch = resp.json()
+        for row in batch:
+            w = row.get("words") or {}
+            if w.get("gurmukhi"):
+                words.append({"id": row["word_id"], "gurmukhi": w["gurmukhi"]})
+        if len(batch) < PAGE_SIZE:
+            break
+        offset += PAGE_SIZE
+    return words
+
+
 # ---------------------------------------------------------------------------
 # Mahan Kosh API lookup
 # ---------------------------------------------------------------------------
@@ -96,18 +135,29 @@ def lookup_word(word: str) -> dict | None:
     """
     Query the Mahan Kosh API for `word`.
     Returns the first matching API line entry (dict), or None if no match found.
+    Raises on transport/parse error so the caller can skip and retry next run
+    (a network blip must NOT be recorded as a permanent "no match").
     Matching strategy:
       1. Exact match on `line["word"] == word`
       2. Normalized match: strip trailing short vowels from both sides
     """
     url = f"{MK_API_BASE}?keyword={requests.utils.quote(word)}&alpha=alpha&page=0"
-    try:
-        resp = SESSION.get(url, timeout=20)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        print(f"\n  API error for '{word}': {e}")
-        return None
+    data = None
+    backoff = 2.0
+    for _ in range(4):
+        try:
+            resp = SESSION.get(url, timeout=20)
+            if resp.status_code == 429:  # rate limited — back off and retry
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            break
+        except Exception as e:
+            raise RuntimeError(f"API error for '{word}': {e}") from e
+    if data is None:
+        raise RuntimeError(f"API error for '{word}': rate-limited (429) after retries")
 
     lines = data.get("lines") or []
     if not lines:
@@ -236,6 +286,8 @@ def load_checkpoint(path: str) -> set[str]:
 def main():
     parser = argparse.ArgumentParser(description="Scrape Mahan Kosh entries for SGGS words.")
     parser.add_argument("--limit", type=int, default=0, help="Max words to process (0=all)")
+    parser.add_argument("--word-set", dest="word_set", default=None,
+                        help="Restrict to a named word set, e.g. 'japji'")
     args = parser.parse_args()
 
     env = load_env()
@@ -248,9 +300,14 @@ def main():
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
-    print(f"Fetching word list from Supabase ({supabase_url})...")
-    words = fetch_all_words(supabase_url, anon_key)
-    print(f"Total words in DB: {len(words)}")
+    if args.word_set:
+        print(f"Fetching word set '{args.word_set}' from Supabase ({supabase_url})...")
+        words = fetch_word_set_words(supabase_url, anon_key, args.word_set)
+        print(f"Words in set '{args.word_set}': {len(words)}")
+    else:
+        print(f"Fetching word list from Supabase ({supabase_url})...")
+        words = fetch_all_words(supabase_url, anon_key)
+        print(f"Total words in DB: {len(words)}")
 
     if args.limit:
         words = words[: args.limit]
@@ -271,7 +328,14 @@ def main():
             if word in done:
                 continue
 
-            entry = lookup_word(word)
+            try:
+                entry = lookup_word(word)
+            except Exception as e:
+                # Transient error — skip without checkpointing so it retries next run.
+                errors += 1
+                print(f"\n  {e} — will retry next run")
+                time.sleep(DELAY_S)
+                continue
 
             if entry and entry.get("description"):
                 record = {

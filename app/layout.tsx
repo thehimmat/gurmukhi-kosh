@@ -88,6 +88,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </a>{" "}
             · Sri Guru Granth Sahib Ji
           </p>
+          <p style={{ marginTop: "0.5rem" }}>
+            <a href="/about" style={{ color: "var(--accent)", textDecoration: "none" }}>
+              Sources &amp; licensing
+            </a>
+            {" · "}
+            <a href="/health" style={{ color: "var(--accent)", textDecoration: "none" }}>
+              Data health
+            </a>
+          </p>
         </footer>
       </body>
     </html>

@@ -1,11 +1,18 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
-import type { DefinitionWithSource, Etymology, WordGrammar } from "@/lib/supabase";
+import type { DefinitionWithSource, Etymology, WordGrammarWithRule } from "@/lib/supabase";
+import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
+import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
+import { TabNav } from "@/components/word/TabNav";
+import { FlagForm } from "@/components/word/FlagForm";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ gurmukhi: string }> };
+type Props = {
+  params: Promise<{ gurmukhi: string }>;
+  searchParams: Promise<{ tab?: string; page?: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { gurmukhi } = await params;
@@ -80,30 +87,49 @@ function CrossRefTags({ refs }: { refs: Record<string, string> | null }) {
   );
 }
 
+function EmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ color: "var(--text-secondary)", fontStyle: "italic", fontFamily: '"Inter", sans-serif', fontSize: "0.95rem", padding: "1rem 0" }}>
+      {children}
+    </p>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default async function WordPage({ params }: Props) {
+export default async function WordPage({ params, searchParams }: Props) {
   const { gurmukhi: encoded } = await params;
+  const { tab = "overview", page: pageParam } = await searchParams;
+  const OCC_PAGE_SIZE = 50;
+  const occPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const word = decodeURIComponent(encoded);
 
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, word_grammar(*)")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*, grammar_rules(*))")
     .eq("gurmukhi", word)
     .single();
 
   if (!wordRow) notFound();
 
   const wordId = wordRow.id;
-  const grammar = ((wordRow as unknown as { word_grammar: WordGrammar[] }).word_grammar ?? []);
+  const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
+  const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
+  const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
+  const grammar = ((wordRow as unknown as { word_grammar: WordGrammarWithRule[] }).word_grammar ?? []);
+  // Regroup the raw rows into one view per attribute: each value with its
+  // distinct sources (cited scholar > dictionary > rule > heuristic), so the UI
+  // can corroborate agreement and flag conflicts instead of stacking raw rows.
+  const grammarView = buildGrammarView(grammar);
+  const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
   const [defsResult, etymResult, occsResult, lexemeFormResult] = await Promise.all([
     // Definitions with source info
     supabase
       .from("definitions")
-      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, dict_sources(code, name, language, url)")
+      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
       .eq("word_id", wordId)
       .order("dict_source_id", { ascending: true })
       .order("sense_number", { ascending: true }),
@@ -122,12 +148,16 @@ export default async function WordPage({ params }: Props) {
         id, position,
         lines (
           id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-          shabads ( id, raag_english, writer_english, ang_start )
+          shabads ( id, raag_english, writer_english, ang_start ),
+          line_translations (
+            body_unicode, language, caveat,
+            translation_sources ( code, name, author, kind, notes, url )
+          )
         )
       `)
       .eq("word_id", wordId)
       .order("id", { ascending: true })
-      .limit(100),
+      .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1),
 
     // Morphological variants: find the lexeme this word belongs to (if any)
     supabase
@@ -155,17 +185,26 @@ export default async function WordPage({ params }: Props) {
   }
 
   // Group definitions by source
-  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; defs: DefinitionWithSource[] }>();
+  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
   for (const def of definitions) {
     const src = def.dict_sources as unknown as { code: string; name: string; url: string | null } | null;
     const key = src?.code ?? "unknown";
     if (!defsBySource.has(key)) {
-      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, defs: [] });
+      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, provenance: def.provenance ?? null, reviewStatus: def.review_status ?? null, defs: [] });
     }
     defsBySource.get(key)!.defs.push(def);
   }
 
   // Occurrences — group by raag
+  type LineCommentary = {
+    body_unicode: string;
+    language: string;
+    caveat: string | null;
+    translation_sources: {
+      code: string; name: string; author: string | null; kind: string;
+      notes: string | null; url: string | null;
+    } | null;
+  };
   type OccRow = {
     id: number;
     position: number;
@@ -174,6 +213,7 @@ export default async function WordPage({ params }: Props) {
       translation_en: string | null; transliteration_en: string | null;
       shabad_id: number;
       shabads: { id: number; raag_english: string | null; writer_english: string | null } | null;
+      line_translations: LineCommentary[] | null;
     } | null;
   };
   const rows = (occsResult.data ?? []) as unknown as OccRow[];
@@ -200,6 +240,66 @@ export default async function WordPage({ params }: Props) {
     pronoun: "Pronoun", particle: "Particle", postposition: "Postposition",
     conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
   };
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  // Order per-line commentaries: Sahib Singh first, Faridkot (archaic) last.
+  const COMMENTARY_ORDER = ["ss_darpan", "ss_padarth", "manmohan_pa", "manmohan_en", "faridkot"];
+  const commentaryRank = (code: string | undefined) => {
+    const i = COMMENTARY_ORDER.indexOf(code ?? "");
+    return i === -1 ? 99 : i;
+  };
+  // Display a grammar value: POS uses the long label table, others just capitalize.
+  const fmtGrammar = (attribute: string, value: string) =>
+    attribute === "pos" ? GRAMMAR_LABELS[value.toLowerCase()] ?? value : cap(value);
+  // Map a source kind to the existing provenance pill, an honest tier label, and
+  // the adjective used when noting a disagreeing reading.
+  const KIND_PROVENANCE: Record<string, string> = {
+    scholar: "imported", dictionary: "scraped", rule: "rule_derived", heuristic: "computed",
+  };
+  const KIND_TIER: Record<string, string> = {
+    scholar: "Read from a cited source", dictionary: "Read from a cited source",
+    rule: "Established grammar rule", heuristic: "Our grouping heuristic",
+  };
+  const KIND_WORD: Record<string, string> = {
+    scholar: "cited", dictionary: "dictionary", rule: "rule-derived", heuristic: "heuristic",
+  };
+
+  // Usage tab: common phrases (bigrams) + statistical collocations. Fetch the
+  // pair rows, then resolve partner word_ids to Gurmukhi in one follow-up query.
+  let phrases: Array<{ w1: string; w2: string; count: number }> = [];
+  let collocates: Array<{ partner: string; count: number; pmi: number | null }> = [];
+  let writerStats: Array<{ writer: string; count: number }> = [];
+  if (tab === "usage") {
+    const [bgRes, colRes, wsRes] = await Promise.all([
+      supabase.from("bigrams").select("w1_id, w2_id, pair_count")
+        .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
+        .order("pair_count", { ascending: false }).limit(15),
+      supabase.from("collocations").select("word_a_id, word_b_id, pair_count, pmi")
+        .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
+        .order("pmi", { ascending: false }).limit(15),
+      // writer_english requires migration 008; before it is applied this errors
+      // and degrades to an empty list (we only read .data).
+      supabase.from("word_writer_stats").select("writer_english, occurrence_count")
+        .eq("word_id", wordId)
+        .order("occurrence_count", { ascending: false }).limit(8),
+    ]);
+    const bgRows = (bgRes.data ?? []) as Array<{ w1_id: number; w2_id: number; pair_count: number }>;
+    const colRows = (colRes.data ?? []) as Array<{ word_a_id: number; word_b_id: number; pair_count: number; pmi: number | null }>;
+    const partnerIds = new Set<number>();
+    for (const r of bgRows) { partnerIds.add(r.w1_id); partnerIds.add(r.w2_id); }
+    for (const r of colRows) { partnerIds.add(r.word_a_id); partnerIds.add(r.word_b_id); }
+    const { data: partnerWords } = partnerIds.size
+      ? await supabase.from("words").select("id, gurmukhi").in("id", [...partnerIds])
+      : { data: [] };
+    const idToGur = new Map(((partnerWords ?? []) as Array<{ id: number; gurmukhi: string }>).map((w) => [w.id, w.gurmukhi]));
+    phrases = bgRows.map((r) => ({ w1: idToGur.get(r.w1_id) ?? "?", w2: idToGur.get(r.w2_id) ?? "?", count: r.pair_count }));
+    collocates = colRows.map((r) => {
+      const partnerId = r.word_a_id === wordId ? r.word_b_id : r.word_a_id;
+      return { partner: idToGur.get(partnerId) ?? "?", count: r.pair_count, pmi: r.pmi };
+    });
+    writerStats = ((wsRes.data ?? []) as Array<{ writer_english: string | null; occurrence_count: number }>)
+      .filter((r) => r.writer_english)
+      .map((r) => ({ writer: r.writer_english!, count: r.occurrence_count }));
+  }
 
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
@@ -214,13 +314,29 @@ export default async function WordPage({ params }: Props) {
         <h1 className="gurmukhi-xl" style={{ marginBottom: "0.25rem" }}>
           {word}
         </h1>
+        {ipaDisplay && (
+          <p
+            title="Display IPA (rule-derived from Gurmukhi phoneme rules)"
+            style={{
+              fontFamily: '"Inter", sans-serif',
+              color: "var(--text-secondary)",
+              fontSize: "1.05rem",
+              margin: "0.15rem 0 0.4rem",
+            }}
+          >
+            /{ipaDisplay}/
+          </p>
+        )}
         <span className="badge" style={{ marginTop: "0.5rem" }}>
           {wordRow.frequency.toLocaleString()} occurrences in SGGS
         </span>
       </div>
 
-      {/* ── 2. Morphological variants ── */}
-      {morphForms.length > 0 && (
+      {/* ── Tab Navigation ── */}
+      <TabNav gurmukhi={word} currentTab={tab} />
+
+      {/* ── 2. Morphological variants (overview) ── */}
+      {tab === "overview" && morphForms.length > 0 && (
         <section style={{ marginBottom: "2rem" }}>
           <SectionHeading>Forms</SectionHeading>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
@@ -242,17 +358,18 @@ export default async function WordPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── 3. Definitions ── */}
-      {defsBySource.size > 0 && (
+      {/* ── 3. Definitions (overview + meanings) ── */}
+      {(tab === "overview" || tab === "meanings") && defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
-          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, defs }]) => (
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, provenance, reviewStatus, defs }]) => (
             <div key={code} style={{ marginBottom: "1.25rem" }}>
               {/* Source name */}
-              <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
                   {sourceName}
                 </span>
+                <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />
                 {(sourceUrl || code === "mahan_kosh") && (
                   <a
                     href={code === "mahan_kosh"
@@ -286,6 +403,12 @@ export default async function WordPage({ params }: Props) {
                       {def.definition_en}
                     </p>
                   )}
+                  <FlagForm
+                    wordId={wordId}
+                    targetTable="definitions"
+                    targetId={def.id}
+                    contextLabel={`Definition${defs.length > 1 ? ` ${def.sense_number}` : ""} (${sourceName})`}
+                  />
                 </div>
               ))}
             </div>
@@ -293,65 +416,193 @@ export default async function WordPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── 4. Grammar ── */}
-      {grammar.length > 0 && (
+      {/* ── Meanings empty state ── */}
+      {tab === "meanings" && defsBySource.size === 0 && (
+        <EmptyState>No dictionary definitions ingested for this word yet.</EmptyState>
+      )}
+
+      {/* ── Pronunciation (overview + pronunciation) ── */}
+      {(tab === "overview" || tab === "pronunciation") && (
         <section style={{ marginBottom: "2.5rem" }}>
-          <SectionHeading>Grammar</SectionHeading>
-          {grammar.map((g) => (
-            <div key={g.id} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
-              {g.pos && (
-                <span className="badge">
-                  {GRAMMAR_LABELS[g.pos.toLowerCase()] ?? g.pos}
-                </span>
-              )}
-              {g.gender && (
-                <span className="badge">
-                  {g.gender.charAt(0).toUpperCase() + g.gender.slice(1)}
-                </span>
-              )}
-              {g.number && (
-                <span className="badge">
-                  {g.number.charAt(0).toUpperCase() + g.number.slice(1)}
-                </span>
-              )}
-              {g.gram_case && (
-                <span className="badge">
-                  {g.gram_case.charAt(0).toUpperCase() + g.gram_case.slice(1)}
-                </span>
-              )}
-              {g.notes && (
-                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
-                  {g.notes}
-                </span>
-              )}
-            </div>
-          ))}
+          <SectionHeading>Pronunciation</SectionHeading>
+          <div style={CARD}>
+            {ipaDisplay ? (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: romanIso || romanPractical ? "0.5rem" : 0 }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>IPA</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "1.05rem" }}>/{ipaDisplay}/</span>
+              </div>
+            ) : (
+              <EmptyState>No IPA generated yet.</EmptyState>
+            )}
+            {romanIso && (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: romanPractical ? "0.5rem" : 0 }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>ISO 15919</span>
+                <span style={{ fontStyle: "italic" }}>{romanIso}</span>
+              </div>
+            )}
+            {romanPractical && (
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline" }}>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "7rem" }}>Practical</span>
+                <span style={{ fontStyle: "italic" }}>{romanPractical}</span>
+              </div>
+            )}
+          </div>
+          {tab === "pronunciation" && (
+            <EmptyState>Audio pronunciation is planned for a later phase.</EmptyState>
+          )}
         </section>
       )}
 
-      {/* ── 5. Etymology ── */}
-      {etymology.length > 0 && (
+      {/* ── 4. Grammar (grammar tab) ── */}
+      {tab === "grammar" && grammar.length > 0 && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Grammar</SectionHeading>
+
+          {/* Honest framing: distinguish facts read from a scholar from rule-derived ones. */}
+          <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
+            {hasSourcedGrammar && (
+              <>
+                Entries marked <em>Imported</em> are read directly from a cited scholarly
+                source: Prof. Sahib Singh&apos;s explicit grammar notes in his <em>Sri Guru
+                Granth Sahib Darpan</em> pad-arth, with the line cited.{" "}
+              </>
+            )}
+            The remaining analysis is produced by applying established Gurbani grammar
+            rules (Prof. Sahib Singh&apos;s Viakaran) to each word&apos;s form, alongside the
+            part-of-speech markers in its Mahan Kosh entry. That part is rule-derived and
+            deterministic, not a per-word guess; where a word&apos;s ending is ambiguous we
+            leave a field blank rather than assume. Expand &ldquo;How we determined this&rdquo;
+            on any entry to see the exact rule or source. Unverified rules are pending
+            page-level verification against the published text.
+          </p>
+
+          {grammarView.map((av: AttributeView) => {
+            const lead: AttributeReading = av.readings[0];
+            const others = av.readings.slice(1);
+            const leadSource = lead.attestations[0];
+            return (
+              <div key={av.attribute} style={{ ...CARD, marginBottom: "0.75rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
+                    {av.label}
+                  </span>
+                  <span className="badge">{fmtGrammar(av.attribute, lead.value)}</span>
+                  {lead.attestations.length > 1 && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#1d7333", background: "#e1f1e6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
+                      Corroborated by {lead.attestations.length} sources
+                    </span>
+                  )}
+                  {av.conflict && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.68rem", fontWeight: 500, color: "var(--text-secondary)", opacity: 0.75 }}>
+                      · other readings differ
+                    </span>
+                  )}
+                  {av.polysemy && (
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#5c574f", background: "#eceae6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
+                      Multiple senses
+                    </span>
+                  )}
+                  <span style={{ marginLeft: "auto" }}>
+                    <ProvenanceBadge provenance={KIND_PROVENANCE[leadSource.sourceKind]} reviewStatus={leadSource.verified ? "approved" : "unreviewed"} />
+                  </span>
+                </div>
+
+                {/* Polysemy: the same source simply lists more than one value (senses).
+                    Shown neutrally, with no "we may be wrong" framing. */}
+                {av.polysemy && others.map((r) => (
+                  <div key={r.value} style={{ marginTop: "0.5rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                    <span className="badge" style={{ marginRight: "0.4rem", opacity: 0.85 }}>{fmtGrammar(av.attribute, r.value)}</span>
+                    Also recorded by {r.attestations[0].sourceLabel} as a separate sense.
+                  </div>
+                ))}
+
+                {/* Conflict: a disagreeing reading, demoted, with feedback invited.
+                    Distinguish OUR reading being overruled from two real sources differing. */}
+                {av.conflict && others.map((r) => {
+                  const kind = r.attestations[0].sourceKind;
+                  const ours = kind === "rule" || kind === "heuristic";
+                  return (
+                    <div key={r.value} style={{ marginTop: "0.55rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                      <span style={{ textDecoration: "line-through", opacity: 0.7, marginRight: "0.4rem" }}>{fmtGrammar(av.attribute, r.value)}</span>
+                      {ours
+                        ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
+                        : `${r.attestations[0].sourceLabel} reads this differently; the lead source takes precedence, but the sources genuinely differ here.`}
+                    </div>
+                  );
+                })}
+
+                <FlagForm
+                  wordId={wordId}
+                  targetTable="word_grammar"
+                  contextLabel={`Grammar — ${av.label}: ${fmtGrammar(av.attribute, lead.value)}`}
+                />
+
+                <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
+                  <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
+                    How we determined this
+                  </summary>
+                  <div style={{ marginTop: "0.55rem", color: "var(--text-secondary)", lineHeight: 1.6, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
+                    {av.readings.map((r) => (
+                      <div key={r.value}>
+                        <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>{fmtGrammar(av.attribute, r.value)}</div>
+                        {r.attestations.map((a, i) => (
+                          <div key={i} style={{ marginTop: "0.35rem" }}>
+                            <div style={{ fontWeight: 600 }}>{a.sourceLabel}</div>
+                            {a.explanation && <div>{a.explanation}</div>}
+                            {a.citation && <div style={{ fontStyle: "italic", marginTop: "0.2rem" }}>Source: {a.citation}</div>}
+                            <div style={{ marginTop: "0.25rem", fontSize: "0.78rem" }}>
+                              {KIND_TIER[a.sourceKind]}
+                              {" · "}
+                              {a.verified ? "Verified against source" : a.confidenceLabel ? `Confidence: ${a.confidenceLabel}` : "Not yet scholar-verified"}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              </div>
+            );
+          })}
+        </section>
+      )}
+
+      {/* ── Grammar empty state ── */}
+      {tab === "grammar" && grammar.length === 0 && (
+        <EmptyState>No grammatical analysis yet. Rule-based grammar candidates arrive in a later phase.</EmptyState>
+      )}
+
+      {/* ── 5. Etymology (etymology tab) ── */}
+      {tab === "etymology" && etymology.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Etymology</SectionHeading>
           <div style={CARD}>
             {etymology.map((e, i) => (
-              <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", marginBottom: i < etymology.length - 1 ? "0.5rem" : 0 }}>
+              <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", flexWrap: "wrap", marginBottom: i < etymology.length - 1 ? "0.75rem" : 0 }}>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)", minWidth: "5rem" }}>
                   {e.origin_language}
                 </span>
-                <div>
-                  {e.root_form && (
-                    <span className="gurmukhi" style={{ marginRight: "0.4rem" }}>{e.root_form}</span>
-                  )}
-                  {e.root_form_roman && (
-                    <span style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem", marginRight: "0.4rem" }}>
-                      ({e.root_form_roman})
-                    </span>
-                  )}
+                <div style={{ flex: 1, minWidth: "12rem" }}>
+                  <div>
+                    {e.root_form && (
+                      <span className="gurmukhi" style={{ marginRight: "0.4rem" }}>{e.root_form}</span>
+                    )}
+                    {e.root_form_roman && (
+                      <span style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem", marginRight: "0.4rem" }}>
+                        ({e.root_form_roman})
+                      </span>
+                    )}
+                    <ProvenanceBadge provenance={e.provenance ?? null} reviewStatus={e.review_status ?? null} />
+                  </div>
                   {e.derivation_note && (
-                    <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", margin: "0.3rem 0 0" }}>
                       {e.derivation_note}
-                    </span>
+                    </p>
+                  )}
+                  {e.source_text && (
+                    <p className="gurmukhi" style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.3rem 0 0", fontStyle: "italic" }}>
+                      {e.source_text}
+                    </p>
                   )}
                 </div>
               </div>
@@ -360,13 +611,81 @@ export default async function WordPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── 6. Occurrences ── */}
+      {/* ── Etymology empty state ── */}
+      {tab === "etymology" && etymology.length === 0 && (
+        <EmptyState>No etymology recorded yet. Cross-dictionary roots (Sanskrit, Farsi, Arabic) arrive in a later phase.</EmptyState>
+      )}
+
+      {/* ── Usage (usage tab) ── */}
+      {tab === "usage" && (
+        <>
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Common phrases</SectionHeading>
+            {phrases.length === 0 ? (
+              <EmptyState>No recurring two-word phrases for this word.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {phrases.map((p, i) => (
+                  <div key={i} style={{ ...CARD, marginBottom: 0, display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "0.6rem 1rem" }}>
+                    <span className="gurmukhi" style={{ fontSize: "1.2rem" }}>
+                      <span style={{ color: p.w1 === word ? "var(--accent)" : "inherit", fontWeight: p.w1 === word ? 600 : 400 }}>{p.w1}</span>
+                      {" "}
+                      <span style={{ color: p.w2 === word ? "var(--accent)" : "inherit", fontWeight: p.w2 === word ? 600 : 400 }}>{p.w2}</span>
+                    </span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>{p.count}×</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Frequently appears near</SectionHeading>
+            {collocates.length === 0 ? (
+              <EmptyState>No strong collocations (within 3 words) for this word.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                {collocates.map((c, i) => (
+                  <a
+                    key={i}
+                    href={`/word/${encodeURIComponent(c.partner)}`}
+                    title={`${c.count}× nearby${c.pmi != null ? ` · PMI ${c.pmi.toFixed(1)}` : ""}`}
+                    style={{ ...CARD, marginBottom: 0, padding: "0.4rem 0.8rem", textDecoration: "none", display: "inline-flex", alignItems: "baseline", gap: "0.4rem" }}
+                  >
+                    <span className="gurmukhi" style={{ fontSize: "1.1rem", color: "var(--accent)" }}>{c.partner}</span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}>{c.count}×</span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section style={{ marginBottom: "2.5rem" }}>
+            <SectionHeading>Most used by</SectionHeading>
+            {writerStats.length === 0 ? (
+              <EmptyState>No writer breakdown available yet.</EmptyState>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {writerStats.map((ws, i) => (
+                  <div key={i} style={{ ...CARD, marginBottom: 0, display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "0.6rem 1rem" }}>
+                    <span style={{ fontFamily: '"Inter", sans-serif' }}>{ws.writer}</span>
+                    <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>{ws.count.toLocaleString()}×</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
+
+      {/* ── 6. Occurrences (occurrences tab) ── */}
+      {tab === "occurrences" && (
       <section>
         <SectionHeading>
           Occurrences in Sri Guru Granth Sahib Ji
-          {rows.length >= 100 && (
+          {wordRow.frequency > 0 && (
             <span style={{ fontWeight: 400, marginLeft: "0.5rem", textTransform: "none", letterSpacing: 0 }}>
-              (showing first 100)
+              ({((occPage - 1) * OCC_PAGE_SIZE + 1).toLocaleString()}–{Math.min(occPage * OCC_PAGE_SIZE, wordRow.frequency).toLocaleString()} of {wordRow.frequency.toLocaleString()})
             </span>
           )}
         </SectionHeading>
@@ -408,12 +727,108 @@ export default async function WordPage({ params }: Props) {
                       {line.translation_en}
                     </p>
                   )}
+
+                  {line.line_translations && line.line_translations.length > 0 && (
+                    <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif' }}>
+                      <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600, fontSize: "0.82rem" }}>
+                        Commentaries &amp; translations ({line.line_translations.length})
+                      </summary>
+                      <div style={{ marginTop: "0.6rem", display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                        {[...line.line_translations]
+                          .sort((a, b) => commentaryRank(a.translation_sources?.code) - commentaryRank(b.translation_sources?.code))
+                          .map((c, i) => {
+                            const src = c.translation_sources;
+                            return (
+                              <div key={i} style={{ borderLeft: "2px solid var(--border)", paddingLeft: "0.7rem" }}>
+                                <div style={{ fontSize: "0.76rem", color: "var(--text-secondary)", fontWeight: 600, marginBottom: "0.2rem" }}>
+                                  {src?.name}{src?.author ? ` · ${src.author}` : ""}
+                                  {src?.kind === "padarth" ? " · word meanings" : ""}
+                                </div>
+                                <p
+                                  className={c.language === "pa" ? "gurmukhi" : undefined}
+                                  style={{ margin: 0, color: "var(--text-primary)", lineHeight: 1.7, fontSize: c.language === "pa" ? "1.05rem" : "0.95rem" }}
+                                >
+                                  {c.body_unicode}
+                                </p>
+                                {(c.caveat ?? src?.notes) && (
+                                  <p style={{ margin: "0.25rem 0 0", fontSize: "0.72rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
+                                    {c.caveat ?? src?.notes}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--text-secondary)" }}>
+                          Punjabi commentaries are shown in the original, not machine-translated. Sourced via BaniDB.
+                        </p>
+                      </div>
+                    </details>
+                  )}
                 </div>
               );
             })}
           </div>
         ))}
+
+        {wordRow.frequency > OCC_PAGE_SIZE && (
+          <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", fontFamily: '"Inter", sans-serif', fontSize: "0.9rem" }}>
+            {occPage > 1 ? (
+              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage - 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>← Previous</a>
+            ) : <span />}
+            <span style={{ color: "var(--text-secondary)" }}>
+              Page {occPage} of {Math.max(1, Math.ceil(wordRow.frequency / OCC_PAGE_SIZE)).toLocaleString()}
+            </span>
+            {occPage * OCC_PAGE_SIZE < wordRow.frequency ? (
+              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage + 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>Next →</a>
+            ) : <span />}
+          </nav>
+        )}
       </section>
+      )}
+
+      {/* ── 7. Sources & provenance (sources tab) ── */}
+      {tab === "sources" && (
+        <section>
+          <SectionHeading>Sources &amp; provenance</SectionHeading>
+          {defsBySource.size === 0 && grammar.length === 0 && (
+            <EmptyState>No sourced data yet for this word.</EmptyState>
+          )}
+          {defsBySource.size > 0 &&
+            Array.from(defsBySource.entries()).map(([key, group]) => (
+              <div key={key} style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                <div>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>{group.sourceName}</span>
+                  <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", marginLeft: "0.5rem" }}>
+                    {group.defs.length} {group.defs.length === 1 ? "sense" : "senses"}
+                  </span>
+                </div>
+                <ProvenanceBadge provenance={group.provenance} reviewStatus={group.reviewStatus} />
+              </div>
+            ))}
+
+          {/* Grammar provenance: be explicit that grammar is rule-derived. */}
+          {grammar.length > 0 && (
+            <div style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+              <div>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Grammar analysis</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", marginLeft: "0.5rem" }}>
+                  rule-derived from Sahib Singh&apos;s Viakaran + Mahan Kosh markers (see the Grammar tab for each rule and its source)
+                </span>
+              </div>
+              <ProvenanceBadge provenance="rule_derived" reviewStatus="unreviewed" />
+            </div>
+          )}
+
+          {/* Planned source, pending permission (reminder + public transparency). */}
+          <div style={{ ...CARD, borderStyle: "dashed" }}>
+            <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Planned: SikhRI — The Guru Granth Sahib Dictionary</span>
+            <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.6, marginTop: "0.35rem", marginBottom: 0 }}>
+              We intend to incorporate SikhRI&apos;s per-word meanings and grammar, with full attribution,
+              once we receive their permission. Not yet integrated.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

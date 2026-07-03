@@ -8,7 +8,11 @@ export type BaniDBVerse = {
     unicode: string;
   };
   translation: {
-    en?: { bdb?: string; ms?: string };
+    en?: { bdb?: string; ms?: string; ssk?: string };
+    // Punjabi teekas/commentaries; each is { gurmukhi, unicode }.
+    //   ss = Sahib Singh (Darpan arth), pss = Sahib Singh pad-arth,
+    //   ft = Faridkot Teeka, ms = Manmohan Singh.
+    pu?: Record<string, { gurmukhi?: string; unicode?: string } | undefined>;
   };
   transliteration: {
     english: string;
@@ -44,5 +48,28 @@ export async function fetchShabad(shabadId: number) {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`BaniDB fetch failed for shabad ${shabadId}: ${res.status}`);
+  return res.json();
+}
+
+// A bani (e.g. Japji Sahib) groups verses across angs. Each entry nests the
+// verse under a `verse` key; `verseId` matches our `lines.verse_id`.
+export type BaniDBBaniVerse = {
+  verse: {
+    verseId: number;
+    pageNo: number;
+    lineNo: number;
+  };
+};
+
+export type BaniDBBani = {
+  baniInfo: unknown;
+  verses: BaniDBBaniVerse[];
+};
+
+export async function fetchBani(baniId: number): Promise<BaniDBBani> {
+  const res = await fetch(`${BASE_URL}/banis/${baniId}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`BaniDB fetch failed for bani ${baniId}: ${res.status}`);
   return res.json();
 }

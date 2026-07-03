@@ -28,6 +28,18 @@ export type Word = {
   id: number;
   gurmukhi: string;
   frequency: number;
+  ipa_display?: string | null;       // faithful display IPA (NOT the phonetic_ipa fuzzy key)
+  roman_iso15919?: string | null;
+  roman_practical?: string | null;
+};
+
+// Provenance + review fields present on every enrichment table (migration 003).
+export type Provenance =
+  | "scraped" | "imported" | "rule_derived" | "computed" | "ai_draft" | "human_verified";
+export type ReviewStatus = "unreviewed" | "approved" | "needs_work" | "rejected";
+export type Curated = {
+  provenance?: Provenance | null;
+  review_status?: ReviewStatus | null;
 };
 
 export type Shabad = {
@@ -83,7 +95,7 @@ export type DictSource = {
   ingested_at: string | null;
 };
 
-export type Definition = {
+export type Definition = Curated & {
   id: number;
   word_id: number;
   dict_source_id: number;
@@ -100,7 +112,7 @@ export type DefinitionWithSource = Definition & {
   dict_sources: DictSource | null;
 };
 
-export type Etymology = {
+export type Etymology = Curated & {
   id: number;
   word_id: number;
   order_index: number;
@@ -111,7 +123,7 @@ export type Etymology = {
   source_text: string | null;
 };
 
-export type WordGrammar = {
+export type WordGrammar = Curated & {
   id: number;
   word_id: number;
   definition_id: number | null;
@@ -120,6 +132,30 @@ export type WordGrammar = {
   number: string | null;
   gram_case: string | null;
   notes: string | null;
+  rule_code: string | null;
+  confidence: number | null;
+  person: string | null;
+  verb_form: string | null;
+  // Per-datum citation (migration 011): a sourced grammar fact points at the
+  // exact line it was read from (e.g. Sahib Singh's pad-arth).
+  source_code: string | null;
+  source_line_id: number | null;
+};
+
+// Registry (migration 009) explaining each rule_code: its plain-English basis,
+// scholarly citation, tier, and whether it's been verified against the source.
+export type GrammarRule = {
+  rule_code: string;
+  title: string;
+  explanation: string;
+  citation: string | null;
+  tier: "codified_rule" | "source_extraction" | "heuristic";
+  verified: boolean;
+};
+
+// word_grammar row with its rule registry entry embedded (FK rule_code).
+export type WordGrammarWithRule = WordGrammar & {
+  grammar_rules: GrammarRule | null;
 };
 
 export type Lexeme = {
@@ -134,4 +170,26 @@ export type WordForm = {
   lexeme_id: number;
   word_id: number;
   inflection_desc: string | null;
+};
+
+// Community flagging (migration 014). Write-only from the public side (insert
+// RLS only) — read/actioned only via the key-gated /admin/flags surface.
+export type FlagTargetTable = "word_grammar" | "definitions" | "etymology";
+export type FlagType = "incorrect" | "unclear" | "has_better_source" | "other";
+export type FlagStatus = "open" | "resolved" | "dismissed";
+
+export type Flag = {
+  id: number;
+  word_id: number;
+  target_table: FlagTargetTable | null;
+  target_id: number | null;
+  flag_type: FlagType;
+  message: string;
+  suggested_source: string | null;
+  reporter_name: string | null;
+  reporter_email: string | null;
+  status: FlagStatus;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  created_at: string;
 };
