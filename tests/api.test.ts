@@ -162,7 +162,10 @@ describe("search", () => {
 // ── Production smoke test ──────────────────────────────────────────────────────
 
 describe("production", () => {
-  const BASE = "https://kosh.atthebunga.com";
+  // This app's own production deployment. Not the public search.atthebunga.com
+  // domain: the shell there shadows / and /api/search with its own versions
+  // (kosh.atthebunga.com is decommissioned and 308s to the shell).
+  const BASE = "https://gurmukhi-kosh.vercel.app";
 
   it("homepage responds 200", async () => {
     const res = await fetch(BASE);
