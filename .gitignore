@@ -35,6 +35,7 @@ yarn-error.log*
 
 # pipeline intermediate outputs
 pipeline/mahan-kosh/output/
+pipeline/sikhri/output/
 pipeline/manual/data/*.jsonl
 
 # vercel
