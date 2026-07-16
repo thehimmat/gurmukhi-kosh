@@ -1,3 +1,6 @@
 {
-  "alias": ["kosh.atthebunga.com"]
+  "alias": ["kosh.atthebunga.com"],
+  "crons": [
+    { "path": "/api/health", "schedule": "0 8 * * *" }
+  ]
 }
