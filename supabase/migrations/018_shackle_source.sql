@@ -79,6 +79,11 @@ alter table etymology
   add column if not exists doublet_of text[];                     -- =FOO  (etymological doublet)
 alter table etymology
   add column if not exists compare_forms text[];                  -- cf. FOO
+-- source_code lets a multi-source table scope idempotent/takedown deletes the
+-- way word_grammar already does (etymology has no dict_source_id).
+alter table etymology
+  add column if not exists source_code text;
+create index if not exists etymology_source_code on etymology (source_code) where source_code is not null;
 
 -- ---------------------------------------------------------------------------
 -- 4. Controlled-vocabulary lookup tables (references.json + mappings.json)
