@@ -17,6 +17,8 @@
     "ingest:etymology": "tsx pipeline/etymology/ingest.ts",
     "scrape:sikhri": "tsx pipeline/sikhri/scrape.ts",
     "ingest:sikhri": "tsx pipeline/sikhri/ingest.ts",
+    "ingest:shackle:lookups": "tsx pipeline/shackle/load-lookups.ts",
+    "ingest:shackle": "tsx pipeline/shackle/ingest.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",

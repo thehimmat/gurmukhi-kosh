@@ -48,3 +48,4 @@ next-env.d.ts
 # Internal dev notes (kept local, not for public repo)
 CLAUDE.md
 AGENTS.md
+pipeline/shackle/data/
