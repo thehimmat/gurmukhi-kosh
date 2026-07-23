@@ -27,6 +27,20 @@ export interface GlossaryEntry {
   etymologyRaw?: string;
   etymology?: Etymology;
   flags: string[];
+
+  // Present only on appendix entries, added by reverse_appendix.py: the Gurmukhi
+  // above is DERIVED (reverse-transliterated), not from the source.
+  _derived?: boolean;
+  _ambiguities?: ReverseAmbiguity[];
+}
+
+export interface ReverseAmbiguity {
+  kind: string;
+  chosen: string;
+  alternatives: string[];
+  note: string;
+  source: string;
+  start: number;
 }
 
 export interface Inflection {

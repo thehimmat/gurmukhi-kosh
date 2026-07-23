@@ -39,6 +39,8 @@ import type { GlossaryEntry } from "./types";
 type DB = ReturnType<typeof supabaseAdmin>;
 
 const JSONL_PATH = "pipeline/shackle/data/glossary-entries.jsonl";
+// Appendix entries with Gurmukhi reverse-transliterated by reverse_appendix.py.
+const APPENDIX_PATH = "pipeline/shackle/data/appendix-derived.jsonl";
 const SOURCE_CODE = "shackle";
 const BATCH = 200;
 
@@ -115,6 +117,12 @@ function defNotes(e: GlossaryEntry): string | null {
   if (e.frequency?.raw) parts.push(`shackle-freq: ${e.frequency.raw}`);
   if (e.glossIsCrossRefOnly) parts.push("cross-reference-only");
   if (e.secondMemberOnly) parts.push("second-member-only");
+  if (e._derived) {
+    const alts = (e._ambiguities ?? [])
+      .filter((a) => a.alternatives?.some((x) => x))
+      .map((a) => `${a.kind}[${a.chosen}|${a.alternatives.filter(Boolean).join("/")}]`);
+    parts.push(`gurmukhi-derived (reverse-translit${alts.length ? `; ambiguities: ${alts.join(", ")}` : ""})`);
+  }
   return parts.length ? parts.join(" | ") : null;
 }
 
@@ -131,9 +139,18 @@ async function main() {
   console.log(`dict_source '${SOURCE_CODE}' = ${sourceId}`);
 
   const all = await readEntries(JSONL_PATH);
-  const entries = all.filter((e) => e.gurmukhi && e.gurmukhi.trim());
-  const appendix = all.length - entries.length;
-  console.log(`Entries: ${all.length} total | ${entries.length} with Gurmukhi | ${appendix} deferred (no Gurmukhi / appendix)`);
+  const mainEntries = all.filter((e) => e.gurmukhi && e.gurmukhi.trim());
+  // Appendix entries (no Gurmukhi in source) with a reverse-transliterated form.
+  // Optional: if the file isn't there, ingest the main pass only.
+  const appendixEntries = fs.existsSync(APPENDIX_PATH)
+    ? (await readEntries(APPENDIX_PATH)).filter((e) => e.gurmukhi && e.gurmukhi.trim())
+    : [];
+  const missingAppendix = all.length - mainEntries.length - appendixEntries.length;
+  const entries = [...mainEntries, ...appendixEntries];
+  console.log(
+    `Entries: ${all.length} total | ${mainEntries.length} main + ${appendixEntries.length} appendix(derived)` +
+      (missingAppendix ? ` | ${missingAppendix} appendix not yet reverse-transliterated (run reverse_appendix.py)` : ""),
+  );
 
   // 1. Reset this source FIRST — so resolving corpus words below can't match
   //    (and then strand) off-corpus lemmas a prior run created.
@@ -158,12 +175,16 @@ async function main() {
   // pick one representative entry per unmatched Gurmukhi (for roman_shackle)
   const repByGurmukhi = new Map<string, GlossaryEntry>();
   for (const e of entries) if (!wordMap.has(e.gurmukhi) && !repByGurmukhi.has(e.gurmukhi)) repByGurmukhi.set(e.gurmukhi, e);
+  // A Gurmukhi backed by any printed (OCR) entry is 'unverified_ocr'; only ones
+  // seen exclusively via a derived (appendix) entry are 'derived_transliteration'.
+  const hasPrinted = new Set<string>();
+  for (const e of entries) if (!e._derived) hasPrinted.add(e.gurmukhi);
   const newWordRows = unmatched.map((g) => ({
     gurmukhi: g,
     frequency: 0,
     in_corpus: false,
     origin_source: SOURCE_CODE,
-    spelling_status: "unverified_ocr",
+    spelling_status: hasPrinted.has(g) ? "unverified_ocr" : "derived_transliteration",
     roman_shackle: repByGurmukhi.get(g)?.headword ?? null,
   }));
   console.log(`Creating ${newWordRows.length} off-corpus lemma rows...`);
@@ -312,7 +333,7 @@ async function main() {
   console.log(`  grammar:      ${grammarRows.length}`);
   console.log(`  etymology:    ${etymRows.length}`);
   console.log(`  examples:     ${exampleRows.length}`);
-  console.log(`  deferred:     ${appendix} appendix entries (no Gurmukhi) — issue #7 follow-up`);
+  console.log(`  appendix:     ${appendixEntries.length} entries via reverse-transliteration (spelling_status='derived_transliteration')`);
 }
 
 main().catch((err) => {
