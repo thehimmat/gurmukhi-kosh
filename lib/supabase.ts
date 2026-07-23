@@ -121,6 +121,29 @@ export type Etymology = Curated & {
   root_form_roman: string | null;
   derivation_note: string | null;
   source_text: string | null;
+  // Shackle etymology extras (migration 018): CDIAL/Turner headword number,
+  // etymological doublets/compare-forms, and Shackle's own hedging markers.
+  cdial?: number | null;
+  doublet_of?: string[] | null;
+  compare_forms?: string[] | null;
+  is_hypothetical?: boolean | null;
+  doubtful?: "no" | "doubtful" | "very-doubtful" | null;
+  source_code?: string | null;
+};
+
+export type DictExample = {
+  id: number;
+  word_id: number;
+  definition_id: number | null;
+  dict_source_id: number;
+  order_index: number;
+  quote_roman: string | null; // internal cross-reference; NOT rendered
+  translation: string | null;
+  citation_raw: string | null;
+  citation_siglum: string | null;
+  citation_hymn: string | null;
+  citation_verse: string | null;
+  citation_author: string | null;
 };
 
 export type WordGrammar = Curated & {
