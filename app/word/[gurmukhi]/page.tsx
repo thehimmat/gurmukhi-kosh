@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
-import type { DefinitionWithSource, Etymology, WordGrammarWithRule } from "@/lib/supabase";
+import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { TabNav } from "@/components/word/TabNav";
@@ -107,13 +107,15 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*, grammar_rules(*))")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, word_grammar(*, grammar_rules(*))")
     .eq("gurmukhi", word)
     .single();
 
   if (!wordRow) notFound();
 
   const wordId = wordRow.id;
+  const inCorpus = (wordRow as unknown as { in_corpus: boolean | null }).in_corpus ?? true;
+  const spellingStatus = (wordRow as unknown as { spelling_status: string | null }).spelling_status;
   const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
   const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
@@ -125,7 +127,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
-  const [defsResult, etymResult, occsResult, lexemeFormResult] = await Promise.all([
+  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult] = await Promise.all([
     // Definitions with source info
     supabase
       .from("definitions")
@@ -165,10 +167,33 @@ export default async function WordPage({ params, searchParams }: Props) {
       .select("lexeme_id, inflection_desc")
       .eq("word_id", wordId)
       .maybeSingle(),
+
+    // Dictionary example quotations (Shackle etc.) — English translation + AG
+    // citation. The romanized quote (quote_roman) is internal and not selected.
+    supabase
+      .from("dict_examples")
+      .select("id, definition_id, order_index, translation, citation_raw, citation_siglum, citation_hymn, citation_verse, citation_author")
+      .eq("word_id", wordId)
+      .order("id", { ascending: true }),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
   const etymology = (etymResult.data ?? []) as Etymology[];
+  const examples = (examplesResult.data ?? []) as unknown as DictExample[];
+
+  // Resolve citation sigla (siglum → work title) for this word's examples.
+  const siglaTitle = new Map<string, string>();
+  const siglaCodes = [...new Set(examples.map((x) => x.citation_siglum).filter((s): s is string => !!s))];
+  if (siglaCodes.length > 0) {
+    const { data: siglaRows } = await supabase
+      .from("citation_sigla")
+      .select("siglum, title")
+      .eq("source_code", "shackle")
+      .in("siglum", siglaCodes);
+    for (const r of (siglaRows ?? []) as { siglum: string; title: string | null }[]) {
+      if (r.title) siglaTitle.set(r.siglum, r.title);
+    }
+  }
 
   // Step 3: if lexeme found, fetch all sibling forms
   let morphForms: Array<{ gurmukhi: string; inflection_desc: string | null }> = [];
@@ -327,9 +352,39 @@ export default async function WordPage({ params, searchParams }: Props) {
             /{ipaDisplay}/
           </p>
         )}
-        <span className="badge" style={{ marginTop: "0.5rem" }}>
-          {wordRow.frequency.toLocaleString()} occurrences in SGGS
-        </span>
+        {inCorpus ? (
+          <span className="badge" style={{ marginTop: "0.5rem" }}>
+            {wordRow.frequency.toLocaleString()} occurrences in SGGS
+          </span>
+        ) : (
+          <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center" }}>
+            <span
+              className="badge"
+              title="This is a dictionary head-word (base/citation form). It does not occur as this exact form in the ingested Sri Guru Granth Sahib corpus."
+              style={{ background: "#eceae6", color: "#5c574f" }}
+            >
+              Not attested in SGGS · dictionary head-word
+            </span>
+            {spellingStatus === "derived_transliteration" && (
+              <span
+                className="badge"
+                title="No Gurmukhi is printed for this word in the source (Later-Gurus appendix); the spelling shown was reverse-transliterated from Shackle's romanization and is not yet verified."
+                style={{ background: "#f6ecd9", color: "#8a6d1f" }}
+              >
+                Gurmukhi spelling derived — unverified
+              </span>
+            )}
+            {spellingStatus === "unverified_ocr" && (
+              <span
+                className="badge"
+                title="The Gurmukhi spelling is from OCR of the printed glossary and has not been verified against the corpus."
+                style={{ background: "#f6ecd9", color: "#8a6d1f" }}
+              >
+                Gurmukhi spelling unverified (OCR)
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Tab Navigation ── */}
@@ -419,6 +474,42 @@ export default async function WordPage({ params, searchParams }: Props) {
       {/* ── Meanings empty state ── */}
       {tab === "meanings" && defsBySource.size === 0 && (
         <EmptyState>No dictionary definitions ingested for this word yet.</EmptyState>
+      )}
+
+      {/* ── Examples / attestations (overview + meanings) ── */}
+      {(tab === "overview" || tab === "meanings") && examples.length > 0 && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Examples</SectionHeading>
+          <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0 0 0.75rem", lineHeight: 1.5 }}>
+            Attestations cited in A Guru Nanak Glossary (Christopher Shackle), with the Adi Granth reference.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {examples.map((x) => {
+              const base = x.citation_siglum ? siglaTitle.get(x.citation_siglum) ?? x.citation_siglum : x.citation_raw ?? "";
+              const loc = [x.citation_hymn, x.citation_verse].filter(Boolean).join(".");
+              const author = x.citation_author ? ` (${x.citation_author})` : "";
+              const citation = `${base}${loc ? ` ${loc}` : ""}${author}`.trim();
+              return (
+                <div key={x.id} style={{ ...CARD, marginBottom: 0, padding: "0.65rem 1rem" }}>
+                  {x.translation ? (
+                    <div style={{ fontFamily: '"Crimson Pro", Georgia, serif', fontSize: "1.05rem", color: "var(--text-primary)", lineHeight: 1.5 }}>
+                      &ldquo;{x.translation}&rdquo;
+                    </div>
+                  ) : (
+                    <div style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
+                      Attested (no translation printed)
+                    </div>
+                  )}
+                  {citation && (
+                    <div style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.78rem", color: "var(--text-secondary)", marginTop: "0.3rem" }}>
+                      — {citation}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* ── Pronunciation (overview + pronunciation) ── */}
@@ -603,6 +694,32 @@ export default async function WordPage({ params, searchParams }: Props) {
                     <p className="gurmukhi" style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.3rem 0 0", fontStyle: "italic" }}>
                       {e.source_text}
                     </p>
+                  )}
+                  {/* Structured Shackle markers: CDIAL number, doublets, hedging. */}
+                  {(e.cdial || e.doublet_of?.length || e.compare_forms?.length || e.is_hypothetical || (e.doubtful && e.doubtful !== "no")) && (
+                    <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center", marginTop: "0.4rem", fontFamily: '"Inter", sans-serif', fontSize: "0.75rem" }}>
+                      {e.cdial != null && (
+                        <span className="badge" title="Turner, A Comparative Dictionary of the Indo-Aryan Languages — head-word number">
+                          CDIAL №{e.cdial}
+                        </span>
+                      )}
+                      {e.is_hypothetical && (
+                        <span style={{ color: "var(--text-secondary)" }} title="Reconstructed form, not directly attested (Shackle marks these with *)">
+                          * hypothetical
+                        </span>
+                      )}
+                      {e.doubtful && e.doubtful !== "no" && (
+                        <span style={{ color: "var(--text-secondary)" }} title="Shackle's own hedging (? doubtful, ?? very doubtful)">
+                          {e.doubtful === "very-doubtful" ? "?? very doubtful" : "? doubtful"}
+                        </span>
+                      )}
+                      {e.doublet_of?.length ? (
+                        <span style={{ color: "var(--text-secondary)" }}>doublet of {e.doublet_of.join(", ").toLowerCase()}</span>
+                      ) : null}
+                      {e.compare_forms?.length ? (
+                        <span style={{ color: "var(--text-secondary)" }}>cf. {e.compare_forms.join(", ").toLowerCase()}</span>
+                      ) : null}
+                    </div>
                   )}
                 </div>
               </div>
