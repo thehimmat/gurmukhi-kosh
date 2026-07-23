@@ -95,10 +95,10 @@ const SOURCES: Source[] = [
   },
   {
     name: "The Guru Granth Sahib Dictionary (SikhRI)",
-    role: "Per-word meanings and grammar — the strongest candidate for citable, scholar-verified grammar.",
-    status: "pending-permission",
+    role: "Per-word English meanings (and scholar-verified grammar, planned) — cited on each word's entry.",
+    status: "in-use",
     url: "https://gurugranthsahibdictionary.io",
-    note: "© SikhRI, all rights reserved. A permission request to use and cite this data, free and strictly non-commercial with full attribution, has been sent. We will not ingest any of it until SikhRI agrees.",
+    note: "© SikhRI, all rights reserved. Used strictly non-commercially with attribution and a link back to each entry. We have written to SikhRI about this use and will remove it promptly on their request. Only per-word meanings are shown, never the dictionary as a whole.",
   },
   {
     name: "Sri Granth Gurbani Dictionary (Dr. Kulbir S. Thind & Dr. Gurcharan Singh)",

@@ -19,9 +19,13 @@ export default async function BrowsePage({
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
+  // Frequency-ranked list of the SGGS corpus; off-corpus dictionary lemmas
+  // (e.g. Shackle headwords not attested in the corpus, frequency 0) are
+  // excluded here but remain reachable via search and their word pages.
   const { data: words, count } = await supabase
     .from("words")
     .select("id, gurmukhi, frequency", { count: "exact" })
+    .eq("in_corpus", true)
     .order("frequency", { ascending: false })
     .range(from, to);
 
