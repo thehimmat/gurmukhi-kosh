@@ -107,7 +107,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Step 1: fetch word + grammar together
   const { data: wordRow } = await supabase
     .from("words")
-    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, word_grammar(*, grammar_rules(*))")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, spelling_reviewed_at, word_grammar(*, grammar_rules(*))")
     .eq("gurmukhi", word)
     .single();
 
@@ -115,7 +115,10 @@ export default async function WordPage({ params, searchParams }: Props) {
 
   const wordId = wordRow.id;
   const inCorpus = (wordRow as unknown as { in_corpus: boolean | null }).in_corpus ?? true;
-  const spellingStatus = (wordRow as unknown as { spelling_status: string | null }).spelling_status;
+  // A human-reviewed spelling is no longer "unverified", even if its origin
+  // marker (spelling_status) still records how it first entered.
+  const spellingReviewed = !!(wordRow as unknown as { spelling_reviewed_at: string | null }).spelling_reviewed_at;
+  const spellingStatus = spellingReviewed ? null : (wordRow as unknown as { spelling_status: string | null }).spelling_status;
   const ipaDisplay = (wordRow as unknown as { ipa_display: string | null }).ipa_display;
   const romanIso = (wordRow as unknown as { roman_iso15919: string | null }).roman_iso15919;
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
