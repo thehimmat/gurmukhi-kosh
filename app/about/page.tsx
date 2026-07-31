@@ -101,6 +101,12 @@ const SOURCES: Source[] = [
     note: "© SikhRI, all rights reserved. Used strictly non-commercially with attribution and a link back to each entry. We have written to SikhRI about this use and will remove it promptly on their request. Only per-word meanings are shown, never the dictionary as a whole.",
   },
   {
+    name: "A Guru Nanak Glossary (Christopher Shackle, 2nd ed.)",
+    role: "Definitions, grammar, and etymology (incl. CDIAL/Turner numbers) for words in the hymns of Guru Nanak, Guru Angad, and Shaikh Farid; our richest single source, with in-text example citations.",
+    status: "in-use",
+    note: "© Christopher Shackle / SOAS, all rights reserved. Used strictly non-commercially with attribution, consistent with how we treat SikhRI's dictionary above; we will remove it promptly on request. Off-corpus appendix headwords are reverse-transliterated into Gurmukhi by us and clearly marked as derived, not original to the source.",
+  },
+  {
     name: "Sri Granth Gurbani Dictionary (Dr. Kulbir S. Thind & Dr. Gurcharan Singh)",
     role: "A second definitions source that also carries part-of-speech markers.",
     status: "pending-terms",
