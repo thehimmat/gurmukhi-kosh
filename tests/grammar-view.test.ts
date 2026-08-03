@@ -170,4 +170,60 @@ describe("buildGrammarView", () => {
     ]);
     expect(view.map((v) => v.attribute)).toEqual(["gender", "gram_case"]);
   });
+
+  // Every imported row must be attributed to the source it actually came from.
+  // Shackle rows carry no rule_code, so an attribution keyed on provenance alone
+  // silently credited all 7,018 of them to Sahib Singh's pad-arth.
+  it("attributes an imported row to its own source, not a hard-coded scholar", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", gender: "feminine", source_code: "shackle" }),
+    ]);
+    const att = view.find((v) => v.attribute === "gender")!.readings[0].attestations[0];
+    expect(att.sourceLabel).toBe("Shackle, A Guru Nanak Glossary");
+    expect(att.citation).toContain("Christopher Shackle");
+  });
+
+  it("does not attribute an unrecognised imported source to a named scholar", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", gender: "feminine", source_code: null }),
+    ]);
+    const att = view.find((v) => v.attribute === "gender")!.readings[0].attestations[0];
+    expect(att.sourceLabel).toBe("Cited source (unattributed)");
+    expect(att.sourceLabel).not.toContain("Sahib Singh");
+  });
+
+  // Two scholars are both sourceKind "scholar", so keying conflict detection on
+  // kind reported a real disagreement between them as mere polysemy.
+  it("reports two scholars disagreeing as a conflict, not polysemy", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", gender: "feminine", source_code: "shackle" }),
+      row({ provenance: "imported", gender: "masculine", source_code: "ss_padarth", grammar_rules: rule({ rule_code: "SS_PADARTH_GENDER", verified: true }) }),
+    ]);
+    const gender = view.find((v) => v.attribute === "gender")!;
+    expect(gender.readings).toHaveLength(2);
+    expect(gender.conflict).toBe(true);
+    expect(gender.polysemy).toBe(false);
+  });
+
+  it("counts two scholars agreeing as genuine corroboration", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", gender: "feminine", source_code: "shackle" }),
+      row({ provenance: "imported", gender: "feminine", source_code: "ss_padarth", grammar_rules: rule({ rule_code: "SS_PADARTH_GENDER", verified: true }) }),
+    ]);
+    const gender = view.find((v) => v.attribute === "gender")!;
+    expect(gender.readings).toHaveLength(1);
+    expect(gender.readings[0].attestations).toHaveLength(2);
+    expect(gender.conflict).toBe(false);
+    expect(gender.polysemy).toBe(false);
+  });
+
+  it("still treats one source listing several values as polysemy", () => {
+    const view = buildGrammarView([
+      row({ provenance: "imported", pos: "noun", source_code: "shackle" }),
+      row({ provenance: "imported", pos: "adjective", source_code: "shackle" }),
+    ]);
+    const pos = view.find((v) => v.attribute === "pos")!;
+    expect(pos.polysemy).toBe(true);
+    expect(pos.conflict).toBe(false);
+  });
 });

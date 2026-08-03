@@ -610,17 +610,27 @@ export default async function WordPage({ params, searchParams }: Props) {
                   </div>
                 ))}
 
-                {/* Conflict: a disagreeing reading, demoted, with feedback invited.
-                    Distinguish OUR reading being overruled from two real sources differing. */}
+                {/* Conflict: a disagreeing reading. Two cases that must be presented
+                    differently — when OUR derived rule is overruled by a cited source we
+                    demote it, but when two cited scholars differ we present both plainly
+                    and let the reader weigh them. We are not the authority here, so no
+                    strikethrough and no "takes precedence" on a scholar's reading. */}
                 {av.conflict && others.map((r) => {
                   const kind = r.attestations[0].sourceKind;
                   const ours = kind === "rule" || kind === "heuristic";
                   return (
                     <div key={r.value} style={{ marginTop: "0.55rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                      <span style={{ textDecoration: "line-through", opacity: 0.7, marginRight: "0.4rem" }}>{fmtGrammar(av.attribute, r.value)}</span>
+                      <span
+                        className={ours ? undefined : "badge"}
+                        style={ours
+                          ? { textDecoration: "line-through", opacity: 0.7, marginRight: "0.4rem" }
+                          : { marginRight: "0.4rem", opacity: 0.85 }}
+                      >
+                        {fmtGrammar(av.attribute, r.value)}
+                      </span>
                       {ours
                         ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
-                        : `${r.attestations[0].sourceLabel} reads this differently; the lead source takes precedence, but the sources genuinely differ here.`}
+                        : `${r.attestations[0].sourceLabel} reads it this way. The sources genuinely differ; both readings are recorded here so you can weigh them.`}
                     </div>
                   );
                 })}
