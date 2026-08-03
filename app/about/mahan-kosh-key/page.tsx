@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import legendJson from "@/pipeline/mahan-kosh/abbreviations.json";
+import type { ReactNode } from "react";
+import legendJson from "../../../pipeline/mahan-kosh/abbreviations.json";
 
 export const metadata: Metadata = {
   title: "Mahan Kosh Key (ਸੰਕੇਤ) — Gurmukhi Kosh",
@@ -130,7 +131,7 @@ function SourceBadge({ source }: { source: EntrySource }) {
   );
 }
 
-function SectionHeading({ id, children }: { id: string; children: React.ReactNode }) {
+function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
@@ -148,7 +149,7 @@ function SectionHeading({ id, children }: { id: string; children: React.ReactNod
   );
 }
 
-function Blurb({ children }: { children: React.ReactNode }) {
+function Blurb({ children }: { children: ReactNode }) {
   return (
     <p
       style={{
