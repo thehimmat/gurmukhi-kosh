@@ -557,8 +557,11 @@ export default async function WordPage({ params, searchParams }: Props) {
             {hasSourcedGrammar && (
               <>
                 Entries marked <em>Imported</em> are read directly from a cited scholarly
-                source: Prof. Sahib Singh&apos;s explicit grammar notes in his <em>Sri Guru
-                Granth Sahib Darpan</em> pad-arth, with the line cited.{" "}
+                source — Prof. Sahib Singh&apos;s grammar notes in his <em>Sri Guru Granth
+                Sahib Darpan</em> pad-arth (with the line cited), or Christopher
+                Shackle&apos;s <em>A Guru Nanak Glossary</em>. Each entry names the source it
+                came from. Where two scholars read a word differently we show both rather
+                than choose between them.{" "}
               </>
             )}
             The remaining analysis is produced by applying established Gurbani grammar
