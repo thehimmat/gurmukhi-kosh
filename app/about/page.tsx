@@ -48,6 +48,7 @@ type Source = {
   status: Status;
   url?: string;
   note?: string;
+  link?: { href: string; label: string };
 };
 
 const SOURCES: Source[] = [
@@ -64,6 +65,10 @@ const SOURCES: Source[] = [
     status: "in-use",
     url: "https://www.searchgurbani.com/sggs-kosh",
     note: "Underlying work is from the public-domain era; the digitization is sourced from searchgurbani.com.",
+    link: {
+      href: "/about/mahan-kosh-key",
+      label: "Read the key to its shorthand (ਸੰਕੇਤ) →",
+    },
   },
   {
     name: "Sri Guru Granth Sahib Darpan & pad-arth (Prof. Sahib Singh)",
@@ -183,6 +188,22 @@ function SourceRow({ source }: { source: Source }) {
           }}
         >
           {source.note}
+        </p>
+      )}
+      {source.link && (
+        <p style={{ margin: "0.45rem 0 0" }}>
+          <a
+            href={source.link.href}
+            style={{
+              fontFamily: '"Inter", sans-serif',
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              color: "var(--accent)",
+              textDecoration: "none",
+            }}
+          >
+            {source.link.label}
+          </a>
         </p>
       )}
     </div>

@@ -89,9 +89,24 @@
       { "abbr": "ਪੰਜਾਬੀ", "variants": [], "gurmukhi": "ਪੰਜਾਬੀ (ਸਪੈਲ ਕੀਤਾ ਹੋਇਆ)", "english": "Punjabi — always written out in full, never abbreviated", "iso639": "pa", "source": "corpus" }
     ],
     "deprecated_non_canonical": [
-      { "abbr": "ਪੰ.", "reason": "not in the printed key; was in scrape.py's map as 'Punjabi'. Corpus check: ~3 substring hits, all inside other words." },
-      { "abbr": "ਉ.", "reason": "not in the printed key; was in scrape.py's map as 'Urdu' and already measured 32/34 false positives (the key has no Urdu marker at all — Urdu-origin words are marked ਅ਼./ਫ਼ਾ. by etymological source)." },
-      { "abbr": "ਦੇਸ਼.", "reason": "not in the printed key; was in scrape.py's map as 'Desi/regional'. Zero corpus hits." }
+      {
+        "abbr": "ਪੰ.",
+        "was_assumed": "Punjabi",
+        "actually": "Not a Mahan Kosh abbreviation at all. Zero standalone occurrences in the corpus; the scraper's substring match only ever hit letter sequences inside other words.",
+        "resolved": "2026-08-03 corpus check (standalone-token regex)"
+      },
+      {
+        "abbr": "ਉ.",
+        "was_assumed": "Urdu",
+        "actually": "The Gurmukhi list enumerator (ੳ ਅ ੲ ... used like a/b/c), found standalone exactly once ('#ਉ. ਪ੍ਰਾਗਭਾਵ...' in the ਅਭਾਵ entry's lettered list). The 34 senses previously tagged Urdu were word-final substrings (ਭਾਉ. ਜਾਉ. ...). Mahan Kosh has no Urdu marker; words that entered Punjabi via Urdu are marked by their etymological source (ਅ਼. ਫ਼ਾ. ਤੁ.).",
+        "resolved": "2026-08-03 corpus check (standalone-token regex; 1 hit, enumerator context)"
+      },
+      {
+        "abbr": "ਦੇਸ਼.",
+        "was_assumed": "Desi / regional word",
+        "actually": "The ordinary noun ਦੇਸ਼ (country, region) used as a gloss word, e.g. 'ਅਸਥਾਨ. ਦੇਸ਼.' — the period is Mahan Kosh's gloss separator, not an abbreviation dot. All 27 standalone occurrences are glosses.",
+        "resolved": "2026-08-03 corpus check (standalone-token regex; 27 hits, all gloss contexts)"
+      }
     ]
   },
 
