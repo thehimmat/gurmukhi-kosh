@@ -25,7 +25,7 @@ export type GramAttr = 'gender' | 'number' | 'pos' | 'gram_case';
 export interface PadarthFact {
   headword: string;
   attribute: GramAttr;
-  value: string; // masculine|feminine | singular|plural | noun|adjective|pronoun | nominative
+  value: string; // masculine|feminine | singular|plural | noun|adjective|pronoun | direct
   snippet: string; // verbatim window around the statement, for citation/audit
 }
 
@@ -48,7 +48,9 @@ const PREDICATES: Array<{ re: RegExp; attribute: GramAttr; value: string }> = [
   { re: new RegExp('ਪੁਲਿੰਗ'), attribute: 'gender', value: 'masculine' },
   { re: new RegExp('ਇਕ[\\s-]*ਵਚਨ'), attribute: 'number', value: 'singular' },
   { re: new RegExp('ਬਹੁ[\\s-]*ਵਚਨ'), attribute: 'number', value: 'plural' },
-  { re: new RegExp('ਕਰਤਾ[\\s]*ਕਾਰਕ'), attribute: 'gram_case', value: 'nominative' },
+  // The scholar's kartaa kaarak statement implies the direct form (a kartaa is
+  // always in the direct case); his verbatim wording survives in the quote.
+  { re: new RegExp('ਕਰਤਾ[\\s]*ਕਾਰਕ'), attribute: 'gram_case', value: 'direct' },
 ];
 
 // Parenthetical POS tags. Order matters: ਪੜਨਾਂਵ contains ਨਾਂਵ, so test it first.

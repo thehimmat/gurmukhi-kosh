@@ -183,16 +183,77 @@ export type WordGrammarWithRule = WordGrammar & {
 
 export type Lexeme = {
   id: number;
-  root_word_id: number;
+  root_word_id: number | null;
   gloss_en: string | null;
   notes: string | null;
+  lemma_gurmukhi: string | null;
+  lemma_roman: string | null;
+  pos: string | null;
+  gender: "masculine" | "feminine" | null;
 };
 
+// Membership of a surface form in a lexeme, with the features the asserting
+// source reads into that form. Features are membership-scoped (migration 023,
+// issue #30): a homograph carries different features per lexeme. One source
+// may assert several readings of one membership, ordered by reading_number.
 export type WordForm = {
   id: number;
   lexeme_id: number;
   word_id: number;
   inflection_desc: string | null;
+  source_code: string | null;
+  reading_number: number;
+  gram_case: "direct" | "oblique" | "vocative" | "locative" | "ablative" | null;
+  gender: "masculine" | "feminine" | null;
+  number: "singular" | "plural" | null;
+  person: "first" | "second" | "third" | null;
+  verb_form:
+    | "infinitive"
+    | "gerundive"
+    | "verbal_noun"
+    | "absolutive"
+    | "present_participle"
+    | "past_participle"
+    | null;
+  tense_mood: "present" | "future" | "imperative" | "subjunctive" | null;
+  label_raw: string | null;
+  features: Record<string, unknown>;
+  rule_code: string | null;
+};
+
+// Per-source headword choice for a lexeme (Shackle heads verbs at the
+// absolutive, others at the infinitive; neither is rewritten as the other).
+export type LexemeCitation = {
+  lexeme_id: number;
+  source_code: string;
+  citation_gurmukhi: string | null;
+  citation_roman: string | null;
+  notes: string | null;
+};
+
+export type LexemeRelationType =
+  | "causative_of"
+  | "agent_noun_of"
+  | "correlative_pair"
+  | "see_also";
+
+// Typed cross-lexeme link a source explicitly asserts; no inferred edges.
+export type LexemeRelation = {
+  id: number;
+  from_lexeme_id: number;
+  to_lexeme_id: number;
+  relation_type: LexemeRelationType;
+  source_code: string;
+  label_raw: string | null;
+  notes: string | null;
+};
+
+// Raw source POS string -> normalized POS (migration 023). Absent row = the
+// raw string renders as-is.
+export type PosMapping = {
+  source_code: string;
+  pos_raw: string;
+  pos_norm: string;
 };
 
 // Community flagging (migration 014). Write-only from the public side (insert

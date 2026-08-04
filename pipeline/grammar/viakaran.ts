@@ -61,7 +61,7 @@ export function stem(gurmukhi: string): string {
 }
 
 export interface FormAnalysis {
-  gram_case: string | null; // 'nominative' | 'oblique' | 'vocative' | null
+  gram_case: string | null; // 'direct' | 'oblique' | 'vocative' | null
   number: string | null; // 'singular' | 'plural' | null
   gender: string | null; // 'masculine' | 'feminine' | null
   rule_code: string | null;
@@ -88,18 +88,19 @@ export function analyzeNounForm(gurmukhi: string): FormAnalysis {
   const vowel = finalVowel(gurmukhi);
 
   switch (vowel) {
-    case 'ੁ': // ੁ aunkar → nominative (kartaa kaarak) singular masc.
-      // The aunkar-ending nominative singular is the canonical masculine noun
+    case 'ੁ': // ੁ aunkar → direct (kartaa kaarak) singular masc.
+      // The aunkar-ending direct singular is the canonical masculine noun
       // form, so gender is reliably masculine here. Other endings are ambiguous
       // for gender (Mahan Kosh carries no gender marker in this corpus), so we
-      // decline rather than guess.
+      // decline rather than guess. 'direct' is the form-level value (issue #30
+      // decision 1); the kartaa kaarak function reading stays occurrence-level.
       return {
-        gram_case: 'nominative',
+        gram_case: 'direct',
         number: 'singular',
         gender: 'masculine',
         rule_code: 'AUNKAR_NOM_SG',
         confidence: 0.85,
-        notes: 'Final aunkar marks the nominative singular of a masculine noun.',
+        notes: 'Final aunkar marks the direct-case singular of a masculine noun.',
       };
 
     case 'ਿ': // ਿ sihari → oblique (karan/adhikaran kaarak) singular.
