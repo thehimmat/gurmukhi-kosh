@@ -104,6 +104,7 @@ export type Definition = Curated & {
   definition_text: string;
   definition_en: string | null;
   cross_refs: Record<string, string> | null;
+  parsed: Record<string, unknown> | null;
   source_url: string | null;
   notes: string | null;
 };

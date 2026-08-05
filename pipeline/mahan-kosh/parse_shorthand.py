@@ -311,6 +311,11 @@ def parse_sense(text: str) -> dict:
             seen_lang_at.add(start)
             spans.append((start, chain + m.end()))
             chain += m.end()
+            ety, ety_span = _gurmukhi_etymon(t, chain)
+            if ety:
+                rec["etymon"] = ety
+                spans.append(ety_span)
+                chain = ety_span[1]
         else:
             # already recorded via script-adjacency; skip past marker + etymon
             chain += m.end()
@@ -375,6 +380,29 @@ def _read_etymon(t, pos):
     l = RE_LATIN_RUN.match(t, p)
     if l:
         return {"script": "latin", "text": l.group(0).rstrip(".")}, (p, l.end())
+    return None, None
+
+
+def _gurmukhi_etymon(t, pos):
+    """Gurmukhi-transcribed etymon after a head-chain language marker
+    (ਸੰ. ਪਾਨੀਯ. ਸੰਗ੍ਯਾ- …). Deterministic guard: the candidate token must not
+    itself be a marker, and the token right after it must be a POS marker
+    (with dash) or another language marker (with dot) — otherwise it is an
+    ordinary first gloss and nothing is claimed. Flagged inferred: this is
+    our reading, not script-explicit like Devanagari or [Perso-Arabic]."""
+    m = re.match(rf"\s*([{GURM}]{{2,15}})\.", t[pos:])
+    if not m:
+        return None, None
+    tok = m.group(1)
+    if tok in LANG or tok in POS or tok == "ਦੇਖੋ":
+        return None, None
+    after = pos + m.end()
+    nm = re.match(rf"\s*([{GURM}]{{1,12}})(-|\.)", t[after:])
+    if not nm:
+        return None, None
+    ntok, sep = nm.group(1), nm.group(2)
+    if (sep == "-" and ntok in POS) or (sep == "." and ntok in LANG):
+        return {"script": "gurmukhi", "text": tok, "inferred": True}, (pos + m.start(1), after)
     return None, None
 
 
