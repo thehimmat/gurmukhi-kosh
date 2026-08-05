@@ -1,0 +1,362 @@
+{
+  "_meta": {
+    "title": "Mahan Kosh shorthand legend (ਸੰਕੇਤ)",
+    "purpose": "Machine-readable key to the abbreviations, markers, and orthographic conventions used inside Mahan Kosh entries, so the pipeline can parse definition_text deterministically (etymology language, POS, citations, cross-references) instead of by ad-hoc substring matching.",
+    "sources": {
+      "front_matter": {
+        "work": "Kahn Singh Nabha, ਗੁਰੁਸ਼ਬਦ ਰਤਨਾਕਰ ਮਹਾਨ ਕੋਸ਼ (Gurushabad Ratnakar Mahan Kosh), 1930",
+        "sections": [
+          "ਮਹਾਨਕੋਸ਼ ਦੇ ਪਤਿਆਂ ਦੇ ਸੰਖੇਪ ਸੰਕੇਤ (abbreviations of the sources/headings)",
+          "ਅੱਖਰਾਂ ਦੇ ਸੰਕੇਤ (signs on letters — Kahn Singh's diacritic system for foreign phonemes)"
+        ],
+        "witness": "Bhasha Vibhag Punjab reprint scan on Punjabi Wikisource, file 'ਮਹਾਨ ਕੋਸ਼ ਭਾਗ 1.pdf', PDF pages 19-21 (front-matter pages ੲ, ਅ, ...)",
+        "witness_urls": [
+          "https://pa.wikisource.org/wiki/ਪੰਨਾ:ਮਹਾਨ_ਕੋਸ਼_ਭਾਗ_1.pdf/19",
+          "https://commons.wikimedia.org/wiki/File:ਮਹਾਨ_ਕੋਸ਼_ਭਾਗ_1.pdf"
+        ],
+        "verified": "2026-08-03: transcribed directly from the scan page images (pages 20-21 have no Wikisource transcription yet; page 19's transcription is unproofread and was corrected against the image)"
+      },
+      "corpus": {
+        "file": "pipeline/mahan-kosh/output/entries.jsonl",
+        "scope": "12,772 found entries / 23,092 senses scraped from the searchgurbani.com Mahan Kosh API",
+        "analyzed": "2026-08-03 via pipeline/mahan-kosh/analyze_shorthand.py"
+      }
+    },
+    "source_values": {
+      "front_matter": "listed in the book's own printed abbreviation key (citation above)",
+      "corpus": "not in the printed key; inferred from consistent usage in the scraped corpus (best-judgment, flagged per the provenance principle)"
+    },
+    "notes": [
+      "The scraper's original 7-marker map (pipeline/mahan-kosh/scrape.py extract_cross_refs) includes ਪੰ. (Punjabi), ਉ. (Urdu) and ਦੇਸ਼. (regional) — NONE of these appear in the printed key. The ਉ. marker was already found to be 32/34 false positives (see pipeline/etymology/parse.ts REQUIRES_CORROBORATION); this legend supersedes those three markers.",
+      "Short markers (ਸ. ਹੀ. ਪਾ. ਯੂ. ...) are only reliable positionally: at the head of a sense, immediately after a sense number, or immediately before a script run / citation. Bare substring matching over-counts them badly (e.g. ਹੀ. matches inside ਸਹੀ.).",
+      "L. doubles as the Latin-language marker and as the prefix of Linnaean binomial species names (e.g. 'L. Vatica Robusta') in flora/fauna entries.",
+      "UNICODE NORMALIZATION: the scraped corpus writes nukta letters decomposed (base + U+0A3C), and the precomposed Gurmukhi nukta letters U+0A59–U+0A5E are composition-excluded in NFC. Any parser matching this legend against corpus text MUST normalize both sides (NFD, or an explicit precomposed↔decomposed map) or markers like ਫ਼ਾ./ਖ਼ਾ. silently fail to match."
+    ]
+  },
+
+  "pos_markers": {
+    "_convention": "A part-of-speech marker opens a sense (or follows a language marker/etymon) and is written with a trailing hyphen: 'ਸੰਗ੍ਯਾ- ...', 'ਵਿ- ...'. ਕ੍ਰਿ. ਵਿ- is a two-token marker. The marker applies to the sense it opens.",
+    "entries": [
+      { "abbr": "ਸੰਗ੍ਯਾ", "variants": ["ਸੰਗਯਾ"], "gurmukhi": "ਨਾਮ", "english": "noun", "pos": "noun", "source": "front_matter" },
+      { "abbr": "ਵਿ", "variants": [], "gurmukhi": "ਵਿਸ਼ੇਸ਼ਣ", "english": "adjective", "pos": "adjective", "source": "front_matter" },
+      { "abbr": "ਸਰਵ", "variants": ["ਸਰਵ."], "gurmukhi": "ਸਰਵਨਾਮ. ਪੜਨਾਉਂ", "english": "pronoun", "pos": "pronoun", "source": "front_matter" },
+      { "abbr": "ਕ੍ਰਿ", "variants": ["ਕ੍ਰਿਯਾ"], "gurmukhi": "ਕ੍ਰਿਯਾ ਵਾਚਕ ਸ਼ਬਦ", "english": "verb", "pos": "verb", "source": "front_matter" },
+      { "abbr": "ਕ੍ਰਿ. ਵਿ", "variants": ["ਕ੍ਰਿ ਵਿ", "ਕ੍ਰਿ- ਵਿ"], "gurmukhi": "ਕ੍ਰਿਯਾ ਵਿਸ਼ੇਸ਼ਣ", "english": "adverb", "pos": "adverb", "source": "front_matter" },
+      { "abbr": "ਵ੍ਯ", "variants": ["ਵਯ"], "gurmukhi": "ਅਵ੍ਯਯ", "english": "particle / indeclinable (avyaya)", "pos": "particle", "source": "front_matter" },
+      { "abbr": "ਉਪ", "variants": [], "gurmukhi": "ਉਪਸਰਗ", "english": "prefix / preverb (upasarga; the key glosses it 'Preposition')", "pos": "prefix", "source": "front_matter" },
+      { "abbr": "ਪ੍ਰਤ੍ਯ", "variants": ["ਪ੍ਰਤਯ"], "gurmukhi": "ਪ੍ਰਤ੍ਯਯ", "english": "suffix / case postposition (pratyaya)", "pos": "suffix", "source": "front_matter" },
+      { "abbr": "ਧਾ", "variants": [], "gurmukhi": "ਧਾਤੁ. ਮਸਦਰ", "english": "verbal root (dhatu; usually follows ਸੰ. + Devanagari root)", "pos": "verbal_root", "source": "front_matter" },
+      { "abbr": "ਅਨੁ", "variants": [], "gurmukhi": "ਅਨੁਕਰਣ. ਸ਼ਬਦ ਦੀ ਨਕਲ", "english": "onomatopoeia", "pos": "onomatopoeia", "source": "front_matter" },
+      { "abbr": "ਯੌ", "variants": [], "gurmukhi": "ਯੌਗਿਕ ਸ਼ਬਦ", "english": "compound/derived word (yaugik; the key glosses it 'Etymological')", "pos": "compound", "source": "front_matter" },
+      { "abbr": "ਵਾ", "variants": [], "gurmukhi": "ਵਾਕ੍ਯ", "english": "phrase/sentence (rare; needs positional confirmation — ਵਾ. also ends common words)", "pos": "phrase", "source": "front_matter" },
+      { "abbr": "ਲੋਕੋ", "variants": [], "gurmukhi": "ਲੋਕੋਕ੍ਤਿ. ਲੋਕਾਂ ਦੀ ਕਹਿਣਾਵਤ", "english": "proverb / folk saying", "pos": "proverb", "source": "front_matter" },
+      { "abbr": "ਖ਼ਾ", "variants": [], "gurmukhi": "ਖ਼ਾਲਸੇ ਦਾ ਸੰਕੇਤ ਕੀਤਾ ਸ਼ਬਦ", "english": "Khalsa argot term (bole)", "pos": "khalsa_argot", "source": "front_matter" }
+    ]
+  },
+
+  "language_markers": {
+    "_convention": "A language-origin marker opens a sense (or a sense after its number) and is a short Gurmukhi abbreviation ending in '.'; for Sanskrit/Hindi it is often followed by the etymon in Devanagari, for Arabic/Persian/Turkish by the etymon in Perso-Arabic script inside [square brackets].",
+    "entries": [
+      { "abbr": "ਸੰ.", "variants": ["ਸੰ,", "ਸੰ"], "gurmukhi": "ਸੰਸਕ੍ਰਿਤ ਭਾਸ਼ਾ", "english": "Sanskrit", "iso639": "sa", "source": "front_matter" },
+      { "abbr": "ਅ਼.", "variants": ["ਅ਼"], "gurmukhi": "ਅ਼ਰਬੀ ਭਾਸ਼ਾ", "english": "Arabic", "iso639": "ar", "source": "front_matter", "note": "ਅ + nukta = Kahn Singh's sign for Arabic ʿain (ع); see letter_signs" },
+      { "abbr": "ਫ਼ਾ.", "variants": ["ਫ਼ਾ"], "gurmukhi": "ਫ਼ਾਰਸੀ ਭਾਸ਼ਾ", "english": "Persian", "iso639": "fa", "source": "front_matter" },
+      { "abbr": "ਤੁ.", "variants": ["ਤੁ"], "gurmukhi": "ਤੁਰਕੀ ਭਾਸ਼ਾ", "english": "Turkish", "iso639": "tr", "source": "front_matter" },
+      { "abbr": "ਅੰ.", "variants": [], "gurmukhi": "ਅੰਗ੍ਰੇਜ਼ੀ ਭਾਸ਼ਾ", "english": "English", "iso639": "en", "source": "front_matter", "note": "usually followed by the English word in Latin script" },
+      { "abbr": "ਹਿੰ.", "variants": [], "gurmukhi": "ਹਿੰਦੀ ਭਾਸ਼ਾ", "english": "Hindi", "iso639": "hi", "source": "front_matter" },
+      { "abbr": "ਸਿੰਧੀ.", "variants": ["ਸਿੰਧੀ"], "gurmukhi": "ਸਿੰਧੀ ਭਾਸ਼ਾ", "english": "Sindhi", "iso639": "sd", "source": "front_matter" },
+      { "abbr": "ਹੀ.", "variants": [], "gurmukhi": "ਹੀਬ੍ਰੂ ਭਾਸ਼ਾ. ਇਬਰਾਨੀ", "english": "Hebrew", "iso639": "he", "source": "front_matter" },
+      { "abbr": "ਕਾਸ਼.", "variants": [], "gurmukhi": "ਕਸ਼ਮੀਰੀ ਭਾਸ਼ਾ", "english": "Kashmiri", "iso639": "ks", "source": "front_matter" },
+      { "abbr": "ਗੁਜ.", "variants": [], "gurmukhi": "ਗੁਜਰਾਤੀ ਭਾਸ਼ਾ", "english": "Gujarati", "iso639": "gu", "source": "front_matter" },
+      { "abbr": "ਮਰਾ.", "variants": [], "gurmukhi": "ਮਹਾਰਾਸ਼ਟ੍ਰੀ ਭਾਸ਼ਾ", "english": "Marathi (Maharashtri)", "iso639": "mr", "source": "front_matter" },
+      { "abbr": "ਮਾਗਧੀ.", "variants": [], "gurmukhi": "ਮਗਧ ਦੇਸ਼ ਦੀ ਭਾਸ਼ਾ", "english": "Magadhi", "iso639": "mag", "source": "front_matter" },
+      { "abbr": "ਮਾਰ.", "variants": [], "gurmukhi": "ਮਾਰਵਾੜੀ", "english": "Marwari", "iso639": "mwr", "source": "front_matter" },
+      { "abbr": "ਮੁਲ.", "variants": [], "gurmukhi": "ਮੁਲਤਾਨੀ ਭਾਸ਼ਾ", "english": "Multani (Saraiki)", "iso639": "skr", "source": "front_matter" },
+      { "abbr": "ਪਹਾ.", "variants": [], "gurmukhi": "ਪਹਾੜੀ ਭਾਸ਼ਾ", "english": "Pahari (hill dialects)", "iso639": null, "source": "front_matter" },
+      { "abbr": "ਪਾ.", "variants": [], "gurmukhi": "ਪਾਲੀ ਭਾਸ਼ਾ", "english": "Pali", "iso639": "pi", "source": "front_matter" },
+      { "abbr": "ਪੁਰਤ.", "variants": [], "gurmukhi": "ਪੁਰਤਗਾਲੀ ਭਾਸ਼ਾ", "english": "Portuguese", "iso639": "pt", "source": "front_matter" },
+      { "abbr": "ਪੂ.", "variants": [], "gurmukhi": "ਪੂਰਵੀ ਭਾਸ਼ਾ", "english": "Purbi (Eastern dialect)", "iso639": null, "source": "front_matter" },
+      { "abbr": "ਪੋਠੋ.", "variants": [], "gurmukhi": "ਪੋਠੋਹਾਰੀ ਸ਼ਬਦ", "english": "Pothohari", "iso639": "phr", "source": "front_matter" },
+      { "abbr": "ਪ੍ਰਾ.", "variants": [], "gurmukhi": "ਪ੍ਰਾਕ੍ਰਿਤ ਭਾਸ਼ਾ", "english": "Prakrit", "iso639": "pra", "source": "front_matter" },
+      { "abbr": "ਫ੍ਰ.", "variants": [], "gurmukhi": "ਫ੍ਰੈਂਚ", "english": "French", "iso639": "fr", "source": "front_matter" },
+      { "abbr": "ਯੂ.", "variants": [], "gurmukhi": "ਯੂਨਾਨੀ ਭਾਸ਼ਾ", "english": "Greek", "iso639": "el", "source": "front_matter", "note": "ਯੂ. ਪੀ. (the province U.P.) is a false friend; require sense-head position" },
+      { "abbr": "L.", "variants": [], "gurmukhi": "ਲੈਟਿਨ ਭਾਸ਼ਾ", "english": "Latin; also prefixes Linnaean binomials (L. Vatica Robusta)", "iso639": "la", "source": "front_matter" },
+      { "abbr": "ਵ੍ਰਜ.", "variants": ["ਵ੍ਰਜ"], "gurmukhi": "ਵ੍ਰਜਭਾਸ਼ਾ (ਮਥੁਰਾ ਵ੍ਰਿੰਦਾਵਨ ਦੀ ਬੋਲੀ)", "english": "Braj Bhasha", "iso639": "bra", "source": "front_matter" },
+      { "abbr": "ਡਿੰਗ.", "variants": ["ਡਿੰਗ"], "gurmukhi": "ਡਿੰਗਲ ਭਾਸ਼ਾ. ਰਾਜਪੂਤਾਨੇ ਦੇ ਕਵੀਆਂ ਦੀ ਪੁਰਾਣੀ ਬੋਲੀ", "english": "Dingal (old literary Rajasthani)", "iso639": null, "source": "front_matter" },
+      { "abbr": "ਚੰਬਾ.", "variants": [], "gurmukhi": "ਚੰਬੇ ਦੀ ਭਾਸ਼ਾ", "english": "Chambeali (Chamba dialect)", "iso639": "cdh", "source": "front_matter" },
+      { "abbr": "ਥਲੀ.", "variants": [], "gurmukhi": "ਥਲੀ ਦੇਸ਼ ਦੀ ਭਾਸ਼ਾ", "english": "Thali (Thal region dialect)", "iso639": null, "source": "front_matter" },
+      { "abbr": "ਬਾਂਗਰ.", "variants": [], "gurmukhi": "ਬਾਂਗਰ ਦੀ ਭਾਸ਼ਾ", "english": "Bangru (Haryanvi)", "iso639": "bgc", "source": "front_matter" },
+      { "abbr": "ਦਖ.", "variants": [], "gurmukhi": "ਦੱਖਣੀ ਭਾਸ਼ਾ", "english": "Dakhani (Southern)", "iso639": "dcc", "source": "front_matter" },
+      { "abbr": "ਪੰਜਾਬੀ", "variants": [], "gurmukhi": "ਪੰਜਾਬੀ (ਸਪੈਲ ਕੀਤਾ ਹੋਇਆ)", "english": "Punjabi — always written out in full, never abbreviated", "iso639": "pa", "source": "corpus" }
+    ],
+    "deprecated_non_canonical": [
+      {
+        "abbr": "ਪੰ.",
+        "was_assumed": "Punjabi",
+        "actually": "Not a Mahan Kosh abbreviation at all. Zero standalone occurrences in the corpus; the scraper's substring match only ever hit letter sequences inside other words.",
+        "resolved": "2026-08-03 corpus check (standalone-token regex)"
+      },
+      {
+        "abbr": "ਉ.",
+        "was_assumed": "Urdu",
+        "actually": "The Gurmukhi list enumerator (ੳ ਅ ੲ ... used like a/b/c), found standalone exactly once ('#ਉ. ਪ੍ਰਾਗਭਾਵ...' in the ਅਭਾਵ entry's lettered list). The 34 senses previously tagged Urdu were word-final substrings (ਭਾਉ. ਜਾਉ. ...). Mahan Kosh has no Urdu marker; words that entered Punjabi via Urdu are marked by their etymological source (ਅ਼. ਫ਼ਾ. ਤੁ.).",
+        "resolved": "2026-08-03 corpus check (standalone-token regex; 1 hit, enumerator context)"
+      },
+      {
+        "abbr": "ਦੇਸ਼.",
+        "was_assumed": "Desi / regional word",
+        "actually": "The ordinary noun ਦੇਸ਼ (country, region) used as a gloss word, e.g. 'ਅਸਥਾਨ. ਦੇਸ਼.' — the period is Mahan Kosh's gloss separator, not an abbreviation dot. All 27 standalone occurrences are glosses.",
+        "resolved": "2026-08-03 corpus check (standalone-token regex; 27 hits, all gloss contexts)"
+      }
+    ]
+  },
+
+  "grammar_annotations": {
+    "_convention": "Recurring grammatical frames written in full words rather than the dash-marker system. These are phrase patterns; each 'frame' below uses X for the referenced word.",
+    "entries": [
+      { "frame": "X ਦਾ ਬਹੁਵਚਨ / X ਦਾ ਬਹੁ ਵਚਨ", "english": "plural of X", "attribute": "number=plural", "source": "corpus" },
+      { "frame": "ਸੰਬੋਧਨ", "english": "vocative (often 'ਸੰਬੋਧਨ. ਹੇ ...!')", "attribute": "case=vocative", "source": "corpus" },
+      { "frame": "X ਕ੍ਰਿਯਾ ਦਾ ਅਮਰ", "english": "imperative of verb X", "attribute": "mood=imperative", "source": "corpus", "note": "ਅਮਰ alone is also an ordinary word (immortal); require the frame" },
+      { "frame": "ਭੂਤ ਕਾਲ (ਬੋਧਕ)", "english": "past tense (indicator)", "attribute": "tense=past", "source": "corpus" },
+      { "frame": "ਵਰਤਮਾਨ", "english": "present tense", "attribute": "tense=present", "source": "corpus" },
+      { "frame": "ਇਸਤ੍ਰੀ ਲਿੰਗ", "english": "feminine gender", "attribute": "gender=feminine", "source": "corpus", "note": "ਇਸਤ੍ਰੀ alone is usually the gloss 'woman'; require the ਲਿੰਗ frame" },
+      { "frame": "ਪੁਲਿੰਗ", "english": "masculine gender", "attribute": "gender=masculine", "source": "corpus" },
+      { "frame": "X ਦਾ ਸੰਖੇਪ", "english": "short form / abbreviation of X", "attribute": "lexical=short_form_of", "source": "corpus" }
+    ]
+  },
+
+  "discourse_markers": {
+    "_convention": "Markers that structure the prose of a sense rather than classify the headword.",
+    "entries": [
+      { "abbr": "ਦੇਖੋ,", "variants": ["ਦੇਖੋ."], "english": "cross-reference ('see X'); may carry a sense number: 'ਦੇਖੋ, ਮਯ ੭' = see ਮਯ sense 7", "role": "xref", "source": "corpus" },
+      { "abbr": "ਭਾਵ-", "variants": ["ਭਾਵ."], "english": "'meaning / that is' — introduces the figurative or intended sense", "role": "figurative_gloss", "source": "corpus" },
+      { "abbr": "ਜੈਸੇ-", "variants": ["ਜਿਵੇਂ-"], "english": "'for example'", "role": "example", "source": "corpus" },
+      { "abbr": "ਯਥਾ-", "variants": [], "english": "'as in / viz.' — introduces supporting quotations", "role": "example", "source": "corpus" },
+      { "abbr": "ਉਦਾਹਰਣ-", "variants": [], "english": "'example:' — usually before a metrical specimen", "role": "example", "source": "corpus" },
+      { "abbr": "ਅਰਥਾਤ-", "variants": [], "english": "'that is (i.e.)'", "role": "clarification", "source": "corpus" },
+      { "abbr": "ਅਥਵਾ-", "variants": [], "english": "'or / alternatively' — alternative reading of a quoted line", "role": "alternative", "source": "corpus" },
+      { "abbr": "ਲੱਛਣ-", "variants": [], "english": "'defining characteristics' — esp. metrical definition of a ਛੰਦ", "role": "definition", "source": "corpus" },
+      { "abbr": "ਆਰੋਹੀ- / ਅਵਰੋਹੀ-", "variants": [], "english": "ascending / descending scale of a raag (svara letters follow)", "role": "raag_scale", "source": "corpus" }
+    ]
+  },
+
+  "citation_grammar": {
+    "_convention": "A quotation \"...\" is followed by a parenthesized citation. Grammar: (WORK), (RAAG ਮਃ N), (ਵਾਰ RAAG [N] ਮਃ N), (RAAG ਅਃ ਮਃ N), (RAAG ਛੰਤ ਮਃ N), (RAAG BHAGAT), (ਸ. BHAGAT), (ਮਃ N. ਵਾਰ RAAG [N]) etc. Gurmukhi digits; ਃ marks the abbreviations ਮਃ/ਅਃ/ਸਃ.",
+    "tokens": [
+      { "abbr": "ਮਃ", "gurmukhi": "ਮਹਲਾ", "english": "Mahala N = the Nth Guru (ਪਾਤਸ਼ਾਹੀ, ਸਤਿਗੁਰੂ)", "source": "front_matter" },
+      { "abbr": "ਅਃ", "variants": ["ਅ:"], "gurmukhi": "ਅਸ਼ਟਪਦੀ ਅਤੇ ਅਧ੍ਯਾਯ", "english": "ashtapadi (in SGGS citations) or adhyaya/chapter (in other granths)", "source": "front_matter" },
+      { "abbr": "ਸ.", "variants": ["ਸਃ"], "gurmukhi": "ਸਲੋਕ", "english": "salok (ਸ. ਕਬੀਰ = Salok Kabir)", "source": "front_matter" },
+      { "abbr": "ਸਵਾ", "gurmukhi": "ਸਲੋਕ ਵਾਰਾਂ ਤੇ ਵਧੀਕ", "english": "Salok Varan te Vadhik", "source": "front_matter" },
+      { "abbr": "ਸਹਸ", "gurmukhi": "ਸਹਸਕ੍ਰਿਤੀ ਸਲੋਕ", "english": "Sahaskriti Salok", "source": "front_matter" },
+      { "abbr": "ਵਾਰ [N]", "gurmukhi": "ਵਾਰ", "english": "vaar; the key's rule: a raag with one vaar gets no number; raags with several use ਵਾਰ 1/2/3; the weekday bani (ਐਤ ਸੋਮ ...) is cited ਵਾਰ ੭", "source": "front_matter" },
+      { "abbr": "ਛੰਤ", "gurmukhi": "ਛੰਤ", "english": "chhant section of a raag", "source": "corpus" },
+      { "abbr": "ਸੋਲਹੇ", "gurmukhi": "ਸੋਲਹੇ", "english": "Solhe (16-stanza compositions, ਮਾਰੂ ਸੋਲਹੇ)", "source": "corpus" },
+      { "abbr": "ਕੇ", "gurmukhi": "ਕੇ", "english": "'of' — (ਸਵੈਯੇ ਮਃ ੪. ਕੇ) = Bhatt Savaiye in praise of Mahala 4", "source": "corpus" },
+      { "abbr": "(ੳ) (ਅ) (ੲ) (ਸ) ...", "english": "list enumerators inside an entry (like (a)(b)(c)), not citations", "source": "corpus" }
+    ],
+    "bhagat_authors": ["ਕਬੀਰ", "ਫਰੀਦ", "ਨਾਮਦੇਵ", "ਰਵਿਦਾਸ", "ਬੇਣੀ", "ਤ੍ਰਿਲੋਚਨ", "ਧੰਨਾ", "ਜੈਦੇਵ", "ਸੈਣ", "ਪੀਪਾ", "ਸਧਨਾ", "ਭੀਖਨ", "ਸੂਰਦਾਸ", "ਪਰਮਾਨੰਦ", "ਰਾਮਾਨੰਦ", "ਮਰਦਾਨਾ", "ਸੱਤਾ ਬਲਵੰਡ", "ਸੁੰਦਰ"]
+  },
+
+  "citation_sources": {
+    "_convention": "Works cited in parentheses after quotations. 'type' groups them; SGGS raag citations combine with citation_grammar tokens.",
+    "sggs_raags": [
+      { "abbr": "ਸ੍ਰੀ", "raag": "Sri Raag", "source": "front_matter" },
+      { "abbr": "ਮਾਝ", "raag": "Majh", "source": "front_matter" },
+      { "abbr": "ਗਉ", "raag": "Gauri (ਗਉੜੀ)", "source": "front_matter" },
+      { "abbr": "ਆਸਾ", "raag": "Asa", "source": "front_matter" },
+      { "abbr": "ਗੂਜ", "raag": "Gujri (ਗੂਜਰੀ)", "source": "front_matter" },
+      { "abbr": "ਦੇਵ", "raag": "Devgandhari (ਦੇਵਗੰਧਾਰੀ)", "source": "front_matter" },
+      { "abbr": "ਬਿਹਾ", "raag": "Bihagra (ਬਿਹਾਗੜਾ)", "source": "front_matter" },
+      { "abbr": "ਵਡ", "raag": "Vadhans (ਵਡਹੰਸ)", "source": "front_matter" },
+      { "abbr": "ਸੋਰ", "raag": "Sorath (ਸੋਰਠ)", "source": "front_matter" },
+      { "abbr": "ਧਨਾ", "raag": "Dhanasri (ਧਨਾਸਰੀ)", "source": "front_matter" },
+      { "abbr": "ਜੈਤ", "raag": "Jaitsri (ਜੈਤਸਰੀ)", "source": "front_matter" },
+      { "abbr": "ਟੋਡੀ", "raag": "Todi", "source": "front_matter" },
+      { "abbr": "ਬੈਰਾ", "raag": "Bairari (ਬੈਰਾੜੀ)", "source": "front_matter" },
+      { "abbr": "ਤਿਲੰ", "raag": "Tilang (ਤਿਲੰਗ)", "source": "front_matter" },
+      { "abbr": "ਸੂਹੀ", "raag": "Suhi", "source": "front_matter" },
+      { "abbr": "ਬਿਲਾ", "raag": "Bilaval (ਬਿਲਾਵਲ)", "source": "front_matter" },
+      { "abbr": "ਗੌਂਡ", "raag": "Gond", "source": "front_matter" },
+      { "abbr": "ਰਾਮ", "raag": "Ramkali (ਰਾਮਕਲੀ)", "source": "front_matter" },
+      { "abbr": "ਨਟ", "raag": "Nat (Narayan)", "source": "front_matter" },
+      { "abbr": "ਮਾਲੀ", "raag": "Mali Gaura (ਮਾਲੀਗਉੜਾ)", "source": "front_matter" },
+      { "abbr": "ਮਾਰੂ", "raag": "Maru", "source": "front_matter" },
+      { "abbr": "ਤੁਖਾ", "raag": "Tukhari (ਤੁਖਾਰੀ)", "source": "front_matter" },
+      { "abbr": "ਕੇਦਾ", "raag": "Kedara (ਕੇਦਾਰਾ)", "source": "front_matter" },
+      { "abbr": "ਭੈਰ", "raag": "Bhairo (ਭੈਰਉ)", "source": "front_matter" },
+      { "abbr": "ਬਸੰ", "raag": "Basant (ਬਸੰਤ)", "source": "front_matter" },
+      { "abbr": "ਸਾਰ", "raag": "Sarang (ਸਾਰੰਗ)", "source": "front_matter" },
+      { "abbr": "ਮਲਾ", "raag": "Malar (ਮਲਾਰ)", "source": "front_matter" },
+      { "abbr": "ਕਾਨ", "raag": "Kanra (ਕਾਨੜਾ)", "source": "front_matter" },
+      { "abbr": "ਕਲਿ", "raag": "Kalyan (ਕਲਿਆਨ)", "source": "front_matter" },
+      { "abbr": "ਪ੍ਰਭਾ", "raag": "Prabhati (ਪ੍ਰਭਾਤੀ)", "source": "front_matter" },
+      { "abbr": "ਜੈਜਾ", "raag": "Jaijavanti (ਜੈਜਾਵੰਤੀ)", "source": "front_matter" }
+    ],
+    "sggs_compositions": [
+      { "abbr": "ਜਪੁ", "work": "Japji Sahib", "source": "corpus" },
+      { "abbr": "ਸੋਦਰੁ", "work": "So Dar", "source": "corpus" },
+      { "abbr": "ਸੋਪੁਰਖੁ", "work": "So Purakh", "source": "corpus" },
+      { "abbr": "ਸੋਹਿਲਾ", "work": "Sohila", "source": "corpus" },
+      { "abbr": "ਸੁਖਮਨੀ", "work": "Sukhmani Sahib (Gauri M5)", "source": "corpus" },
+      { "abbr": "ਬਾਵਨ", "work": "Bavan Akhri (ਬਾਵਨਅਖਰੀ, Gauri Kabir/M5)", "source": "front_matter" },
+      { "abbr": "ਓਅੰਕਾਰ", "work": "Dakhni Oankar (Ramkali M1)", "source": "corpus" },
+      { "abbr": "ਸਿਧਗੋਸਟਿ", "work": "Sidh Gosht (Ramkali M1)", "source": "corpus" },
+      { "abbr": "ਅਨੰਦੁ", "work": "Anand Sahib (Ramkali M3)", "source": "corpus" },
+      { "abbr": "ਬਾਰਹਮਾਹਾ", "work": "Barah Maha (Majh M5 / Tukhari M1)", "source": "corpus" },
+      { "abbr": "ਥਿਤੀ", "work": "Thiti (Gauri M5 / Bilaval M1)", "source": "corpus" },
+      { "abbr": "ਪਟੀ", "work": "Patti (Asa M1/M3)", "source": "corpus" },
+      { "abbr": "ਫੁਨਹੇ", "work": "Phunhe M5", "source": "corpus" },
+      { "abbr": "ਗਾਥਾ", "work": "Gatha M5", "source": "corpus" },
+      { "abbr": "ਚਉ", "work": "Chaubole (ਚਉਬੋਲੇ M5)", "source": "front_matter" },
+      { "abbr": "ਪੈਪਾਇ", "work": "the shabad 'ਪੈ ਪਾਇ ਮਨਾਈ ਸੋਇ ਜੀਉ' (Sri Raag M5) — incipit citation", "source": "corpus" },
+      { "abbr": "ਸਦੁ", "work": "Sadd (Ramkali, Baba Sundar)", "source": "corpus" },
+      { "abbr": "ਅਲਾਹਣੀ", "work": "Alahania (Vadhans M1/M3)", "source": "corpus" },
+      { "abbr": "ਪਹਰੇ", "work": "Pahre (Sri Raag)", "source": "corpus" },
+      { "abbr": "ਰੁਤੀ", "work": "Ruti M5 (Ramkali)", "source": "corpus" },
+      { "abbr": "ਵਣਜਾਰਾ", "work": "Vanjara (Sri Raag M4)", "source": "corpus" },
+      { "abbr": "ਮੁੰਦਾਵਣੀ", "work": "Mundavani M5", "source": "corpus" },
+      { "abbr": "ਬਿਰਹੜੇ", "work": "Birharre (Asa M5)", "source": "corpus" },
+      { "abbr": "ਘੋੜੀਆ", "work": "Ghorian (Vadhans M4)", "source": "corpus" },
+      { "abbr": "ਕਰਹਲੇ", "work": "Karhale (Gauri M4)", "source": "corpus" },
+      { "abbr": "ਡਖਣੇ", "work": "Dakhne M5 (Maru)", "source": "corpus" },
+      { "abbr": "ਸਵੈਯੇ ਸ੍ਰੀ ਮੁਖਵਾਕ ਮਃ ੫", "work": "Savaiye Sri Mukhvak M5", "source": "corpus" },
+      { "abbr": "ਸਵੈਯੇ ਮਃ N ਕੇ", "work": "Bhatt Savaiye in praise of Mahala N", "source": "corpus" }
+    ],
+    "dasam_granth": [
+      { "abbr": "ਜਾਪੁ", "work": "Jaap Sahib", "source": "corpus" },
+      { "abbr": "ਅਕਾਲ", "work": "Akal Ustat (ਅਕਾਲਉਸਤਤਿ)", "source": "front_matter" },
+      { "abbr": "ਵਿਚਿਤ੍ਰ", "work": "Vichitra (Bachittar) Natak", "source": "front_matter" },
+      { "abbr": "ਚੰਡੀ ੧", "work": "Chandi Charitra (larger)", "source": "front_matter" },
+      { "abbr": "ਚੰਡੀ ੨", "work": "Chandi Charitra (smaller)", "source": "front_matter" },
+      { "abbr": "ਚੰਡੀ ੩", "work": "Chandi di Var", "source": "front_matter" },
+      { "abbr": "ਗ੍ਯਾਨ", "work": "Gyan Prabodh (ਗ੍ਯਾਨਪ੍ਰਬੋਧ)", "source": "front_matter" },
+      { "abbr": "ਚੌਬੀਸਾਵ", "work": "Chaubis Avtar (intro + avatar kathas)", "source": "front_matter" },
+      { "abbr": "ਮੱਛਾਵ", "work": "Machh (Matsya) Avtar", "source": "front_matter" },
+      { "abbr": "ਕੱਛਾਵ", "work": "Kachhap (Kurma) Avtar", "source": "front_matter" },
+      { "abbr": "ਕੱਸਪਾਵ", "work": "Kashyap Avtar", "source": "front_matter" },
+      { "abbr": "ਸਮੁਦ੍ਰਮਥਨ", "work": "Samudra Mathan katha", "source": "front_matter" },
+      { "abbr": "ਧਨੰਤਰਾਵ", "work": "Dhanantar Avtar", "source": "front_matter" },
+      { "abbr": "ਸੂਰਜਾਵ", "work": "Surya Avtar", "source": "front_matter" },
+      { "abbr": "ਚੰਦ੍ਰਾਵ", "work": "Chandrama Avtar", "source": "front_matter" },
+      { "abbr": "ਨਰਾਵ", "work": "Nar Avtar", "source": "front_matter" },
+      { "abbr": "ਨਰਸਿੰਘਾਵ", "work": "Narsingh Avtar", "source": "front_matter" },
+      { "abbr": "ਨਰਨਾਰਾਯਣ", "work": "Nar Narayan Avtar", "source": "front_matter" },
+      { "abbr": "ਵਾਮਨਾਵ", "work": "Vaman Avtar", "source": "front_matter" },
+      { "abbr": "ਪਰਸਰਾਮਾਵ", "work": "Parashuram Avtar", "source": "front_matter" },
+      { "abbr": "ਰਾਮਾਵ", "work": "Ram Avtar", "source": "front_matter" },
+      { "abbr": "ਕ੍ਰਿਸਨਾਵ", "work": "Krishna Avtar", "source": "front_matter" },
+      { "abbr": "ਕਲਕੀ", "work": "Kalki Avtar", "source": "front_matter" },
+      { "abbr": "ਮੋਹਨੀ", "work": "Mohini Avtar", "source": "front_matter" },
+      { "abbr": "ਵਰਾਹ", "work": "Varaha Avtar", "source": "front_matter" },
+      { "abbr": "ਵਿਸਨਾਵ", "work": "Vishnu Avtar", "source": "front_matter" },
+      { "abbr": "ਬ੍ਰਹਮਾਵ", "work": "Brahma Avtar", "source": "front_matter" },
+      { "abbr": "ਰੁਦ੍ਰਾਵ", "work": "Rudra Avtar", "source": "front_matter" },
+      { "abbr": "ਜਲੰਧਰਾਵ", "work": "Jalandhar Avtar", "source": "front_matter" },
+      { "abbr": "ਦੱਤਾਵ", "work": "Dattatreya Avtar", "source": "front_matter" },
+      { "abbr": "ਪਾਰਸਾਵ", "work": "Parasnath Avtar", "source": "front_matter" },
+      { "abbr": "ਅਰਹੰਤਾਵ", "work": "Arhant Avtar", "source": "front_matter" },
+      { "abbr": "ਮਨੁਰਾਜ", "work": "Manu Raj prasang", "source": "front_matter" },
+      { "abbr": "ਪ੍ਰਿਥੁਰਾਜ", "work": "Raja Prithu katha", "source": "front_matter" },
+      { "abbr": "ਮਾਂਧਾਤਾ", "work": "Mandhata katha", "source": "front_matter" },
+      { "abbr": "ਦਿਲੀਪ", "work": "Raja Dilip katha", "source": "front_matter" },
+      { "abbr": "ਰਘੁਰਾਜ", "work": "Raja Raghu katha", "source": "front_matter" },
+      { "abbr": "ਅਜਰਾਜ", "work": "Raja Aj katha", "source": "front_matter" },
+      { "abbr": "ਜਜਾਤਿ", "work": "Raja Yayati katha", "source": "front_matter" },
+      { "abbr": "ਬੇਨਰਾਜ", "work": "Raja Ven katha", "source": "front_matter" },
+      { "abbr": "ਜਨਮੇਜਯ", "work": "Raja Janmejaya katha", "source": "front_matter" },
+      { "abbr": "ਜਗਰਾਜ", "work": "Raja Jag katha", "source": "front_matter" },
+      { "abbr": "ਯੁਧਿਸਟਰ ਰਾਜ", "work": "Raja Yudhishthir katha", "source": "front_matter" },
+      { "abbr": "ਪਰੀਛਤਰਾਜ", "work": "Raja Parikshit katha", "source": "front_matter" },
+      { "abbr": "ਅਜੈ ਸਿੰਘ", "work": "Ajai Singh katha", "source": "front_matter" },
+      { "abbr": "ਸਵੈਯੇ ੩੩", "work": "33 Savaiye", "source": "front_matter" },
+      { "abbr": "ਹਜਾਰੇ ੧੦", "work": "Shabad Hazare Patshahi 10", "source": "front_matter" },
+      { "abbr": "ਖਾਮ", "work": "Khalse di Mahima", "source": "front_matter" },
+      { "abbr": "ਸਨਾਮਾ", "work": "Shastar Nam Mala (ਸ਼ਸਤ੍ਰਨਾਮਮਾਲਾ)", "source": "front_matter" },
+      { "abbr": "ਚਰਿਤ੍ਰ [N]", "work": "Charitropakhyan, charitra N", "source": "front_matter" },
+      { "abbr": "ਚੌਪਈ", "work": "Benti Chaupai", "source": "front_matter" },
+      { "abbr": "ਹਕਾਯਤ", "work": "the 11 Hikayats after Zafarnama", "source": "front_matter" },
+      { "abbr": "ਜਫਰ", "work": "Zafarnama (ਜ਼ਫ਼ਰਨਾਮਹ)", "source": "front_matter" },
+      { "abbr": "ਅਸਫੋ", "work": "Asphotak Kabitt", "source": "front_matter" }
+    ],
+    "other_works": [
+      { "abbr": "ਭਾਗੁ", "variants": ["ਭਾਗ"], "work": "Bhai Gurdas — Varan", "source": "front_matter" },
+      { "abbr": "ਭਾਗੁ ਕ", "variants": ["ਭਾਗੁਕ"], "work": "Bhai Gurdas — Kabitt Savaiye", "source": "front_matter" },
+      { "abbr": "ਗੁਪ੍ਰਸੂ", "work": "Gur Pratap Suraj Granth (Suraj Prakash), Bhai Santokh Singh", "source": "front_matter" },
+      { "abbr": "ਨਾਪ੍ਰ", "work": "(Guru) Nanak Prakash, Bhai Santokh Singh", "source": "front_matter" },
+      { "abbr": "ਗੁਵਿ ੬", "work": "Gurbilas Patshahi 6", "source": "front_matter" },
+      { "abbr": "ਗੁਵਿ ੧੦", "work": "Gurbilas Patshahi 10", "source": "front_matter" },
+      { "abbr": "ਪੰਪ੍ਰ", "work": "Panth Prakash, Giani Gian Singh", "source": "front_matter" },
+      { "abbr": "ਪ੍ਰਾਪੰਪ੍ਰ", "work": "Prachin Panth Prakash, Rattan Singh Bhangu", "source": "front_matter" },
+      { "abbr": "ਗੁਰੁਪਦ", "work": "Gurupad Prem Prakash", "source": "front_matter" },
+      { "abbr": "ਜਸਾ", "work": "Janamsakhi (Bhai Bala tradition)", "source": "front_matter" },
+      { "abbr": "ਜਸਭਾਮ", "work": "Janamsakhi of Bhai Mani Singh (Gyan Ratanavali)", "source": "front_matter" },
+      { "abbr": "ਭਗਤਾਵਲੀ", "work": "Bhagat Ratanavali — Bhai Mani Singh's commentary on Bhai Gurdas' 11th vaar", "source": "front_matter" },
+      { "abbr": "ਮਗੋ", "work": "Makke Madine di Gosht", "source": "front_matter" },
+      { "abbr": "ਹਨੂ", "work": "Hanuman Natak (Hridayram)", "source": "front_matter" },
+      { "abbr": "ਵ੍ਰਿੰਦ", "work": "Satsai of the poet Vrind", "source": "front_matter" },
+      { "abbr": "ਮਨੁ", "work": "Manusmriti", "source": "front_matter" },
+      { "abbr": "ਮਾ ਸੰ", "work": "Madhavanal Sangit", "source": "front_matter" },
+      { "abbr": "ਸਲੋਹ", "work": "Sarabloh Granth", "source": "front_matter" },
+      { "abbr": "ਜੰਗਨਾਮਾ", "work": "Jangnama (anonymous vaar of Guru Gobind Singh: Aurangzeb–Zebunnisa dialogue)", "source": "front_matter" },
+      { "abbr": "ਜਿੰਦਗੀ", "work": "Zindaginama, Bhai Nand Lal", "source": "front_matter" },
+      { "abbr": "ਦੀਗੋ", "work": "Diwan-e-Goya (ghazals of Bhai Nand Lal)", "source": "front_matter" },
+      { "abbr": "ਤਨਾਮਾ", "work": "Tankhahnama", "source": "front_matter" },
+      { "abbr": "ਨਸੀਹਤ", "work": "Nasihatnama", "source": "front_matter" },
+      { "abbr": "ਰਹਿਤ", "work": "Rahitnama(s)", "source": "front_matter" },
+      { "abbr": "ਬੰਨੋ", "work": "Bhai Banno's bir of Sri Guru Granth Sahib", "source": "front_matter" },
+      { "abbr": "ਕਵਿ ੫੨", "work": "the 52 court poets of Guru Gobind Singh", "source": "front_matter" },
+      { "abbr": "ਗੁਰੁਸੋਭਾ", "work": "Gur Sobha (Sainapati) — appears in corpus citations", "source": "corpus" }
+    ],
+    "date_and_person_markers": [
+      { "abbr": "ਜ.", "gurmukhi": "ਜਨਮ", "english": "born (year follows)", "source": "front_matter" },
+      { "abbr": "ਦੇ.", "gurmukhi": "ਦੇਹਾਂਤ", "english": "died (year follows)", "source": "front_matter" },
+      { "abbr": "ਸੰਮਤ", "gurmukhi": "ਵਿਕ੍ਰਮੀ ਸਾਲ", "english": "Vikrami (Bikrami) year", "source": "front_matter" },
+      { "abbr": "ਸਨ.", "gurmukhi": "ਈਸਵੀ ਸਨ (ਸਾਲ)", "english": "CE year", "source": "front_matter" },
+      { "abbr": "ਏ. ਡੀ.", "english": "A.D. (CE year)", "source": "front_matter" },
+      { "abbr": "ਬੀ. ਸੀ.", "english": "B.C. (year before CE)", "source": "front_matter" }
+    ]
+  },
+
+  "letter_signs": {
+    "_convention": "ਅੱਖਰਾਂ ਦੇ ਸੰਕੇਤ: Kahn Singh marks Gurmukhi letters (mostly with a nukta-like dot or stroke) to show the exact foreign phoneme of the source word. The searchgurbani Unicode text preserves many of these as U+0A3C nukta; some print distinctions collapse in Unicode.",
+    "perso_arabic": [
+      { "sign": "ਅ਼ / ਇ਼ / ਉ਼", "represents": "ع (ʿain)", "examples": ["ਅ਼ਕ਼ਲ", "ਇ਼ਲਮ", "ਉਮਰ"], "source": "front_matter" },
+      { "sign": "ਤ਼", "represents": "ط (ṭā)", "examples": ["ਤ਼ਬੀਬ"], "source": "front_matter" },
+      { "sign": "ਹ਼", "represents": "ح (ḥā)", "examples": ["ਹ਼ਰਾਮ"], "source": "front_matter" },
+      { "sign": "ਖ਼", "represents": "خ (khā)", "examples": ["ਖ਼ੁਸ਼ਕ"], "source": "front_matter" },
+      { "sign": "ਗ਼", "represents": "غ (ghain)", "examples": ["ਗ਼ਰਕ਼"], "source": "front_matter" },
+      { "sign": "ਫ਼", "represents": "ف (fā)", "examples": ["ਫ਼ੌਜ"], "source": "front_matter" },
+      { "sign": "ਕ਼", "represents": "ق (qāf)", "examples": ["ਕ਼ਤਲ"], "source": "front_matter" },
+      { "sign": "ਜ਼ (four print variants)", "represents": "ذ ز ض ظ (dhāl, zā, ḍād, ẓā — distinguished in print, collapsed to ਜ਼ in the Unicode scrape)", "examples": ["ਜ਼ਿਕਰ", "ਜ਼ਾਹਿਰ", "ਜ਼ਯਾਫ਼ਤ", "ਜ਼ਹੂਰ"], "source": "front_matter" },
+      { "sign": "ਜ਼਼ (print)", "represents": "ژ (zhā)", "examples": ["ਅਜ਼ਦਹਾ"], "source": "front_matter" },
+      { "sign": "ਸ (three print variants)", "represents": "ث س ص (thā, sīn, ṣād — distinguished in print, collapsed in Unicode)", "examples": ["ਸਬੂਤ", "ਸਹੂਲਤ", "ਸਬਰ"], "source": "front_matter" },
+      { "sign": "ਸ਼", "represents": "ش (shīn)", "examples": ["ਸ਼ਹੀਦ"], "source": "front_matter" },
+      { "sign": "ਤ / ਹ (unmarked)", "represents": "ت / ہ", "examples": ["ਤਕਲੀਫ਼", "ਹਜਵ"], "source": "front_matter" },
+      { "sign": "¶ (izafat)", "represents": "Persian ezāfe vowel — 'ਇਸ ਮਾਤ੍ਰਾ ਦੀ ਆਵਾਜ਼ ਸਿਹਾਰੀ ਅਤੇ ਲਾਂ ਦੇ ਮੱਧ ਹੈ'", "examples": ["ਚਸ਼ਮੇ ਮਾ (چشمِ ما)"], "source": "front_matter" }
+    ],
+    "sanskrit": [
+      { "sign": "਋ → ਰਿ", "represents": "vocalic ṛ", "examples": ["ਰਿਸ਼ਿ"], "source": "front_matter" },
+      { "sign": "ਸ਼", "represents": "श (ś)", "examples": ["ਸ਼ਰੀਰ"], "source": "front_matter" },
+      { "sign": "ਸ਼ (marked in print)", "represents": "ष (ṣ)", "examples": ["ਸ਼ਟ ਸ਼ਾਸਤ੍ਰ"], "source": "front_matter" },
+      { "sign": "ਕ੍ਸ਼", "represents": "क्ष (kṣ)", "examples": ["ਕ੍ਸ਼ਮਾ"], "source": "front_matter" },
+      { "sign": "ਗ੍ਯ", "represents": "ज्ञ (jñ)", "examples": ["ਗ੍ਯਾਨ"], "source": "front_matter" },
+      { "sign": "superscript ਰ (repha, † in the key)", "represents": "r before a consonant (ਰੇਫ; e.g. ਵਰ੍‍ਣ, ਮੂਰ੍‌ਤਿ — with ZWJ/ZWNJ in Unicode)", "examples": ["ਵਰ੍‍ਣ"], "source": "front_matter" },
+      { "sign": "ਃ (visarga, ‡ in the key)", "represents": "Sanskrit visarga; ALSO reused as the abbreviation mark in ਮਃ ਅਃ ਸਃ", "examples": ["ਦੁਃਖ", "ਨਮਃ"], "source": "front_matter" },
+      { "sign": "੍ (halant, § in the key)", "represents": "vowelless consonant (ਹਲ ਦਾ ਚਿੰਨ੍ਹ)", "examples": ["ਮਨਸ੍"], "source": "front_matter" }
+    ]
+  },
+
+  "structural_conventions": {
+    "entries": [
+      { "convention": "। N.", "english": "sense delimiter: danda + Gurmukhi numeral + period starts sense N (sense 1 is unnumbered)", "source": "corpus", "note": "already implemented in scrape.py parse_senses(); beware bare numerals like '੧੦. ਉਂਗਲ' (ten fingers) which are quantities, not senses — the leading danda is the real signal" },
+      { "convention": "\"...\" (CITATION)", "english": "witness quotation followed by parenthesized citation; ~18,000 quotes across 12,265 senses", "source": "corpus" },
+      { "convention": "[...]", "english": "Perso-Arabic script of the etymon (follows ਅ਼./ਫ਼ਾ./ਤੁ.)", "source": "corpus" },
+      { "convention": "Devanagari run after ਸੰ./ਹਿੰ.", "english": "the Sanskrit/Hindi etymon in Devanagari", "source": "corpus" },
+      { "convention": "''...''", "english": "non-Gurbani scriptural quotation (usually Devanagari shloka), often with its own citation like (ਯੋਗਸੂਤ੍ਰ, ੩-੨)", "source": "corpus" },
+      { "convention": "#", "english": "line/paragraph break marker introduced by the searchgurbani digitization (not Kahn Singh's)", "source": "corpus" },
+      { "convention": "¹ ² ³", "english": "footnote references; footnote text usually follows a # at the end of the sense", "source": "corpus" },
+      { "convention": "ਦੇਖੋ, X [N]", "english": "cross-reference to entry X (optionally sense N)", "source": "corpus" },
+      { "convention": "(ੳ) (ਅ) (ੲ) (ਸ)", "english": "in-entry list enumerators", "source": "corpus" },
+      { "convention": ". between glosses", "english": "period separates synonym glosses within a sense ('ਜਗਾ. ਥਾਂ.') — not sentence punctuation", "source": "corpus" }
+    ]
+  }
+}
