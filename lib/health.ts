@@ -13,6 +13,13 @@
 import { supabase } from "./supabase";
 import { buildGrammarView } from "./grammar-view";
 import type { WordGrammarWithRule } from "./supabase";
+import legendJson from "../pipeline/mahan-kosh/abbreviations.json";
+
+// Single source of truth for the expected parse stamp: the legend's _meta
+// (the same file the Python parser reads), so app and pipeline can't drift.
+const MK_PARSE_VERSION: string =
+  ((legendJson as Record<string, unknown>)._meta as { parse_version?: string })
+    ?.parse_version ?? "0";
 
 export type MetricStatus = "ok" | "warn" | "info";
 export type Row = Record<string, string | number>;
@@ -111,12 +118,44 @@ async function grammarConflictMetrics(): Promise<Metric[]> {
   ];
 }
 
+// Rows whose parsed stamp differs from the current parse_version (issue #46).
+// PostgREST can't express IS DISTINCT FROM, so: stale = total Mahan Kosh rows
+// (from the RPC's per-source breakdown) minus rows stamped with the current
+// version — which correctly counts parsed=null and missing-stamp rows as stale.
+async function mkParseStalenessMetric(s: HealthStats): Promise<Metric[]> {
+  const mk = s.definitions_per_source.find((r) => r.code === "mahan_kosh");
+  if (!mk) return [];
+  const { data: src } = await supabase
+    .from("dict_sources")
+    .select("id")
+    .eq("code", "mahan_kosh")
+    .single();
+  if (!src) return [];
+  const { count } = await supabase
+    .from("definitions")
+    .select("id", { count: "exact", head: true })
+    .eq("dict_source_id", src.id)
+    .eq("parsed->>parser_version", MK_PARSE_VERSION);
+  const stale = mk.rows - (count ?? 0);
+  return [
+    {
+      key: "mk_parse_stale",
+      label: "Mahan Kosh rows without the current structured parse",
+      group: "Definitions",
+      value: stale,
+      status: stale === 0 ? "ok" : "warn",
+      note: `Expected parse version ${MK_PARSE_VERSION}. Nonzero means the parser or legend changed without the ~1 min re-run (parse_shorthand.py --run + ingest:mahankosh).`,
+    },
+  ];
+}
+
 export async function computeHealth(): Promise<HealthReport> {
   const [{ data: statsData }, grammarConflictM] = await Promise.all([
     supabase.rpc("health_stats"),
     grammarConflictMetrics(),
   ]);
   const s = statsData as HealthStats;
+  const mkParseM = await mkParseStalenessMetric(s);
 
   const metrics: Metric[] = [
     // Corpus / ingest
@@ -252,6 +291,7 @@ export async function computeHealth(): Promise<HealthReport> {
       value: s.open_flags_by_type.map((r) => ({ type: r.flag_type, count: r.rows })),
     },
   ];
+  metrics.push(...mkParseM);
 
   return { generatedAt: new Date().toISOString(), metrics };
 }

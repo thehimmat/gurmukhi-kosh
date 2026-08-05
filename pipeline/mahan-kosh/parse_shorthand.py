@@ -102,6 +102,11 @@ def _load_legend():
 
 LEGEND, LANG, POS, WORKS_1, WORKS_N, RAAGS, BHAGATS = _load_legend()
 
+# Stamped into every parsed sense; /health flags rows whose stamp differs from
+# the legend's current parse_version (issue #46). Bump it in abbreviations.json
+# on any behavior change, then re-run --run + ingest.
+PARSE_VERSION = str(LEGEND.get("_meta", {}).get("parse_version", "0"))
+
 SECTION_TOKENS = {
     nfd("ਅਃ"): "ਅਸਟਪਦੀ",
     nfd("ਛੰਤ"): "ਛੰਤ",
@@ -239,6 +244,7 @@ def parse_sense(text: str) -> dict:
     spans = []  # (start, end) removed from residue
 
     out = {
+        "parser_version": PARSE_VERSION,
         "language_origins": [], "pos": [], "grammar": [],
         "citations": [], "quotes": [], "xrefs": [], "residue": "",
     }
