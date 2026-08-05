@@ -95,16 +95,16 @@ const SOURCES: Source[] = [
   },
   {
     name: "The Guru Granth Sahib Dictionary (SikhRI)",
-    role: "Per-word English meanings (and scholar-verified grammar, planned) — cited on each word's entry.",
-    status: "in-use",
+    role: "Per-word English meanings (and scholar-verified grammar), planned — not currently shown on any entry.",
+    status: "pending-permission",
     url: "https://gurugranthsahibdictionary.io",
-    note: "© SikhRI, all rights reserved. Used strictly non-commercially with attribution and a link back to each entry. We have written to SikhRI about this use and will remove it promptly on their request. Only per-word meanings are shown, never the dictionary as a whole.",
+    note: "© SikhRI, all rights reserved. We wrote to SikhRI about using per-word meanings here, and they have told us the request is under internal review. While they consider it we have paused this work: nothing of theirs is published here apart from a few entries left over from an early technical test, which we are removing. We will follow whatever guidance they give.",
   },
   {
     name: "A Guru Nanak Glossary (Christopher Shackle, 2nd ed.)",
     role: "Definitions, grammar, and etymology (incl. CDIAL/Turner numbers) for words in the hymns of Guru Nanak, Guru Angad, and Shaikh Farid; our richest single source, with in-text example citations.",
     status: "in-use",
-    note: "© Christopher Shackle / SOAS, all rights reserved. Used strictly non-commercially with attribution, consistent with how we treat SikhRI's dictionary above; we will remove it promptly on request. Off-corpus appendix headwords are reverse-transliterated into Gurmukhi by us and clearly marked as derived, not original to the source.",
+    note: "© Christopher Shackle / SOAS, all rights reserved. Used strictly non-commercially with attribution, and we will remove it promptly on request. Off-corpus appendix headwords are reverse-transliterated into Gurmukhi by us and clearly marked as derived, not original to the source.",
   },
   {
     name: "Sri Granth Gurbani Dictionary (Dr. Kulbir S. Thind & Dr. Gurcharan Singh)",
