@@ -16,7 +16,7 @@ export interface LexemeGroup {
   forms: LexemeForm[];
 }
 
-// Builds a short inflection label from the Viakaran analysis, e.g. "nominative
+// Builds a short inflection label from the Viakaran analysis, e.g. "direct
 // singular", or null when the form's ending is undecided.
 function inflectionDesc(gurmukhi: string): string | null {
   const a = analyzeNounForm(gurmukhi);
