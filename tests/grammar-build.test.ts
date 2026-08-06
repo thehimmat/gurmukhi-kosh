@@ -12,12 +12,12 @@ const verb = (g = '') => ({ definition_text: `ਕ੍ਰਿ- ${g}` });
 const particle = (g = '') => ({ definition_text: `ਵ੍ਯ- ${g}` });
 
 describe('buildGrammar', () => {
-  it('ਨਾਮੁ as a noun → nominative singular masculine row', () => {
+  it('ਨਾਮੁ as a noun → direct singular masculine row', () => {
     const rows = buildGrammar('ਨਾਮੁ', [noun('ਪ੍ਰਭੂ ਦਾ ਨਾਮ')]);
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       pos: 'noun',
-      gram_case: 'nominative',
+      gram_case: 'direct',
       number: 'singular',
       gender: 'masculine',
       rule_code: 'AUNKAR_NOM_SG',
@@ -74,7 +74,7 @@ describe('buildInheritedGrammar', () => {
     const row = buildInheritedGrammar('ਨਾਮੁ', 'noun', 'ਨਾਮ');
     expect(row).toMatchObject({
       pos: 'noun',
-      gram_case: 'nominative',
+      gram_case: 'direct',
       number: 'singular',
       rule_code: 'AUNKAR_NOM_SG',
     });

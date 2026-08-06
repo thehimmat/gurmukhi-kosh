@@ -47,7 +47,7 @@ describe('groupLexemes', () => {
   it('labels each form with an inflection description from the Viakaran analysis', () => {
     const groups = groupLexemes(['ਹੁਕਮੁ', 'ਹੁਕਮਿ']);
     const byForm = Object.fromEntries(groups[0].forms.map((f) => [f.gurmukhi, f.inflection_desc]));
-    expect(byForm['ਹੁਕਮੁ']).toMatch(/nominative/);
+    expect(byForm['ਹੁਕਮੁ']).toMatch(/direct/);
     expect(byForm['ਹੁਕਮਿ']).toMatch(/oblique/);
   });
 

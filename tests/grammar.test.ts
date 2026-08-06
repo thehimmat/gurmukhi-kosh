@@ -27,9 +27,9 @@ describe('viakaran', () => {
   });
 
   describe('analyzeNounForm', () => {
-    it('ਨਾਮੁ (aunkar) → nominative singular, masculine', () => {
+    it('ਨਾਮੁ (aunkar) → direct singular, masculine', () => {
       const a = analyzeNounForm('ਨਾਮੁ');
-      expect(a.gram_case).toBe('nominative');
+      expect(a.gram_case).toBe('direct');
       expect(a.number).toBe('singular');
       expect(a.gender).toBe('masculine');
       expect(a.rule_code).toBe('AUNKAR_NOM_SG');
@@ -44,9 +44,9 @@ describe('viakaran', () => {
       expect(analyzeNounForm('ਗੁਰ').gender).toBeNull();
     });
 
-    it('ਹੁਕਮੁ (aunkar) → nominative singular', () => {
+    it('ਹੁਕਮੁ (aunkar) → direct singular', () => {
       const a = analyzeNounForm('ਹੁਕਮੁ');
-      expect(a.gram_case).toBe('nominative');
+      expect(a.gram_case).toBe('direct');
       expect(a.number).toBe('singular');
       expect(a.rule_code).toBe('AUNKAR_NOM_SG');
     });
