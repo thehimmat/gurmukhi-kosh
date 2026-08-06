@@ -1,4 +1,4 @@
--- 024_viakaran_rule_corrections.sql
+-- 025_viakaran_rule_corrections.sql
 -- Corrects the grammar_rules registry against the primary source: Prof. Sahib Singh,
 -- Gurbani Viakaran (Singh Brothers, 17th ed. 2011; first ed. 1939). Page references are
 -- to that edition and were transcribed from the 300 DPI scan (issue #24, Phase 0).
