@@ -194,8 +194,34 @@ async function main() {
     byWord.set(row.word_id, list);
   }
 
-  const allRows = Array.from(byWord.values()).flat();
   const wordIds = Array.from(byWord.keys());
+
+  // UNIQUE(word_id, order_index) spans provenances: imported rows (e.g.
+  // Shackle, since 2026-07-22) already occupy the low order_index slots for
+  // many of these words, so rule-derived rows must number ABOVE each word's
+  // surviving rows (the same renumber-above convention the /admin/spellings
+  // merge uses). Numbering from 1 collides on the first shared word.
+  const survivorMax = new Map<number, number>();
+  for (let i = 0; i < wordIds.length; i += 100) {
+    const batch = wordIds.slice(i, i + 100);
+    const { data, error } = await db
+      .from("etymology")
+      .select("word_id, order_index")
+      .in("word_id", batch)
+      .neq("provenance", PROVENANCE);
+    if (error) throw new Error(`survivor order_index fetch: ${error.message}`);
+    for (const r of data ?? []) {
+      survivorMax.set(r.word_id, Math.max(survivorMax.get(r.word_id) ?? 0, r.order_index));
+    }
+  }
+  for (const [wordId, list] of byWord) {
+    const base = survivorMax.get(wordId) ?? 0;
+    list.forEach((row, i) => {
+      row.order_index = base + i + 1;
+    });
+  }
+
+  const allRows = Array.from(byWord.values()).flat();
   console.log(`Etymology rows to write: ${allRows.length} (${wordIds.length} words)`);
 
   // Idempotent replace: this pipeline is the sole writer of
