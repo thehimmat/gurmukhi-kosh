@@ -103,7 +103,7 @@ const SOURCES: Source[] = [
     role: "Per-word English meanings (and scholar-verified grammar), planned — not currently shown on any entry.",
     status: "pending-permission",
     url: "https://gurugranthsahibdictionary.io",
-    note: "© SikhRI, all rights reserved. We wrote to SikhRI about using per-word meanings here, and they have told us the request is under internal review. While they consider it we have paused this work: nothing of theirs is published here apart from a few entries left over from an early technical test, which we are removing. We will follow whatever guidance they give.",
+    note: "© SikhRI, all rights reserved. We wrote to SikhRI about using per-word meanings here, and they have told us the request is under internal review. While they consider it we have paused this work and none of their material is published on this site. We will follow whatever guidance they give.",
   },
   {
     name: "A Guru Nanak Glossary (Christopher Shackle, 2nd ed.)",
