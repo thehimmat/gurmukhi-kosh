@@ -24,12 +24,37 @@ export interface EtymologyCandidate {
   source_text: string; // the Mahan Kosh sentence this was read from, verbatim
 }
 
+// ISO codes as emitted by the canonical legend (pipeline/mahan-kosh/
+// abbreviations.json language_markers). 'pa' and 'ur' are retired: they came
+// from the scraper's non-canonical ਪੰ./ਉ. markers (#35) and canonical
+// cross_refs can no longer carry them; 'ur' is kept solely so the
+// corroboration guard below stays meaningful if legacy data resurfaces.
 export const ORIGIN_LANGUAGE_NAME: Record<string, string> = {
   sa: "Sanskrit",
   ar: "Arabic",
   fa: "Persian",
   hi: "Hindi",
-  pa: "Punjabi",
+  tr: "Turkish",
+  sd: "Sindhi",
+  pra: "Prakrit",
+  pi: "Pali",
+  en: "English",
+  mr: "Marathi",
+  el: "Greek",
+  he: "Hebrew",
+  fr: "French",
+  la: "Latin",
+  pt: "Portuguese",
+  gu: "Gujarati",
+  ks: "Kashmiri",
+  mag: "Magadhi",
+  mwr: "Marwari",
+  skr: "Multani (Saraiki)",
+  phr: "Pothohari",
+  bgc: "Bangru",
+  dcc: "Dakhani",
+  cdh: "Chambeali",
+  bra: "Braj",
   ur: "Urdu",
 };
 

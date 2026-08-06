@@ -24,6 +24,7 @@ import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
 
 const JSONL_PATH = "pipeline/mahan-kosh/output/entries.jsonl";
+const PARSED_PATH = "pipeline/mahan-kosh/output/parsed.jsonl";
 const DICT_SOURCE_CODE = "mahan_kosh";
 const BATCH_SIZE = 50; // definitions upserted per DB call
 
@@ -32,6 +33,15 @@ interface Sense {
   definition_text: string;
   cross_refs: Record<string, string> | null;
 }
+
+// Output of pipeline/mahan-kosh/parse_shorthand.py --run (issue #32).
+type ParsedSense = Record<string, unknown> & {
+  sense_number?: number;
+  language_origins?: {
+    iso639?: string | null;
+    etymon?: { script?: string; text?: string } | null;
+  }[];
+};
 
 interface JournalEntry {
   gurmukhi: string;
@@ -84,6 +94,49 @@ async function readJsonl(path: string): Promise<JournalEntry[]> {
   return entries;
 }
 
+/**
+ * Reads parsed.jsonl into a `${gurmukhi}#${sense_number}` map. The parse is
+ * the canonical reading of each sense; when present it also supersedes the
+ * scraper's legacy cross_refs (see crossRefsFromParsed).
+ */
+async function readParsed(path: string): Promise<Map<string, ParsedSense>> {
+  const map = new Map<string, ParsedSense>();
+  if (!fs.existsSync(path)) return map;
+  const rl = readline.createInterface({
+    input: fs.createReadStream(path, "utf-8"),
+    crlfDelay: Infinity,
+  });
+  for await (const line of rl) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      const e = JSON.parse(trimmed);
+      for (const s of e.senses ?? []) {
+        map.set(`${e.gurmukhi}#${s.sense_number}`, s as ParsedSense);
+      }
+    } catch {
+      // malformed line: entries.jsonl is the row driver, so just skip here
+    }
+  }
+  return map;
+}
+
+/**
+ * Regenerates the legacy cross_refs shape from the structured parse, so
+ * downstream consumers (pipeline/etymology) read canonical origins instead of
+ * the scraper's old substring guesses (#35): origin_lang from the first
+ * origin's ISO code, ar_fa from the first Perso-Arabic etymon.
+ */
+function crossRefsFromParsed(p: ParsedSense): Record<string, string> | null {
+  const refs: Record<string, string> = {};
+  const origins = p.language_origins ?? [];
+  const iso = origins[0]?.iso639;
+  if (iso) refs.origin_lang = iso;
+  const arFa = origins.find((o) => o.etymon?.script === "perso_arabic")?.etymon?.text;
+  if (arFa) refs.ar_fa = arFa;
+  return Object.keys(refs).length ? refs : null;
+}
+
 async function main() {
   const db = supabaseAdmin();
   const dictSourceId = await resolveDictSource(db, DICT_SOURCE_CODE);
@@ -94,6 +147,17 @@ async function main() {
   console.log(
     `Total JSONL lines: ${allEntries.length} | entries with senses: ${foundEntries.length}`
   );
+
+  const parsedMap = await readParsed(PARSED_PATH);
+  if (parsedMap.size === 0) {
+    console.warn(
+      `WARNING: ${PARSED_PATH} not found or empty — rows will carry the ` +
+        `scraper's legacy cross_refs and parsed=null. Run ` +
+        `'python3 pipeline/mahan-kosh/parse_shorthand.py --run' first.`
+    );
+  } else {
+    console.log(`Structured parses loaded: ${parsedMap.size} senses.`);
+  }
 
   // Build a batch of (gurmukhi → word_id) lookups
   const gurmukhiSet = [...new Set(foundEntries.map((e) => e.gurmukhi))];
@@ -126,11 +190,13 @@ async function main() {
     sense_number: number;
     definition_text: string;
     cross_refs: Record<string, string> | null;
+    parsed: Record<string, unknown> | null;
     source_url: string | null;
   };
 
   const rows: DefRow[] = [];
   let skipped = 0;
+  let withParsed = 0;
 
   for (const entry of foundEntries) {
     const wordId = wordMap.get(entry.gurmukhi);
@@ -139,17 +205,23 @@ async function main() {
       continue;
     }
     for (const sense of entry.senses!) {
+      const parsed = parsedMap.get(`${entry.gurmukhi}#${sense.sense_number}`) ?? null;
+      if (parsed) withParsed++;
+      // sense_number is already a column; keep the jsonb payload lean
+      const { sense_number: _sn, ...parsedStored } = parsed ?? {};
       rows.push({
         word_id: wordId,
         dict_source_id: dictSourceId,
         entry_gurmukhi: entry.entry_gurmukhi ?? null,
         sense_number: sense.sense_number,
         definition_text: sense.definition_text,
-        cross_refs: sense.cross_refs ?? null,
+        cross_refs: parsed ? crossRefsFromParsed(parsed) : (sense.cross_refs ?? null),
+        parsed: parsed ? (parsedStored as Record<string, unknown>) : null,
         source_url: entry.source_url ?? null,
       });
     }
   }
+  console.log(`Structured parse attached to ${withParsed}/${rows.length} rows.`);
 
   // Dedupe by conflict key (word_id, sense_number): a malformed Mahan Kosh
   // description can parse into two senses sharing a sense_number, which makes the

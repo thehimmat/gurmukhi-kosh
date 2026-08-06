@@ -49,3 +49,6 @@ next-env.d.ts
 CLAUDE.md
 AGENTS.md
 pipeline/shackle/data/
+
+# Python bytecode caches (pipeline scripts)
+__pycache__/

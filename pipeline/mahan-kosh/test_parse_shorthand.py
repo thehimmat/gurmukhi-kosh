@@ -51,6 +51,33 @@ class HeadMarkers(unittest.TestCase):
         self.assertEqual(o["etymon"]["text"], "गुर")
         self.assertEqual(s["pos"][0]["pos"], "verbal_root")
 
+    def test_gurmukhi_transcribed_etymon(self):
+        # ਸੰ. ਪਾਨੀਯ. ਸੰਗ੍ਯਾ- : the etymon is transcribed in Gurmukhi rather than
+        # Devanagari. Captured only when the very next token is another marker,
+        # and flagged inferred (it is our reading, not script-explicit).
+        s = parse_sense("ਸੰ. ਪਾਨੀਯ. ਸੰਗ੍ਯਾ- ਜਲ.")
+        o = s["language_origins"][0]
+        self.assertEqual(o["language"], "Sanskrit")
+        self.assertEqual(o["etymon"]["script"], "gurmukhi")
+        self.assertEqual(o["etymon"]["text"], "ਪਾਨੀਯ")
+        self.assertTrue(o["etymon"]["inferred"])
+        self.assertNotIn("ਪਾਨੀਯ", s["residue"])
+        self.assertIn("ਜਲ", s["residue"])
+
+    def test_no_gurmukhi_etymon_when_pos_follows_directly(self):
+        # ਡਿੰਗ. ਸੰਗ੍ਯਾ- ਨਾਭੀ : no transcription slot between marker and POS,
+        # and the first gloss must never be mistaken for an etymon.
+        s = parse_sense("ਡਿੰਗ. ਸੰਗ੍ਯਾ- ਨਾਭੀ. ਤੁੰਨ. ਧੁੰਨੀ.")
+        self.assertIsNone(s["language_origins"][0]["etymon"])
+        self.assertIn("ਨਾਭੀ", s["residue"])
+
+    def test_no_gurmukhi_etymon_from_plain_gloss(self):
+        # ਸਿੰਧੀ. ਬੱਸ. ਹੋਰ ਨਹੀਂ : the token after the marker is a gloss (next
+        # token is prose, not a marker), so nothing is claimed as etymon.
+        s = parse_sense("ਸਿੰਧੀ. ਬੱਸ. ਹੋਰ ਨਹੀਂ.")
+        self.assertIsNone(s["language_origins"][0]["etymon"])
+        self.assertIn("ਬੱਸ", s["residue"])
+
     def test_nfc_input_still_matches(self):
         # precomposed ਫ਼ (U+0A5E): parser must normalize
         s = parse_sense(unicodedata.normalize("NFC", "ਫ਼ਾ. [نام] ਸੰਗ੍ਯਾ- ਨਾਉਂ."))

@@ -201,15 +201,17 @@ def extract_cross_refs(text: str) -> dict | None:
         if re.search(r"[؀-ۿ]", m):
             refs.setdefault("ar_fa", m)
 
-    # Language origin markers common in Mahan Kosh
+    # Language origin markers — canonical only (verified against the printed
+    # 1930 ਸੰਕੇਤ key, see abbreviations.json). The formerly guessed ਪੰ./ਉ./ਦੇਸ਼.
+    # are NOT Mahan Kosh markers (ਉ. is a list enumerator, ਦੇਸ਼. an ordinary
+    # gloss noun, ਪੰ. never occurs) and produced false origin tags (#35).
+    # This whole field is superseded by parse_shorthand.py's positional
+    # parsing; it remains only so a fresh scrape carries sane legacy values.
     lang_markers = {
         "ਸੰ.": "sa",    # Sanskrit
         "ਅ਼.": "ar",    # Arabic
         "ਫ਼ਾ.": "fa",   # Farsi/Persian
         "ਹਿੰ.": "hi",   # Hindi
-        "ਪੰ.": "pa",    # Punjabi
-        "ਉ.":  "ur",    # Urdu
-        "ਦੇਸ਼.": "pa",  # Desi/regional
     }
     for marker, lang in lang_markers.items():
         if marker in text:
