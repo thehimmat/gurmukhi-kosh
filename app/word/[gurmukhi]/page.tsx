@@ -633,7 +633,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                       </span>
                       {ours
                         ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
-                        : `${r.attestations[0].sourceLabel} reads it this way. The sources genuinely differ; both readings are recorded here so you can weigh them.`}
+                        : `${r.attestations[0].sourceLabel} reads it this way. Both readings are recorded here so you can weigh them.`}
                     </div>
                   );
                 })}

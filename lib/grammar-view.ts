@@ -56,10 +56,9 @@ const IMPORTED_SOURCES: Record<string, { label: string; citation: string }> = {
     label: "Shackle, A Guru Nanak Glossary",
     citation: "Christopher Shackle, A Guru Nanak Glossary (2nd ed.), SOAS.",
   },
-  viakaran: {
-    label: "Sahib Singh's Gurbani Viakaran",
-    citation: "Prof. Sahib Singh, Gurbani Viakaran (1939; Singh Brothers 17th ed. 2011).",
-  },
+  // Add an entry only once a source actually writes rows with that source_code.
+  // An unrecognised code falls through to "Cited source (unattributed)", which is
+  // honest; a pre-registered label would assert an edition we have not ingested.
 };
 
 export interface AttributeReading {

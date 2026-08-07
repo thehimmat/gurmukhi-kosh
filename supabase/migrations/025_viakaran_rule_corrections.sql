@@ -30,9 +30,12 @@
 update grammar_rules set
   title = 'Mukta (bare) ending -> ambiguous; most often nominative plural',
   explanation = 'A bare noun form with no final vowel sign (mukta) does NOT determine one '
-    'reading. Per Gurbani Viakaran p.62, mukta occurs in the plural of six of the eight '
-    'kaaraks, and in the singular only for sampradaan, sambandh and sambodhan -- not for '
-    'karan or adhikaran. p.71 states of its mukta-ending examples that they are all '
+    'reading. In the mukta-stem MASCULINE paradigm tabulated at Gurbani Viakaran p.62, '
+    'mukta occurs in the plural of six of the eight kaaraks, and in the singular only for '
+    'sampradaan, sambandh and sambodhan -- not for karan or adhikaran. (That table covers '
+    'that one noun class; other classes are tabulated separately, so read it as evidence '
+    'that the ending is ambiguous, not as a count over the whole lexicon.) '
+    'p.71 states of its mukta-ending examples that they are all '
     'nominative PLURAL, and p.72 notes the agreeing verbs are plural too. p.129 adds that '
     'a mukta-only stem is feminine (only the masculine can take aunkar), and its bare form '
     'is nominative singular. Mukta is the absence of a marker, so it cannot signal a single '
