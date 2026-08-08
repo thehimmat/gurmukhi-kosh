@@ -564,26 +564,60 @@ export default async function WordPage({ params, searchParams }: Props) {
                 than choose between them.{" "}
               </>
             )}
-            The remaining analysis is produced by applying established Gurbani grammar
-            rules (Prof. Sahib Singh&apos;s Viakaran) to each word&apos;s form, alongside the
-            part-of-speech markers in its Mahan Kosh entry. That part is rule-derived and
-            deterministic, not a per-word guess; where a word&apos;s ending is ambiguous we
-            leave a field blank rather than assume. Expand &ldquo;How we determined this&rdquo;
-            on any entry to see the exact rule or source. Unverified rules are pending
-            page-level verification against the published text.
+            The remaining analysis is <em>our own</em>: we apply rules from Prof. Sahib
+            Singh&apos;s <em>Viakaran</em> to each word&apos;s form, alongside the
+            part-of-speech markers in its Mahan Kosh entry. Those readings are applied
+            uniformly by rule rather than judged word by word — which makes them
+            consistent, but no more reliable than the rule behind them. A rule marked
+            <em> unverified</em> has not been confirmed against the published text, and in
+            some cases the text is now known to contradict it. Treat those as our working
+            inference, not as a scholar&apos;s statement. Expand &ldquo;How we determined
+            this&rdquo; on any entry to see the exact rule, its status, and its source.
           </p>
 
           {grammarView.map((av: AttributeView) => {
             const lead: AttributeReading = av.readings[0];
             const others = av.readings.slice(1);
             const leadSource = lead.attestations[0];
+            // Our own rule/heuristic, resting on a rule not yet confirmed against the
+            // published source. Corroboration by any other source clears it — the point
+            // is an uncorroborated inference, not the rule's mere presence.
+            const leadIsUnverifiedRule =
+              (leadSource.sourceKind === "rule" || leadSource.sourceKind === "heuristic") &&
+              !leadSource.verified &&
+              lead.attestations.length === 1;
             return (
               <div key={av.attribute} style={{ ...CARD, marginBottom: "0.75rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
                   <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                     {av.label}
                   </span>
-                  <span className="badge">{fmtGrammar(av.attribute, lead.value)}</span>
+                  {/* A reading that rests on an unverified rule must not look like a
+                      cited scholar's. Same information, visibly lower confidence: the
+                      solid badge is reserved for readings a source actually attests. */}
+                  <span
+                    className={leadIsUnverifiedRule ? undefined : "badge"}
+                    style={leadIsUnverifiedRule
+                      ? {
+                          fontFamily: '"Inter", sans-serif',
+                          fontSize: "0.8rem",
+                          color: "var(--text-secondary)",
+                          border: "1px dashed var(--border)",
+                          borderRadius: "4px",
+                          padding: "0.05rem 0.45rem",
+                        }
+                      : undefined}
+                  >
+                    {fmtGrammar(av.attribute, lead.value)}
+                  </span>
+                  {leadIsUnverifiedRule && (
+                    <span
+                      title={leadSource.citation ?? undefined}
+                      style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.68rem", fontWeight: 600, color: "#8a6d1f", background: "#f7efd8", borderRadius: "999px", padding: "0.05rem 0.5rem" }}
+                    >
+                      Unverified rule — our inference
+                    </span>
+                  )}
                   {lead.attestations.length > 1 && (
                     <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#1d7333", background: "#e1f1e6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
                       Corroborated by {lead.attestations.length} sources
