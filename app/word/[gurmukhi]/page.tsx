@@ -565,11 +565,11 @@ export default async function WordPage({ params, searchParams }: Props) {
               </>
             )}
             The remaining analysis is <em>our own</em>: we apply rules from Prof. Sahib
-            Singh&apos;s <em>Viakaran</em> to each word&apos;s form, alongside the
+            Singh&apos;s <em>Viakaran</em>{" "}to each word&apos;s form, alongside the
             part-of-speech markers in its Mahan Kosh entry. Those readings are applied
             uniformly by rule rather than judged word by word — which makes them
-            consistent, but no more reliable than the rule behind them. A rule marked
-            <em> unverified</em> has not been confirmed against the published text, and in
+            consistent, but no more reliable than the rule behind them. A rule marked{" "}
+            <em>unverified</em>{" "}has not been confirmed against the published text, and in
             some cases the text is now known to contradict it. Treat those as our working
             inference, not as a scholar&apos;s statement. Expand &ldquo;How we determined
             this&rdquo; on any entry to see the exact rule, its status, and its source.
