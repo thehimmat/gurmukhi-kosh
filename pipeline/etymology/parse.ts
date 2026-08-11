@@ -1,34 +1,33 @@
-// Etymology extraction (P5) — pure parser over Mahan Kosh definition rows.
+// Etymology extraction (P5) — pure mapping from the structured Mahan Kosh
+// parse (definitions.parsed.language_origins) to etymology candidates.
 //
-// The Mahan Kosh scraper (pipeline/mahan-kosh/scrape.py) already tags each sense
-// row with an origin-language marker in `cross_refs.origin_lang` (ਸੰ. Sanskrit,
-// ਅ਼. Arabic, ਫ਼ਾ. Persian, ਹਿੰ. Hindi, ਪੰ. Punjabi, ਉ. Urdu — see
-// extract_cross_refs() there) and, when the source cites a bracketed
-// Perso-Arabic form, the exact script in `cross_refs.ar_fa`.
-//
-// This module turns that into an etymology candidate:
-//   - Arabic/Persian: root_form comes directly from cross_refs.ar_fa (already
-//     extracted by the scraper — nothing left to parse).
-//   - Sanskrit/Hindi: the scraper does NOT pre-extract a root string, because
-//     Mahan Kosh sometimes gives the Sanskrit root in Devanagari right after the
-//     marker (e.g. "ਸੰ. गुरू ਗੁਰੂ...") and sometimes only paraphrases it in
-//     Gurmukhi with no Devanagari at all (e.g. "ਸੰ. ਪੁਰੁਸ."). We scan for a
-//     Devanagari run immediately after the marker and return null when there
-//     isn't one — an honest omission rather than guessing a root.
-
-export type CrossRefs = { origin_lang?: string; ar_fa?: string } | null;
+// Until #48 this read only cross_refs.origin_lang — the FIRST origin — so a
+// chained marker run (ਫ਼ਾ. [سیب] … ਅੰ. Apple) produced a single row and 49
+// senses whose origin language has no ISO code never produced one at all.
+// The parsed layer carries the full ordered origin list, and
+// etymology.order_index already models a chain, so every origin becomes a
+// candidate in print order.
 
 export interface EtymologyCandidate {
   origin_language: string; // e.g. "Sanskrit"
-  root_form: string | null; // script form (Devanagari or Perso-Arabic), if extractable
-  source_text: string; // the Mahan Kosh sentence this was read from, verbatim
+  root_form: string | null; // the etymon as printed (Devanagari / Perso-Arabic / Latin), if any
+  root_script: string | null; // etymon script, decides which external dictionary applies
+  source_text: string; // the Mahan Kosh sense this was read from, verbatim
 }
 
-// ISO codes as emitted by the canonical legend (pipeline/mahan-kosh/
-// abbreviations.json language_markers). 'pa' and 'ur' are retired: they came
-// from the scraper's non-canonical ਪੰ./ਉ. markers (#35) and canonical
-// cross_refs can no longer carry them; 'ur' is kept solely so the
-// corroboration guard below stays meaningful if legacy data resurfaces.
+// One entry of parsed.language_origins as parse_shorthand.py emits it.
+export type ParsedOrigin = {
+  marker: string;
+  language: string;
+  iso639: string | null;
+  etymon: { text: string; script: string; inferred?: boolean } | null;
+};
+
+// Display names for the canonical legend's ISO codes (pipeline/mahan-kosh/
+// abbreviations.json language_markers). Preferred over the parser's `language`
+// field, which sometimes carries the legend's verbose gloss ("Braj Bhasha",
+// "Marathi (Maharashtri)"); the parser name is the fallback for the handful of
+// markers with no ISO code (Pahari, Purbi, Thali, Dingal).
 export const ORIGIN_LANGUAGE_NAME: Record<string, string> = {
   sa: "Sanskrit",
   ar: "Arabic",
@@ -55,61 +54,37 @@ export const ORIGIN_LANGUAGE_NAME: Record<string, string> = {
   dcc: "Dakhani",
   cdh: "Chambeali",
   bra: "Braj",
-  ur: "Urdu",
 };
 
-// The exact marker strings scrape.py's extract_cross_refs() matches on, so a
-// Devanagari scan here stays consistent with why origin_lang was set at all.
-const DEVANAGARI_MARKER: Record<string, string> = {
-  sa: "ਸੰ.",
-  hi: "ਹਿੰ.",
-};
-
-const DEVANAGARI_RUN = /^\s*([ऀ-ॿ]+)/;
+// Scripts whose etymon text is the source word as printed. A `gurmukhi`
+// etymon is the parser's inference that a Gurmukhi token transcribes the
+// etymon (flagged inferred: true) — our reading, not Kahn Singh's print — so
+// it never becomes root_form (#48: printed forms are his, transcriptions are
+// ours and must not be presented as print).
+const PRINTED_ETYMON_SCRIPTS = new Set(["devanagari", "perso_arabic", "latin"]);
 
 /**
- * Finds the first Devanagari run immediately following `marker` in `text`, or
- * null if the marker isn't found or nothing Devanagari follows it (Mahan Kosh
- * sometimes only paraphrases the Sanskrit root in Gurmukhi).
+ * Maps one sense's ordered origin list to etymology candidates, in print
+ * order. Origins are never dropped for lacking an etymon — an origin-language
+ * claim with no printed root is still Kahn Singh's claim (root_form null is
+ * the honest omission).
  */
-export function extractDevanagariRoot(text: string, marker: string): string | null {
-  const idx = text.indexOf(marker);
-  if (idx === -1) return null;
-  const after = text.slice(idx + marker.length);
-  const m = after.match(DEVANAGARI_RUN);
-  return m ? m[1] : null;
-}
-
-/**
- * Builds an etymology candidate for one Mahan Kosh definition row, or null if
- * the row carries no detected origin-language marker.
- */
-// scrape.py's "ਉ." (Urdu) marker is a single bare character + period — far
-// weaker evidence than the other (multi-character) markers, and it shows up
-// as a false positive constantly in practice (34 Mahan Kosh rows tagged "ur";
-// only 2 have an actual Perso-Arabic quote to back it up). Rather than fix the
-// upstream scraper mid-flight (it's mid-run against the full corpus as of
-// 2026-07-01), languages in this set are only accepted when corroborated by
-// an actual quoted script excerpt (cross_refs.ar_fa) — no root, no claim.
-const REQUIRES_CORROBORATION = new Set(["ur"]);
-
-export function extractEtymologyCandidate(
+export function extractEtymologyCandidates(
   definitionText: string,
-  crossRefs: CrossRefs
-): EtymologyCandidate | null {
-  const originLang = crossRefs?.origin_lang;
-  if (!originLang) return null;
-  const originLanguage = ORIGIN_LANGUAGE_NAME[originLang];
-  if (!originLanguage) return null;
-  if (REQUIRES_CORROBORATION.has(originLang) && !crossRefs?.ar_fa) return null;
+  languageOrigins: ParsedOrigin[] | null | undefined
+): EtymologyCandidate[] {
+  const out: EtymologyCandidate[] = [];
+  for (const o of languageOrigins ?? []) {
+    const originLanguage = (o.iso639 && ORIGIN_LANGUAGE_NAME[o.iso639]) || o.language;
+    if (!originLanguage) continue;
 
-  let rootForm: string | null = null;
-  if (crossRefs?.ar_fa) {
-    rootForm = crossRefs.ar_fa;
-  } else {
-    const marker = DEVANAGARI_MARKER[originLang];
-    if (marker) rootForm = extractDevanagariRoot(definitionText, marker);
+    const printed = o.etymon && !o.etymon.inferred && PRINTED_ETYMON_SCRIPTS.has(o.etymon.script);
+    out.push({
+      origin_language: originLanguage,
+      root_form: printed ? o.etymon!.text : null,
+      root_script: printed ? o.etymon!.script : null,
+      source_text: definitionText,
+    });
   }
-
-  return { origin_language: originLanguage, root_form: rootForm, source_text: definitionText };
+  return out;
 }
