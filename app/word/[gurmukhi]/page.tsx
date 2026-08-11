@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
-import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
+import type { DefinitionWithSource, DictExample, Etymology, GrammarRule, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
+import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
+import { analyzeNounForm } from "@/pipeline/grammar/viakaran";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
+import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
 import { FlagForm } from "@/components/word/FlagForm";
 
@@ -130,11 +133,11 @@ export default async function WordPage({ params, searchParams }: Props) {
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
-  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult] = await Promise.all([
-    // Definitions with source info
+  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult, rulesResult] = await Promise.all([
+    // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     supabase
       .from("definitions")
-      .select("id, sense_number, definition_text, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
+      .select("id, sense_number, definition_text, cross_refs, parsed, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
       .eq("word_id", wordId)
       .order("dict_source_id", { ascending: true })
       .order("sense_number", { ascending: true }),
@@ -178,11 +181,32 @@ export default async function WordPage({ params, searchParams }: Props) {
       .select("id, definition_id, order_index, translation, citation_raw, citation_siglum, citation_hymn, citation_verse, citation_author")
       .eq("word_id", wordId)
       .order("id", { ascending: true }),
+
+    // Rule registry: Related-forms labels are derived live from the form's
+    // ending (#56), so each label needs its rule's verified status.
+    supabase.from("grammar_rules").select("rule_code, title, verified"),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
   const etymology = (etymResult.data ?? []) as Etymology[];
   const examples = (examplesResult.data ?? []) as unknown as DictExample[];
+  const rulesByCode = new Map(
+    ((rulesResult.data ?? []) as Pick<GrammarRule, "rule_code" | "title" | "verified">[]).map((r) => [r.rule_code, r])
+  );
+
+  // Structured Mahan Kosh layer (#34): which ਦੇਖੋ targets are real head-words?
+  // Checked against `words` so only existing entries become links. Both
+  // normalization forms are queried — the corpus and the scrape may differ.
+  const parsedSenses = definitions.map((d) => asParsedSense(d.parsed ?? null));
+  const xrefTargets = collectXrefTargets(parsedSenses);
+  const linkableXrefs = new Set<string>();
+  if (xrefTargets.length > 0) {
+    const variants = [...new Set(xrefTargets.flatMap((t) => [t, t.normalize("NFC")]))];
+    const { data: xrefRows } = await supabase.from("words").select("gurmukhi").in("gurmukhi", variants);
+    for (const r of (xrefRows ?? []) as { gurmukhi: string }[]) {
+      linkableXrefs.add(nfdNormalize(r.gurmukhi));
+    }
+  }
 
   // Resolve citation sigla (siglum → work title) for this word's examples.
   const siglaTitle = new Map<string, string>();
@@ -198,18 +222,33 @@ export default async function WordPage({ params, searchParams }: Props) {
     }
   }
 
-  // Step 3: if lexeme found, fetch all sibling forms
-  let morphForms: Array<{ gurmukhi: string; inflection_desc: string | null }> = [];
+  // Step 3: if lexeme found, fetch all sibling forms. The inflection label is
+  // derived live from the form's ending (#56) — never read from the cached
+  // inflection_desc string — so the rule behind it is known and the #52
+  // unverified-rule treatment applies here exactly as in the grammar section.
+  type MorphForm = { gurmukhi: string; label: string | null; ruleTitle: string | null; ruleVerified: boolean };
+  let morphForms: MorphForm[] = [];
   if (lexemeFormResult.data?.lexeme_id) {
     const lexemeId = lexemeFormResult.data.lexeme_id as number;
     const { data: formRows } = await supabase
       .from("word_forms")
-      .select("inflection_desc, words(id, gurmukhi)")
+      .select("words(id, gurmukhi)")
       .eq("lexeme_id", lexemeId);
 
-    morphForms = ((formRows ?? []) as unknown as Array<{ inflection_desc: string | null; words: { id: number; gurmukhi: string } | null }>)
+    morphForms = ((formRows ?? []) as unknown as Array<{ words: { id: number; gurmukhi: string } | null }>)
       .filter((f) => f.words?.gurmukhi && f.words.gurmukhi !== word)
-      .map((f) => ({ gurmukhi: f.words!.gurmukhi, inflection_desc: f.inflection_desc }));
+      .map((f) => {
+        const g = f.words!.gurmukhi;
+        const a = analyzeNounForm(g);
+        const label = [a.gram_case, a.number].filter(Boolean).join(" ") || null;
+        const rule = a.rule_code ? rulesByCode.get(a.rule_code) : undefined;
+        return {
+          gurmukhi: g,
+          label,
+          ruleTitle: rule?.title ?? null,
+          ruleVerified: rule?.verified ?? false,
+        };
+      });
   }
 
   // Group definitions by source
@@ -405,9 +444,22 @@ export default async function WordPage({ params, searchParams }: Props) {
               <a
                 key={f.gurmukhi}
                 href={`/word/${encodeURIComponent(f.gurmukhi)}`}
-                title={f.inflection_desc ?? undefined}
+                title={
+                  f.label
+                    ? f.ruleVerified
+                      ? f.label
+                      : `${f.label}? — rests on an unverified rule (${f.ruleTitle ?? "ending heuristic"}); our inference, not a scholar's reading`
+                    : undefined
+                }
                 className="gurmukhi"
-                style={{ color: "var(--accent)", textDecoration: "none", fontSize: "1.1rem" }}
+                style={{
+                  color: "var(--accent)",
+                  textDecoration: "none",
+                  fontSize: "1.1rem",
+                  // A label resting on an unverified rule is visibly tentative,
+                  // matching the grammar section's dashed treatment (#52/#56).
+                  borderBottom: f.label && !f.ruleVerified ? "1px dashed var(--border)" : undefined,
+                }}
               >
                 {f.gurmukhi}
               </a>
@@ -443,7 +495,9 @@ export default async function WordPage({ params, searchParams }: Props) {
               </div>
 
               {/* Senses */}
-              {defs.map((def) => (
+              {defs.map((def) => {
+                const parsed = asParsedSense(def.parsed ?? null);
+                return (
                 <div key={def.id} style={{ ...CARD, paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
                   <div style={{ display: "flex", gap: "0.6rem", alignItems: "baseline" }}>
                     {defs.length > 1 && (
@@ -453,7 +507,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                     )}
                     <p className="gurmukhi" style={{ margin: 0, lineHeight: 1.7 }}>
                       {def.definition_text}
-                      <CrossRefTags refs={def.cross_refs as Record<string, string> | null} />
+                      {!parsed && <CrossRefTags refs={def.cross_refs as Record<string, string> | null} />}
                     </p>
                   </div>
                   {def.definition_en && (
@@ -461,6 +515,8 @@ export default async function WordPage({ params, searchParams }: Props) {
                       {def.definition_en}
                     </p>
                   )}
+                  {/* Structured layer decoded from the printed shorthand (#34 step 1). */}
+                  {parsed && <ParsedSenseChips parsed={parsed} linkableXrefs={linkableXrefs} />}
                   <FlagForm
                     wordId={wordId}
                     targetTable="definitions"
@@ -468,7 +524,8 @@ export default async function WordPage({ params, searchParams }: Props) {
                     contextLabel={`Definition${defs.length > 1 ? ` ${def.sense_number}` : ""} (${sourceName})`}
                   />
                 </div>
-              ))}
+                );
+              })}
             </div>
           ))}
         </section>
@@ -717,8 +774,25 @@ export default async function WordPage({ params, searchParams }: Props) {
       {tab === "etymology" && etymology.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Etymology</SectionHeading>
+
+          {/* Provenance framing (#48): the origin-language fact on a Mahan Kosh
+              row is Kahn Singh's own printed marker, decoded via his 1930 key —
+              a citation, not our judgment. Only the external dictionary gloss
+              (Monier-Williams / Steingass / Platts) is our best-judgment layer. */}
+          {etymology.some((e) => e.provenance === "rule_derived") && (
+            <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1rem", maxWidth: "44rem" }}>
+              Rows marked <em>Mahan Kosh</em> cite the origin marker Kahn Singh Nabha printed in
+              that entry (ਸੰ. Sanskrit, ਫ਼ਾ. Persian, ਅ਼. Arabic, …), decoded via his own 1930
+              key — the quoted entry text is shown under each row. Where we add a meaning from
+              Monier-Williams, Steingass, or Platts, that lookup is <em>our</em> best-judgment
+              match of the cited root against those dictionaries, and is labeled as such.
+            </p>
+          )}
+
           <div style={CARD}>
-            {etymology.map((e, i) => (
+            {etymology.map((e, i) => {
+              const mahanKoshOrigin = e.provenance === "rule_derived";
+              return (
               <div key={e.id} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", flexWrap: "wrap", marginBottom: i < etymology.length - 1 ? "0.75rem" : 0 }}>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)", minWidth: "5rem" }}>
                   {e.origin_language}
@@ -733,11 +807,28 @@ export default async function WordPage({ params, searchParams }: Props) {
                         ({e.root_form_roman})
                       </span>
                     )}
-                    <ProvenanceBadge provenance={e.provenance ?? null} reviewStatus={e.review_status ?? null} />
+                    {mahanKoshOrigin ? (
+                      <span
+                        className="badge"
+                        title="Origin marker printed in this word's Mahan Kosh entry, decoded via the 1930 ਸੰਕੇਤ key. The quoted entry text is below."
+                      >
+                        Mahan Kosh
+                      </span>
+                    ) : (
+                      <ProvenanceBadge provenance={e.provenance ?? null} reviewStatus={e.review_status ?? null} />
+                    )}
                   </div>
                   {e.derivation_note && (
                     <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", margin: "0.3rem 0 0" }}>
                       {e.derivation_note}
+                      {mahanKoshOrigin && (
+                        <span
+                          title="Our lookup of the cited root in the named dictionary, choosing the vocalization closest to this word's pronunciation. Best judgment, not scholar-verified."
+                          style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.68rem", fontWeight: 600, color: "#8a6d1f", background: "#f7efd8", borderRadius: "999px", padding: "0.05rem 0.5rem", marginLeft: "0.4rem", whiteSpace: "nowrap" }}
+                        >
+                          our lookup — best judgment
+                        </span>
+                      )}
                     </p>
                   )}
                   {e.source_text && (
@@ -773,7 +864,8 @@ export default async function WordPage({ params, searchParams }: Props) {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
