@@ -34,8 +34,11 @@ import {
   type DsalResult,
 } from "./dsal";
 import { gurmukhiToDisplayIPA } from "../../lib/pronounce/gurmukhi-to-ipa";
+import { loadJsonlCache, appendJsonlCache } from "./cache";
 
 const PROVENANCE = "rule_derived";
+const MW_CACHE_FILE = "mw-cache.jsonl";
+const DSAL_CACHE_FILE = "dsal-cache.jsonl";
 const MW_DELAY_MS = 300; // polite delay between Monier-Williams API calls
 const DSAL_DELAY_MS = 500; // gentler delay for DSAL's legacy CGI backend
 
@@ -104,7 +107,9 @@ async function main() {
 
   // Cache Monier-Williams lookups per SLP1 headword so words sharing a root
   // (e.g. inflected forms of the same lemma) don't repeat the network call.
-  const mwCache = new Map<string, { gloss: string | null } | null>();
+  // Seeded from the JSONL checkpoint (#47): only clean lookups are persisted,
+  // so a key that failed last run is absent here and refetches.
+  const mwCache = loadJsonlCache<{ gloss: string | null }>(MW_CACHE_FILE);
 
   // Same idea for DSAL (Steingass/Platts), keyed by diacritic-stripped root.
   // Caches ALL homographs both dictionaries returned across every spelling
@@ -112,7 +117,8 @@ async function main() {
   // the word's pronunciation), so two words citing the same spelling can
   // resolve to different readings.
   type PooledDsalResult = DsalResult & { dict: DsalDict };
-  const dsalCache = new Map<string, PooledDsalResult[]>();
+  const dsalCache = loadJsonlCache<PooledDsalResult[]>(DSAL_CACHE_FILE);
+  console.log(`Cache: ${mwCache.size} MW + ${dsalCache.size} DSAL lookups loaded from checkpoint`);
 
   for (const row of defRows) {
     const candidate = extractEtymologyCandidate(row.definition_text, row.cross_refs);
@@ -131,8 +137,10 @@ async function main() {
           const entry = await fetchMwEntry(slp1);
           const gloss = entry ? extractGlossFromTei(entry.xml) : null;
           cached = { gloss };
+          appendJsonlCache(MW_CACHE_FILE, slp1, cached);
         } catch (e) {
           console.error(`\nMW lookup failed for '${slp1}':`, (e as Error).message);
+          // In-memory only: not retried this run, refetched next run.
           cached = { gloss: null };
         }
         mwCache.set(slp1, cached);
@@ -147,6 +155,7 @@ async function main() {
       let cached = dsalCache.get(cacheKey);
       if (cached === undefined) {
         cached = [];
+        let failed = false;
         try {
           // Query every dictionary under every codepoint-normalized spelling
           // and pool the homographs. The returned headword must equal the
@@ -164,9 +173,13 @@ async function main() {
             }
           }
         } catch (e) {
+          // A partial pool must not be persisted — a homograph the failed
+          // request would have returned could win selectDsalResult.
+          failed = true;
           console.error(`\nDSAL lookup failed for '${cacheKey}':`, (e as Error).message);
         }
         dsalCache.set(cacheKey, cached);
+        if (!failed) appendJsonlCache(DSAL_CACHE_FILE, cacheKey, cached);
       }
 
       if (cached.length > 0 && row.words?.gurmukhi) {
