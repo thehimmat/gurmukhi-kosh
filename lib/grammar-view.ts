@@ -29,6 +29,12 @@ const AUTHORITY: Record<SourceKind, number> = {
 
 export interface Attestation {
   sourceKind: SourceKind;
+  // Stable identity of the SPECIFIC source, not just its kind. Two different
+  // scholars are both `sourceKind: "scholar"`, so grouping by kind would silently
+  // merge them — and, worse, would make a genuine disagreement between them look
+  // like one source listing several senses. Conflict detection and dedupe key off
+  // this instead.
+  sourceId: string;
   sourceLabel: string; // short human label, e.g. "Sahib Singh's Darpan pad-arth"
   citation: string | null; // full citation string when we have one
   explanation: string | null; // the rule's plain-English basis, when applicable
@@ -37,6 +43,23 @@ export interface Attestation {
   lineId: number | null; // pad-arth source_line_id, for "view the line" links
   ruleCode: string | null;
 }
+
+// How each imported source presents itself. Keyed by word_grammar.source_code.
+// Every imported row MUST be attributable to the source it actually came from —
+// citing the wrong scholar is worse than citing none.
+const IMPORTED_SOURCES: Record<string, { label: string; citation: string }> = {
+  ss_padarth: {
+    label: "Sahib Singh's Darpan pad-arth",
+    citation: "Prof. Sahib Singh, Sri Guru Granth Sahib Darpan — pad-arth (word notes), per line.",
+  },
+  shackle: {
+    label: "Shackle, A Guru Nanak Glossary",
+    citation: "Christopher Shackle, A Guru Nanak Glossary (2nd ed.), SOAS.",
+  },
+  // Add an entry only once a source actually writes rows with that source_code.
+  // An unrecognised code falls through to "Cited source (unattributed)", which is
+  // honest; a pre-registered label would assert an edition we have not ingested.
+};
 
 export interface AttributeReading {
   value: string;
@@ -94,16 +117,26 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
   const sourced = g.provenance === "imported"; // read from a cited scholar
   const rule = g.grammar_rules;
 
-  const scholarAtt = (): Attestation => ({
-    sourceKind: "scholar",
-    sourceLabel: "Sahib Singh's Darpan pad-arth",
-    citation: rule?.citation ?? null,
-    explanation: rule?.explanation ?? null,
-    verified: rule?.verified ?? true,
-    confidenceLabel: null,
-    lineId: g.source_line_id ?? null,
-    ruleCode: g.rule_code ?? null,
-  });
+  // An imported fact is attributed to whichever source actually supplied it.
+  // A row whose source_code is missing or unrecognised is NOT attributed to a
+  // named scholar — we say we don't know rather than guess a name.
+  const scholarAtt = (): Attestation => {
+    const code = g.source_code;
+    const known = code ? IMPORTED_SOURCES[code] : undefined;
+    return {
+      sourceKind: "scholar",
+      sourceId: `src:${code ?? "unknown"}`,
+      sourceLabel: known?.label ?? "Cited source (unattributed)",
+      // Prefer the rule registry's citation when the row carries a rule_code
+      // (pad-arth rows do); otherwise fall back to the source's own citation.
+      citation: rule?.citation ?? known?.citation ?? null,
+      explanation: rule?.explanation ?? null,
+      verified: rule?.verified ?? true,
+      confidenceLabel: null,
+      lineId: g.source_line_id ?? null,
+      ruleCode: g.rule_code ?? null,
+    };
+  };
 
   // POS — for a rule-derived row this comes from Mahan Kosh (or inheritance),
   // NOT from the row's case rule_code, so attribute it accordingly.
@@ -118,6 +151,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
         att: inherited
           ? {
               sourceKind: "heuristic",
+              sourceId: "heuristic:inherited",
               sourceLabel: "Inherited from a related form",
               citation: null,
               explanation: "Part of speech carried over from a form sharing this word's stem.",
@@ -128,6 +162,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
             }
           : {
               sourceKind: "dictionary",
+              sourceId: "src:mahan_kosh",
               sourceLabel: "Mahan Kosh marker",
               citation: "Bhai Kahn Singh Nabha, Mahan Kosh",
               explanation: "Read from the part-of-speech marker that opens the Mahan Kosh sense.",
@@ -143,6 +178,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
   // Gender / number / case — from the scholar (sourced) or from the Viakaran rule.
   const ruleAtt = (): Attestation => ({
     sourceKind: "rule",
+    sourceId: `rule:${g.rule_code ?? "unknown"}`,
     sourceLabel: rule?.title ?? "Viakaran rule",
     citation: rule?.citation ?? null,
     explanation: rule?.explanation ?? null,
@@ -179,9 +215,9 @@ export function buildGrammarView(rows: WordGrammarWithRule[]): AttributeView[] {
       let values = byAttr.get(f.attribute);
       if (!values) byAttr.set(f.attribute, (values = new Map()));
       const list = values.get(f.value) ?? [];
-      const dupe = list.some(
-        (a) => a.sourceKind === f.att.sourceKind && a.ruleCode === f.att.ruleCode,
-      );
+      // Dedupe by the specific source, not by kind — two scholars backing the
+      // same value are two attestations (real corroboration), not one.
+      const dupe = list.some((a) => a.sourceId === f.att.sourceId && a.ruleCode === f.att.ruleCode);
       if (!dupe) list.push(f.att);
       values.set(f.value, list);
     }
@@ -199,12 +235,16 @@ export function buildGrammarView(rows: WordGrammarWithRule[]): AttributeView[] {
     // Lead = highest-authority value; tiebreak by number of corroborating sources.
     readings.sort((a, b) => authorityOf(b) - authorityOf(a) || b.attestations.length - a.attestations.length);
 
-    // Multiple values: a conflict iff the values are led by DIFFERENT source kinds
-    // (cross-source disagreement); otherwise the same source is offering several
-    // senses (polysemy), which is not an error.
+    // Multiple values: a conflict iff they are led by DIFFERENT sources; otherwise
+    // one source is offering several senses (polysemy), which is not an error.
+    //
+    // Keyed on sourceId, not sourceKind: Shackle and Sahib Singh are both
+    // `sourceKind: "scholar"`, so comparing kinds reported two scholars flatly
+    // disagreeing as mere polysemy — collapsing exactly the disagreement the
+    // reader most needs to see.
     const multiValue = readings.length > 1;
-    const leadKinds = new Set(readings.map((r) => r.attestations[0].sourceKind));
-    const conflict = multiValue && leadKinds.size > 1;
+    const leadSources = new Set(readings.map((r) => r.attestations[0].sourceId));
+    const conflict = multiValue && leadSources.size > 1;
 
     views.push({
       attribute,
