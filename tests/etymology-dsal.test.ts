@@ -275,3 +275,63 @@ describe('headwordVariants', () => {
     expect(headwordVariants('حُکم')[0]).toBe('حکم');
   });
 });
+
+// ── 2026-08 redesign markup ──────────────────────────────────────────────────
+// DSAL rebuilt the CGI result pages on Bootstrap between 2026-07-02 and
+// 2026-08-04: <div class='hw_result'> became <div class='container mb-3
+// rounded border shadow-sm py-3'>, <blockquote> became <div class='px-4'>,
+// and a trailing headless block artifact appears after the last result. The
+// head line and the no-results sentinel are unchanged. Fixtures captured
+// live 2026-08-11, trimmed to the result region.
+
+const PLATTS_HUKM_2026 = `	<div class="container p-3">
+					<div class='container mb-3 rounded border shadow-sm py-3'>&nbsp;&nbsp;
+                        1) <a href="/cgi-bin/app/platts_query.py?qs=حکم&searchhws=yes&matchtype=exact">حکم</a> ḥukm
+                        (<a href="/cgi-bin/app/platts_query.py?page=480">p. 480</a>)
+                        <div class='px-4'><entry> <span class="new_p">A <hw><pa>حکم</pa> <i>ḥukm</i></hw> (inf. n. of <pa>حکم</pa> 'to prevent or restrain'), s.m. Judgment, judicial decision, sentence, decree; the first card thrown by rule (in a game): — <i>ḥukm uṭhānā</i> (-<i>ka</i>), To execute or carry out an order</span></div>
+					</div>
+					<div class='container mb-3 rounded border shadow-sm py-3'>&nbsp;&nbsp;</div>
+	</div>`;
+
+const STEINGASS_SHIKH_2026 = `	<div class="container p-3">
+					<div class='container mb-3 rounded border shadow-sm py-3'>&nbsp;&nbsp;
+                        1) <a href="/cgi-bin/app/steingass_query.py?qs=شيخ&searchhws=yes&matchtype=exact">شيخ</a> shīḵẖ
+                        (<a href="/cgi-bin/app/steingass_query.py?page=772">p. 772</a>)
+                        <div class='px-4'><hw><pa>شيخ</pa> <i>shīḵẖ</i></hw> , The sea-shore.</span> </div>
+					</div>
+					<div class='container mb-3 rounded border shadow-sm py-3'>&nbsp;&nbsp;
+                        2) <a href="/cgi-bin/app/steingass_query.py?qs=شيخ&searchhws=yes&matchtype=exact">شيخ</a> shaiḵẖ
+                        (<a href="/cgi-bin/app/steingass_query.py?page=772">p. 772</a>)
+                        <div class='px-4'><hw><pa>شيخ</pa> <i>shaiḵẖ</i></hw> , An elder, a chief; a venerable old man; a man above fifty years of age.</span> </div>
+					</div>
+					<div class='container mb-3 rounded border shadow-sm py-3'>&nbsp;&nbsp;</div>
+	</div>`;
+
+describe('extractDsalResults — 2026-08 redesign markup', () => {
+  it('parses headword, roman, and gloss from the Bootstrap result block', () => {
+    const r = extractDsalResult(PLATTS_HUKM_2026, 'platts');
+    expect(r?.headword).toBe('حکم');
+    expect(r?.roman).toBe('ḥukm');
+    expect(r?.gloss).toContain('Judgment, judicial decision');
+  });
+
+  it('still cuts the Platts gloss at the compound-phrases section (": —")', () => {
+    const r = extractDsalResult(PLATTS_HUKM_2026, 'platts');
+    expect(r?.gloss).toContain('(in a game)');
+    expect(r?.gloss).not.toContain('uṭhānā');
+  });
+
+  it('returns every homograph and skips the trailing headless block', () => {
+    const rs = extractDsalResults(STEINGASS_SHIKH_2026, 'steingass');
+    expect(rs).toHaveLength(2);
+    expect(rs[0].roman).toBe('shīḵẖ');
+    expect(rs[0].gloss).toContain('The sea-shore');
+    expect(rs[1].roman).toBe('shaiḵẖ');
+    expect(rs[1].gloss).toContain('An elder');
+  });
+
+  it('selectDsalResult still picks the vocalization nearest the word (ਸੇਖ → elder)', () => {
+    const pooled = extractDsalResults(STEINGASS_SHIKH_2026, 'steingass').map((r) => ({ ...r, dict: 'steingass' as const }));
+    expect(selectDsalResult(pooled, 'seːkʰ')?.roman).toBe('shaiḵẖ');
+  });
+});
