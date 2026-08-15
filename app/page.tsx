@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import type { Word } from "@/lib/supabase";
 import { useGurmukhiInput } from "@atthebunga/gurmukhi-input";
 
+// /api/search hits carry how they matched; "fold" = fuzzy spelling-variant
+// hit on the search_fold key (#63), shown with a "similar" chip.
+type SearchResult = Word & { match?: "prefix" | "fold" | "contains" };
+
 export default function HomePage() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Word[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { onKeyDown: gurmukhiKeyDown, onPaste: gurmukhiPaste } = useGurmukhiInput({
@@ -141,6 +145,22 @@ export default function HomePage() {
                 <span className="gurmukhi-lg" style={{ flex: 1 }}>
                   {word.gurmukhi}
                 </span>
+                {word.match === "fold" && (
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      fontFamily: '"Inter", sans-serif',
+                      fontSize: "0.7rem",
+                      color: "var(--text-secondary)",
+                      border: "1px dashed var(--border)",
+                      borderRadius: "999px",
+                      padding: "0.05rem 0.5rem",
+                    }}
+                    title="Spelling-variant match: found by folding sounds that vary across spellings (ਤ/ਟ, nukta, vowel length, final ੁ/ਿ)"
+                  >
+                    similar
+                  </span>
+                )}
                 <span
                   className="badge"
                   style={{ flexShrink: 0 }}

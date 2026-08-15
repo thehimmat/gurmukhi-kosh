@@ -23,6 +23,7 @@
     "teardown": "tsx pipeline/teardown.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",
+    "searchfold": "tsx pipeline/search-fold/populate.ts",
     "compute:collocations": "tsx pipeline/compute/run.ts",
     "typecheck": "tsc --noEmit",
     "lint": "true",
