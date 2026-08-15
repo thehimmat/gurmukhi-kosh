@@ -99,20 +99,30 @@ export function extractDsalResults(html: string, dict: DsalDict): DsalResult[] {
   if (html.includes("No results for search term")) return [];
 
   const results: DsalResult[] = [];
-  const blockRe = /<div class='hw_result'>([\s\S]*?)<\/div>/g;
-  for (let block = blockRe.exec(html); block; block = blockRe.exec(html)) {
-    const head = block[1].match(/\d+\)\s*<a [^>]*>([^<]+)<\/a>[ \t]*([^\n<(]*)/);
+  // Two markup eras, both supported: the pre-2026-08 CGI pages wrapped each
+  // result in <div class='hw_result'> with the gloss in a <blockquote>; the
+  // 2026-08 Bootstrap redesign wraps it in <div class='container mb-3 …'>
+  // with the gloss in <div class='px-4'>. The redesign kept the head line
+  // ("N) <a>HEAD</a> ROMAN (p. N)") and the no-results sentinel unchanged.
+  // Splitting on the block-open marker (rather than capturing to </div>)
+  // tolerates the nested gloss div; headless chunks (the redesign emits a
+  // trailing empty block) are skipped.
+  const chunks = html
+    .split(/<div class='(?:hw_result|container mb-3 rounded border shadow-sm py-3)'>/)
+    .slice(1);
+  for (const block of chunks) {
+    const head = block.match(/\d+\)\s*<a [^>]*>([^<]+)<\/a>[ \t]*([^\n<(]*)/);
     if (!head) continue;
     const headword = head[1].trim();
     const roman = head[2].trim() || null;
 
-    const bq = block[1].match(/<blockquote>([\s\S]*?)<\/blockquote>/);
+    const bq = block.match(/<blockquote>([\s\S]*?)<\/blockquote>|<div class='px-4'>([\s\S]*?)<\/div>/);
     if (!bq) {
       results.push({ headword, roman, gloss: null });
       continue;
     }
 
-    let raw = bq[1];
+    let raw = bq[1] ?? bq[2];
     if (dict === "steingass") {
       raw = raw.replace(/\[[\s\S]*?\]/g, "");
     }
