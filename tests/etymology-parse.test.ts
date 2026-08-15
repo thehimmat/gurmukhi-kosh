@@ -1,84 +1,83 @@
 import { describe, it, expect } from 'vitest';
-import { extractEtymologyCandidate, extractDevanagariRoot } from '../pipeline/etymology/parse';
+import { extractEtymologyCandidates, type ParsedOrigin } from '../pipeline/etymology/parse';
 
-// Golden cases are real Mahan Kosh definition rows pulled from the DB (see
-// select ... where cross_refs->>'origin_lang' is not null), covering both the
-// "root given in Devanagari" and "marker only, no Devanagari" shapes.
+const TEXT = 'ਸੰ. गुरू ਸੰਗ੍ਯਾ- ...';
 
-describe('extractEtymologyCandidate', () => {
-  it('Sanskrit with Devanagari root given (ਗੁਰੂ)', () => {
-    const r = extractEtymologyCandidate(
-      'ਸੰ. गुरू ਗੁਰੂ. ਸੰਗ੍ਯਾ- ਇਹ ਸ਼ਬਦ ਗ੍ਰੀ (गृ) ਧਾਤੁ ਤੋਂ ਬਣਿਆ ਹੈ',
-      { origin_lang: 'sa' }
-    );
-    expect(r?.origin_language).toBe('Sanskrit');
-    expect(r?.root_form).toBe('गुरू');
-  });
-
-  it('Sanskrit root given mid-sentence, after a sense number (ਗੁਰ)', () => {
-    const r = extractEtymologyCandidate(
-      '੨. ਸੰ. गुर ਧਾ- ਯਤਨ ਕਰਨਾ, ਉੱਦਮ ਕਰਨਾ',
-      { origin_lang: 'sa' }
-    );
-    expect(r?.root_form).toBe('गुर');
-  });
-
-  it('Sanskrit marker with no Devanagari (paraphrased in Gurmukhi only) → null root', () => {
-    const r = extractEtymologyCandidate('ਸੰ. ਪੁਰੁਸ. ਸੰਗ੍ਯਾ- ਮਨੁੱਖ. ਆਦਮੀ', { origin_lang: 'sa' });
-    expect(r?.origin_language).toBe('Sanskrit');
-    expect(r?.root_form).toBeNull();
-  });
-
-  it('Arabic: root_form comes straight from cross_refs.ar_fa, no text scan', () => {
-    const r = extractEtymologyCandidate('ਅ਼. [سلامت] ਵਿ- ਕ਼ਾਇਮ. ਇਸਥਿਤ.', {
-      origin_lang: 'ar',
-      ar_fa: 'سلامت',
-    });
-    expect(r?.origin_language).toBe('Arabic');
-    expect(r?.root_form).toBe('سلامت');
-  });
-
-  it('Persian: origin_lang fa maps to "Persian"', () => {
-    const r = extractEtymologyCandidate('ਫ਼ਾ. [کار] ਜੰਗ.', { origin_lang: 'fa', ar_fa: 'کار' });
-    expect(r?.origin_language).toBe('Persian');
-    expect(r?.root_form).toBe('کار');
-  });
-
-  it('no cross_refs at all → null (not an etymology candidate)', () => {
-    expect(extractEtymologyCandidate('ਸੰਗ੍ਯਾ- ਗੁੜ. ਸਿਆਹਕੰਦ.', null)).toBeNull();
-  });
-
-  it('cross_refs present but origin_lang missing (e.g. only ar_fa somehow) → null', () => {
-    expect(extractEtymologyCandidate('text', {})).toBeNull();
-  });
-
-  it('Urdu ("ਉ.") without a corroborating script quote → null (weak single-char marker)', () => {
-    // Real example: this Mahan Kosh row got tagged origin_lang='ur' purely from
-    // a stray "ਉ." substring match, with no actual Urdu content in the text.
-    const r = extractEtymologyCandidate(
-      'ਸ਼ੀਲ. ਸਦਵ੍ਰਿੱਤਿ ਨੇਕ. ਐ਼ਮਾਲ. "ਵਿਣੁ ਗੁਣ ਕੀਤੇ ਭਗਤਿ ਨ ਹੋਇ." (ਜਪੁ)',
-      { origin_lang: 'ur' }
-    );
-    expect(r).toBeNull();
-  });
-
-  it('Urdu WITH a corroborating script quote is accepted', () => {
-    const r = extractEtymologyCandidate('ਉ. [ناہی] ਵਰਜਣ ਵਾਲਾ.', { origin_lang: 'ur', ar_fa: 'ناہی' });
-    expect(r?.origin_language).toBe('Urdu');
-    expect(r?.root_form).toBe('ناہی');
-  });
+const origin = (p: Partial<ParsedOrigin>): ParsedOrigin => ({
+  marker: 'ਸੰ.',
+  language: 'Sanskrit',
+  iso639: 'sa',
+  etymon: null,
+  ...p,
 });
 
-describe('extractDevanagariRoot', () => {
-  it('captures a run with a virama (ਪ੍ਰਸਾਦਿਨ੍ example)', () => {
-    expect(extractDevanagariRoot('੨. ਸੰ. प्रसादिन्. ਵਿ- ਕ੍ਰਿਪਾ ਕਰਨ ਵਾਲਾ.', 'ਸੰ.')).toBe('प्रसादिन्');
+describe('extractEtymologyCandidates', () => {
+  it('maps a Sanskrit origin with a printed Devanagari etymon', () => {
+    const [r] = extractEtymologyCandidates(TEXT, [
+      origin({ etymon: { text: 'गुरू', script: 'devanagari' } }),
+    ]);
+    expect(r).toEqual({
+      origin_language: 'Sanskrit',
+      root_form: 'गुरू',
+      root_script: 'devanagari',
+      source_text: TEXT,
+    });
   });
 
-  it('returns null when the marker itself is absent', () => {
-    expect(extractDevanagariRoot('ਸੰਗ੍ਯਾ- ਮਿਰਚ', 'ਸੰ.')).toBeNull();
+  it('keeps the origin claim but no root when only a Gurmukhi transcription exists', () => {
+    // The parser flags Gurmukhi etymons inferred: our transcription, not
+    // Kahn Singh's print — it must never be presented as the printed form.
+    const [r] = extractEtymologyCandidates(TEXT, [
+      origin({ etymon: { text: 'ਕ੍ਸ਼ੇਮ', script: 'gurmukhi', inferred: true } }),
+    ]);
+    expect(r.origin_language).toBe('Sanskrit');
+    expect(r.root_form).toBeNull();
+    expect(r.root_script).toBeNull();
   });
 
-  it('stops at the trailing ASCII period, not part of the Devanagari run', () => {
-    expect(extractDevanagariRoot('ਸੰ. हय ਹਯ. ਘੋੜਾ.', 'ਸੰ.')).toBe('हय');
+  it('maps a Perso-Arabic bracketed etymon', () => {
+    const [r] = extractEtymologyCandidates('ਅ਼. [سلامت] ਵਿ- ਕ਼ਾਇਮ.', [
+      origin({ marker: 'ਅ਼.', language: 'Arabic', iso639: 'ar', etymon: { text: 'سلامت', script: 'perso_arabic' } }),
+    ]);
+    expect(r.origin_language).toBe('Arabic');
+    expect(r.root_form).toBe('سلامت');
+    expect(r.root_script).toBe('perso_arabic');
+  });
+
+  it('produces one candidate per origin, in print order (#48 chains)', () => {
+    const rs = extractEtymologyCandidates('ਫ਼ਾ. [سیب] ... ਅੰ. Apple.', [
+      origin({ marker: 'ਫ਼ਾ.', language: 'Persian', iso639: 'fa', etymon: { text: 'سیب', script: 'perso_arabic' } }),
+      origin({ marker: 'ਅੰ.', language: 'English', iso639: 'en', etymon: { text: 'Apple. L. Pyrusmarus', script: 'latin' } }),
+    ]);
+    expect(rs.map((r) => r.origin_language)).toEqual(['Persian', 'English']);
+    expect(rs[0].root_form).toBe('سیب');
+    expect(rs[1].root_form).toBe('Apple. L. Pyrusmarus');
+    expect(rs[1].root_script).toBe('latin');
+  });
+
+  it('prefers the canonical ISO display name over a verbose parser name', () => {
+    const [r] = extractEtymologyCandidates(TEXT, [
+      origin({ marker: 'ਵ੍ਰਜ.', language: 'Braj Bhasha', iso639: 'bra' }),
+    ]);
+    expect(r.origin_language).toBe('Braj');
+  });
+
+  it('falls back to the parser name for ISO-less markers', () => {
+    const [r] = extractEtymologyCandidates(TEXT, [
+      origin({ marker: 'ਪਹਾ.', language: 'Pahari (hill dialects)', iso639: null }),
+    ]);
+    expect(r.origin_language).toBe('Pahari (hill dialects)');
+  });
+
+  it('returns [] for missing or empty origin lists', () => {
+    expect(extractEtymologyCandidates(TEXT, null)).toEqual([]);
+    expect(extractEtymologyCandidates(TEXT, undefined)).toEqual([]);
+    expect(extractEtymologyCandidates(TEXT, [])).toEqual([]);
+  });
+
+  it('keeps an origin with no etymon at all (claim without root)', () => {
+    const [r] = extractEtymologyCandidates('ਸੰ. ਪੁਰੁਸ. ਸੰਗ੍ਯਾ- ਮਨੁੱਖ.', [origin({})]);
+    expect(r.origin_language).toBe('Sanskrit');
+    expect(r.root_form).toBeNull();
   });
 });
