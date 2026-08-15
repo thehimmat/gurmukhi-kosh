@@ -17,10 +17,15 @@ export default async function AngPage({ params }: Props) {
 
   if (isNaN(ang) || ang < 1 || ang > 1430) notFound();
 
+  // This route is SGGS ang browsing specifically: with multiple corpora
+  // ingested (#65), "ang N" exists per source (Bhai Gurdas vaar 1 is also
+  // ang 1 of its source), so the query must pin the corpus. Per-source
+  // browsing routes for the other texts are a follow-up.
   const { data: lines } = await supabase
     .from("lines")
-    .select("*, shabads(raag_english, writer_english)")
+    .select("*, shabads(raag_english, writer_english), sources!inner(code)")
     .eq("ang", ang)
+    .eq("sources.code", "sggs_banidb_v2")
     .order("line_no", { ascending: true });
 
   if (!lines || lines.length === 0) {
