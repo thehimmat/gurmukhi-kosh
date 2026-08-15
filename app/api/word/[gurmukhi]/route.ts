@@ -18,6 +18,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { analyzeNounForm } from "@/pipeline/grammar/viakaran";
 
 type Params = { params: Promise<{ gurmukhi: string }> };
 
@@ -77,7 +78,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   };
 
   // Parallel: definitions, etymology, lexeme lookup, usage (bigrams/collocations), writer stats
-  const [defsResult, etymResult, lexemeFormResult, bgResult, colResult, writerResult] = await Promise.all([
+  const [defsResult, etymResult, lexemeFormResult, rulesResult, bgResult, colResult, writerResult] = await Promise.all([
     supabase
       .from("definitions")
       .select("id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
@@ -93,9 +94,12 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     supabase
       .from("word_forms")
-      .select("lexeme_id, inflection_desc")
+      .select("lexeme_id")
       .eq("word_id", wordId)
       .maybeSingle(),
+
+    // Rule registry for the live-derived variant labels below.
+    supabase.from("grammar_rules").select("rule_code, title, verified"),
 
     supabase
       .from("bigrams")
@@ -121,20 +125,42 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .limit(10),
   ]);
 
-  // Morphological variants
-  let morphological_variants: Array<{ gurmukhi: string; inflection_desc: string | null }> = [];
+  // Morphological variants. The inflection label is derived live from the
+  // form's ending (#56) — the cached inflection_desc column is not read — so
+  // each label ships with the rule that produced it and that rule's verified
+  // status. inflection_desc keeps its key for backward compatibility.
+  const rulesByCode = new Map(
+    ((rulesResult.data ?? []) as Array<{ rule_code: string; title: string; verified: boolean }>).map((r) => [r.rule_code, r])
+  );
+  let morphological_variants: Array<{
+    gurmukhi: string;
+    inflection_desc: string | null;
+    rule_code: string | null;
+    rule_verified: boolean | null;
+  }> = [];
   if (lexemeFormResult.data?.lexeme_id) {
     const lexemeId = lexemeFormResult.data.lexeme_id as number;
     const { data: formRows } = await supabase
       .from("word_forms")
-      .select("inflection_desc, words(id, gurmukhi)")
+      .select("words(id, gurmukhi)")
       .eq("lexeme_id", lexemeId);
 
     morphological_variants = (
-      (formRows ?? []) as unknown as Array<{ inflection_desc: string | null; words: { id: number; gurmukhi: string } | null }>
+      (formRows ?? []) as unknown as Array<{ words: { id: number; gurmukhi: string } | null }>
     )
       .filter((f) => f.words?.gurmukhi && f.words.gurmukhi !== word)
-      .map((f) => ({ gurmukhi: f.words!.gurmukhi, inflection_desc: f.inflection_desc }));
+      .map((f) => {
+        const g = f.words!.gurmukhi;
+        const a = analyzeNounForm(g);
+        const label = [a.gram_case, a.number].filter(Boolean).join(" ") || null;
+        const rule = a.rule_code ? rulesByCode.get(a.rule_code) : undefined;
+        return {
+          gurmukhi: g,
+          inflection_desc: label,
+          rule_code: label ? a.rule_code : null,
+          rule_verified: label ? rule?.verified ?? false : null,
+        };
+      });
   }
 
   // Usage: resolve bigram/collocation partner word_ids to Gurmukhi
