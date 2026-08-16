@@ -175,10 +175,19 @@ async function main() {
 
   // Both frequency layers (#65): words.frequency = total across corpora,
   // word_corpus_stats = the per-corpus split (also flips in_corpus for
-  // dictionary head-words a newly ingested text attests).
+  // dictionary head-words a newly ingested text attests). A failed refresh
+  // must abort loudly: these full-table rebuilds can hit the PostgREST
+  // statement timeout, and an unchecked rpc() once left the stats empty
+  // while the run reported success.
   console.log("Refreshing word frequencies (total + per-corpus)...");
-  await db.rpc("refresh_word_frequencies");
-  await db.rpc("refresh_word_corpus_stats");
+  for (const fn of ["refresh_word_frequencies", "refresh_word_corpus_stats"] as const) {
+    const { error } = await db.rpc(fn);
+    if (error) {
+      console.error(`${fn} FAILED: ${error.message}`);
+      console.error(`Re-run it directly (SQL: select ${fn}();) before trusting any frequency.`);
+      process.exit(1);
+    }
+  }
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`Frequencies updated. Total time: ${elapsed}s`);
