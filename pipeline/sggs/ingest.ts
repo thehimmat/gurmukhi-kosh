@@ -1,10 +1,13 @@
 /**
- * SGGS ingestion pipeline: fetches angs from BaniDB and populates Supabase.
+ * Corpus ingestion pipeline: fetches a BaniDB source page by page and
+ * populates Supabase (lines, shabads, words, word_occurrences, and both
+ * frequency layers: words.frequency totals + word_corpus_stats per corpus).
  *
  * Usage:
- *   npm run ingest                            # full SGGS (angs 1–1430)
+ *   npm run ingest                              # full SGGS (angs 1–1430)
  *   npm run ingest:sggs:range -- --start=1 --end=50
- *   npm run ingest -- --source=sggs_banidb_v2  # explicit source code
+ *   npm run ingest:bhaigurdas                   # Bhai Gurdas Vaaran (vaars 1–40)
+ *   npm run ingest -- --source=<sources.code>   # any registered corpus
  *
  * Requires in .env.local:
  *   NEXT_PUBLIC_SUPABASE_URL
@@ -15,11 +18,17 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
-import { fetchAng, type BaniDBVerse } from "../../lib/banidb";
+import { fetchAng, type BaniDBSourceId, type BaniDBVerse } from "../../lib/banidb";
 import { tokenize } from "../../lib/tokenizer";
 import { sleep, parseArgs, progress } from "../shared/utils";
 
-const TOTAL_ANGS = 1430;
+// Registry: our sources.code → the BaniDB SourceID and the source's page
+// count ("ang" = the source's own page unit; for Bhai Gurdas, the vaar).
+const CORPUS: Record<string, { banidbSource: BaniDBSourceId; totalAngs: number }> = {
+  sggs_banidb_v2: { banidbSource: "G", totalAngs: 1430 },
+  bhai_gurdas_banidb_v2: { banidbSource: "B", totalAngs: 40 },
+};
+
 const DELAY_MS = 150;
 
 async function resolveSource(
@@ -63,9 +72,10 @@ async function upsertShabad(db: ReturnType<typeof supabaseAdmin>, verse: BaniDBV
 async function processAng(
   db: ReturnType<typeof supabaseAdmin>,
   ang: number,
-  sourceFk: number
+  sourceFk: number,
+  banidbSource: BaniDBSourceId
 ) {
-  const data = await fetchAng(ang);
+  const data = await fetchAng(ang, banidbSource);
 
   for (const verse of data.page) {
     await upsertShabad(db, verse);
@@ -134,16 +144,23 @@ async function processAng(
 
 async function main() {
   const db = supabaseAdmin();
-  const { start, end, sourceCode } = parseArgs({ start: 1, end: TOTAL_ANGS, source: "sggs_banidb_v2" });
-  const sourceFk = await resolveSource(db, sourceCode);
+  const args = parseArgs({ start: 1, end: 0, source: "sggs_banidb_v2" });
+  const corpus = CORPUS[args.sourceCode];
+  if (!corpus) {
+    console.error(`Unknown corpus '${args.sourceCode}'. Registered: ${Object.keys(CORPUS).join(", ")}`);
+    process.exit(1);
+  }
+  const start = args.start;
+  const end = args.end || corpus.totalAngs;
+  const sourceFk = await resolveSource(db, args.sourceCode);
 
   const failed: number[] = [];
-  console.log(`\nIngesting angs ${start}–${end} from source '${sourceCode}'`);
+  console.log(`\nIngesting angs ${start}–${end} from source '${args.sourceCode}' (BaniDB ${corpus.banidbSource})`);
   const t0 = Date.now();
 
   for (let ang = start; ang <= end; ang++) {
     try {
-      await processAng(db, ang, sourceFk);
+      await processAng(db, ang, sourceFk, corpus.banidbSource);
       progress(ang, end, t0, "Ang ");
     } catch (err) {
       console.error(`\nFailed ang ${ang}:`, err);
@@ -156,8 +173,21 @@ async function main() {
 
   await db.from("sources").update({ ingested_at: new Date().toISOString() }).eq("id", sourceFk);
 
-  console.log("Refreshing word frequencies...");
-  await db.rpc("refresh_word_frequencies");
+  // Both frequency layers (#65): words.frequency = total across corpora,
+  // word_corpus_stats = the per-corpus split (also flips in_corpus for
+  // dictionary head-words a newly ingested text attests). A failed refresh
+  // must abort loudly: these full-table rebuilds can hit the PostgREST
+  // statement timeout, and an unchecked rpc() once left the stats empty
+  // while the run reported success.
+  console.log("Refreshing word frequencies (total + per-corpus)...");
+  for (const fn of ["refresh_word_frequencies", "refresh_word_corpus_stats"] as const) {
+    const { error } = await db.rpc(fn);
+    if (error) {
+      console.error(`${fn} FAILED: ${error.message}`);
+      console.error(`Re-run it directly (SQL: select ${fn}();) before trusting any frequency.`);
+      process.exit(1);
+    }
+  }
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`Frequencies updated. Total time: ${elapsed}s`);

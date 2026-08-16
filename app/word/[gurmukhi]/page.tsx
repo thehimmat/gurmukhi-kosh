@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const word = decodeURIComponent(gurmukhi);
   return {
     title: `${word} — Gurmukhi Kosh`,
-    description: `Dictionary entry for the Gurmukhi word ${word} as found in Sri Guru Granth Sahib Ji.`,
+    description: `Dictionary entry for the Gurmukhi word ${word} as found in Sri Guru Granth Sahib Ji and other early Sikh texts.`,
   };
 }
 
@@ -133,7 +133,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
-  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult, rulesResult] = await Promise.all([
+  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult, rulesResult, corpusStatsResult] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     supabase
       .from("definitions")
@@ -149,13 +149,14 @@ export default async function WordPage({ params, searchParams }: Props) {
       .eq("word_id", wordId)
       .order("order_index", { ascending: true }),
 
-    // Occurrences with line + shabad
+    // Occurrences with line + shabad + corpus (multi-source since #65)
     supabase
       .from("word_occurrences")
       .select(`
         id, position,
         lines (
           id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
+          sources ( code, name ),
           shabads ( id, raag_english, writer_english, ang_start ),
           line_translations (
             body_unicode, language, caveat,
@@ -185,6 +186,13 @@ export default async function WordPage({ params, searchParams }: Props) {
     // Rule registry: Related-forms labels are derived live from the form's
     // ending (#56), so each label needs its rule's verified status.
     supabase.from("grammar_rules").select("rule_code, title, verified"),
+
+    // Per-corpus frequencies (#65): every displayed count names its text.
+    supabase
+      .from("word_corpus_stats")
+      .select("frequency, sources(name)")
+      .eq("word_id", wordId)
+      .order("frequency", { ascending: false }),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
@@ -193,6 +201,8 @@ export default async function WordPage({ params, searchParams }: Props) {
   const rulesByCode = new Map(
     ((rulesResult.data ?? []) as Pick<GrammarRule, "rule_code" | "title" | "verified">[]).map((r) => [r.rule_code, r])
   );
+  const corpusStats = ((corpusStatsResult.data ?? []) as unknown as Array<{ frequency: number; sources: { name: string } | null }>)
+    .filter((s) => s.sources?.name);
 
   // Structured Mahan Kosh layer (#34): which ਦੇਖੋ targets are real head-words?
   // Checked against `words` so only existing entries become links. Both
@@ -279,6 +289,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       id: number; ang: number; line_no: number; gurmukhi: string;
       translation_en: string | null; transliteration_en: string | null;
       shabad_id: number;
+      sources: { code: string; name: string } | null;
       shabads: { id: number; raag_english: string | null; writer_english: string | null } | null;
       line_translations: LineCommentary[] | null;
     } | null;
@@ -395,17 +406,29 @@ export default async function WordPage({ params, searchParams }: Props) {
           </p>
         )}
         {inCorpus ? (
-          <span className="badge" style={{ marginTop: "0.5rem" }}>
-            {wordRow.frequency.toLocaleString()} occurrences in SGGS
-          </span>
+          // Per-corpus counts (#65): each number names the text it counts.
+          // Falls back to the total if the stats table hasn't been refreshed.
+          <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+            {corpusStats.length > 0 ? (
+              corpusStats.map((s, i) => (
+                <span key={i} className="badge">
+                  {s.frequency.toLocaleString()} occurrences in {s.sources!.name}
+                </span>
+              ))
+            ) : (
+              <span className="badge" title="Occurrences across the ingested corpora">
+                {wordRow.frequency.toLocaleString()} occurrences
+              </span>
+            )}
+          </div>
         ) : (
           <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.4rem", flexWrap: "wrap", alignItems: "center" }}>
             <span
               className="badge"
-              title="This is a dictionary head-word (base/citation form). It does not occur as this exact form in the ingested Sri Guru Granth Sahib corpus."
+              title="This is a dictionary head-word (base/citation form). It does not occur as this exact form in any ingested corpus."
               style={{ background: "#eceae6", color: "#5c574f" }}
             >
-              Not attested in SGGS · dictionary head-word
+              Not attested in the ingested texts · dictionary head-word
             </span>
             {spellingStatus === "derived_transliteration" && (
               <span
@@ -941,7 +964,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       {tab === "occurrences" && (
       <section>
         <SectionHeading>
-          Occurrences in Sri Guru Granth Sahib Ji
+          Occurrences
           {wordRow.frequency > 0 && (
             <span style={{ fontWeight: 400, marginLeft: "0.5rem", textTransform: "none", letterSpacing: 0 }}>
               ({((occPage - 1) * OCC_PAGE_SIZE + 1).toLocaleString()}–{Math.min(occPage * OCC_PAGE_SIZE, wordRow.frequency).toLocaleString()} of {wordRow.frequency.toLocaleString()})
@@ -966,9 +989,19 @@ export default async function WordPage({ params, searchParams }: Props) {
               return (
                 <div key={occ.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
-                    <a href={`/ang/${line.ang}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
-                      Ang {line.ang}
-                    </a>
+                    {/* /ang/N is SGGS browsing; other corpora page differently
+                        (Bhai Gurdas: ang = the vaar) and get no link until
+                        per-source browse routes exist (#65 follow-up). */}
+                    {line.sources == null || line.sources.code === "sggs_banidb_v2" ? (
+                      <a href={`/ang/${line.ang}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
+                        Ang {line.ang}
+                      </a>
+                    ) : (
+                      <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 500 }}>
+                        {line.sources.code === "bhai_gurdas_banidb_v2" ? `Vaar ${line.ang}` : `p. ${line.ang}`}
+                        {" · "}{line.sources.name}
+                      </span>
+                    )}
                     {line.shabads?.writer_english && (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>
                         {line.shabads.writer_english}

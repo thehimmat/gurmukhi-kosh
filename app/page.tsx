@@ -67,7 +67,7 @@ export default function HomePage() {
             fontStyle: "italic",
           }}
         >
-          A dictionary of every word in Sri Guru Granth Sahib Ji
+          A dictionary of the words of Gurbani and early Sikh texts
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export default function HomePage() {
                 <span
                   className="badge"
                   style={{ flexShrink: 0 }}
-                  title="occurrences in SGGS"
+                  title="occurrences across the ingested texts"
                 >
                   {word.frequency.toLocaleString()}×
                 </span>
