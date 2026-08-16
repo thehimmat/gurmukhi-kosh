@@ -27,6 +27,7 @@ import { sleep, parseArgs, progress } from "../shared/utils";
 const CORPUS: Record<string, { banidbSource: BaniDBSourceId; totalAngs: number }> = {
   sggs_banidb_v2: { banidbSource: "G", totalAngs: 1430 },
   bhai_gurdas_banidb_v2: { banidbSource: "B", totalAngs: 40 },
+  dasam_banidb_v2: { banidbSource: "D", totalAngs: 1428 },
 };
 
 const DELAY_MS = 150;

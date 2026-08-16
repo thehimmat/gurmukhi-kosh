@@ -312,6 +312,13 @@ export default async function WordPage({ params, searchParams }: Props) {
     );
   }
 
+  // Each corpus pages in its own unit; the label prefixes the page number on
+  // non-SGGS occurrence cards ("Vaar 3", "Ang 212 · Dasam Bani").
+  const PAGE_UNIT: Record<string, string> = {
+    bhai_gurdas_banidb_v2: "Vaar",
+    dasam_banidb_v2: "Ang",
+  };
+
   // Grammar display helpers
   const GRAMMAR_LABELS: Record<string, string> = {
     noun: "Noun", verb: "Verb", adjective: "Adjective", adverb: "Adverb",
@@ -989,16 +996,17 @@ export default async function WordPage({ params, searchParams }: Props) {
               return (
                 <div key={occ.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
-                    {/* /ang/N is SGGS browsing; other corpora page differently
-                        (Bhai Gurdas: ang = the vaar) and get no link until
-                        per-source browse routes exist (#65 follow-up). */}
+                    {/* /ang/N is SGGS browsing; other corpora page in their
+                        own unit (Bhai Gurdas: the vaar; Dasam Bani: its own
+                        angs) and get no link until per-source browse routes
+                        exist (#68). */}
                     {line.sources == null || line.sources.code === "sggs_banidb_v2" ? (
                       <a href={`/ang/${line.ang}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
                         Ang {line.ang}
                       </a>
                     ) : (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                        {line.sources.code === "bhai_gurdas_banidb_v2" ? `Vaar ${line.ang}` : `p. ${line.ang}`}
+                        {(PAGE_UNIT[line.sources.code] ?? "p.") + ` ${line.ang}`}
                         {" · "}{line.sources.name}
                       </span>
                     )}
