@@ -112,7 +112,9 @@ async function processAng(
       tokens.map((g) => ({ gurmukhi: g, frequency: 0 })),
       { onConflict: "gurmukhi", ignoreDuplicates: true }
     );
-    if (wordErr) console.error(`Word upsert error (ang ${ang}):`, wordErr.message);
+    // A dropped word means dropped occurrences below, so surface it as a
+    // failed ang (retryable) rather than a logged line nobody reads.
+    if (wordErr) throw new Error(`word upsert (ang ${ang}, verse ${verse.verseId}): ${wordErr.message}`);
 
     const { data: wordRows, error: fetchErr } = await db
       .from("words")
@@ -120,25 +122,27 @@ async function processAng(
       .in("gurmukhi", tokens);
 
     if (fetchErr || !wordRows) {
-      console.error(`Word fetch error (ang ${ang}):`, fetchErr?.message);
-      continue;
+      throw new Error(`word fetch (ang ${ang}, verse ${verse.verseId}): ${fetchErr?.message}`);
     }
 
     const wordMap = new Map(wordRows.map((w) => [w.gurmukhi, w.id]));
 
-    const occurrences = tokens
-      .map((token, pos) => {
-        const wordId = wordMap.get(token);
-        if (!wordId) return null;
-        return { word_id: wordId, line_id: lineId, position: pos };
-      })
-      .filter(Boolean) as { word_id: number; line_id: number; position: number }[];
+    // Every token must resolve. Silently skipping unresolved ones (the old
+    // `.filter(Boolean)`) is how the Dasam run lost occurrences with no
+    // signal — see pipeline/verify/occurrences.ts.
+    const occurrences = tokens.map((token, pos) => {
+      const wordId = wordMap.get(token);
+      if (!wordId) {
+        throw new Error(`token '${token}' (ang ${ang}, verse ${verse.verseId}) did not resolve to a word row`);
+      }
+      return { word_id: wordId, line_id: lineId, position: pos };
+    });
 
     if (occurrences.length > 0) {
       const { error: occErr } = await db
         .from("word_occurrences")
         .upsert(occurrences, { ignoreDuplicates: true });
-      if (occErr) console.error(`Occurrence insert error (ang ${ang}):`, occErr.message);
+      if (occErr) throw new Error(`occurrence insert (ang ${ang}, verse ${verse.verseId}): ${occErr.message}`);
     }
   }
 }
