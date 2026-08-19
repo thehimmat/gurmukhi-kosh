@@ -115,6 +115,41 @@ class Xrefs(unittest.TestCase):
         self.assertNotIn("ਦੇਖੋ", s["residue"])
         self.assertIn("ਪਾਰਬ੍ਰਹਮ", s["residue"])
 
+    # -- #75: ਦੇਖੋ followed by prose is a sentence, not a pointer. A clause
+    # that does not reduce to head-word-shaped targets extracts nothing and
+    # stays in the residue whole.
+
+    def test_prose_citation_list_not_captured(self):
+        # real artifact: a Quran citation, not a Mahan Kosh head-word
+        s = parse_sense("ਦੇਖੋ, ਸੂਰਤ ਬਕਰ, ਆਯਤ ੭੧, ਯਹੂਦੀ ਸੂਰ ਨੂੰ ਇਸ ਲਈ ਅਪਵਿਤ੍ਰ ਮੰਨਦੇ ਹਨ.")
+        self.assertEqual(s["xrefs"], [])
+        self.assertIn("ਦੇਖੋ", s["residue"])
+        self.assertIn("ਯਹੂਦੀ", s["residue"])
+
+    def test_midsentence_prose_dekho_left_alone(self):
+        s = parse_sense("ਇਸ ਦੀ ਉਤਪੱਤੀ ਦਾ ਨਿਰਣਾ ਦੇਖੋ, ਸਗਰ ਸ਼ਬਦ ਵਿੱਚ.")
+        self.assertEqual(s["xrefs"], [])
+        self.assertIn("ਸਗਰ", s["residue"])
+
+    def test_sggs_citation_after_dekho_not_captured(self):
+        s = parse_sense("ਦੇਖੋ, ਆਸਾ ਮਃ ੫, ਸ਼ਬਦ ਨੰਃ ੩, ਵਾਰ ਆਸਾ ਦੀ ਪੌੜੀ.")
+        self.assertEqual(s["xrefs"], [])
+        self.assertIn("ਪੌੜੀ", s["residue"])
+
+    def test_verbal_root_qualifier_stripped(self):
+        # 'ਦੇਖੋ, ਭੂ ਧਾ' points at the root entry ਭੂ, like 'X ਸ਼ਬਦ' points at X
+        s = parse_sense("ਦੇਖੋ, ਭੂ ਧਾ.")
+        self.assertEqual(s["xrefs"][0]["target"], "ਭੂ")
+        self.assertNotIn("ਦੇਖੋ", s["residue"])
+        # ZWNJ after a virama-final root must not block the match
+        s2 = parse_sense("ਦੇਖੋ, ਰਮ੍‌ ਧਾ.")
+        self.assertEqual(s2["xrefs"][0]["target"], "ਰਮ੍")
+
+    def test_paren_prose_xref_stays_in_residue(self):
+        s = parse_sense("ਛੰਦ ਦਾ ਨਾਮ (ਦੇਖੋ ਸਵੈਯੇ ਦਾ ਰੂਪ ਗੁਰੁ ਛੰਦ ਦਿਵਾਕਰ ਵਿੱਚ) ਹੈ.")
+        self.assertEqual(s["xrefs"], [])
+        self.assertIn("ਦਿਵਾਕਰ", s["residue"])
+
 
 class Citations(unittest.TestCase):
     def test_named_work_dasam(self):
