@@ -59,7 +59,9 @@ def nfd(s: str) -> str:
 
 def to_int(tok: str):
     t = "".join(_GD.get(c, c) for c in tok)
-    return int(t) if t.isdigit() else None
+    # isascii guard: isdigit() is also true for superscripts (footnote marks
+    # like ਸੂਤ੍ਰ ੨¹ in the print), which int() rejects
+    return int(t) if t.isascii() and t.isdigit() else None
 
 
 # --------------------------------------------------------------- legend
