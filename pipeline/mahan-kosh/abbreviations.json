@@ -1,7 +1,7 @@
 {
   "_meta": {
     "title": "Mahan Kosh shorthand legend (ਸੰਕੇਤ)",
-    "parse_version": "1.2.0",
+    "parse_version": "1.2.1",
     "parse_version_note": "Bump on ANY change to parse behavior — parser code (parse_shorthand.py) or legend data in this file. Stamped into every parsed sense; /health counts rows whose stamp differs (expected 0). After bumping: python3 pipeline/mahan-kosh/parse_shorthand.py --run && npm run ingest:mahankosh (~1 min).",
     "purpose": "Machine-readable key to the abbreviations, markers, and orthographic conventions used inside Mahan Kosh entries, so the pipeline can parse definition_text deterministically (etymology language, POS, citations, cross-references) instead of by ad-hoc substring matching.",
     "sources": {

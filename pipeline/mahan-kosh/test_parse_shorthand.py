@@ -188,6 +188,15 @@ class Citations(unittest.TestCase):
         self.assertEqual(s["citations"], [])
         self.assertIn("(ਹੱਥ)", s["residue"])
 
+    def test_superscript_footnote_digit_does_not_crash(self):
+        # ਯੋਗ sense 3 (2026-08-19 scrape): the print carries a footnote
+        # superscript after a Gurmukhi digit (ਸੂਤ੍ਰ ੨¹). str.isdigit() is true
+        # for ¹ but int() rejects it — the token must read as non-numeric.
+        s = parse_sense(
+            "ਚਿੱਤ ਦੀ ਵ੍ਰਿੱਤਿ ਦਾ ਰੋਕਣਾ. (ਪਾਤੰਜਲ ਦਰਸ਼ਨ. ਪਾਦ ੧. ਸੂਤ੍ਰ ੨¹) ਦੇਖੋ, ਸਹਜ ਜੋਗ ਅਤੇ ਜੋਗ."
+        )
+        self.assertIn("ਰੋਕਣਾ", s["residue"])
+
     def test_quote_citation_pairing(self):
         s = parse_sense('ਸੰਗ੍ਯਾ- ਧਰਮ. "ਨਹਿ ਬਿਲੰਬ ਧਰਮੰ." (ਸਹਸ ਮਃ ੫) "ਸਾਧ ਕੈ ਸੰਗਿ." (ਸੁਖਮਨੀ)')
         self.assertEqual(len(s["quotes"]), 2)
