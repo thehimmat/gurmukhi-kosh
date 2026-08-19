@@ -119,7 +119,9 @@ SECTION_TOKENS = {
 
 RE_QUOTE = re.compile(r'["“]([^"“”]{1,400})["”]')
 RE_PAREN = re.compile(r"\(([^()]{1,70})\)")
-RE_XREF = re.compile(rf"ਦੇਖੋ[,.]?\s*([^.।\"()#]{{1,60}})[.।]?")
+# #75: capture stops at the first comma — a ਦੇਖੋ that runs into a comma is
+# citing or narrating (ਦੇਖੋ, ਸੂਰਤ ਬਕਰ, ਆਯਤ ੭੧ …), not naming a head-word
+RE_XREF = re.compile(rf"ਦੇਖੋ[,.]?\s*([^.।,\"()#]{{1,60}})[.।]?")
 RE_DEVA_RUN = re.compile(rf"[{DEVA}][{DEVA}‌‍]*")
 RE_BRACKET = re.compile(rf"\[\s*([^\]]{{1,60}})\s*\]")
 RE_LATIN_RUN = re.compile(r"[A-Za-z][A-Za-z'’.-]*(?:\s+[A-Za-z][A-Za-z'’.-]*){0,3}")
@@ -272,16 +274,16 @@ def parse_sense(text: str) -> dict:
                     break
         elif kind == "xref":
             inner = re.sub(r"^ਦੇਖੋ[,.]?\s*", "", m.group(1).strip())
-            _append_xrefs(out, inner)
-            spans.append((m.start(), m.end()))
+            if _append_xrefs(out, inner):
+                spans.append((m.start(), m.end()))
         # enumerator / numeric parens stay in the residue
 
     # 3. ਦੇਖੋ clauses outside parens
     for m in RE_XREF.finditer(t):
         if any(s <= m.start() < e for s, e in spans):
             continue
-        _append_xrefs(out, m.group(1))
-        spans.append((m.start(), m.end()))
+        if _append_xrefs(out, m.group(1)):
+            spans.append((m.start(), m.end()))
 
     # 4. language markers immediately before script runs (anywhere)
     seen_lang_at = set()
@@ -358,18 +360,41 @@ def parse_sense(text: str) -> dict:
     return out
 
 
+# a target is one Gurmukhi-script token with no digits and no abbreviation
+# sign ਃ (which marks citations: ਮਃ, ਅਃ, ਨੰਃ)
+RE_XREF_TARGET = re.compile(rf"[{GURM}]+")
+RE_XREF_NONWORD = re.compile(rf"[{GD_DIGITS}0-9ਃ]")
+# 'ਦੇਖੋ, X ਸ਼ਬਦ' and 'ਦੇਖੋ, X ਧਾ' both point at the entry for X
+XREF_QUALIFIERS = tuple(nfd(q) for q in ("ਸ਼ਬਦ", "ਧਾ"))
+ZWJ_CHARS = "‌‍ "
+
+
 def _append_xrefs(out, inner):
+    """Extract head-word-shaped targets from a ਦੇਖੋ clause. Returns True when
+    at least one target is accepted. On False the caller leaves the clause in
+    the residue: prose after ਦੇਖੋ is a sentence, not a pointer, and a clause
+    with any prose-shaped part asserts nothing — an xref missed here is
+    recoverable, a wrong one is asserted provenance (#75)."""
+    inner = inner.split(",")[0]
     inner = inner.strip().rstrip(".।").strip()
     sense_number = None
     m = re.search(rf"\s+([{GD_DIGITS}0-9]+)$", inner)
     if m:
         sense_number = to_int(m.group(1))
         inner = inner[: m.start()].strip()
-    inner = re.sub(r"\s+ਸ਼ਬਦ$", "", inner)
+    targets = []
     for part in re.split(r"\s+ਅਤੇ\s+|\s+ਜਾਂ\s+", inner):
-        part = part.strip()
-        if part:
-            out["xrefs"].append({"target": part, "sense_number": sense_number})
+        part = part.strip(ZWJ_CHARS)
+        for q in XREF_QUALIFIERS:
+            part = re.sub(rf"\s+{q}$", "", part).strip(ZWJ_CHARS)
+        if not part:
+            continue
+        if not RE_XREF_TARGET.fullmatch(part) or RE_XREF_NONWORD.search(part):
+            return False
+        targets.append(part)
+    for tgt in targets:
+        out["xrefs"].append({"target": tgt, "sense_number": sense_number})
+    return bool(targets)
 
 
 def _read_etymon(t, pos):
