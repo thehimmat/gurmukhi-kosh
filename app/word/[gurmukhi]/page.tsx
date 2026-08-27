@@ -132,8 +132,66 @@ export default async function WordPage({ params, searchParams }: Props) {
   const grammarView = buildGrammarView(grammar);
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
+  // Occurrences read in corpus order — SGGS first, then Dasam Bani, then Bhai
+  // Gurdas Ji Vaaran, then anything else — not in word_occurrences.id order,
+  // which the occurrence-gap repair (#70) reshuffled. Paging therefore walks
+  // the corpora in that order, so one page slice can span two of them; the
+  // per-corpus counts needed to plan that come first.
+  const CORPUS_ORDER = ["sggs_banidb_v2", "dasam_banidb_v2", "bhai_gurdas_banidb_v2"];
+  const corpusRank = (code: string | undefined) => {
+    const i = CORPUS_ORDER.indexOf(code ?? "");
+    return i === -1 ? CORPUS_ORDER.length : i;
+  };
+
+  // Per-corpus frequencies (#65): every displayed count names its text.
+  const corpusStatsResult = await supabase
+    .from("word_corpus_stats")
+    .select("source_fk, frequency, sources(code, name)")
+    .eq("word_id", wordId)
+    .order("frequency", { ascending: false });
+
+  const corpusRows = (corpusStatsResult.data ?? []) as unknown as Array<{
+    source_fk: number; frequency: number; sources: { code: string; name: string } | null;
+  }>;
+
+  // Slice the requested page across the corpora in reading order.
+  const occPlan: Array<{ source_fk: number; offset: number; limit: number }> = [];
+  {
+    const ordered = [...corpusRows].sort(
+      (a, b) => corpusRank(a.sources?.code) - corpusRank(b.sources?.code) || a.source_fk - b.source_fk
+    );
+    const start = (occPage - 1) * OCC_PAGE_SIZE;
+    const end = start + OCC_PAGE_SIZE;
+    let cursor = 0;
+    for (const s of ordered) {
+      const from = cursor;
+      const to = cursor + s.frequency;
+      cursor = to;
+      if (to <= start) continue;
+      if (from >= end) break;
+      occPlan.push({
+        source_fk: s.source_fk,
+        offset: Math.max(0, start - from),
+        limit: Math.min(end, to) - Math.max(start, from),
+      });
+    }
+  }
+
+  const OCC_SELECT = `
+        id, position,
+        lines!inner (
+          id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
+          sources ( code, name ),
+          shabads ( id, raag_english, writer_english, ang_start ),
+          line_translations (
+            body_unicode, language, caveat,
+            translation_sources ( code, name, author, kind, notes, url )
+          )
+        )
+      `;
+
   // Step 2: fire remaining queries in parallel
-  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult, rulesResult, corpusStatsResult] = await Promise.all([
+  const [defsResult, etymResult, occsResults, lexemeFormResult, examplesResult, rulesResult] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     supabase
       .from("definitions")
@@ -149,24 +207,21 @@ export default async function WordPage({ params, searchParams }: Props) {
       .eq("word_id", wordId)
       .order("order_index", { ascending: true }),
 
-    // Occurrences with line + shabad + corpus (multi-source since #65)
-    supabase
-      .from("word_occurrences")
-      .select(`
-        id, position,
-        lines (
-          id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-          sources ( code, name ),
-          shabads ( id, raag_english, writer_english, ang_start ),
-          line_translations (
-            body_unicode, language, caveat,
-            translation_sources ( code, name, author, kind, notes, url )
-          )
-        )
-      `)
-      .eq("word_id", wordId)
-      .order("id", { ascending: true })
-      .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1),
+    // Occurrences with line + shabad + corpus (multi-source since #65), one
+    // query per corpus the page touches, each in reading order within its text.
+    Promise.all(
+      occPlan.map((p) =>
+        supabase
+          .from("word_occurrences")
+          .select(OCC_SELECT)
+          .eq("word_id", wordId)
+          .eq("lines.source_fk", p.source_fk)
+          .order("lines(ang)", { ascending: true })
+          .order("lines(line_no)", { ascending: true })
+          .order("id", { ascending: true })
+          .range(p.offset, p.offset + p.limit - 1)
+      )
+    ),
 
     // Morphological variants: find the lexeme this word belongs to (if any)
     supabase
@@ -186,13 +241,6 @@ export default async function WordPage({ params, searchParams }: Props) {
     // Rule registry: Related-forms labels are derived live from the form's
     // ending (#56), so each label needs its rule's verified status.
     supabase.from("grammar_rules").select("rule_code, title, verified"),
-
-    // Per-corpus frequencies (#65): every displayed count names its text.
-    supabase
-      .from("word_corpus_stats")
-      .select("frequency, sources(name)")
-      .eq("word_id", wordId)
-      .order("frequency", { ascending: false }),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
@@ -201,8 +249,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const rulesByCode = new Map(
     ((rulesResult.data ?? []) as Pick<GrammarRule, "rule_code" | "title" | "verified">[]).map((r) => [r.rule_code, r])
   );
-  const corpusStats = ((corpusStatsResult.data ?? []) as unknown as Array<{ frequency: number; sources: { name: string } | null }>)
-    .filter((s) => s.sources?.name);
+  const corpusStats = corpusRows.filter((s) => s.sources?.name);
 
   // Structured Mahan Kosh layer (#34): which ਦੇਖੋ targets are real head-words?
   // Checked against `words` so only existing entries become links. Both
@@ -294,7 +341,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       line_translations: LineCommentary[] | null;
     } | null;
   };
-  const rows = (occsResult.data ?? []) as unknown as OccRow[];
+  const rows = occsResults.flatMap((r) => (r.data ?? []) as unknown as OccRow[]);
   const grouped = new Map<string, OccRow[]>();
   for (const occ of rows) {
     const raag = occ.lines?.shabads?.raag_english ?? "Unknown";
