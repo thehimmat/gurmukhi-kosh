@@ -27,25 +27,15 @@ config({ path: ".env.local" });
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../shared/db";
 import { buildGrammarView } from "../../lib/grammar-view";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import type { WordGrammarWithRule } from "../../lib/supabase";
 
 const SYSTEM_REPORTER = "Rule engine (automated)";
 
 async function fetchAllGrammarRows(db: SupabaseClient): Promise<WordGrammarWithRule[]> {
-  const rows: WordGrammarWithRule[] = [];
-  const PAGE = 1000;
-  for (let offset = 0; ; offset += PAGE) {
-    const { data, error } = await db
-      .from("word_grammar")
-      .select("*, grammar_rules(*)")
-      .order("id", { ascending: true })
-      .range(offset, offset + PAGE - 1);
-    if (error) throw new Error(`fetchAllGrammarRows: ${error.message}`);
-    const batch = (data ?? []) as unknown as WordGrammarWithRule[];
-    rows.push(...batch);
-    if (batch.length < PAGE) break;
-  }
-  return rows;
+  return fetchAllRows<WordGrammarWithRule>("fetchAllGrammarRows", () =>
+    db.from("word_grammar").select("*, grammar_rules(*)").order("id", { ascending: true })
+  );
 }
 
 async function hasOpenAutoFlag(

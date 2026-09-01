@@ -1,3 +1,5 @@
+import { fetchAllRows } from "../../lib/fetch-all-rows";
+
 export interface WordPosition {
   word_id: number;
   position: number;
@@ -109,26 +111,6 @@ interface Occurrence {
   position: number;
 }
 
-/**
- * Page through an entire table with .range(). Supabase caps each response at
- * ~1000 rows, so a bare .select() silently truncates large tables — this loops
- * until a short page is returned.
- */
-async function fetchAllRows<T>(
-  build: () => any,
-  pageSize = 1000
-): Promise<T[]> {
-  const all: T[] = [];
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await build().range(from, from + pageSize - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-    all.push(...data);
-    if (data.length < pageSize) break;
-  }
-  return all;
-}
-
 /** Upsert in bounded chunks so a single request never exceeds payload limits. */
 async function upsertInChunks(
   supabase: any,
@@ -159,7 +141,7 @@ export async function computeCollocationsCorpusWide() {
   );
 
   console.log('Fetching all word occurrences (paginated)...');
-  const occs = await fetchAllRows<Occurrence>(() =>
+  const occs = await fetchAllRows<Occurrence>('word_occurrences', () =>
     supabase
       .from('word_occurrences')
       .select('word_id, line_id, position')

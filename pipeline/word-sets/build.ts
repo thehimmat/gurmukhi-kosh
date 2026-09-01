@@ -16,6 +16,7 @@ config({ path: ".env.local" });
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../shared/db";
 import { getArg } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { fetchBani } from "../../lib/banidb";
 import { WORD_SETS, type WordSetDefinition } from "./sets";
 import { extractVerseIds, aggregateWordCounts, chunk } from "./aggregate";
@@ -58,37 +59,31 @@ async function resolveLineIds(
     return lineIdsByVerseIds(db, sourceId, verseIds);
   }
   if (def.type === "ang_range") {
-    // Paginated: an unpaginated .select() silently caps at Supabase's 1000-row
-    // default, which for a wide ang_range (e.g. the full 1-1430 corpus) would
-    // return only the first 1000 of 60k+ lines with no error.
-    const ids: number[] = [];
-    const PAGE = 1000;
-    for (let offset = 0; ; offset += PAGE) {
-      const { data, error } = await db
+    // A wide ang_range (e.g. the full 1-1430 corpus) is 60k+ lines.
+    const rows = await fetchAllRows<{ id: number }>("resolveLineIds(ang_range)", () =>
+      db
         .from("lines")
         .select("id")
         .eq("source_fk", sourceId)
         .gte("ang", def.start)
         .lte("ang", def.end)
         .order("id", { ascending: true })
-        .range(offset, offset + PAGE - 1);
-      if (error) throw new Error(`resolveLineIds(ang_range): ${error.message}`);
-      const batch = data ?? [];
-      for (const r of batch) ids.push(r.id as number);
-      if (batch.length < PAGE) break;
-    }
-    return ids;
+    );
+    return rows.map((r) => r.id);
   }
-  // shabad_ids
+  // shabad_ids — paginated per chunk too: 300 shabads at ~5 lines each clears
+  // the 1000-row cap (the ang_range branch above was bitten the same way).
   const ids: number[] = [];
   for (const batch of chunk(def.ids, IN_CHUNK)) {
-    const { data, error } = await db
-      .from("lines")
-      .select("id")
-      .eq("source_fk", sourceId)
-      .in("shabad_id", batch);
-    if (error) throw new Error(`resolveLineIds(shabad_ids): ${error.message}`);
-    for (const r of data ?? []) ids.push(r.id as number);
+    const rows = await fetchAllRows<{ id: number }>("resolveLineIds(shabad_ids)", () =>
+      db
+        .from("lines")
+        .select("id")
+        .eq("source_fk", sourceId)
+        .in("shabad_id", batch)
+        .order("id", { ascending: true })
+    );
+    for (const r of rows) ids.push(r.id);
   }
   return ids;
 }
@@ -96,21 +91,15 @@ async function resolveLineIds(
 async function wordCounts(db: SupabaseClient, lineIds: number[]): Promise<Map<number, number>> {
   const rows: { word_id: number }[] = [];
   for (const batch of chunk(lineIds, IN_CHUNK)) {
-    // Paginated per chunk too: 300 lines average ~6.6 words/line (~2000 rows),
-    // comfortably over the 1000-row default cap that bit resolveLineIds above.
-    const PAGE = 1000;
-    for (let offset = 0; ; offset += PAGE) {
-      const { data, error } = await db
+    // 300 lines average ~6.6 words/line (~2000 rows), well over the cap.
+    const page = await fetchAllRows<{ word_id: number }>("wordCounts", () =>
+      db
         .from("word_occurrences")
         .select("word_id")
         .in("line_id", batch)
         .order("id", { ascending: true })
-        .range(offset, offset + PAGE - 1);
-      if (error) throw new Error(`wordCounts: ${error.message}`);
-      const page = data ?? [];
-      for (const r of page) rows.push({ word_id: r.word_id as number });
-      if (page.length < PAGE) break;
-    }
+    );
+    rows.push(...page);
   }
   return aggregateWordCounts(rows);
 }

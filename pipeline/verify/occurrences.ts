@@ -23,6 +23,8 @@ config({ path: ".env.local" });
 import { supabaseAdmin } from "../shared/db";
 import { tokenize } from "../../lib/tokenizer";
 import { progress } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
+import { chunk } from "../word-sets/aggregate";
 
 const LINE_PAGE = 500;
 
@@ -55,25 +57,22 @@ async function main() {
     const expected = new Map<number, string[]>();
     for (const l of batch) expected.set(l.id, tokenize(l.gurmukhi ?? ""));
 
-    // MUST paginate: PostgREST caps an unpaginated read at 1000 rows with no
-    // error, and a 500-line batch holds several thousand occurrences — an
-    // unpaginated fetch reports nearly every existing row as "missing".
+    // A 500-line batch holds several thousand occurrences — an unpaginated
+    // fetch reports nearly every existing row as "missing".
     const havePositions = new Map<number, Set<number>>();
     const lineIds = batch.map((l) => l.id);
-    for (let occOffset = 0; ; occOffset += 1000) {
-      const { data: occRows, error: occErr } = await db
-        .from("word_occurrences")
-        .select("line_id, position")
-        .in("line_id", lineIds)
-        .order("id", { ascending: true })
-        .range(occOffset, occOffset + 999);
-      if (occErr) throw new Error(`occurrences fetch: ${occErr.message}`);
-      const occBatch = (occRows ?? []) as { line_id: number; position: number }[];
-      for (const o of occBatch) {
-        if (!havePositions.has(o.line_id)) havePositions.set(o.line_id, new Set());
-        havePositions.get(o.line_id)!.add(o.position);
-      }
-      if (occBatch.length < 1000) break;
+    const occRows = await fetchAllRows<{ line_id: number; position: number }>(
+      "occurrences fetch",
+      () =>
+        db
+          .from("word_occurrences")
+          .select("line_id, position")
+          .in("line_id", lineIds)
+          .order("id", { ascending: true })
+    );
+    for (const o of occRows) {
+      if (!havePositions.has(o.line_id)) havePositions.set(o.line_id, new Set());
+      havePositions.get(o.line_id)!.add(o.position);
     }
 
     // Gaps: an expected position with no occurrence row.
@@ -101,9 +100,22 @@ async function main() {
         .upsert(tokens.map((g) => ({ gurmukhi: g, frequency: 0 })), { onConflict: "gurmukhi", ignoreDuplicates: true });
       if (wErr) throw new Error(`word upsert: ${wErr.message}`);
 
-      const { data: wordRows, error: wfErr } = await db.from("words").select("id, gurmukhi").in("gurmukhi", tokens);
-      if (wfErr) throw new Error(`word fetch: ${wfErr.message}`);
-      const wordId = new Map((wordRows ?? []).map((w) => [w.gurmukhi as string, w.id as number]));
+      // Chunked at 100: a long .in() list of Unicode headwords overflows the
+      // GET URL and surfaces as an opaque "fetch failed" (the same limit the
+      // Mahan Kosh ingest batches around), and >1000 matches would truncate.
+      const wordId = new Map<string, number>();
+      for (const tokenBatch of chunk(tokens, 100)) {
+        const wordRows = await fetchAllRows<{ id: number; gurmukhi: string }>(
+          "word fetch",
+          () =>
+            db
+              .from("words")
+              .select("id, gurmukhi")
+              .in("gurmukhi", tokenBatch)
+              .order("id", { ascending: true })
+        );
+        for (const w of wordRows) wordId.set(w.gurmukhi, w.id);
+      }
 
       // Unlike the ingest, an unresolvable token is a hard error rather than
       // a silent skip — that silence is the bug this script exists to catch.

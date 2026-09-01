@@ -22,6 +22,7 @@ config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { extractEtymologyCandidates, type ParsedOrigin } from "./parse";
 import { devanagariToIAST, devanagariToSLP1 } from "./transliterate";
 import { fetchMwEntry, extractGlossFromTei } from "./monier-williams";
@@ -69,10 +70,8 @@ async function fetchMarkedDefinitions(db: ReturnType<typeof supabaseAdmin>): Pro
   const { data: dictSource } = await db.from("dict_sources").select("id").eq("code", "mahan_kosh").single();
   if (!dictSource) throw new Error("dict_source 'mahan_kosh' not found");
 
-  const rows: DefRow[] = [];
-  const PAGE = 1000;
-  for (let offset = 0; ; offset += PAGE) {
-    const { data, error } = await db
+  return fetchAllRows<DefRow>("fetchMarkedDefinitions", () =>
+    db
       .from("definitions")
       .select("word_id, definition_text, parsed, words(gurmukhi)")
       .eq("dict_source_id", dictSource.id)
@@ -80,13 +79,7 @@ async function fetchMarkedDefinitions(db: ReturnType<typeof supabaseAdmin>): Pro
       // non-emptiness filter PostgREST can express.
       .not("parsed->language_origins->0", "is", null)
       .order("id", { ascending: true })
-      .range(offset, offset + PAGE - 1);
-    if (error) throw new Error(`fetchMarkedDefinitions: ${error.message}`);
-    const batch = (data ?? []) as unknown as DefRow[];
-    rows.push(...batch);
-    if (batch.length < PAGE) break;
-  }
-  return rows;
+  );
 }
 
 async function main() {

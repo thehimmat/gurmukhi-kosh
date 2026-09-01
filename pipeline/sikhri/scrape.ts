@@ -34,6 +34,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { supabaseAdmin } from "../shared/db";
 import { sleep, getArg } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { parseGlossaryCatalog, parseEntry, decodeWn } from "./parse";
 
 const BASE = "https://gurugranthsahibdictionary.io";
@@ -87,20 +88,10 @@ async function getPanjabiLetters(): Promise<string[]> {
 }
 
 async function fetchOurWords(db: ReturnType<typeof supabaseAdmin>): Promise<Set<string>> {
-  const set = new Set<string>();
-  const PAGE = 1000;
-  for (let offset = 0; ; offset += PAGE) {
-    const { data, error } = await db
-      .from("words")
-      .select("gurmukhi")
-      .order("id", { ascending: true })
-      .range(offset, offset + PAGE - 1);
-    if (error) throw new Error(`fetchOurWords: ${error.message}`);
-    const batch = data ?? [];
-    for (const r of batch) set.add((r as { gurmukhi: string }).gurmukhi);
-    if (batch.length < PAGE) break;
-  }
-  return set;
+  const rows = await fetchAllRows<{ gurmukhi: string }>("fetchOurWords", () =>
+    db.from("words").select("gurmukhi").order("id", { ascending: true })
+  );
+  return new Set(rows.map((r) => r.gurmukhi));
 }
 
 function loadCheckpoint(p: string): Set<string> {
