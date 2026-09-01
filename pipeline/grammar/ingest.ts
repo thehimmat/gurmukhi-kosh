@@ -24,6 +24,7 @@ config({ path: ".env.local" });
 import { supabaseAdmin } from "../shared/db";
 import { fetchWordSet } from "../shared/word-sets";
 import { getArg, progress } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { buildGrammar, buildInheritedGrammar } from "./build";
 import { groupLexemes } from "./lexeme";
 import { stem } from "./viakaran";
@@ -57,17 +58,23 @@ async function main() {
   const sensesByWord = new Map<number, { definition_text: string }[]>();
   for (let i = 0; i < wordIds.length; i += 200) {
     const batch = wordIds.slice(i, i + 200);
-    const { data, error } = await db
-      .from("definitions")
-      .select("word_id, sense_number, definition_text")
-      .eq("dict_source_id", dictSource.id)
-      .in("word_id", batch)
-      .order("sense_number", { ascending: true });
-    if (error) {
-      console.error("Definition fetch error:", error.message);
-      process.exit(1);
-    }
-    for (const row of data ?? []) {
+    // 200 multi-sense words can hold well over 1000 definition rows; ordered
+    // by word_id first so pages are stable, then sense_number so each word's
+    // first-listed sense stays its primary POS.
+    const data = await fetchAllRows<{
+      word_id: number;
+      sense_number: number;
+      definition_text: string;
+    }>("grammar senses", () =>
+      db
+        .from("definitions")
+        .select("word_id, sense_number, definition_text")
+        .eq("dict_source_id", dictSource.id)
+        .in("word_id", batch)
+        .order("word_id", { ascending: true })
+        .order("sense_number", { ascending: true })
+    );
+    for (const row of data) {
       const list = sensesByWord.get(row.word_id) ?? [];
       list.push({ definition_text: row.definition_text });
       sensesByWord.set(row.word_id, list);

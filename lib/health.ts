@@ -12,6 +12,7 @@
 
 import { supabase } from "./supabase";
 import { buildGrammarView } from "./grammar-view";
+import { fetchAllRows } from "./fetch-all-rows";
 import type { WordGrammarWithRule } from "./supabase";
 import legendJson from "../pipeline/mahan-kosh/abbreviations.json";
 
@@ -81,21 +82,11 @@ function pct(part: number, whole: number): string {
 }
 
 async function grammarConflictMetrics(): Promise<Metric[]> {
-  // PostgREST silently caps unpaginated reads at 1000 rows, so this must page
-  // through word_grammar (20k+ rows) or the conflict counts cover ~5% of it.
-  const PAGE = 1000;
-  const rows: WordGrammarWithRule[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
-      .from("word_grammar")
-      .select("*, grammar_rules(*)")
-      .order("id", { ascending: true })
-      .range(from, from + PAGE - 1);
-    if (error) throw new Error(`word_grammar page ${from}: ${error.message}`);
-    const batch = (data ?? []) as unknown as WordGrammarWithRule[];
-    rows.push(...batch);
-    if (batch.length < PAGE) break;
-  }
+  // word_grammar is 20k+ rows; unpaginated, the conflict counts would silently
+  // cover ~5% of it.
+  const rows = await fetchAllRows<WordGrammarWithRule>("word_grammar", () =>
+    supabase.from("word_grammar").select("*, grammar_rules(*)").order("id", { ascending: true })
+  );
 
   const byWord = new Map<number, WordGrammarWithRule[]>();
   for (const row of rows) {

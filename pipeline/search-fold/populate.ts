@@ -15,6 +15,7 @@ config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
 import { progress } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { foldGurmukhi } from "../../lib/gurmukhi-fold";
 
 const BATCH = 500;
@@ -22,18 +23,9 @@ const BATCH = 500;
 async function main() {
   const db = supabaseAdmin();
 
-  const all: { id: number; gurmukhi: string }[] = [];
-  const PAGE = 1000;
-  for (let offset = 0; ; offset += PAGE) {
-    const { data, error } = await db
-      .from("words")
-      .select("id, gurmukhi")
-      .order("id", { ascending: true })
-      .range(offset, offset + PAGE - 1);
-    if (error) throw new Error(error.message);
-    for (const r of data ?? []) all.push({ id: r.id as number, gurmukhi: r.gurmukhi as string });
-    if ((data ?? []).length < PAGE) break;
-  }
+  const all = await fetchAllRows<{ id: number; gurmukhi: string }>("words", () =>
+    db.from("words").select("id, gurmukhi").order("id", { ascending: true })
+  );
   console.log(`Populating search_fold for ${all.length} words...`);
 
   const rows = all.map((w) => ({

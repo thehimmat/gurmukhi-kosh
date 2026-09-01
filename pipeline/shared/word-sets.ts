@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 
 export interface WordSetMember {
   word_id: number;
@@ -31,33 +32,29 @@ export async function fetchWordSet(
     );
   }
 
-  const members: WordSetMember[] = [];
-  const PAGE = 1000;
-  let offset = 0;
-  for (;;) {
-    const { data, error } = await db
+  // Secondary order on word_id: occurrence_count ties are common, and page
+  // boundaries on a non-unique sort can drop or duplicate rows between pages.
+  const rows = await fetchAllRows<{
+    word_id: number;
+    occurrence_count: number;
+    words: { gurmukhi: string } | null;
+  }>(`fetchWordSet('${code}')`, () =>
+    db
       .from("word_set_members")
       .select("word_id, occurrence_count, words(gurmukhi)")
       .eq("word_set_id", set.id)
       .order("occurrence_count", { ascending: false })
-      .range(offset, offset + PAGE - 1);
-    if (error) throw new Error(`fetchWordSet('${code}'): ${error.message}`);
-    const batch = data ?? [];
-    for (const row of batch as unknown as Array<{
-      word_id: number;
-      occurrence_count: number;
-      words: { gurmukhi: string } | null;
-    }>) {
-      if (row.words) {
-        members.push({
-          word_id: row.word_id,
-          gurmukhi: row.words.gurmukhi,
-          occurrence_count: row.occurrence_count,
-        });
-      }
+      .order("word_id", { ascending: true })
+  );
+  const members: WordSetMember[] = [];
+  for (const row of rows) {
+    if (row.words) {
+      members.push({
+        word_id: row.word_id,
+        gurmukhi: row.words.gurmukhi,
+        occurrence_count: row.occurrence_count,
+      });
     }
-    if (batch.length < PAGE) break;
-    offset += PAGE;
   }
 
   if (members.length === 0) {

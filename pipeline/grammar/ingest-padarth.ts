@@ -24,6 +24,7 @@ config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
 import { progress } from "../shared/utils";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { extractGrammarFacts, type GramAttr } from "./padarth";
 
 const SOURCE_CODE = "ss_padarth";
@@ -47,25 +48,13 @@ async function main() {
   console.log(`Mining grammar facts from '${SOURCE_CODE}' pad-arth...`);
 
   // 1. Pull every pad-arth line with its ang (for the citation locator).
-  //    Supabase caps a single select at 1000 rows, so page through explicitly
-  //    or we silently mine only the first 1000 lines once the corpus grows.
-  const lineRows: LineRow[] = [];
-  const PAGE = 1000;
-  for (let from = 0; ; from += PAGE) {
-    const { data: rows, error } = await db
+  const lineRows = await fetchAllRows<LineRow>("pad-arth lines", () =>
+    db
       .from("line_translations")
       .select("line_id, body_unicode, lines(ang)")
       .eq("source_code", SOURCE_CODE)
       .order("line_id", { ascending: true })
-      .range(from, from + PAGE - 1);
-    if (error) {
-      console.error("line_translations fetch error:", error.message);
-      process.exit(1);
-    }
-    const batch = (rows ?? []) as unknown as LineRow[];
-    lineRows.push(...batch);
-    if (batch.length < PAGE) break;
-  }
+  );
   console.log(`Pad-arth lines: ${lineRows.length}`);
 
   // 2. Extract candidate facts per line.
