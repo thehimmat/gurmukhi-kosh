@@ -71,10 +71,17 @@ describe("database", () => {
     expect((data as any).frequency).toBeGreaterThan(5000);
   });
 
+  // The two largest tables use a planner-estimated count, not an exact one.
+  // An exact count scans the whole table (~1s idle, but 7-8s when CI runs
+  // race each other against this shared database, which trips the anon
+  // role's statement timeout and fails with an empty error message). These
+  // are coarse floor assertions with ~3x headroom, where the estimate's
+  // ~0.4% drift is irrelevant. Exact per-row integrity is the job of
+  // `npm run verify:occurrences`, not of a threshold check.
   it("lines table has expected row count (>50k)", async () => {
     const { count, error } = await db
       .from("lines")
-      .select("*", { count: "exact", head: true });
+      .select("*", { count: "estimated", head: true });
     expect(error).toBeNull();
     expect(count).toBeGreaterThan(50000);
   });
@@ -82,7 +89,7 @@ describe("database", () => {
   it("word_occurrences table has expected row count (>300k)", async () => {
     const { count, error } = await db
       .from("word_occurrences")
-      .select("*", { count: "exact", head: true });
+      .select("*", { count: "estimated", head: true });
     expect(error).toBeNull();
     expect(count).toBeGreaterThan(300000);
   });
