@@ -284,13 +284,17 @@ export default async function WordPage({ params, searchParams }: Props) {
     grouped.get(raag)!.push(occ);
   }
 
-  function highlightWord(text: string, target: string) {
+  function HighlightedLine({ text, target }: { text: string; target: string }) {
     const idx = text.indexOf(target);
-    if (idx === -1) return text;
+    if (idx === -1) return <>{text}</>;
     return (
-      text.slice(0, idx) +
-      `<mark style="background:var(--accent-light,#f5e5d0);border-radius:3px;padding:0 2px;">${target}</mark>` +
-      text.slice(idx + target.length)
+      <>
+        {text.slice(0, idx)}
+        <mark style={{ background: "var(--accent-light, #f5e5d0)", borderRadius: "3px", padding: "0 2px" }}>
+          {target}
+        </mark>
+        {text.slice(idx + target.length)}
+      </>
     );
   }
 
@@ -977,7 +981,9 @@ export default async function WordPage({ params, searchParams }: Props) {
                       </span>
                     )}
                   </div>
-                  <p className="gurmukhi-lg" style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: highlightWord(line.gurmukhi, word) }} />
+                  <p className="gurmukhi-lg" style={{ marginBottom: "0.4rem" }}>
+                    <HighlightedLine text={line.gurmukhi} target={word} />
+                  </p>
                   {line.transliteration_en && (
                     <p style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "0.4rem" }}>
                       {line.transliteration_en}

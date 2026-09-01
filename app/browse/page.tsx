@@ -14,7 +14,7 @@ export default async function BrowsePage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const { page: pageParam } = await searchParams;
-  const page = Math.max(1, parseInt(pageParam ?? "1"));
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const pageSize = 50;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
