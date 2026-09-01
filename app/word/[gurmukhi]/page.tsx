@@ -132,53 +132,69 @@ export default async function WordPage({ params, searchParams }: Props) {
   const grammarView = buildGrammarView(grammar);
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
-  // Step 2: fire remaining queries in parallel
+  // Step 2: fire remaining queries in parallel — but only the ones the active
+  // tab actually renders. Every tab still pays for the header (word row +
+  // per-corpus stats); the heavy joins (occurrences with commentaries) and the
+  // enrichment tables are fetched per tab.
+  const needsDefs = tab === "overview" || tab === "meanings" || tab === "sources";
+  const needsExamples = tab === "overview" || tab === "meanings";
+  const needsForms = tab === "overview";
+  const EMPTY = Promise.resolve({ data: null });
+
   const [defsResult, etymResult, occsResult, examplesResult, rulesByCode, corpusStatsResult] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
-    supabase
-      .from("definitions")
-      .select("id, sense_number, definition_text, cross_refs, parsed, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
-      .eq("word_id", wordId)
-      .order("dict_source_id", { ascending: true })
-      .order("sense_number", { ascending: true }),
+    needsDefs
+      ? supabase
+          .from("definitions")
+          .select("id, sense_number, definition_text, cross_refs, parsed, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
+          .eq("word_id", wordId)
+          .order("dict_source_id", { ascending: true })
+          .order("sense_number", { ascending: true })
+      : EMPTY,
 
     // Etymology
-    supabase
-      .from("etymology")
-      .select("*")
-      .eq("word_id", wordId)
-      .order("order_index", { ascending: true }),
+    tab === "etymology"
+      ? supabase
+          .from("etymology")
+          .select("*")
+          .eq("word_id", wordId)
+          .order("order_index", { ascending: true })
+      : EMPTY,
 
     // Occurrences with line + shabad + corpus (multi-source since #65)
-    supabase
-      .from("word_occurrences")
-      .select(`
-        id, position,
-        lines (
-          id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-          sources ( code, name ),
-          shabads ( id, raag_english, writer_english, ang_start ),
-          line_translations (
-            body_unicode, language, caveat,
-            translation_sources ( code, name, author, kind, notes, url )
-          )
-        )
-      `)
-      .eq("word_id", wordId)
-      .order("id", { ascending: true })
-      .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1),
+    tab === "occurrences"
+      ? supabase
+          .from("word_occurrences")
+          .select(`
+            id, position,
+            lines (
+              id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
+              sources ( code, name ),
+              shabads ( id, raag_english, writer_english, ang_start ),
+              line_translations (
+                body_unicode, language, caveat,
+                translation_sources ( code, name, author, kind, notes, url )
+              )
+            )
+          `)
+          .eq("word_id", wordId)
+          .order("id", { ascending: true })
+          .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1)
+      : EMPTY,
 
     // Dictionary example quotations (Shackle etc.) — English translation + AG
     // citation. The romanized quote (quote_roman) is internal and not selected.
-    supabase
-      .from("dict_examples")
-      .select("id, definition_id, order_index, translation, citation_raw, citation_siglum, citation_hymn, citation_verse, citation_author")
-      .eq("word_id", wordId)
-      .order("id", { ascending: true }),
+    needsExamples
+      ? supabase
+          .from("dict_examples")
+          .select("id, definition_id, order_index, translation, citation_raw, citation_siglum, citation_hymn, citation_verse, citation_author")
+          .eq("word_id", wordId)
+          .order("id", { ascending: true })
+      : EMPTY,
 
     // Rule registry: Related-forms labels are derived live from the form's
     // ending (#56), so each label needs its rule's verified status.
-    fetchRulesByCode(),
+    needsForms ? fetchRulesByCode() : new Map<string, { rule_code: string; title: string; verified: boolean }>(),
 
     // Per-corpus frequencies (#65): every displayed count names its text.
     supabase
@@ -225,7 +241,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Step 3: sibling inflected forms, across every lexeme this word belongs to
   // (lib/word-data.ts — shared with the JSON API, labels derived live per #56,
   // #52 unverified-rule treatment applied exactly as in the grammar section).
-  const morphForms = await fetchMorphVariants(wordId, word, rulesByCode);
+  const morphForms = needsForms ? await fetchMorphVariants(wordId, word, rulesByCode) : [];
 
   // Group definitions by source
   const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
