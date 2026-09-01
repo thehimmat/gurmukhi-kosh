@@ -28,12 +28,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # npm install, not npm ci: this repo normally installs via the suite's
-      # npm-workspace root (../), so the local package-lock.json is stale and
-      # ci refuses it. The workspace-linked @atthebunga/gurmukhi-input resolves
-      # from the registry here (published as 1.3.0+).
-      - run: npm install --no-audit --no-fund
+      # npm ci against the standalone lockfile, so CI and Vercel build the
+      # exact pinned dependency graph (including @atthebunga/gurmukhi-input,
+      # which local dev resolves via the suite workspace symlink instead).
+      # Local installs still go through the suite's npm-workspace root (../);
+      # after any dependency change here, refresh the lockfile with:
+      #   npm run lockfile:refresh
+      - run: npm ci --no-audit --no-fund
       - name: Every active user story has a story-tagged test
         run: node scripts/check-stories.mjs
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Production build compiles
+        run: npm run build
       - name: Test suite (unit + live-DB + prod integration)
         run: npm test
