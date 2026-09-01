@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
-import type { DefinitionWithSource, DictExample, Etymology, GrammarRule, WordGrammarWithRule } from "@/lib/supabase";
+import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { analyzeNounForm } from "@/pipeline/grammar/viakaran";
+import { fetchMorphVariants, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
@@ -133,7 +133,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel
-  const [defsResult, etymResult, occsResult, lexemeFormResult, examplesResult, rulesResult, corpusStatsResult] = await Promise.all([
+  const [defsResult, etymResult, occsResult, examplesResult, rulesByCode, corpusStatsResult] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     supabase
       .from("definitions")
@@ -168,13 +168,6 @@ export default async function WordPage({ params, searchParams }: Props) {
       .order("id", { ascending: true })
       .range((occPage - 1) * OCC_PAGE_SIZE, occPage * OCC_PAGE_SIZE - 1),
 
-    // Morphological variants: find the lexeme this word belongs to (if any)
-    supabase
-      .from("word_forms")
-      .select("lexeme_id, inflection_desc")
-      .eq("word_id", wordId)
-      .maybeSingle(),
-
     // Dictionary example quotations (Shackle etc.) — English translation + AG
     // citation. The romanized quote (quote_roman) is internal and not selected.
     supabase
@@ -185,7 +178,7 @@ export default async function WordPage({ params, searchParams }: Props) {
 
     // Rule registry: Related-forms labels are derived live from the form's
     // ending (#56), so each label needs its rule's verified status.
-    supabase.from("grammar_rules").select("rule_code, title, verified"),
+    fetchRulesByCode(),
 
     // Per-corpus frequencies (#65): every displayed count names its text.
     supabase
@@ -198,9 +191,6 @@ export default async function WordPage({ params, searchParams }: Props) {
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
   const etymology = (etymResult.data ?? []) as Etymology[];
   const examples = (examplesResult.data ?? []) as unknown as DictExample[];
-  const rulesByCode = new Map(
-    ((rulesResult.data ?? []) as Pick<GrammarRule, "rule_code" | "title" | "verified">[]).map((r) => [r.rule_code, r])
-  );
   const corpusStats = ((corpusStatsResult.data ?? []) as unknown as Array<{ frequency: number; sources: { name: string } | null }>)
     .filter((s) => s.sources?.name);
 
@@ -232,34 +222,10 @@ export default async function WordPage({ params, searchParams }: Props) {
     }
   }
 
-  // Step 3: if lexeme found, fetch all sibling forms. The inflection label is
-  // derived live from the form's ending (#56) — never read from the cached
-  // inflection_desc string — so the rule behind it is known and the #52
-  // unverified-rule treatment applies here exactly as in the grammar section.
-  type MorphForm = { gurmukhi: string; label: string | null; ruleTitle: string | null; ruleVerified: boolean };
-  let morphForms: MorphForm[] = [];
-  if (lexemeFormResult.data?.lexeme_id) {
-    const lexemeId = lexemeFormResult.data.lexeme_id as number;
-    const { data: formRows } = await supabase
-      .from("word_forms")
-      .select("words(id, gurmukhi)")
-      .eq("lexeme_id", lexemeId);
-
-    morphForms = ((formRows ?? []) as unknown as Array<{ words: { id: number; gurmukhi: string } | null }>)
-      .filter((f) => f.words?.gurmukhi && f.words.gurmukhi !== word)
-      .map((f) => {
-        const g = f.words!.gurmukhi;
-        const a = analyzeNounForm(g);
-        const label = [a.gram_case, a.number].filter(Boolean).join(" ") || null;
-        const rule = a.rule_code ? rulesByCode.get(a.rule_code) : undefined;
-        return {
-          gurmukhi: g,
-          label,
-          ruleTitle: rule?.title ?? null,
-          ruleVerified: rule?.verified ?? false,
-        };
-      });
-  }
+  // Step 3: sibling inflected forms, across every lexeme this word belongs to
+  // (lib/word-data.ts — shared with the JSON API, labels derived live per #56,
+  // #52 unverified-rule treatment applied exactly as in the grammar section).
+  const morphForms = await fetchMorphVariants(wordId, word, rulesByCode);
 
   // Group definitions by source
   const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
@@ -348,40 +314,19 @@ export default async function WordPage({ params, searchParams }: Props) {
     scholar: "cited", dictionary: "dictionary", rule: "rule-derived", heuristic: "heuristic",
   };
 
-  // Usage tab: common phrases (bigrams) + statistical collocations. Fetch the
-  // pair rows, then resolve partner word_ids to Gurmukhi in one follow-up query.
+  // Usage tab: common phrases (bigrams) + statistical collocations + writer
+  // breakdown (lib/word-data.ts — shared with the JSON API).
   let phrases: Array<{ w1: string; w2: string; count: number }> = [];
   let collocates: Array<{ partner: string; count: number; pmi: number | null }> = [];
   let writerStats: Array<{ writer: string; count: number }> = [];
   if (tab === "usage") {
-    const [bgRes, colRes, wsRes] = await Promise.all([
-      supabase.from("bigrams").select("w1_id, w2_id, pair_count")
-        .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
-        .order("pair_count", { ascending: false }).limit(15),
-      supabase.from("collocations").select("word_a_id, word_b_id, pair_count, pmi")
-        .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
-        .order("pmi", { ascending: false }).limit(15),
-      // writer_english requires migration 008; before it is applied this errors
-      // and degrades to an empty list (we only read .data).
-      supabase.from("word_writer_stats").select("writer_english, occurrence_count")
-        .eq("word_id", wordId)
-        .order("occurrence_count", { ascending: false }).limit(8),
+    const [usage, writerRows] = await Promise.all([
+      fetchUsage(wordId),
+      fetchWriterStats(wordId, 8),
     ]);
-    const bgRows = (bgRes.data ?? []) as Array<{ w1_id: number; w2_id: number; pair_count: number }>;
-    const colRows = (colRes.data ?? []) as Array<{ word_a_id: number; word_b_id: number; pair_count: number; pmi: number | null }>;
-    const partnerIds = new Set<number>();
-    for (const r of bgRows) { partnerIds.add(r.w1_id); partnerIds.add(r.w2_id); }
-    for (const r of colRows) { partnerIds.add(r.word_a_id); partnerIds.add(r.word_b_id); }
-    const { data: partnerWords } = partnerIds.size
-      ? await supabase.from("words").select("id, gurmukhi").in("id", [...partnerIds])
-      : { data: [] };
-    const idToGur = new Map(((partnerWords ?? []) as Array<{ id: number; gurmukhi: string }>).map((w) => [w.id, w.gurmukhi]));
-    phrases = bgRows.map((r) => ({ w1: idToGur.get(r.w1_id) ?? "?", w2: idToGur.get(r.w2_id) ?? "?", count: r.pair_count }));
-    collocates = colRows.map((r) => {
-      const partnerId = r.word_a_id === wordId ? r.word_b_id : r.word_a_id;
-      return { partner: idToGur.get(partnerId) ?? "?", count: r.pair_count, pmi: r.pmi };
-    });
-    writerStats = ((wsRes.data ?? []) as Array<{ writer_english: string | null; occurrence_count: number }>)
+    phrases = usage.phrases.map((p) => ({ w1: p.w1 ?? "?", w2: p.w2 ?? "?", count: p.count }));
+    collocates = usage.collocates.map((c) => ({ partner: c.partner ?? "?", count: c.count, pmi: c.pmi }));
+    writerStats = writerRows
       .filter((r) => r.writer_english)
       .map((r) => ({ writer: r.writer_english!, count: r.occurrence_count }));
   }
