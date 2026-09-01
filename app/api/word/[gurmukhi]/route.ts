@@ -18,7 +18,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { analyzeNounForm } from "@/pipeline/grammar/viakaran";
+import { fetchMorphVariants, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 
 type Params = { params: Promise<{ gurmukhi: string }> };
 
@@ -77,8 +77,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     word_grammar: GrammarRow[];
   };
 
-  // Parallel: definitions, etymology, lexeme lookup, usage (bigrams/collocations), writer stats
-  const [defsResult, etymResult, lexemeFormResult, rulesResult, bgResult, colResult, writerResult] = await Promise.all([
+  // Parallel: definitions, etymology, rule registry, usage, writer stats.
+  // The morphological-variant and usage derivations are shared with the word
+  // page via lib/word-data.ts so the two surfaces cannot drift.
+  const [defsResult, etymResult, rulesByCode, usage, writerRows] = await Promise.all([
     supabase
       .from("definitions")
       .select("id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
@@ -92,95 +94,23 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .eq("word_id", wordId)
       .order("order_index"),
 
-    supabase
-      .from("word_forms")
-      .select("lexeme_id")
-      .eq("word_id", wordId)
-      .maybeSingle(),
-
-    // Rule registry for the live-derived variant labels below.
-    supabase.from("grammar_rules").select("rule_code, title, verified"),
-
-    supabase
-      .from("bigrams")
-      .select("w1_id, w2_id, pair_count")
-      .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
-      .order("pair_count", { ascending: false })
-      .limit(15),
-
-    supabase
-      .from("collocations")
-      .select("word_a_id, word_b_id, pair_count, pmi")
-      .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
-      .order("pmi", { ascending: false })
-      .limit(15),
-
-    // writer_english requires migration 008; until applied this errors and
-    // degrades to an empty list (we only read .data).
-    supabase
-      .from("word_writer_stats")
-      .select("writer_english, occurrence_count")
-      .eq("word_id", wordId)
-      .order("occurrence_count", { ascending: false })
-      .limit(10),
+    fetchRulesByCode(),
+    fetchUsage(wordId),
+    fetchWriterStats(wordId, 10),
   ]);
 
-  // Morphological variants. The inflection label is derived live from the
-  // form's ending (#56) — the cached inflection_desc column is not read — so
-  // each label ships with the rule that produced it and that rule's verified
-  // status. inflection_desc keeps its key for backward compatibility.
-  const rulesByCode = new Map(
-    ((rulesResult.data ?? []) as Array<{ rule_code: string; title: string; verified: boolean }>).map((r) => [r.rule_code, r])
-  );
-  let morphological_variants: Array<{
-    gurmukhi: string;
-    inflection_desc: string | null;
-    rule_code: string | null;
-    rule_verified: boolean | null;
-  }> = [];
-  if (lexemeFormResult.data?.lexeme_id) {
-    const lexemeId = lexemeFormResult.data.lexeme_id as number;
-    const { data: formRows } = await supabase
-      .from("word_forms")
-      .select("words(id, gurmukhi)")
-      .eq("lexeme_id", lexemeId);
+  // inflection_desc keeps its key for backward compatibility; rule_code and
+  // rule_verified are only meaningful when a label was derived.
+  const morphological_variants = (await fetchMorphVariants(wordId, word, rulesByCode)).map((v) => ({
+    gurmukhi: v.gurmukhi,
+    inflection_desc: v.label,
+    rule_code: v.label ? v.ruleCode : null,
+    rule_verified: v.label ? v.ruleVerified : null,
+  }));
 
-    morphological_variants = (
-      (formRows ?? []) as unknown as Array<{ words: { id: number; gurmukhi: string } | null }>
-    )
-      .filter((f) => f.words?.gurmukhi && f.words.gurmukhi !== word)
-      .map((f) => {
-        const g = f.words!.gurmukhi;
-        const a = analyzeNounForm(g);
-        const label = [a.gram_case, a.number].filter(Boolean).join(" ") || null;
-        const rule = a.rule_code ? rulesByCode.get(a.rule_code) : undefined;
-        return {
-          gurmukhi: g,
-          inflection_desc: label,
-          rule_code: label ? a.rule_code : null,
-          rule_verified: label ? rule?.verified ?? false : null,
-        };
-      });
-  }
-
-  // Usage: resolve bigram/collocation partner word_ids to Gurmukhi
-  const bgRows = (bgResult.data ?? []) as Array<{ w1_id: number; w2_id: number; pair_count: number }>;
-  const colRows = (colResult.data ?? []) as Array<{ word_a_id: number; word_b_id: number; pair_count: number; pmi: number | null }>;
-  const partnerIds = new Set<number>();
-  for (const r of bgRows) { partnerIds.add(r.w1_id); partnerIds.add(r.w2_id); }
-  for (const r of colRows) { partnerIds.add(r.word_a_id); partnerIds.add(r.word_b_id); }
-  const { data: partnerWords } = partnerIds.size
-    ? await supabase.from("words").select("id, gurmukhi").in("id", [...partnerIds])
-    : { data: [] };
-  const idToGur = new Map(((partnerWords ?? []) as Array<{ id: number; gurmukhi: string }>).map((pw) => [pw.id, pw.gurmukhi]));
-
-  const phrases = bgRows.map((r) => ({ w1: idToGur.get(r.w1_id) ?? null, w2: idToGur.get(r.w2_id) ?? null, count: r.pair_count }));
-  const collocations = colRows.map((r) => {
-    const partnerId = r.word_a_id === wordId ? r.word_b_id : r.word_a_id;
-    return { word: idToGur.get(partnerId) ?? null, count: r.pair_count, pmi: r.pmi };
-  });
-  const writers = ((writerResult.data ?? []) as Array<{ writer_english: string | null; occurrence_count: number }>)
-    .map((r) => ({ writer: r.writer_english, count: r.occurrence_count }));
+  const phrases = usage.phrases;
+  const collocations = usage.collocates.map((c) => ({ word: c.partner, count: c.count, pmi: c.pmi }));
+  const writers = writerRows.map((r) => ({ writer: r.writer_english, count: r.occurrence_count }));
 
   return NextResponse.json({
     word: {
