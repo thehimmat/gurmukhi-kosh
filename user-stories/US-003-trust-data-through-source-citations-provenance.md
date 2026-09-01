@@ -3,9 +3,9 @@ id: US-003
 title: Trust every datum through visible source citations/provenance
 status: delivered
 created: 2026-07-22
-updated: 2026-08-31
+updated: 2026-09-01
 linked_issues: []
-linked_tests: []
+linked_tests: ["tests/stories/us-003.test.ts"]
 supersedes: null
 superseded_by: null
 ---

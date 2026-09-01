@@ -15,3 +15,22 @@ jobs:
           node-version: 22
       - name: Check migrations enable RLS on every created table
         run: node scripts/check-migrations-rls.mjs
+
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      # Public client-side values (shipped in every browser bundle of the
+      # deployed site); RLS is the security boundary, not these strings.
+      NEXT_PUBLIC_SUPABASE_URL: https://brczghxvpfikezsevbkh.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyY3pnaHh2cGZpa2V6c2V2YmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzODE0NDgsImV4cCI6MjA5NDk1NzQ0OH0.g8PHrRaWECquYUUyv_KiC4MdVmOffSFA0O3Jgg6NRuY
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Every active user story has a story-tagged test
+        run: node scripts/check-stories.mjs
+      - name: Test suite (unit + live-DB + prod integration)
+        run: npm test

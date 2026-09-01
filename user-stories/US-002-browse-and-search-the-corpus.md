@@ -3,9 +3,9 @@ id: US-002
 title: Browse and search the corpus to reach any word
 status: delivered
 created: 2026-07-22
-updated: 2026-08-31
+updated: 2026-09-01
 linked_issues: []
-linked_tests: []
+linked_tests: ["tests/stories/us-002.test.ts"]
 supersedes: null
 superseded_by: null
 ---
