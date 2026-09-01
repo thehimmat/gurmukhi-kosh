@@ -857,6 +857,12 @@ export default async function WordPage({ params, searchParams }: Props) {
                       ) : null}
                     </div>
                   )}
+                  <FlagForm
+                    wordId={wordId}
+                    targetTable="etymology"
+                    targetId={e.id}
+                    contextLabel={`Etymology — ${e.origin_language}${e.root_form_roman ? ` (${e.root_form_roman})` : ""}`}
+                  />
                 </div>
               </div>
               );
