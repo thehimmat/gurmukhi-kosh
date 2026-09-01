@@ -4,7 +4,9 @@
 // morphological variants and usage partner resolution — live here once.
 
 import { supabase } from "./supabase";
-import { analyzeNounForm } from "@/pipeline/grammar/viakaran";
+// Relative (not "@/") so this module also loads under vitest, which does not
+// read the tsconfig path alias.
+import { analyzeNounForm } from "../pipeline/grammar/viakaran";
 
 export type RuleInfo = { rule_code: string; title: string; verified: boolean };
 

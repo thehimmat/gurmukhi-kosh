@@ -1,11 +1,11 @@
 ---
 id: US-005
 title: See per-line commentary and etymology alongside occurrences
-status: partial
+status: active
 created: 2026-07-22
-updated: 2026-08-31
+updated: 2026-09-01
 linked_issues: []
-linked_tests: []
+linked_tests: ["tests/stories/us-005.test.ts"]
 supersedes: null
 superseded_by: null
 ---

@@ -1,11 +1,11 @@
 ---
 id: US-006
 title: Flag errors and monitor data quality (curation + admin)
-status: partial
+status: active
 created: 2026-07-22
-updated: 2026-08-31
+updated: 2026-09-01
 linked_issues: [2]
-linked_tests: []
+linked_tests: ["tests/stories/us-006.test.ts"]
 supersedes: null
 superseded_by: null
 ---
