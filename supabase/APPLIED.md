@@ -78,6 +78,7 @@ no ledger entry (applied via the dashboard SQL editor, marked below the table).
 | 44 | 20260827220226 | corpus_ordered_search | search `005_corpus_ordered_search.sql` |
 | 45 | 20260828151712 | multi_select_filters | search `006_multi_select_filters.sql` |
 | 46 | 20260828152404 | search_rpc_single_value_compat | search `007_single_value_rpc_compat.sql` |
+| 47 |  20260917191135 | 032_number_occurrences | kosh `032_number_occurrences.sql` |
 
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never

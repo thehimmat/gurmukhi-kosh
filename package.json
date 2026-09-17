@@ -22,6 +22,7 @@
     "ingest:shackle:lookups": "tsx pipeline/shackle/load-lookups.ts",
     "ingest:shackle": "tsx pipeline/shackle/ingest.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
+    "ingest:numbers": "tsx pipeline/numbers/populate.ts",
     "teardown": "tsx pipeline/teardown.ts",
     "wordset:build": "tsx pipeline/word-sets/build.ts",
     "pronounce": "tsx pipeline/pronounce/populate.ts",
