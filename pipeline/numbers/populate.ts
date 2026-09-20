@@ -14,6 +14,15 @@
  * (line_id, char_start) key means a partial re-run cannot double-count. Run it
  * after any corpus ingest, since new lines carry new numerals.
  *
+ * The table was first populated (2026-09-20) by a one-time SQL transliteration
+ * of extractNumerals, run server-side because that session had no egress to
+ * the database. That backfill was checked against this classifier — exact
+ * agreement on representative lines, then eight invariants over all 48,119
+ * rows: numeral counts per line, the danda rule in both directions, keyword
+ * presence, the 3-word window, and the stop-at-an-earlier-numeral rule. The
+ * SQL is not kept; this script is the only supported way to rebuild, and one
+ * run of it replaces the backfilled rows wholesale.
+ *
  * Requires in .env.local:
  *   NEXT_PUBLIC_SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY

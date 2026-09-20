@@ -80,6 +80,11 @@ no ledger entry (applied via the dashboard SQL editor, marked below the table).
 | 46 | 20260828152404 | search_rpc_single_value_compat | search `007_single_value_rpc_compat.sql` |
 | 47 |  20260917191135 | 032_number_occurrences | kosh `032_number_occurrences.sql` |
 
+`number_occurrences` was populated on 2026-09-20 by a one-time server-side SQL
+transliteration of `lib/gurmukhi-numerals.ts` (48,119 rows), verified against that
+classifier and then dropped. `npm run ingest:numbers` is the supported rebuild and
+replaces those rows wholesale — see `pipeline/numbers/populate.ts`.
+
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never
 recorded it. It IS live (its rule corrections are visible in `grammar_rules`).
