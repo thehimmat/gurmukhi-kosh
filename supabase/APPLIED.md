@@ -91,6 +91,13 @@ Migration 033 adds `list_number_roles` and `search_number_lines`, whose only con
 the **gurmukhi-search** shell. It lands here per rule 1 above: kosh owns the schema even
 when the motivating feature lives in a sibling repo.
 
+| 49 | 20260923131352 | 034_number_lines_all_offsets | kosh `034_number_lines_all_offsets.sql` |
+
+Migration 034 adds `char_starts`/`char_ends` to `search_number_lines` so a line holding the
+same number twice highlights both. The scalar `char_start`/`char_end` stay until search has
+shipped against the arrays — rule 5, add-then-remove for signatures a deployed sibling reads.
+A later migration may drop them.
+
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never
 recorded it. It IS live (its rule corrections are visible in `grammar_rules`).
