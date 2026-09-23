@@ -85,6 +85,12 @@ transliteration of `lib/gurmukhi-numerals.ts` (48,119 rows), verified against th
 classifier and then dropped. `npm run ingest:numbers` is the supported rebuild and
 replaces those rows wholesale — see `pipeline/numbers/populate.ts`.
 
+| 48 | 20260923123133 | 033_number_search_rpcs | kosh `033_number_search_rpcs.sql` |
+
+Migration 033 adds `list_number_roles` and `search_number_lines`, whose only consumer is
+the **gurmukhi-search** shell. It lands here per rule 1 above: kosh owns the schema even
+when the motivating feature lives in a sibling repo.
+
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never
 recorded it. It IS live (its rule corrections are visible in `grammar_rules`).
