@@ -21,6 +21,7 @@ import { supabaseAdmin } from "../shared/db";
 import { fetchAng, type BaniDBSourceId, type BaniDBVerse } from "../../lib/banidb";
 import { tokenize } from "../../lib/tokenizer";
 import { sleep, parseArgs, progress } from "../shared/utils";
+import { shabadUpsertRow } from "./shabad-meta";
 
 // Registry: our sources.code → the BaniDB SourceID and the source's page
 // count ("ang" = the source's own page unit; for Bhai Gurdas, the vaar).
@@ -52,22 +53,31 @@ async function resolveSource(
 }
 
 const insertedShabads = new Set<number>();
+const shabadsWithWriter = new Set<number>();
 
+// The first verse of a shabad creates its row. Later verses only fill a writer
+// the earlier ones lacked (#86): BaniDB reports writer per verse, and a shabad
+// whose first verse had none used to stay null for good.
 async function upsertShabad(db: ReturnType<typeof supabaseAdmin>, verse: BaniDBVerse) {
-  if (insertedShabads.has(verse.shabadId)) return;
-  const { error } = await db.from("shabads").upsert(
-    {
-      id: verse.shabadId,
-      raag_english: verse.raag?.english ?? null,
-      raag_gurmukhi: verse.raag?.unicode ?? null,
-      writer_english: verse.writer?.english ?? null,
-      writer_id: verse.writer?.writerId ?? null,
-      ang_start: verse.pageNo,
-    },
-    { onConflict: "id" }
-  );
-  if (error) console.error(`Shabad upsert error (${verse.shabadId}):`, error.message);
-  else insertedShabads.add(verse.shabadId);
+  const row = shabadUpsertRow(verse);
+  const hasWriter = row.writer_english !== undefined;
+  if (!insertedShabads.has(verse.shabadId)) {
+    const { error } = await db.from("shabads").upsert(row, { onConflict: "id" });
+    if (error) {
+      console.error(`Shabad upsert error (${verse.shabadId}):`, error.message);
+      return;
+    }
+    insertedShabads.add(verse.shabadId);
+    if (hasWriter) shabadsWithWriter.add(verse.shabadId);
+    return;
+  }
+  if (!hasWriter || shabadsWithWriter.has(verse.shabadId)) return;
+  const { error } = await db
+    .from("shabads")
+    .update({ writer_english: row.writer_english, writer_id: row.writer_id })
+    .eq("id", verse.shabadId);
+  if (error) console.error(`Shabad writer update error (${verse.shabadId}):`, error.message);
+  else shabadsWithWriter.add(verse.shabadId);
 }
 
 async function processAng(
