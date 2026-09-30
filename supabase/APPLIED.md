@@ -98,6 +98,11 @@ same number twice highlights both. The scalar `char_start`/`char_end` stay until
 shipped against the arrays — rule 5, add-then-remove for signatures a deployed sibling reads.
 A later migration may drop them.
 
+| 50 | 20260930142606 | 035_pos_mappings_form_labels | kosh `035_pos_mappings_form_labels.sql` |
+
+Migration 035 seeds the five Shackle POS labels 023 left unmapped (#29). Data only; the
+table's reader landed in the same change (`lib/grammar-view.ts` `normalizePos`).
+
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never
 recorded it. It IS live (its rule corrections are visible in `grammar_rules`).
