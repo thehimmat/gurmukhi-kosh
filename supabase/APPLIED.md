@@ -96,7 +96,19 @@ when the motivating feature lives in a sibling repo.
 Migration 034 adds `char_starts`/`char_ends` to `search_number_lines` so a line holding the
 same number twice highlights both. The scalar `char_start`/`char_end` stay until search has
 shipped against the arrays — rule 5, add-then-remove for signatures a deployed sibling reads.
-A later migration may drop them.
+Migration 036 dropped them.
+
+| 50 | 20260930142606 | 035_pos_mappings_form_labels | kosh `035_pos_mappings_form_labels.sql` |
+
+Migration 035 seeds the five Shackle POS labels 023 left unmapped (#29). Data only; the
+table's reader landed in the same change (`lib/grammar-view.ts` `normalizePos`).
+
+| 51 | 20260930143950 | 036_number_lines_drop_scalar_offsets | kosh `036_number_lines_drop_scalar_offsets.sql` |
+
+Migration 036 is the remove half of 034's add-then-remove: search_number_lines no longer
+returns the scalar `char_start`/`char_end`. Verified gurmukhi-search production (f6ec668,
+live since 2026-09-23) reads the arrays first; results for value 1 over author/ghar were
+identical before and after (713 lines; the double-੧ heading still returns [25, 31]).
 
 **In repo but not in the ledger:** kosh `025_viakaran_rule_corrections.sql` (added
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never

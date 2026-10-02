@@ -13,6 +13,7 @@
 import { supabase } from "./supabase";
 import { buildGrammarView } from "./grammar-view";
 import { fetchAllRows } from "./fetch-all-rows";
+import { fetchPosMap } from "./word-data";
 import type { WordGrammarWithRule } from "./supabase";
 import legendJson from "../pipeline/mahan-kosh/abbreviations.json";
 
@@ -84,9 +85,12 @@ function pct(part: number, whole: number): string {
 async function grammarConflictMetrics(): Promise<Metric[]> {
   // word_grammar is 20k+ rows; unpaginated, the conflict counts would silently
   // cover ~5% of it.
-  const rows = await fetchAllRows<WordGrammarWithRule>("word_grammar", () =>
-    supabase.from("word_grammar").select("*, grammar_rules(*)").order("id", { ascending: true })
-  );
+  const [rows, posMap] = await Promise.all([
+    fetchAllRows<WordGrammarWithRule>("word_grammar", () =>
+      supabase.from("word_grammar").select("*, grammar_rules(*)").order("id", { ascending: true })
+    ),
+    fetchPosMap(),
+  ]);
 
   const byWord = new Map<number, WordGrammarWithRule[]>();
   for (const row of rows) {
@@ -98,7 +102,7 @@ async function grammarConflictMetrics(): Promise<Metric[]> {
   let conflicts = 0;
   let polysemy = 0;
   for (const wordRows of byWord.values()) {
-    const view = buildGrammarView(wordRows);
+    const view = buildGrammarView(wordRows, posMap);
     if (view.some((a) => a.conflict)) conflicts++;
     if (view.some((a) => a.polysemy)) polysemy++;
   }

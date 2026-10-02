@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { fetchMorphVariants, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
+import { fetchMorphVariants, fetchPosMap, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
@@ -107,12 +107,15 @@ export default async function WordPage({ params, searchParams }: Props) {
   const occPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const word = decodeURIComponent(encoded);
 
-  // Step 1: fetch word + grammar together
-  const { data: wordRow } = await supabase
-    .from("words")
-    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, spelling_reviewed_at, word_grammar(*, grammar_rules(*))")
-    .eq("gurmukhi", word)
-    .single();
+  // Step 1: fetch word + grammar together (and the POS map the view compares through)
+  const [{ data: wordRow }, posMap] = await Promise.all([
+    supabase
+      .from("words")
+      .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, spelling_reviewed_at, word_grammar(*, grammar_rules(*))")
+      .eq("gurmukhi", word)
+      .single(),
+    fetchPosMap(),
+  ]);
 
   if (!wordRow) notFound();
 
@@ -129,7 +132,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Regroup the raw rows into one view per attribute: each value with its
   // distinct sources (cited scholar > dictionary > rule > heuristic), so the UI
   // can corroborate agreement and flag conflicts instead of stacking raw rows.
-  const grammarView = buildGrammarView(grammar);
+  const grammarView = buildGrammarView(grammar, posMap);
   const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel — but only the ones the active
@@ -310,6 +313,9 @@ export default async function WordPage({ params, searchParams }: Props) {
     noun: "Noun", verb: "Verb", adjective: "Adjective", adverb: "Adverb",
     pronoun: "Pronoun", particle: "Particle", postposition: "Postposition",
     conjunction: "Conjunction", interjection: "Interjection", "proper noun": "Proper Noun",
+    // The rest of the pos_mappings vocabulary (#29), so no normalized key shows raw.
+    verb_transitive: "Verb (transitive)", verb_intransitive: "Verb (intransitive)",
+    preposition: "Preposition", numeral: "Numeral", prefix: "Prefix", suffix: "Suffix",
   };
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   // Order per-line commentaries: Sahib Singh first, Faridkot (archaic) last.
@@ -741,6 +747,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                         {r.attestations.map((a, i) => (
                           <div key={i} style={{ marginTop: "0.35rem" }}>
                             <div style={{ fontWeight: 600 }}>{a.sourceLabel}</div>
+                            {a.rawLabel && <div>Recorded in the source as &ldquo;{a.rawLabel}&rdquo;.</div>}
                             {a.explanation && <div>{a.explanation}</div>}
                             {a.citation && <div style={{ fontStyle: "italic", marginTop: "0.2rem" }}>Source: {a.citation}</div>}
                             <div style={{ marginTop: "0.25rem", fontSize: "0.78rem" }}>

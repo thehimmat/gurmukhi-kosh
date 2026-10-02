@@ -15,6 +15,12 @@
  * an open flag from this same reporter, so re-running after a future ingest
  * doesn't pile up duplicates.
  *
+ * Reconciling: an open doubt flag whose grammar row no longer exists (or whose
+ * rule is now verified), and an open conflict flag on a word that no longer
+ * conflicts, are dismissed with a note (e.g. after #29 normalized Shackle
+ * POS strings, most "conflicts" were string artifacts). Only this reporter's
+ * still-open flags are touched; human flags and reviewed flags never are.
+ *
  * Usage (from gurmukhi-kosh project root):
  *   npm run ingest:grammar:autoflag
  *
@@ -28,6 +34,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../shared/db";
 import { buildGrammarView } from "../../lib/grammar-view";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
+import { fetchPosMap } from "../../lib/word-data";
 import type { WordGrammarWithRule } from "../../lib/supabase";
 
 const SYSTEM_REPORTER = "Rule engine (automated)";
@@ -62,16 +69,18 @@ async function hasOpenAutoFlag(
 async function main() {
   const db = supabaseAdmin();
 
-  const rows = await fetchAllGrammarRows(db);
+  const [rows, posMap] = await Promise.all([fetchAllGrammarRows(db), fetchPosMap(db)]);
   console.log(`Fetched ${rows.length} word_grammar rows`);
 
   // --- Doubt: rule_derived rows whose rule isn't yet verified ---
   let doubtCreated = 0;
   let doubtSkipped = 0;
+  const doubtRowIds = new Set<number>();
   for (const row of rows) {
     if (row.provenance !== "rule_derived" || !row.rule_code) continue;
     const rule = row.grammar_rules;
     if (!rule || rule.verified) continue;
+    doubtRowIds.add(row.id);
 
     if (await hasOpenAutoFlag(db, row.word_id, "word_grammar", row.id, "unclear")) {
       doubtSkipped++;
@@ -103,10 +112,12 @@ async function main() {
 
   let conflictCreated = 0;
   let conflictSkipped = 0;
+  const conflictingWords = new Set<number>();
   for (const [wordId, wordRows] of byWord) {
-    const view = buildGrammarView(wordRows);
+    const view = buildGrammarView(wordRows, posMap);
     const conflicting = view.filter((a) => a.conflict);
     if (conflicting.length === 0) continue;
+    conflictingWords.add(wordId);
 
     if (await hasOpenAutoFlag(db, wordId, null, null, "incorrect")) {
       conflictSkipped++;
@@ -130,6 +141,51 @@ async function main() {
     conflictCreated++;
   }
   console.log(`Conflict flags: ${conflictCreated} created, ${conflictSkipped} already open`);
+
+  // --- Reconcile: retire this reporter's flags that no longer hold ---
+  const resolvedAt = new Date().toISOString();
+  const dismiss = async (ids: number[], note: string) => {
+    for (let i = 0; i < ids.length; i += 500) {
+      const { error } = await db
+        .from("flags")
+        .update({ status: "dismissed", resolved_at: resolvedAt, resolution_note: note })
+        .in("id", ids.slice(i, i + 500));
+      if (error) throw new Error(`flag dismiss: ${error.message}`);
+    }
+  };
+
+  // Doubt flags whose word_grammar row is gone (a re-ingest replaces rows, so
+  // the old ids vanish) or whose rule has since been verified.
+  const openDoubtFlags = await fetchAllRows<{ id: number; target_id: number | null }>("open auto doubt flags", () =>
+    db
+      .from("flags")
+      .select("id, target_id")
+      .eq("status", "open")
+      .eq("reporter_name", SYSTEM_REPORTER)
+      .eq("flag_type", "unclear")
+      .eq("target_table", "word_grammar")
+      .order("id", { ascending: true })
+  );
+  const staleDoubt = openDoubtFlags.filter((f) => f.target_id == null || !doubtRowIds.has(f.target_id)).map((f) => f.id);
+  await dismiss(
+    staleDoubt,
+    "Auto-dismissed: the flagged reading no longer exists or its rule is now verified."
+  );
+  console.log(`Doubt flags dismissed as no longer applicable: ${staleDoubt.length}`);
+
+  const openConflictFlags = await fetchAllRows<{ id: number; word_id: number }>("open auto conflict flags", () =>
+    db
+      .from("flags")
+      .select("id, word_id")
+      .eq("status", "open")
+      .eq("reporter_name", SYSTEM_REPORTER)
+      .eq("flag_type", "incorrect")
+      .is("target_table", null)
+      .order("id", { ascending: true })
+  );
+  const stale = openConflictFlags.filter((f) => !conflictingWords.has(f.word_id)).map((f) => f.id);
+  await dismiss(stale, "Auto-dismissed: the grammar view no longer finds a cross-source conflict on this word.");
+  console.log(`Conflict flags dismissed as no longer conflicting: ${stale.length}`);
 }
 
 main().catch((err) => {

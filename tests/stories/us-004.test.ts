@@ -3,8 +3,9 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { anonDb } from "./helpers";
-import { buildGrammarView } from "../../lib/grammar-view";
-import { fetchMorphVariants, fetchRulesByCode } from "../../lib/word-data";
+import { buildGrammarView, normalizePos } from "../../lib/grammar-view";
+import { fetchMorphVariants, fetchPosMap, fetchRulesByCode } from "../../lib/word-data";
+import { fetchAllRows } from "../../lib/fetch-all-rows";
 import type { WordGrammarWithRule } from "../../lib/supabase";
 
 function grammarRow(over: Record<string, unknown>): WordGrammarWithRule {
@@ -52,5 +53,27 @@ describe("US-004: grammar grouped by attribute with citations", () => {
     const rules = await fetchRulesByCode();
     const variants = await fetchMorphVariants((w as { id: number }).id, "ਅਗਨਿ", rules);
     expect(variants.length).toBeGreaterThan(0);
+  });
+
+  // #29: an unmapped label compares as a raw string and fakes a cross-source
+  // conflict. A re-ingest that introduces a new Shackle label must fail here.
+  it("US-004: every stored Shackle POS label normalizes to a controlled part of speech (#29)", async () => {
+    const CONTROLLED = new Set([
+      "noun", "adjective", "verb", "verb_transitive", "verb_intransitive", "pronoun",
+      "postposition", "preposition", "particle", "adverb", "numeral", "interjection",
+      "conjunction", "prefix", "suffix",
+    ]);
+    const [posMap, rows] = await Promise.all([
+      fetchPosMap(db),
+      fetchAllRows<{ pos: string }>("shackle word_grammar pos", () =>
+        db.from("word_grammar").select("id, pos").eq("source_code", "shackle").not("pos", "is", null).order("id")
+      ),
+    ]);
+    expect(rows.length).toBeGreaterThan(5000);
+    const unresolved = new Set<string>();
+    for (const r of rows) {
+      for (const v of normalizePos("shackle", r.pos, posMap)) if (!CONTROLLED.has(v)) unresolved.add(v);
+    }
+    expect([...unresolved]).toEqual([]);
   });
 });

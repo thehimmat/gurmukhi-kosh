@@ -3,7 +3,9 @@
 // same word entry, so the derivations that must stay identical between them —
 // morphological variants and usage partner resolution — live here once.
 
-import { supabase } from "./supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { supabase, type PosMapping } from "./supabase";
+import { posMappingsFrom, type PosMap } from "./grammar-view";
 // Relative (not "@/") so this module also loads under vitest, which does not
 // read the tsconfig path alias.
 import { analyzeNounForm } from "../pipeline/grammar/viakaran";
@@ -17,6 +19,15 @@ export async function fetchRulesByCode(): Promise<Map<string, RuleInfo>> {
     .from("grammar_rules")
     .select("rule_code, title, verified");
   return new Map(((data ?? []) as RuleInfo[]).map((r) => [r.rule_code, r]));
+}
+
+// pos_mappings (#29): every surface that builds a grammar view must compare POS
+// through the same map, or the word page, /health and the autoflag pass drift.
+// The table is tiny (one row per distinct raw label), so no paging is needed.
+export async function fetchPosMap(db: SupabaseClient = supabase): Promise<PosMap> {
+  const { data, error } = await db.from("pos_mappings").select("source_code, pos_raw, pos_norm");
+  if (error) throw new Error(`fetchPosMap: ${error.message}`);
+  return posMappingsFrom((data ?? []) as PosMapping[]);
 }
 
 export type MorphVariant = {

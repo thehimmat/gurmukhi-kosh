@@ -13,7 +13,44 @@
 //     sources back it; a conflict flag when sources disagree.
 // This module is pure and deterministic so it can be unit-tested.
 
-import type { WordGrammarWithRule } from "./supabase";
+import type { PosMapping, WordGrammarWithRule } from "./supabase";
+
+// ---------------------------------------------------------------------------
+// POS normalization (#29). Sources store POS in their own vocabulary (Shackle:
+// "masculine, masculine noun"); comparing those strings to Mahan Kosh's "noun"
+// reported agreeing sources as disagreeing. pos_mappings (migration 023) is the
+// reviewable raw -> normalized table; this is its read side.
+// ---------------------------------------------------------------------------
+
+/** (source_code, pos_raw) -> pos_norm. Build once per request with posMappingsFrom. */
+export type PosMap = ReadonlyMap<string, string>;
+
+const EMPTY_POS_MAP: PosMap = new Map();
+
+const posKey = (sourceCode: string, raw: string) => `${sourceCode}\u0000${raw}`;
+
+export function posMappingsFrom(rows: readonly PosMapping[]): PosMap {
+  return new Map(rows.map((r) => [posKey(r.source_code, r.pos_raw), r.pos_norm]));
+}
+
+// Labels a source attaches ALONGSIDE a part of speech ("possessive; pronoun",
+// "negative; adverb"). They qualify that POS rather than being one, so they are
+// dropped from the POS reading when a real POS accompanies them. Alone, they
+// stay raw: an honest unmapped label beats a guessed category.
+const POS_FEATURE_LABELS = new Set(["possessive", "negative", "enclitic"]);
+
+/**
+ * Normalizes one stored POS string into the part(s) of speech it asserts.
+ * A ";" joins a source's list of POS (the ingest joined Shackle's array), so each
+ * part is mapped separately. Unmapped parts are returned verbatim.
+ */
+export function normalizePos(sourceCode: string | null, raw: string, posMap: PosMap): string[] {
+  const parts = raw.split(";").map((p) => p.trim()).filter(Boolean);
+  const substantive = parts.filter((p) => !POS_FEATURE_LABELS.has(p));
+  const kept = substantive.length > 0 ? substantive : parts;
+  const mapped = kept.map((p) => (sourceCode ? posMap.get(posKey(sourceCode, p)) : undefined) ?? p);
+  return Array.from(new Set(mapped));
+}
 
 export type GrammarAttribute = "pos" | "gender" | "number" | "gram_case" | "verb_form";
 
@@ -42,6 +79,10 @@ export interface Attestation {
   confidenceLabel: string | null; // qualitative band for rule/heuristic; null when cited
   lineId: number | null; // pad-arth source_line_id, for "view the line" links
   ruleCode: string | null;
+  // The source's verbatim label when it was normalized to a different value
+  // (e.g. Shackle "masculine, masculine noun" -> noun). Kept so nothing the
+  // source said is lost; null when the stored value is already the shown one.
+  rawLabel: string | null;
 }
 
 // How each imported source presents itself. Keyed by word_grammar.source_code.
@@ -112,7 +153,7 @@ interface Fact {
   att: Attestation;
 }
 
-function rowToFacts(g: WordGrammarWithRule): Fact[] {
+function rowToFacts(g: WordGrammarWithRule, posMap: PosMap): Fact[] {
   const facts: Fact[] = [];
   const sourced = g.provenance === "imported"; // read from a cited scholar
   const rule = g.grammar_rules;
@@ -135,6 +176,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
       confidenceLabel: null,
       lineId: g.source_line_id ?? null,
       ruleCode: g.rule_code ?? null,
+      rawLabel: null,
     };
   };
 
@@ -142,7 +184,11 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
   // NOT from the row's case rule_code, so attribute it accordingly.
   if (g.pos) {
     if (sourced) {
-      facts.push({ attribute: "pos", value: g.pos, att: scholarAtt() });
+      for (const value of normalizePos(g.source_code, g.pos, posMap)) {
+        const att = scholarAtt();
+        att.rawLabel = value === g.pos ? null : g.pos;
+        facts.push({ attribute: "pos", value, att });
+      }
     } else {
       const inherited = (g.notes ?? "").includes("inherited from lemma");
       facts.push({
@@ -159,6 +205,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
               confidenceLabel: confidenceBand(g.confidence),
               lineId: null,
               ruleCode: null,
+              rawLabel: null,
             }
           : {
               sourceKind: "dictionary",
@@ -170,6 +217,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
               confidenceLabel: null,
               lineId: null,
               ruleCode: null,
+              rawLabel: null,
             },
       });
     }
@@ -186,6 +234,7 @@ function rowToFacts(g: WordGrammarWithRule): Fact[] {
     confidenceLabel: confidenceBand(g.confidence),
     lineId: null,
     ruleCode: g.rule_code ?? null,
+    rawLabel: null,
   });
 
   for (const attribute of ["gender", "number", "gram_case", "verb_form"] as const) {
@@ -203,15 +252,17 @@ function authorityOf(r: AttributeReading): number {
 
 /**
  * Builds the grouped, provenance-aware grammar view for one word's rows.
+ * Pass the pos_mappings map so imported POS strings compare in one vocabulary;
+ * without it, raw strings are compared as stored.
  * Attributes with no asserted value are omitted; attributes appear in a stable
  * order (POS, Gender, Number, Case).
  */
-export function buildGrammarView(rows: WordGrammarWithRule[]): AttributeView[] {
+export function buildGrammarView(rows: WordGrammarWithRule[], posMap: PosMap = EMPTY_POS_MAP): AttributeView[] {
   // attribute → value → attestations (deduped per source kind + rule code)
   const byAttr = new Map<GrammarAttribute, Map<string, Attestation[]>>();
 
   for (const row of rows) {
-    for (const f of rowToFacts(row)) {
+    for (const f of rowToFacts(row, posMap)) {
       let values = byAttr.get(f.attribute);
       if (!values) byAttr.set(f.attribute, (values = new Map()));
       const list = values.get(f.value) ?? [];

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildGrammarView, confidenceBand } from "../lib/grammar-view";
+import { buildGrammarView, confidenceBand, normalizePos, posMappingsFrom } from "../lib/grammar-view";
 import type { WordGrammarWithRule } from "../lib/supabase";
 
 // Minimal row factory; only the fields buildGrammarView reads matter.
@@ -225,5 +225,95 @@ describe("buildGrammarView", () => {
     const pos = view.find((v) => v.attribute === "pos")!;
     expect(pos.polysemy).toBe(true);
     expect(pos.conflict).toBe(false);
+  });
+});
+
+// Issue #29: raw source POS strings are normalized through pos_mappings before
+// comparison, so sources that agree stop reading as a conflict.
+describe("POS normalization (#29)", () => {
+  const posMap = posMappingsFrom([
+    { source_code: "shackle", pos_raw: "masculine, masculine noun", pos_norm: "noun" },
+    { source_code: "shackle", pos_raw: "adjective, adjectival", pos_norm: "adjective" },
+    { source_code: "shackle", pos_raw: "pronoun", pos_norm: "pronoun" },
+    { source_code: "shackle", pos_raw: "adverb, adverbial", pos_norm: "adverb" },
+  ]);
+
+  it("normalizePos maps a raw label through the row's own source", () => {
+    expect(normalizePos("shackle", "masculine, masculine noun", posMap)).toEqual(["noun"]);
+    // The map is per source: another source's identical string is untouched.
+    expect(normalizePos("ss_padarth", "masculine, masculine noun", posMap)).toEqual(["masculine, masculine noun"]);
+  });
+
+  it("normalizePos splits a compound label into one POS per part", () => {
+    expect(normalizePos("shackle", "adjective, adjectival; masculine, masculine noun", posMap)).toEqual([
+      "adjective",
+      "noun",
+    ]);
+  });
+
+  it("normalizePos drops feature labels that qualify another POS", () => {
+    expect(normalizePos("shackle", "possessive; pronoun", posMap)).toEqual(["pronoun"]);
+    expect(normalizePos("shackle", "negative; adverb, adverbial", posMap)).toEqual(["adverb"]);
+  });
+
+  it("normalizePos keeps an unmapped label raw rather than guessing", () => {
+    expect(normalizePos("shackle", "possessive", posMap)).toEqual(["possessive"]);
+    expect(normalizePos("shackle", "something new", posMap)).toEqual(["something new"]);
+  });
+
+  it("normalizePos dedupes parts that map to the same POS", () => {
+    expect(normalizePos("shackle", "masculine, masculine noun; masculine, masculine noun", posMap)).toEqual(["noun"]);
+  });
+
+  it("Shackle 'masculine, masculine noun' corroborates Mahan Kosh 'noun' instead of conflicting (ਮਲੁ)", () => {
+    const view = buildGrammarView(
+      [
+        row({ provenance: "imported", source_code: "shackle", pos: "masculine, masculine noun" }),
+        row({ provenance: "rule_derived", pos: "noun" }),
+      ],
+      posMap
+    );
+    const pos = view.find((v) => v.attribute === "pos")!;
+    expect(pos.readings).toHaveLength(1);
+    expect(pos.readings[0].value).toBe("noun");
+    expect(pos.readings[0].attestations).toHaveLength(2);
+    expect(pos.conflict).toBe(false);
+    expect(pos.polysemy).toBe(false);
+  });
+
+  it("a compound Shackle label is polysemy within one source, not a conflict", () => {
+    const view = buildGrammarView(
+      [row({ provenance: "imported", source_code: "shackle", pos: "adjective, adjectival; masculine, masculine noun" })],
+      posMap
+    );
+    const pos = view.find((v) => v.attribute === "pos")!;
+    expect(pos.readings.map((r) => r.value).sort()).toEqual(["adjective", "noun"]);
+    expect(pos.conflict).toBe(false);
+    expect(pos.polysemy).toBe(true);
+  });
+
+  it("keeps the source's verbatim label on the attestation when it was normalized", () => {
+    const view = buildGrammarView(
+      [row({ provenance: "imported", source_code: "shackle", pos: "masculine, masculine noun" })],
+      posMap
+    );
+    const att = view.find((v) => v.attribute === "pos")!.readings[0].attestations[0];
+    expect(att.rawLabel).toBe("masculine, masculine noun");
+  });
+
+  it("carries no raw label when the stored value is already normalized", () => {
+    const view = buildGrammarView([row({ provenance: "rule_derived", pos: "noun" })], posMap);
+    expect(view.find((v) => v.attribute === "pos")!.readings[0].attestations[0].rawLabel).toBeNull();
+  });
+
+  it("still flags a genuine disagreement after normalization", () => {
+    const view = buildGrammarView(
+      [
+        row({ provenance: "imported", source_code: "shackle", pos: "adjective, adjectival" }),
+        row({ provenance: "rule_derived", pos: "noun" }),
+      ],
+      posMap
+    );
+    expect(view.find((v) => v.attribute === "pos")!.conflict).toBe(true);
   });
 });
