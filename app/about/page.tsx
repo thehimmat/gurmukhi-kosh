@@ -282,11 +282,11 @@ export default function AboutPage() {
           maxWidth: "62ch",
         }}
       >
-        Grammar that is computed from established rules rather than read directly
-        from a source is shown as rule-derived best judgment, with its
-        confidence and the rule it applies, never as a citation. Where two
-        sources disagree, we lead with the cited scholar and flag the
-        difference.
+        Grammar is shown only where a source states it: a cited scholar, or the
+        part-of-speech marker in a Mahan Kosh entry. We do not infer gender,
+        number or case from a word&apos;s spelling, so where no source gives
+        them they are left blank. Where two sources disagree, we lead with the
+        cited scholar and show both readings.
       </p>
     </div>
   );

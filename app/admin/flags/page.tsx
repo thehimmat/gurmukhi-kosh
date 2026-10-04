@@ -29,9 +29,9 @@ const TARGET_LABEL: Record<string, string> = {
 type FlagWithWord = Flag & { words: { gurmukhi: string; frequency: number } | null };
 
 // Must match pipeline/grammar/auto-flag.ts's SYSTEM_REPORTER. A "doubt" flag is
-// an automated one raised for an unverified rule; those dominate at corpus scale
-// (thousands, from ~2 rules) and would bury the handful of genuinely reviewable
-// conflicts + real user submissions, so they live behind their own filter.
+// an automated one raised for an unverified Viakaran ending rule. Those rules
+// were retired (migration 037) and their flags dismissed, but the filter stays
+// so the dismissed history remains browsable apart from real conflicts.
 const SYSTEM_REPORTER = "Rule engine (automated)";
 function isDoubtFlag(f: FlagWithWord): boolean {
   return f.reporter_name === SYSTEM_REPORTER && f.flag_type === "unclear";

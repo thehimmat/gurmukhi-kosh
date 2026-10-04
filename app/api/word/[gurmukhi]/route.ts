@@ -8,17 +8,17 @@
  * Existing fields (word, grammar, definitions, etymology, morphological_variants)
  * are preserved for backward compatibility with gurmukhi-search consumers.
  *
- * `grammar` rows are NOT uniformly reliable. Some are read from a cited scholar;
- * others are derived by our own rule engine, and some of those rules are known to
- * be contradicted by the source (issue #21). Each row therefore carries its
- * `grammar_rules` join, and `grammar_caveats` names every unverified rule the
- * payload depends on. Consumers presenting this data should surface that
- * distinction rather than rendering all grammar as equally established.
+ * `grammar` rows are each read from a named source (`source_code`): a cited
+ * scholar (Sahib Singh's pad-arth, Shackle) or a Mahan Kosh part-of-speech
+ * marker. Nothing is inferred from a word's spelling (#30); the Viakaran ending
+ * rules that used to fill case/number/gender were retired by migration 037.
+ * Each row still carries its `grammar_rules` join (pad-arth extraction rules),
+ * and `grammar_caveats` names any unverified rule the payload depends on.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { fetchMorphVariants, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
+import { fetchMorphVariants, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 
 type Params = { params: Promise<{ gurmukhi: string }> };
 
@@ -33,9 +33,7 @@ type GrammarRow = {
  *
  * A JSON consumer strips whatever framing the HTML carries, so the caveat has to
  * travel with the data. `verified = false` means the rule has not been confirmed
- * against the published source — and for MUKTA_OBL_SG and SIHARI_OBL_SG the source
- * actively contradicts the rule as stated (see issue #21). Readings derived from
- * those rules are our working inference, not a scholar's statement.
+ * against the published source.
  */
 function buildCaveats(rows: GrammarRow[]) {
   const seen = new Map<string, { rule_code: string; title: string; citation: string | null }>();
@@ -56,10 +54,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
   // Fetch word + grammar + pronunciation
   const { data: wordRow, error: wordErr } = await supabase
     .from("words")
-    // grammar_rules is joined so every rule-derived reading ships with the rule
-    // that produced it — its tier, its citation, and crucially whether it has been
-    // verified against the published source. Without it a consumer receives a bare
-    // rule_code and no way to know the reading rests on an unverified rule.
+    // grammar_rules is joined so a reading extracted by rule (pad-arth) ships
+    // with that rule's tier, citation, and whether it has been verified.
     // Kept as one string literal: Supabase parses the select at compile time to
     // infer the row type, and a concatenated expression defeats that.
     .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*, grammar_rules(rule_code, title, tier, verified, citation))")
@@ -77,10 +73,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     word_grammar: GrammarRow[];
   };
 
-  // Parallel: definitions, etymology, rule registry, usage, writer stats.
+  // Parallel: definitions, etymology, usage, writer stats.
   // The morphological-variant and usage derivations are shared with the word
   // page via lib/word-data.ts so the two surfaces cannot drift.
-  const [defsResult, etymResult, rulesByCode, usage, writerRows] = await Promise.all([
+  const [defsResult, etymResult, usage, writerRows] = await Promise.all([
     supabase
       .from("definitions")
       .select("id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
@@ -94,18 +90,19 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .eq("word_id", wordId)
       .order("order_index"),
 
-    fetchRulesByCode(),
     fetchUsage(wordId),
     fetchWriterStats(wordId, 10),
   ]);
 
-  // inflection_desc keeps its key for backward compatibility; rule_code and
-  // rule_verified are only meaningful when a label was derived.
-  const morphological_variants = (await fetchMorphVariants(wordId, word, rulesByCode)).map((v) => ({
+  // inflection_desc keeps its key for backward compatibility and now carries
+  // the source's own label. rule_code / rule_verified are kept for existing
+  // consumers but are always null: no variant label is rule-derived any more.
+  const morphological_variants = (await fetchMorphVariants(wordId, word)).map((v) => ({
     gurmukhi: v.gurmukhi,
     inflection_desc: v.label,
-    rule_code: v.label ? v.ruleCode : null,
-    rule_verified: v.label ? v.ruleVerified : null,
+    source_code: v.sourceCode,
+    rule_code: null,
+    rule_verified: null,
   }));
 
   const phrases = usage.phrases;

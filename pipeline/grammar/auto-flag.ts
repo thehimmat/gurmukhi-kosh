@@ -1,25 +1,22 @@
 /**
  * Auto-flagging pass (P4) over word_grammar: raises a system flag for every
- * reading that carries genuine "doubt" or "conflict", so a human reviews
- * exactly the readings worth reviewing instead of the whole corpus.
+ * word whose sources disagree, so a human reviews exactly the readings worth
+ * reviewing instead of the whole corpus.
  *
- *   - doubt:    a rule_derived row whose rule is still grammar_rules.verified=false
- *               (currently SIHARI_OBL_SG, MUKTA_OBL_SG). Targets that specific
- *               word_grammar row.
  *   - conflict: buildGrammarView finds cross-source disagreement on some
  *               attribute for the word (the same signal the word page and
  *               /health already surface). Targets the word generally, matching
  *               how the interactive grammar FlagForm targets conflicts.
  *
- * Idempotent: skips a (word, target, flag_type) combination that already has
- * an open flag from this same reporter, so re-running after a future ingest
- * doesn't pile up duplicates.
+ * Idempotent: skips a word that already has an open conflict flag from this
+ * same reporter, so re-running after a future ingest doesn't pile up duplicates.
  *
- * Reconciling: an open doubt flag whose grammar row no longer exists (or whose
- * rule is now verified), and an open conflict flag on a word that no longer
- * conflicts, are dismissed with a note (e.g. after #29 normalized Shackle
- * POS strings, most "conflicts" were string artifacts). Only this reporter's
- * still-open flags are touched; human flags and reviewed flags never are.
+ * Reconciling: an open conflict flag on a word that no longer conflicts is
+ * dismissed with a note (e.g. after #29 normalized Shackle POS strings, most
+ * "conflicts" were string artifacts). So is any remaining "doubt" flag: those
+ * targeted readings from the retired Viakaran ending rules, which no longer
+ * exist (migration 037 archived them). Only this reporter's still-open flags
+ * are touched; human flags and reviewed flags never are.
  *
  * Usage (from gurmukhi-kosh project root):
  *   npm run ingest:grammar:autoflag
@@ -71,36 +68,6 @@ async function main() {
 
   const [rows, posMap] = await Promise.all([fetchAllGrammarRows(db), fetchPosMap(db)]);
   console.log(`Fetched ${rows.length} word_grammar rows`);
-
-  // --- Doubt: rule_derived rows whose rule isn't yet verified ---
-  let doubtCreated = 0;
-  let doubtSkipped = 0;
-  const doubtRowIds = new Set<number>();
-  for (const row of rows) {
-    if (row.provenance !== "rule_derived" || !row.rule_code) continue;
-    const rule = row.grammar_rules;
-    if (!rule || rule.verified) continue;
-    doubtRowIds.add(row.id);
-
-    if (await hasOpenAutoFlag(db, row.word_id, "word_grammar", row.id, "unclear")) {
-      doubtSkipped++;
-      continue;
-    }
-    const { error } = await db.from("flags").insert({
-      word_id: row.word_id,
-      target_table: "word_grammar",
-      target_id: row.id,
-      flag_type: "unclear",
-      message: `Auto-flagged: this reading comes from an unverified rule (${rule.title}). ${rule.explanation}`,
-      reporter_name: SYSTEM_REPORTER,
-    });
-    if (error) {
-      console.error(`doubt flag insert error (word_grammar ${row.id}):`, error.message);
-      continue;
-    }
-    doubtCreated++;
-  }
-  console.log(`Doubt flags: ${doubtCreated} created, ${doubtSkipped} already open`);
 
   // --- Conflict: cross-source disagreement on some attribute, per word ---
   const byWord = new Map<number, WordGrammarWithRule[]>();
@@ -154,24 +121,23 @@ async function main() {
     }
   };
 
-  // Doubt flags whose word_grammar row is gone (a re-ingest replaces rows, so
-  // the old ids vanish) or whose rule has since been verified.
-  const openDoubtFlags = await fetchAllRows<{ id: number; target_id: number | null }>("open auto doubt flags", () =>
+  // Doubt flags: every one targeted a retired ending-rule reading.
+  const openDoubtFlags = await fetchAllRows<{ id: number }>("open auto doubt flags", () =>
     db
       .from("flags")
-      .select("id, target_id")
+      .select("id")
       .eq("status", "open")
       .eq("reporter_name", SYSTEM_REPORTER)
       .eq("flag_type", "unclear")
       .eq("target_table", "word_grammar")
       .order("id", { ascending: true })
   );
-  const staleDoubt = openDoubtFlags.filter((f) => f.target_id == null || !doubtRowIds.has(f.target_id)).map((f) => f.id);
+  const staleDoubt = openDoubtFlags.map((f) => f.id);
   await dismiss(
     staleDoubt,
-    "Auto-dismissed: the flagged reading no longer exists or its rule is now verified."
+    "Auto-dismissed: the flagged reading came from a retired Viakaran ending rule and is no longer shown (migration 037)."
   );
-  console.log(`Doubt flags dismissed as no longer applicable: ${staleDoubt.length}`);
+  console.log(`Doubt flags dismissed: ${staleDoubt.length}`);
 
   const openConflictFlags = await fetchAllRows<{ id: number; word_id: number }>("open auto conflict flags", () =>
     db

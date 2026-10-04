@@ -26,7 +26,7 @@ export const WORD_SETS: Record<string, WordSetSpec> = {
   all: {
     code: "all",
     name: "Full corpus",
-    description: "Every ang (1-1430) — widens rule-derived grammar past the Japji pilot.",
+    description: "Every ang (1-1430) — widens grammar ingest past the Japji pilot.",
     definition: { type: "ang_range", start: 1, end: 1430 },
   },
 };

@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { buildGrammarView, confidenceBand, normalizePos, posMappingsFrom } from "../lib/grammar-view";
+import { buildGrammarView, normalizePos, posMappingsFrom } from "../lib/grammar-view";
 import type { WordGrammarWithRule } from "../lib/supabase";
 
-// Minimal row factory; only the fields buildGrammarView reads matter.
+// Minimal row factory; only the fields buildGrammarView reads matter. The
+// default is a Mahan Kosh part-of-speech row, the one non-scholar row the
+// grammar pipeline still writes.
 function row(p: Partial<WordGrammarWithRule>): WordGrammarWithRule {
   return {
     id: Math.random(),
@@ -17,9 +19,9 @@ function row(p: Partial<WordGrammarWithRule>): WordGrammarWithRule {
     confidence: null,
     person: null,
     verb_form: null,
-    source_code: null,
+    source_code: "mahan_kosh",
     source_line_id: null,
-    provenance: "rule_derived",
+    provenance: "scraped",
     review_status: "unreviewed",
     grammar_rules: null,
     ...p,
@@ -36,50 +38,41 @@ const rule = (over: Partial<NonNullable<WordGrammarWithRule["grammar_rules"]>>) 
   ...over,
 });
 
-describe("confidenceBand", () => {
-  it("maps scores to qualitative bands and never to a number", () => {
-    expect(confidenceBand(0.9)).toBe("Very high");
-    expect(confidenceBand(0.8)).toBe("High");
-    expect(confidenceBand(0.6)).toBe("Moderate");
-    expect(confidenceBand(0.45)).toBe("Low");
-    expect(confidenceBand(0.2)).toBe("Very low");
-  });
-  it("returns null for a cited fact (no probabilistic confidence)", () => {
-    expect(confidenceBand(null)).toBeNull();
-    expect(confidenceBand(undefined)).toBeNull();
-  });
-});
+// A row shaped like the retired Viakaran ending rules wrote (#21/#27/#117):
+// no source, values inferred from the word's spelling.
+const inferred = (p: Partial<WordGrammarWithRule>) =>
+  row({ provenance: "rule_derived", source_code: null, confidence: 0.85, ...p });
 
-describe("buildGrammarView", () => {
-  it("corroborates when a scholar and a rule agree (ਵੀਚਾਰੁ masculine)", () => {
+describe("buildGrammarView: only values a source states are shown", () => {
+  it("shows nothing from a row inferred by an ending rule, even a verified one", () => {
     const view = buildGrammarView([
-      row({
-        provenance: "imported",
+      inferred({
+        pos: "pronoun",
         gender: "masculine",
-        source_code: "ss_padarth",
-        source_line_id: 141,
-        rule_code: "SS_PADARTH_GENDER",
-        grammar_rules: rule({ rule_code: "SS_PADARTH_GENDER", tier: "source_extraction", verified: true, citation: "Darpan pad-arth" }),
-      }),
-      row({
-        provenance: "rule_derived",
-        gender: "masculine",
-        confidence: 0.85,
+        number: "singular",
+        gram_case: "direct",
         rule_code: "AUNKAR_NOM_SG",
         grammar_rules: rule({ rule_code: "AUNKAR_NOM_SG", verified: true }),
       }),
     ]);
-    const gender = view.find((v) => v.attribute === "gender")!;
-    expect(gender.conflict).toBe(false);
-    expect(gender.readings).toHaveLength(1);
-    expect(gender.readings[0].value).toBe("masculine");
-    // Two distinct sources corroborate, scholar listed first.
-    expect(gender.readings[0].attestations).toHaveLength(2);
-    expect(gender.readings[0].attestations[0].sourceKind).toBe("scholar");
-    expect(gender.readings[0].attestations[1].sourceKind).toBe("rule");
+    expect(view).toEqual([]);
   });
 
-  it("flags a conflict and leads with the scholar (ਤਿਨ: plural vs rule singular)", () => {
+  it("shows nothing from a POS carried over from a similarly spelled word", () => {
+    const view = buildGrammarView([inferred({ pos: "noun", confidence: 0.6, notes: "POS inherited from lemma ਹੁਕਮ." })]);
+    expect(view).toEqual([]);
+  });
+
+  it("takes only POS from a Mahan Kosh row; it states no case, number or gender", () => {
+    const view = buildGrammarView([row({ pos: "noun", gram_case: "oblique", number: "singular" })]);
+    expect(view.map((v) => v.attribute)).toEqual(["pos"]);
+    const att = view[0].readings[0].attestations[0];
+    expect(att.sourceKind).toBe("dictionary");
+    expect(att.sourceLabel).toBe("Mahan Kosh marker");
+    expect(att.verified).toBe(true);
+  });
+
+  it("an inferred reading never conflicts with a scholar (ਤਿਨ: pad-arth plural stands alone)", () => {
     const view = buildGrammarView([
       row({
         provenance: "imported",
@@ -89,84 +82,63 @@ describe("buildGrammarView", () => {
         rule_code: "SS_PADARTH_NUMBER",
         grammar_rules: rule({ rule_code: "SS_PADARTH_NUMBER", tier: "source_extraction", verified: true }),
       }),
-      row({
-        provenance: "rule_derived",
-        pos: "pronoun",
-        number: "singular",
-        confidence: 0.7,
-        rule_code: "MUKTA_OBL_SG",
-        grammar_rules: rule({ rule_code: "MUKTA_OBL_SG", verified: false }),
-      }),
+      inferred({ number: "singular", rule_code: "MUKTA_OBL_SG", grammar_rules: rule({ rule_code: "MUKTA_OBL_SG" }) }),
     ]);
     const number = view.find((v) => v.attribute === "number")!;
-    expect(number.conflict).toBe(true);
-    expect(number.readings[0].value).toBe("plural"); // scholar leads
-    expect(number.readings[0].attestations[0].sourceKind).toBe("scholar");
-    expect(number.readings[1].value).toBe("singular"); // rule reading demoted
-    expect(number.readings[1].attestations[0].sourceKind).toBe("rule");
-    expect(number.readings[1].attestations[0].confidenceLabel).toBe("High");
+    expect(number.readings).toHaveLength(1);
+    expect(number.readings[0].value).toBe("plural");
+    expect(number.readings[0].attestations).toHaveLength(1);
+    expect(number.conflict).toBe(false);
   });
 
-  it("attributes a rule row's POS to Mahan Kosh, not its case rule_code (ਕੋਟਿ)", () => {
+  it("an inferred reading does not count as corroboration (ਵੀਚਾਰੁ masculine)", () => {
     const view = buildGrammarView([
       row({
         provenance: "imported",
+        gender: "masculine",
+        source_code: "ss_padarth",
+        rule_code: "SS_PADARTH_GENDER",
+        grammar_rules: rule({ rule_code: "SS_PADARTH_GENDER", tier: "source_extraction", verified: true }),
+      }),
+      inferred({ gender: "masculine", rule_code: "AUNKAR_NOM_SG", grammar_rules: rule({ rule_code: "AUNKAR_NOM_SG", verified: true }) }),
+    ]);
+    const gender = view.find((v) => v.attribute === "gender")!;
+    expect(gender.readings[0].attestations).toHaveLength(1);
+    expect(gender.readings[0].attestations[0].sourceKind).toBe("scholar");
+  });
+});
+
+describe("buildGrammarView", () => {
+  it("a scholar-vs-Mahan Kosh disagreement is a conflict led by the scholar (ਕੋਟਿ)", () => {
+    const view = buildGrammarView([
+      row({
+        provenance: "imported",
+        source_code: "ss_padarth",
         pos: "adjective",
         rule_code: "SS_PADARTH_POS",
         grammar_rules: rule({ rule_code: "SS_PADARTH_POS", tier: "source_extraction", verified: true }),
       }),
-      row({
-        provenance: "rule_derived",
-        pos: "noun",
-        gram_case: "oblique",
-        confidence: 0.8,
-        rule_code: "SIHARI_OBL_SG",
-        grammar_rules: rule({ rule_code: "SIHARI_OBL_SG", verified: false }),
-      }),
+      row({ pos: "noun" }),
     ]);
     const pos = view.find((v) => v.attribute === "pos")!;
     expect(pos.conflict).toBe(true);
-    expect(pos.readings[0].value).toBe("adjective"); // scholar leads
-    // the rule-derived noun POS is attributed to the dictionary, not the rule
-    const nounReading = pos.readings.find((r) => r.value === "noun")!;
-    expect(nounReading.attestations[0].sourceKind).toBe("dictionary");
+    expect(pos.polysemy).toBe(false);
+    expect(pos.readings[0].value).toBe("adjective");
+    expect(pos.readings[0].attestations[0].sourceKind).toBe("scholar");
+    expect(pos.readings.find((r) => r.value === "noun")!.attestations[0].sourceKind).toBe("dictionary");
   });
 
-  it("treats one source listing several values as polysemy, not a conflict (ਇਕ noun/adjective)", () => {
-    // Mahan Kosh gives ਇਕ both a noun and an adjective sense; both decompose to
-    // the dictionary as POS source, so it's polysemy — not a contradiction.
-    const view = buildGrammarView([
-      row({ provenance: "rule_derived", pos: "noun", confidence: 0.7, rule_code: "MUKTA_OBL_SG", grammar_rules: rule({ rule_code: "MUKTA_OBL_SG" }) }),
-      row({ provenance: "rule_derived", pos: "adjective", confidence: 0.7, rule_code: "MUKTA_OBL_SG", grammar_rules: rule({ rule_code: "MUKTA_OBL_SG" }) }),
-    ]);
+  it("treats Mahan Kosh listing several POS as polysemy, not a conflict (ਇਕ noun/adjective)", () => {
+    const view = buildGrammarView([row({ pos: "noun" }), row({ pos: "adjective" })]);
     const pos = view.find((v) => v.attribute === "pos")!;
     expect(pos.polysemy).toBe(true);
     expect(pos.conflict).toBe(false);
     expect(pos.readings).toHaveLength(2);
   });
 
-  it("a scholar-vs-dictionary disagreement is a conflict, not polysemy (ਕੋਟਿ)", () => {
-    const view = buildGrammarView([
-      row({ provenance: "imported", pos: "adjective", rule_code: "SS_PADARTH_POS", grammar_rules: rule({ rule_code: "SS_PADARTH_POS", tier: "source_extraction", verified: true }) }),
-      row({ provenance: "rule_derived", pos: "noun", confidence: 0.8, rule_code: "SIHARI_OBL_SG", grammar_rules: rule({ rule_code: "SIHARI_OBL_SG" }) }),
-    ]);
-    const pos = view.find((v) => v.attribute === "pos")!;
-    expect(pos.conflict).toBe(true);
-    expect(pos.polysemy).toBe(false);
-  });
-
-  it("labels an inherited POS as a heuristic with a confidence band", () => {
-    const view = buildGrammarView([
-      row({ provenance: "rule_derived", pos: "noun", confidence: 0.6, notes: "POS inherited from lemma ਹੁਕਮ." }),
-    ]);
-    const att = view.find((v) => v.attribute === "pos")!.readings[0].attestations[0];
-    expect(att.sourceKind).toBe("heuristic");
-    expect(att.confidenceLabel).toBe("Moderate");
-  });
-
   it("omits attributes with no asserted value and orders POS→Gender→Number→Case", () => {
     const view = buildGrammarView([
-      row({ provenance: "rule_derived", gram_case: "nominative", gender: "masculine", confidence: 0.85, grammar_rules: rule({}) }),
+      row({ provenance: "imported", source_code: "shackle", gram_case: "direct", gender: "masculine" }),
     ]);
     expect(view.map((v) => v.attribute)).toEqual(["gender", "gram_case"]);
   });
@@ -269,7 +241,7 @@ describe("POS normalization (#29)", () => {
     const view = buildGrammarView(
       [
         row({ provenance: "imported", source_code: "shackle", pos: "masculine, masculine noun" }),
-        row({ provenance: "rule_derived", pos: "noun" }),
+        row({ pos: "noun" }),
       ],
       posMap
     );
@@ -302,7 +274,7 @@ describe("POS normalization (#29)", () => {
   });
 
   it("carries no raw label when the stored value is already normalized", () => {
-    const view = buildGrammarView([row({ provenance: "rule_derived", pos: "noun" })], posMap);
+    const view = buildGrammarView([row({ pos: "noun" })], posMap);
     expect(view.find((v) => v.attribute === "pos")!.readings[0].attestations[0].rawLabel).toBeNull();
   });
 
@@ -310,7 +282,7 @@ describe("POS normalization (#29)", () => {
     const view = buildGrammarView(
       [
         row({ provenance: "imported", source_code: "shackle", pos: "adjective, adjectival" }),
-        row({ provenance: "rule_derived", pos: "noun" }),
+        row({ pos: "noun" }),
       ],
       posMap
     );

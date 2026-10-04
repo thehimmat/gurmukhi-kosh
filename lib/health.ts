@@ -78,6 +78,13 @@ type HealthStats = {
   open_flags_by_type: { flag_type: string; rows: number }[];
 };
 
+// word_grammar provenance → what it means for a grammar row (#30: every row is
+// read from a named source). An unexpected value shows raw, so it stands out.
+const GRAMMAR_PROVENANCE_LABEL: Record<string, string> = {
+  imported: "scholar-cited (pad-arth, Shackle)",
+  scraped: "Mahan Kosh part-of-speech marker",
+};
+
 function pct(part: number, whole: number): string {
   return whole > 0 ? `${((100 * part) / whole).toFixed(1)}%` : "n/a";
 }
@@ -231,20 +238,20 @@ export async function computeHealth(): Promise<HealthReport> {
     { key: "words_with_any_grammar", label: "Words with any grammar", group: "Grammar", value: s.words_with_any_grammar },
     {
       key: "sourced_vs_rule",
-      label: "Sourced vs. rule-derived grammar",
+      label: "Grammar by source type",
       group: "Grammar",
       value: s.sourced_vs_rule.map((r) => ({
-        provenance: r.provenance === "imported" ? "sourced (cited)" : "rule-derived",
+        provenance: GRAMMAR_PROVENANCE_LABEL[r.provenance] ?? r.provenance,
         rows: r.rows,
         words: r.words,
       })),
     },
     {
       key: "sourced_only_words",
-      label: "Words with sourced grammar the rule engine never touched",
+      label: "Words with scholar-cited grammar and no Mahan Kosh marker",
       group: "Grammar",
       value: s.sourced_only_words,
-      note: "Scholar-cited grammar (pad-arth) filling a gap the Japji-scoped rule engine doesn't cover.",
+      note: "Grammar from Sahib Singh's pad-arth or Shackle on words whose Mahan Kosh entry gives no part-of-speech marker.",
     },
     ...grammarConflictM,
     { key: "grammar_unreviewed", label: "Grammar rows awaiting scholar review", group: "Grammar", value: s.grammar_unreviewed, status: "info" },
