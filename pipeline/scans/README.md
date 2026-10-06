@@ -81,6 +81,24 @@ Historical ingest candidates: Sri Gur Sobha, Shaheed Bilas, Sau Sakhi, Hanuman N
   - The Granthavali excerpt is missing Joti Bigas couplets 1–69.
   - Reet Ratnavali Part 1 is only a 44-page preview.
 
+## Sarbloh Granth: public sources (archive.org, checked 2026-10-06)
+
+The goal is a canonical text that rests on public-domain manuscripts, with modern editions kept as witnesses.
+
+| role | item | notes |
+|---|---|---|
+| **canonical exemplar** (public domain) | 1878 CE Bhai Chanda Singh bir: `sarbloh_granth_color/sarbloh_1878ce_bhai_chanda_singh.pdf` (also `sarbloh_granth_bir`) | 1003 flat single-page scans by the Panjab Digital Library. Clear larivaar hand, red rubrics, a table of contents, numbered verses. The date is written inside in Bikrami. |
+| public-domain witness | 1698 CE Mastuana Sahib bir: `sarbloh_granth_color/sarbloh_1698ce_mastuana_sahib_bir.pdf` | 453 photos of open spreads. Older (as dated by the uploader) but smaller, crinkled and harder to read. Use it where the 1878 bir is unclear. |
+| low-value witness | Mai Bhago bir: `sarbloh_granth_color/sarbloh_mai_bhago_bir.pdf` | Handheld photos, curved pages. |
+| transcription aid / witness | Typed PDF: `sarbloh_granth/sarbloh_granth.pdf` | A 2022 page-for-page retyping of the Budha Dal print in GurbaniAkhar. Its back page names Budha Dal under Baba Maan Singh as publisher, so despite the uploader's PD mark its rights are Budha Dal's. Converts without OCR and supplies word division (the manuscripts are larivaar). |
+| scholarly witness | *Shudh Paath* critical edition, Jasvant Singh: `sarbloh_critical_edition` | Base text is the Sachkhand Hazur Sahib bir, collated with the Mastuana, Khalsa College, Shahi Samadhan Sangrur and Angitha Sahib Patiala birs, with a full apparatus. Modern scholarship, so treat it as the editor's copyright. The text layer is scrambled, so it needs OCR. |
+| witnesses | the user's Budha Dal text-only print and the 2000 steek | See manifest.yaml. |
+
+Planned method:
+1. Convert the typed PDF and align it to the 1878 bir's pages by text. The bir's verse numbering restarts per section and doesn't match the print's running numbers, so number matching won't work.
+2. Check each line against the manuscript image. Where they differ, the canonical text takes the 1878 reading and records the print's reading as a variant.
+3. Use the 1698 bir and the critical edition's apparatus to settle unclear places.
+
 ## Tooling
 
 `npm run scans:check < lines.txt` reads Unicode Gurmukhi sample lines from a section and prints its
