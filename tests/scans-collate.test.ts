@@ -54,6 +54,11 @@ describe("editionFold", () => {
     expect(editionFold("ਪ੍ਰਗਟ")).toBe(editionFold("ਪੁਗਟ"));
   });
 
+  it("folds the manuscript's ਏ endings to the print's ਯ forms (ਜਾਪੀਏ / ਜਾਪੀਯੈ)", () => {
+    expect(editionFold("ਜਾਪੀਏ")).toBe(editionFold("ਜਾਪੀਯੈ"));
+    expect(editionFold("ਗਾਈਏ")).toBe(editionFold("ਗਾਇਯੈ"));
+  });
+
   it("keeps genuinely different words apart", () => {
     expect(editionFold("ਹਰਿ")).not.toBe(editionFold("ਮਾਇਆ"));
     expect(editionFold("ਸੇਵਕ")).not.toBe(editionFold("ਸੇਵਿ"));
@@ -88,6 +93,8 @@ describe("isHeading", () => {
     expect(isHeading("ਬਿਸਨੁਪਦ ਰਾਗੁ ਭੈਰਉ ਦੂਜੀ ਤਰਹ")).toBe(true);
     expect(isHeading("ਪੰਚਾਲ ਦੋਹਰਾ")).toBe(true);
     expect(isHeading("ਛਪਯ ਛੰਦ")).toBe(true);
+    expect(isHeading("ਪਉੜੀ ਚੰਪਕ ਕੀ")).toBe(true);
+    expect(isHeading("ਚਉਪਯਾ ਛੰਤ ਅਥ ਸਮਰ ਜਾਤਾ ਸ੍ਰੀ ਵਿਸਨੁ ਕਥਤੇ")).toBe(true);
   });
 
   it("does not treat verse text as a heading", () => {
@@ -133,6 +140,11 @@ describe("classify", () => {
     expect(classify("ਕਾਲ ਰੱਛ ਤਾਰਨ ਪ੍ਰਭੂ ਮਾਯਾ ਰੂਪ ਮੁਰਾਰਿ", "ਕਾਲਰਛ ਤਾਰਨ ਪ੍ਰਭੂ ਮਾਇਆ ਰੂਪ ਮੁਰਾਰ")).toBe("same");
     expect(classify("ਤੁਮ ਸਮ ਧਨੀ ਨ ਮੋ ਸਮ ਜਾਚਿਕ ਪ੍ਰਭੁ ਮਾਂਗਉ ਦੇਤ ਦਾਤਾਰੇ", "ਤੁਮ ਸਮ ਧਨੀ ਨ ਮੋ ਸਮ ਜਾਚਿਕ ਪ੍ਰਭ ਦਾਨ ਦੇਹ ਦਾਤਾਰੇ")).toBe("probable");
     expect(classify("ਗੁਪਤਿ ਪ੍ਰਗਟਿ ਸਭ ਘਟਿ ਬਿਖੈ ਵਰਤੇ ਰੂਪ ਅਪਾਰ", "ਜਬ ਰਚਨਾ ਖਿੰਚੀ ਸਕਲ ਤਬ ਆਪੇ ਆਪ ਮੁਰਾਰ")).toBe("definite");
+  });
+
+  it("bands a half-line the other edition broke in two as split, not as a variant", () => {
+    expect(classify("ਬਿਮਲ ਰਤਨ ਜਗਮਗ ਦੁਤਿ ਕ੍ਰਾਂਤਾ ਸੁਭਗ ਮਨੋਹਰ ਦੁਰਤ ਬਿਧਾਤਾ", "ਬਿਮਲ ਰਤਨ ਜਗਮਗ ਦੁਤਿ ਕ੍ਰਾਂਤਾ")).toBe("split");
+    expect(classify("ਸੁਭਗ ਮਨੋਹਰ", "ਬਿਮਲ ਰਤਨ ਜਗਮਗ ਦੁਤਿ ਕ੍ਰਾਂਤਾ ਸੁਭਗ ਮਨੋਹਰ ਦੁਰਤ ਬਿਧਾਤਾ")).toBe("split");
   });
 
   it("reports headings and missing lines separately", () => {

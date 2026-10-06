@@ -48,6 +48,9 @@ const FOLDS: Array<[string, string]> = [
   ["ੂ", "ੁ"],
   ["ੈ", "ੇ"],
   ["ੌ", "ਉ"],
+  ["ਈ", "ਇ"],
+  ["ਊ", "ਉ"],
+  ["ਏ", "ਇੇ"], // manuscripts end words in ਏ where prints write ਯੈ (ਜਾਪੀਏ / ਜਾਪੀਯੈ)
   ["੍ਯਾ", "ਿਆ"],
   ["੍ਯ", "ਿਅ"],
   ["ਯਾ", "ਇਆ"],
@@ -94,7 +97,7 @@ export function similarity(a: string, b: string): number {
 }
 
 const HEADING_WORDS = new Set(
-  "ਦੋਹਰਾ ਦੋਹਿਰਾ ਦੋਹਾ ਸੋਰਠਾ ਚੌਪਈ ਚਉਪਈ ਛਪਯ ਛਪੈ ਛੰਦ ਸਵਯਾ ਸਵੈਯਾ ਸ੍ਵੈਯਾ ਬਿਸਨਪਦ ਬਿਸਨੁਪਦ ਬਿਸ੍ਨਪਦ ਰਾਗ ਰਾਗੁ ਤਰਹ ਅੜਿਲ ਭੁਜੰਗ ਪ੍ਰਯਾਤ ਨਰਾਜ ਕਬਿਤ ਤੋਮਰ ਪਾਧੜੀ ਰਹਾਉ ਅਸਟਪਦੀ ਤਿਪਦਾ ਪੜਤਾਲ"
+  "ਦੋਹਰਾ ਦੋਹਿਰਾ ਦੋਹਾ ਸੋਰਠਾ ਚੌਪਈ ਚਉਪਈ ਛਪਯ ਛਪੈ ਛੰਦ ਸਵਯਾ ਸਵੈਯਾ ਸ੍ਵੈਯਾ ਬਿਸਨਪਦ ਬਿਸਨੁਪਦ ਬਿਸ੍ਨਪਦ ਰਾਗ ਰਾਗੁ ਤਰਹ ਅੜਿਲ ਭੁਜੰਗ ਪ੍ਰਯਾਤ ਨਰਾਜ ਕਬਿਤ ਤੋਮਰ ਪਾਧੜੀ ਰਹਾਉ ਅਸਟਪਦੀ ਤਿਪਦਾ ਪੜਤਾਲ ਪਉੜੀ ਛੰਤ ਚਉਪਯਾ ਕਥਤੇ ਲਿਖਯਤੇ ਸਲੋਕ ਕਬਿਤੁ ਸਵਈਆ ਬੈਂਤ"
     .split(" ")
     .map(editionFold),
 );
@@ -102,17 +105,24 @@ const HEADING_WORDS = new Set(
 /** A metre or raag label (ਪੰਚਾਲ ਦੋਹਰਾ, ਬਿਸਨੁਪਦ ਰਾਗੁ ਭੈਰਉ ਦੂਜੀ ਤਰਹ) rather than verse text. */
 export function isHeading(text: string): boolean {
   const words = text.split(/\s+/).map(editionFold).filter(Boolean);
-  return words.length > 0 && words.length <= 7 && words.some((w) => HEADING_WORDS.has(w));
+  return words.length > 0 && words.length <= 10 && words.some((w) => HEADING_WORDS.has(w));
 }
 
-export type Band = "same" | "probable" | "definite" | "heading" | "missing";
+export type Band = "same" | "probable" | "definite" | "heading" | "split" | "missing";
 
-/** Band a pair of half-lines: same (spelling only), probable or definite variant, heading, missing. */
+// One side is (nearly) a part of the other: an edition broke the half-line at a single danda.
+function isSplit(a: string, b: string): boolean {
+  const [short, long] = [[...foldLetters(a)], [...foldLetters(b)]].sort((x, y) => x.length - y.length);
+  return short.length > 0 && short.length / long.length <= 0.8 && lcs(short, long) / short.length >= 0.9;
+}
+
+/** Band a pair of half-lines: same (spelling only), probable or definite variant, heading, split, missing. */
 export function classify(base: string, other: string | null): Band {
   if (other === null) return "missing";
   const s = similarity(base, other);
   if (s >= 90) return "same";
   if (isHeading(base) || isHeading(other)) return "heading";
+  if (isSplit(base, other)) return "split";
   return s >= 75 ? "probable" : "definite";
 }
 
