@@ -1,14 +1,18 @@
 // Grammar presentation model.
 //
-// The word page stores grammar as word_grammar rows, but a single rule-derived
-// row is multi-attribute (POS + case + number together) and mixes provenance
-// WITHIN the row: its POS is read from Mahan Kosh while its case/number come from
-// a Viakaran rule. To show each datum honestly — corroborated when independent
-// sources agree, flagged when they conflict — we decompose every row into
-// per-attribute facts, then regroup by attribute.
+// The word page stores grammar as word_grammar rows, each multi-attribute (POS
+// + case + number together). To show each datum honestly — corroborated when
+// independent sources agree, flagged when they conflict — we decompose every row
+// into per-attribute facts, then regroup by attribute.
+//
+// Only values a source states are shown (#30, "no guessing"): a cited scholar's
+// row (Sahib Singh's pad-arth, Shackle) and the POS read from a Mahan Kosh sense
+// marker. A row with any other shape — the retired Viakaran ending rules, a POS
+// carried over from a similarly spelled word — contributes nothing, so an
+// attribute no source states stays blank.
 //
 // Output, per attribute (POS / Gender / Number / Case):
-//   - readings sorted by source authority (a cited scholar outranks our rule);
+//   - readings sorted by source authority (a cited scholar outranks a dictionary marker);
 //   - the lead reading [0] is what we present; a corroboration count when several
 //     sources back it; a conflict flag when sources disagree.
 // This module is pure and deterministic so it can be unit-tested.
@@ -55,13 +59,11 @@ export function normalizePos(sourceCode: string | null, raw: string, posMap: Pos
 export type GrammarAttribute = "pos" | "gender" | "number" | "gram_case" | "verb_form";
 
 // How a single source supports a value. Ordered by authority (highest first).
-export type SourceKind = "scholar" | "dictionary" | "rule" | "heuristic";
+export type SourceKind = "scholar" | "dictionary";
 
 const AUTHORITY: Record<SourceKind, number> = {
-  scholar: 4, // explicit statement read from a cited scholar (Sahib Singh's pad-arth)
-  dictionary: 3, // extracted from a dictionary's own marker (Mahan Kosh POS)
-  rule: 2, // our codified Viakaran rule
-  heuristic: 1, // our own grouping/inheritance heuristic
+  scholar: 2, // explicit statement read from a cited scholar (Sahib Singh's pad-arth, Shackle)
+  dictionary: 1, // extracted from a dictionary's own marker (Mahan Kosh POS)
 };
 
 export interface Attestation {
@@ -74,9 +76,8 @@ export interface Attestation {
   sourceId: string;
   sourceLabel: string; // short human label, e.g. "Sahib Singh's Darpan pad-arth"
   citation: string | null; // full citation string when we have one
-  explanation: string | null; // the rule's plain-English basis, when applicable
-  verified: boolean; // scholar-verified / read-from-source
-  confidenceLabel: string | null; // qualitative band for rule/heuristic; null when cited
+  explanation: string | null; // the extraction rule's plain-English basis, when applicable
+  verified: boolean; // read from the source (false only if its extraction rule is unverified)
   lineId: number | null; // pad-arth source_line_id, for "view the line" links
   ruleCode: string | null;
   // The source's verbatim label when it was normalized to a different value
@@ -101,6 +102,11 @@ const IMPORTED_SOURCES: Record<string, { label: string; citation: string }> = {
   // An unrecognised code falls through to "Cited source (unattributed)", which is
   // honest; a pre-registered label would assert an edition we have not ingested.
 };
+
+/** Display label for a source_code, e.g. on a Related-forms link. */
+export function sourceDisplayLabel(code: string): string {
+  return code === "mahan_kosh" ? "Mahan Kosh" : IMPORTED_SOURCES[code]?.label ?? code;
+}
 
 export interface AttributeReading {
   value: string;
@@ -130,34 +136,37 @@ const ATTRIBUTE_LABEL: Record<GrammarAttribute, string> = {
 
 const ATTRIBUTE_ORDER: GrammarAttribute[] = ["pos", "gender", "number", "gram_case", "verb_form"];
 
-/**
- * Maps an internal confidence (0..1) to a qualitative band. We deliberately do
- * NOT show the number — it implies a precision the rule engine doesn't have — but
- * still signal relative strength. Returns null when there is no confidence (a
- * cited fact isn't a probabilistic guess).
- */
-export function confidenceBand(confidence: number | null | undefined): string | null {
-  if (typeof confidence !== "number") return null;
-  if (confidence >= 0.85) return "Very high";
-  if (confidence >= 0.7) return "High";
-  if (confidence >= 0.55) return "Moderate";
-  if (confidence >= 0.4) return "Low";
-  return "Very low";
-}
-
 // Decompose one stored row into the per-attribute facts it actually asserts,
-// attributing each to its true source (POS≠case provenance within a rule row).
+// attributing each to its true source.
 interface Fact {
   attribute: GrammarAttribute;
   value: string;
   att: Attestation;
 }
 
-function rowToFacts(g: WordGrammarWithRule, posMap: PosMap): Fact[] {
-  const facts: Fact[] = [];
-  const sourced = g.provenance === "imported"; // read from a cited scholar
-  const rule = g.grammar_rules;
+const FEATURE_ATTRIBUTES = ["gender", "number", "gram_case", "verb_form"] as const;
 
+const MAHAN_KOSH_POS: Attestation = {
+  sourceKind: "dictionary",
+  sourceId: "src:mahan_kosh",
+  sourceLabel: "Mahan Kosh marker",
+  citation: "Bhai Kahn Singh Nabha, Mahan Kosh",
+  explanation: "Read from the part-of-speech marker that opens the Mahan Kosh sense.",
+  verified: true,
+  lineId: null,
+  ruleCode: null,
+  rawLabel: null,
+};
+
+function rowToFacts(g: WordGrammarWithRule, posMap: PosMap): Fact[] {
+  // Mahan Kosh states a part of speech and nothing else.
+  if (g.source_code === "mahan_kosh") {
+    return g.pos ? [{ attribute: "pos", value: g.pos, att: { ...MAHAN_KOSH_POS } }] : [];
+  }
+  // Anything not read from a cited source is inference, and is never shown.
+  if (g.provenance !== "imported") return [];
+
+  const rule = g.grammar_rules;
   // An imported fact is attributed to whichever source actually supplied it.
   // A row whose source_code is missing or unrecognised is NOT attributed to a
   // named scholar — we say we don't know rather than guess a name.
@@ -173,76 +182,24 @@ function rowToFacts(g: WordGrammarWithRule, posMap: PosMap): Fact[] {
       citation: rule?.citation ?? known?.citation ?? null,
       explanation: rule?.explanation ?? null,
       verified: rule?.verified ?? true,
-      confidenceLabel: null,
       lineId: g.source_line_id ?? null,
       ruleCode: g.rule_code ?? null,
       rawLabel: null,
     };
   };
 
-  // POS — for a rule-derived row this comes from Mahan Kosh (or inheritance),
-  // NOT from the row's case rule_code, so attribute it accordingly.
+  const facts: Fact[] = [];
   if (g.pos) {
-    if (sourced) {
-      for (const value of normalizePos(g.source_code, g.pos, posMap)) {
-        const att = scholarAtt();
-        att.rawLabel = value === g.pos ? null : g.pos;
-        facts.push({ attribute: "pos", value, att });
-      }
-    } else {
-      const inherited = (g.notes ?? "").includes("inherited from lemma");
-      facts.push({
-        attribute: "pos",
-        value: g.pos,
-        att: inherited
-          ? {
-              sourceKind: "heuristic",
-              sourceId: "heuristic:inherited",
-              sourceLabel: "Inherited from a related form",
-              citation: null,
-              explanation: "Part of speech carried over from a form sharing this word's stem.",
-              verified: false,
-              confidenceLabel: confidenceBand(g.confidence),
-              lineId: null,
-              ruleCode: null,
-              rawLabel: null,
-            }
-          : {
-              sourceKind: "dictionary",
-              sourceId: "src:mahan_kosh",
-              sourceLabel: "Mahan Kosh marker",
-              citation: "Bhai Kahn Singh Nabha, Mahan Kosh",
-              explanation: "Read from the part-of-speech marker that opens the Mahan Kosh sense.",
-              verified: true,
-              confidenceLabel: null,
-              lineId: null,
-              ruleCode: null,
-              rawLabel: null,
-            },
-      });
+    for (const value of normalizePos(g.source_code, g.pos, posMap)) {
+      const att = scholarAtt();
+      att.rawLabel = value === g.pos ? null : g.pos;
+      facts.push({ attribute: "pos", value, att });
     }
   }
-
-  // Gender / number / case — from the scholar (sourced) or from the Viakaran rule.
-  const ruleAtt = (): Attestation => ({
-    sourceKind: "rule",
-    sourceId: `rule:${g.rule_code ?? "unknown"}`,
-    sourceLabel: rule?.title ?? "Viakaran rule",
-    citation: rule?.citation ?? null,
-    explanation: rule?.explanation ?? null,
-    verified: rule?.verified ?? false,
-    confidenceLabel: confidenceBand(g.confidence),
-    lineId: null,
-    ruleCode: g.rule_code ?? null,
-    rawLabel: null,
-  });
-
-  for (const attribute of ["gender", "number", "gram_case", "verb_form"] as const) {
+  for (const attribute of FEATURE_ATTRIBUTES) {
     const value = g[attribute];
-    if (!value) continue;
-    facts.push({ attribute, value, att: sourced ? scholarAtt() : ruleAtt() });
+    if (value) facts.push({ attribute, value, att: scholarAtt() });
   }
-
   return facts;
 }
 

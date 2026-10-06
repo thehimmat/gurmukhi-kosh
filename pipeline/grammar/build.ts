@@ -1,117 +1,37 @@
-// word_grammar row builder.
+// word_grammar rows from Mahan Kosh.
 //
-// Combines the two grammar signals into candidate word_grammar rows:
-//   - POS from the Mahan Kosh sense marker (parsePosFromDefinition)
-//   - case/number from the surface form's final vowel (analyzeNounForm)
-//
-// The nominal form rules (case/number) are applied ONLY when the POS is nominal
-// (noun/adjective/pronoun). A verb such as ਲਿਖਿ carries a sihari ending but must
-// not be analyzed as an oblique noun, so its case/number stay null.
+// The only grammar this pipeline writes is what Mahan Kosh itself states: the
+// part of speech read from each sense's own marker (parsePosFromDefinition).
+// Case, number, gender and verb form are never inferred from a word's spelling;
+// those come only from sources that state them (Sahib Singh's pad-arth, Shackle)
+// and are absent otherwise. The Viakaran ending rules that used to fill them
+// were retired because an ending alone underdetermines the reading (#21, #27,
+// #54, #117); their output is archived by migration 037.
 
 import { parsePosFromDefinition } from './pos';
-import { analyzeNounForm, analyzeVerbForm } from './viakaran';
 
-const NOMINAL_POS = new Set(['noun', 'adjective', 'pronoun']);
-
-export interface GrammarRow {
-  pos: string | null;
-  gender: string | null;
-  number: string | null;
-  gram_case: string | null;
-  verb_form: string | null;
-  rule_code: string | null;
-  confidence: number | null;
-  notes: string | null;
+export interface MahanKoshGrammarRow {
+  pos: string;
+  provenance: 'scraped';
+  source_code: 'mahan_kosh';
 }
 
 interface SenseLike {
   definition_text: string;
 }
 
-// Builds a single grammar row for a known POS, applying the Viakaran case/number
-// analysis only when the POS is nominal. `posConfidence` weights the POS signal;
-// `extraNote`, when present, is appended to document non-direct provenance.
-function grammarRowForPos(
-  gurmukhi: string,
-  pos: string,
-  posConfidence: number,
-  extraNote?: string,
-): GrammarRow {
-  if (NOMINAL_POS.has(pos)) {
-    const form = analyzeNounForm(gurmukhi);
-    // Combine POS and form confidence multiplicatively: the row is only as
-    // trustworthy as its weaker signal.
-    const confidence = Number((posConfidence * form.confidence).toFixed(3));
-    const notes = [form.notes, extraNote].filter(Boolean).join(' ') || null;
-    return {
-      pos,
-      gender: form.gender,
-      number: form.number,
-      gram_case: form.gram_case,
-      verb_form: null,
-      rule_code: form.rule_code,
-      confidence,
-      notes,
-    };
-  }
-  if (pos === 'verb') {
-    // Classify the non-finite verb form from its ending, same gating principle as
-    // nouns: only the verb POS is fed to the verb morphology rules.
-    const v = analyzeVerbForm(gurmukhi);
-    const confidence = Number((posConfidence * v.confidence).toFixed(3));
-    const notes = [v.notes, extraNote].filter(Boolean).join(' ') || null;
-    return {
-      pos,
-      gender: null,
-      number: null,
-      gram_case: null,
-      verb_form: v.verb_form,
-      rule_code: v.rule_code,
-      confidence: v.verb_form ? confidence : posConfidence,
-      notes: v.verb_form ? notes : extraNote ?? null,
-    };
-  }
-  return {
-    pos,
-    gender: null,
-    number: null,
-    gram_case: null,
-    verb_form: null,
-    rule_code: null,
-    confidence: posConfidence,
-    notes: extraNote ?? null,
-  };
-}
-
 /**
- * Builds one word_grammar row per distinct POS attested across the word's senses.
- * For nominal POS the surface form is analyzed for case/number; other POS get a
- * POS-only row. Returns an empty array when no sense carries a recognized POS marker.
+ * One row per distinct POS marker across the word's senses, in sense order.
+ * A sense with no marker (including a pure ਦੇਖੋ redirect) contributes nothing.
  */
-export function buildGrammar(gurmukhi: string, senses: SenseLike[]): GrammarRow[] {
+export function mahanKoshGrammarRows(senses: SenseLike[]): MahanKoshGrammarRow[] {
   const seen = new Set<string>();
-  const rows: GrammarRow[] = [];
-
+  const rows: MahanKoshGrammarRow[] = [];
   for (const sense of senses) {
-    const posResult = parsePosFromDefinition(sense.definition_text);
-    if (!posResult) continue;
-    if (seen.has(posResult.pos)) continue;
-    seen.add(posResult.pos);
-    rows.push(grammarRowForPos(gurmukhi, posResult.pos, posResult.confidence));
+    const pos = parsePosFromDefinition(sense.definition_text)?.pos;
+    if (!pos || seen.has(pos)) continue;
+    seen.add(pos);
+    rows.push({ pos, provenance: 'scraped', source_code: 'mahan_kosh' });
   }
-
   return rows;
-}
-
-// POS inherited via a cross-reference is less certain than a POS read directly
-// off the form's own marker, so we discount its confidence.
-const INHERIT_CONFIDENCE = 0.6;
-
-/**
- * Builds a grammar row for a form that has no marker of its own but redirects to
- * a lemma whose POS is known (e.g. ਨਾਮੁ → "ਦੇਖੋ, ਨਾਮ."). The POS is inherited from
- * `lemma`; case/number still come from the form itself.
- */
-export function buildInheritedGrammar(gurmukhi: string, pos: string, lemma: string): GrammarRow {
-  return grammarRowForPos(gurmukhi, pos, INHERIT_CONFIDENCE, `POS inherited from lemma ${lemma}.`);
 }

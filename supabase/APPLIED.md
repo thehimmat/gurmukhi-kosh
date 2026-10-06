@@ -114,6 +114,14 @@ identical before and after (713 lines; the double-੧ heading still returns [25,
 2026-08-06) — applied outside the MCP (dashboard SQL editor), so the server ledger never
 recorded it. It IS live (its rule corrections are visible in `grammar_rules`).
 
+Same for kosh `037_archive_inferred_grammar.sql` (applied 2026-10-06 via the dashboard
+SQL editor: the MCP's destructive-statement confirmation could not be answered from a
+cloud session). Verified live after applying: word_grammar 15,488 rows, all with a
+source_code (8,179 mahan_kosh, 7,018 shackle, 291 ss_padarth), 0 rule_derived;
+word_grammar_inferred_archive 14,638 (6,459 inherited POS + 8,179 pre-strip snapshots);
+word_forms 0 live / 17,715 archived; lexemes 0 live / 5,385 archived; 5,979 automated
+doubt flags dismissed. Archive tables have RLS on, no policies, no anon select.
+
 Name-to-file matches above are by name and date and are best-effort for the early
 entries; the UNFILED rows' actual SQL would need to be reconstructed from the live
 schema if ever required.

@@ -21,7 +21,7 @@ describe("US-003: every datum carries provenance", () => {
     expect(count).toBe(0);
   });
 
-  it("US-003: a reading resting on an unverified rule is marked unverified, not scholar-cited", () => {
+  it("US-003: a reading inferred from an ending rule is never shown as data", () => {
     const row = {
       id: 1, word_id: 1, definition_id: null,
       pos: null, gender: null, number: "singular", gram_case: "oblique",
@@ -33,11 +33,7 @@ describe("US-003: every datum carries provenance", () => {
         citation: null, tier: "codified_rule", verified: false,
       },
     } as unknown as WordGrammarWithRule;
-    const view = buildGrammarView([row]);
-    const caseView = view.find((v) => v.attribute === "gram_case")!;
-    const att = caseView.readings[0].attestations[0];
-    expect(att.sourceKind).toBe("rule");
-    expect(att.verified).toBe(false);
+    expect(buildGrammarView([row])).toEqual([]);
   });
 
   it("US-003: the JSON API ships grammar caveats alongside grammar rows", async () => {

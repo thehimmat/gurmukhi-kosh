@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { anonDb } from "./helpers";
 import { buildGrammarView, normalizePos } from "../../lib/grammar-view";
-import { fetchMorphVariants, fetchPosMap, fetchRulesByCode } from "../../lib/word-data";
+import { fetchPosMap } from "../../lib/word-data";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
 import type { WordGrammarWithRule } from "../../lib/supabase";
 
@@ -13,8 +13,8 @@ function grammarRow(over: Record<string, unknown>): WordGrammarWithRule {
     id: 1, word_id: 1, definition_id: null,
     pos: null, gender: null, number: null, gram_case: null,
     notes: null, rule_code: null, confidence: null,
-    person: null, verb_form: null, source_code: null, source_line_id: null,
-    provenance: "rule_derived", review_status: "unreviewed",
+    person: null, verb_form: null, source_code: "mahan_kosh", source_line_id: null,
+    provenance: "scraped", review_status: "unreviewed",
     grammar_rules: null,
     ...over,
   } as unknown as WordGrammarWithRule;
@@ -39,20 +39,33 @@ describe("US-004: grammar grouped by attribute with citations", () => {
     expect(pos.readings[0].attestations[0].sourceKind).toBe("scholar");
   });
 
-  it("US-004: grammar coverage exists at corpus scale (20k+ rows)", async () => {
+  it("US-004: sourced grammar coverage exists at corpus scale (15k+ rows)", async () => {
     const { count, error } = await db
       .from("word_grammar")
       .select("id", { count: "exact", head: true });
     expect(error).toBeNull();
-    expect(count).toBeGreaterThan(20000);
+    expect(count).toBeGreaterThan(15000);
   });
 
-  it("US-004: a word in multiple lexemes still lists its related forms (PR #89 regression)", async () => {
-    const { data: w } = await db.from("words").select("id").eq("gurmukhi", "ਅਗਨਿ").single();
-    expect(w).toBeTruthy();
-    const rules = await fetchRulesByCode();
-    const variants = await fetchMorphVariants((w as { id: number }).id, "ਅਗਨਿ", rules);
-    expect(variants.length).toBeGreaterThan(0);
+  // #30 "no guessing": every stored grammar value is read from a named source.
+  it("US-004: every grammar row names its source; none is inferred from spelling", async () => {
+    const [unsourced, inferred] = await Promise.all([
+      db.from("word_grammar").select("id", { count: "exact", head: true }).is("source_code", null),
+      db.from("word_grammar").select("id", { count: "exact", head: true }).eq("provenance", "rule_derived"),
+    ]);
+    expect(unsourced.error).toBeNull();
+    expect(inferred.error).toBeNull();
+    expect(unsourced.count).toBe(0);
+    expect(inferred.count).toBe(0);
+  });
+
+  it("US-004: every related-form membership names the source that asserts it", async () => {
+    const { count, error } = await db
+      .from("word_forms")
+      .select("id", { count: "exact", head: true })
+      .is("source_code", null);
+    expect(error).toBeNull();
+    expect(count).toBe(0);
   });
 
   // #29: an unmapped label compares as a raw string and fakes a cross-source

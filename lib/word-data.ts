@@ -6,20 +6,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase, type PosMapping } from "./supabase";
 import { posMappingsFrom, type PosMap } from "./grammar-view";
-// Relative (not "@/") so this module also loads under vitest, which does not
-// read the tsconfig path alias.
-import { analyzeNounForm } from "../pipeline/grammar/viakaran";
+import { toMorphVariants, type MorphVariant, type SiblingFormRow } from "./morph-variants";
 
-export type RuleInfo = { rule_code: string; title: string; verified: boolean };
-
-// Rule registry lookup: related-form labels are derived live from the form's
-// ending (#56), so each label needs its rule's title + verified status.
-export async function fetchRulesByCode(): Promise<Map<string, RuleInfo>> {
-  const { data } = await supabase
-    .from("grammar_rules")
-    .select("rule_code, title, verified");
-  return new Map(((data ?? []) as RuleInfo[]).map((r) => [r.rule_code, r]));
-}
+export type { MorphVariant };
 
 // pos_mappings (#29): every surface that builds a grammar view must compare POS
 // through the same map, or the word page, /health and the autoflag pass drift.
@@ -30,62 +19,32 @@ export async function fetchPosMap(db: SupabaseClient = supabase): Promise<PosMap
   return posMappingsFrom((data ?? []) as PosMapping[]);
 }
 
-export type MorphVariant = {
-  gurmukhi: string;
-  label: string | null;
-  ruleCode: string | null;
-  ruleTitle: string | null;
-  ruleVerified: boolean;
-};
-
 /**
- * Sibling inflected forms of a word, across every lexeme it belongs to.
+ * Sibling inflected forms of a word, across every lexeme it belongs to, from
+ * source-asserted word_forms memberships only (see lib/morph-variants.ts).
  *
  * A word may hold several word_forms rows (per-source memberships and multiple
- * readings, migration 023 / #30). The previous `.maybeSingle()` lookup errored
- * on those words and silently rendered no related forms at all; this unions
- * the sibling forms of every lexeme the word is a member of, deduped.
+ * readings, migration 023 / #30), so this unions the sibling forms of every
+ * lexeme the word is a member of, deduped.
  */
-export async function fetchMorphVariants(
-  wordId: number,
-  word: string,
-  rulesByCode: Map<string, RuleInfo>
-): Promise<MorphVariant[]> {
+export async function fetchMorphVariants(wordId: number, word: string): Promise<MorphVariant[]> {
   const { data: memberships } = await supabase
     .from("word_forms")
     .select("lexeme_id")
-    .eq("word_id", wordId);
+    .eq("word_id", wordId)
+    .not("source_code", "is", null);
   const lexemeIds = [
-    ...new Set(((memberships ?? []) as { lexeme_id: number }[]).map((m) => m.lexeme_id)),
+    ...new Set(((memberships ?? []) as Array<{ lexeme_id: number }>).map((m) => m.lexeme_id)),
   ];
   if (lexemeIds.length === 0) return [];
 
   const { data: formRows } = await supabase
     .from("word_forms")
-    .select("words(id, gurmukhi)")
-    .in("lexeme_id", lexemeIds);
-
-  const seen = new Set<string>();
-  const variants: MorphVariant[] = [];
-  for (const f of (formRows ?? []) as unknown as Array<{ words: { id: number; gurmukhi: string } | null }>) {
-    const g = f.words?.gurmukhi;
-    if (!g || g === word || seen.has(g)) continue;
-    seen.add(g);
-    // The inflection label is derived live from the form's ending (#56) — never
-    // read from the cached inflection_desc — so the rule behind it is known and
-    // the unverified-rule treatment (#52) applies on both surfaces.
-    const a = analyzeNounForm(g);
-    const label = [a.gram_case, a.number].filter(Boolean).join(" ") || null;
-    const rule = a.rule_code ? rulesByCode.get(a.rule_code) : undefined;
-    variants.push({
-      gurmukhi: g,
-      label,
-      ruleCode: a.rule_code ?? null,
-      ruleTitle: rule?.title ?? null,
-      ruleVerified: rule?.verified ?? false,
-    });
-  }
-  return variants;
+    .select("source_code, label_raw, words(gurmukhi)")
+    .in("lexeme_id", lexemeIds)
+    .not("source_code", "is", null)
+    .order("id", { ascending: true });
+  return toMorphVariants((formRows ?? []) as unknown as SiblingFormRow[], word);
 }
 
 export type UsagePhrase = { w1: string | null; w2: string | null; count: number };

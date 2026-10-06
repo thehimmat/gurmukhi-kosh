@@ -1,95 +1,46 @@
 import { describe, it, expect } from 'vitest';
-import { buildGrammar, buildInheritedGrammar } from '../pipeline/grammar/build';
+import { mahanKoshGrammarRows } from '../pipeline/grammar/build';
 
-// The builder combines two signals into word_grammar rows:
-//   - POS from the Mahan Kosh sense marker (pos.ts)
-//   - case/number from the surface form's final vowel (viakaran.ts)
-// Crucially, the nominal form rules are applied ONLY when the POS is nominal.
+// The grammar pipeline writes only what Mahan Kosh states: the part of speech
+// read from each sense's own marker. It never infers case, number, gender or
+// verb form from a word's spelling (the retired Viakaran ending rules, #21 /
+// #27 / #117), so the surface form is not even an input.
 
 const noun = (g = '') => ({ definition_text: `ਸੰਗ੍ਯਾ- ${g}` });
 const adj = (g = '') => ({ definition_text: `ਵਿ- ${g}` });
+const pronoun = (g = '') => ({ definition_text: `ਸਰਵ- ${g}` });
 const verb = (g = '') => ({ definition_text: `ਕ੍ਰਿ- ${g}` });
-const particle = (g = '') => ({ definition_text: `ਵ੍ਯ- ${g}` });
 
-describe('buildGrammar', () => {
-  it('ਨਾਮੁ as a noun → direct singular masculine row', () => {
-    const rows = buildGrammar('ਨਾਮੁ', [noun('ਪ੍ਰਭੂ ਦਾ ਨਾਮ')]);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({
-      pos: 'noun',
-      gram_case: 'direct',
-      number: 'singular',
-      gender: 'masculine',
-      rule_code: 'AUNKAR_NOM_SG',
-    });
-    expect(rows[0].confidence).toBeGreaterThan(0.6);
+const MAHAN_KOSH_POS = { provenance: 'scraped', source_code: 'mahan_kosh' };
+
+describe('mahanKoshGrammarRows', () => {
+  it('writes the POS the sense marker states, attributed to Mahan Kosh', () => {
+    expect(mahanKoshGrammarRows([noun('ਪ੍ਰਭੂ ਦਾ ਨਾਮ')])).toEqual([{ pos: 'noun', ...MAHAN_KOSH_POS }]);
   });
 
-  it('does not assign gender to a verb', () => {
-    const rows = buildGrammar('ਲਿਖਿ', [verb('ਲਿਖਣਾ')]);
-    expect(rows[0].gender).toBeNull();
+  it('asserts nothing beyond POS: no case, number, gender, verb form or rule', () => {
+    const [row] = mahanKoshGrammarRows([noun()]);
+    expect(Object.keys(row).sort()).toEqual(['pos', 'provenance', 'source_code']);
   });
 
-  it('ਹੁਕਮਿ as a noun → oblique singular row', () => {
-    const rows = buildGrammar('ਹੁਕਮਿ', [noun('ਆਗਿਆ ਅਨੁਸਾਰ')]);
-    expect(rows[0]).toMatchObject({
-      pos: 'noun',
-      gram_case: 'oblique',
-      number: 'singular',
-      rule_code: 'SIHARI_OBL_SG',
-    });
+  it('gives a pronoun only its POS (#117: no noun case/gender carried onto ਤਿਸੁ)', () => {
+    expect(mahanKoshGrammarRows([pronoun('ਉਸ')])).toEqual([{ pos: 'pronoun', ...MAHAN_KOSH_POS }]);
   });
 
-  it('does NOT apply nominal case rules to a verb (ਲਿਖਿ has a sihari but is a verb)', () => {
-    const rows = buildGrammar('ਲਿਖਿ', [verb('ਲਿਖਣਾ')]);
-    expect(rows).toHaveLength(1);
-    expect(rows[0].pos).toBe('verb');
-    expect(rows[0].gram_case).toBeNull();
-    expect(rows[0].number).toBeNull();
-    expect(rows[0].rule_code).toBeNull();
+  it('gives a verb only its POS (no verb form read off the ending, #54)', () => {
+    expect(mahanKoshGrammarRows([verb('ਕਰਨਾ')])).toEqual([{ pos: 'verb', ...MAHAN_KOSH_POS }]);
   });
 
-  it('does NOT apply nominal case rules to a particle', () => {
-    const rows = buildGrammar('ਭੀ', [particle('ਵੀ, ਅਤੇ')]);
-    expect(rows[0].pos).toBe('particle');
-    expect(rows[0].gram_case).toBeNull();
-  });
-
-  it('emits one row per distinct POS across senses, de-duplicated', () => {
-    const rows = buildGrammar('ਸਚੁ', [noun('ਸਤ੍ਯ'), adj('ਸੱਚਾ'), noun('ਪਰਮਾਤਮਾ')]);
-    const posList = rows.map((r) => r.pos);
-    expect(posList).toContain('noun');
-    expect(posList).toContain('adjective');
-    expect(new Set(posList).size).toBe(posList.length); // no duplicate POS rows
+  it('emits one row per distinct POS across senses, in sense order', () => {
+    const rows = mahanKoshGrammarRows([noun('ਸਤ੍ਯ'), adj('ਸੱਚਾ'), noun('ਪਰਮਾਤਮਾ')]);
+    expect(rows.map((r) => r.pos)).toEqual(['noun', 'adjective']);
   });
 
   it('returns no rows when no sense carries a recognized POS marker', () => {
-    const rows = buildGrammar('ਗੁਰ', [{ definition_text: 'ਗੁਰੂ ਦਾ ਸੰਖੇਪ ਰੂਪ' }]);
-    expect(rows).toEqual([]);
-  });
-});
-
-describe('buildInheritedGrammar', () => {
-  it('ਨਾਮੁ inherits noun POS and gets its own case/number from the form', () => {
-    const row = buildInheritedGrammar('ਨਾਮੁ', 'noun', 'ਨਾਮ');
-    expect(row).toMatchObject({
-      pos: 'noun',
-      gram_case: 'direct',
-      number: 'singular',
-      rule_code: 'AUNKAR_NOM_SG',
-    });
+    expect(mahanKoshGrammarRows([{ definition_text: 'ਗੁਰੂ ਦਾ ਸੰਖੇਪ ਰੂਪ' }])).toEqual([]);
   });
 
-  it('marks the inherited row with lower confidence and a sourcing note', () => {
-    const direct = buildGrammar('ਨਾਮੁ', [{ definition_text: 'ਸੰਗ੍ਯਾ- ਨਾਮ' }])[0];
-    const inherited = buildInheritedGrammar('ਨਾਮੁ', 'noun', 'ਨਾਮ');
-    expect(inherited.confidence!).toBeLessThan(direct.confidence!);
-    expect(inherited.notes).toMatch(/ਨਾਮ/); // names the lemma it was inherited from
-  });
-
-  it('does not apply nominal case rules when the inherited POS is non-nominal', () => {
-    const row = buildInheritedGrammar('ਕਰਿ', 'verb', 'ਕਰ');
-    expect(row.pos).toBe('verb');
-    expect(row.gram_case).toBeNull();
+  it('returns no rows for a pure redirect (no POS is borrowed from the target)', () => {
+    expect(mahanKoshGrammarRows([{ definition_text: 'ਦੇਖੋ, ਨਾਮ.' }])).toEqual([]);
   });
 });

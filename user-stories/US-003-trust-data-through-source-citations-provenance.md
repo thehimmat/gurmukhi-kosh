@@ -3,7 +3,7 @@ id: US-003
 title: Trust every datum through visible source citations/provenance
 status: delivered
 created: 2026-07-22
-updated: 2026-09-01
+updated: 2026-10-04
 linked_issues: []
 linked_tests: ["tests/stories/us-003.test.ts"]
 supersedes: null
@@ -47,3 +47,11 @@ Residuals (noted, not blockers): the Usage tab's bigrams/collocations carry
 no provenance label (they read as plain statistics), and every enrichment row
 is still review_status=unreviewed — provenance is labeled, scholar review has
 not happened.
+
+## Addendum (2026-10-04)
+
+Grammar no longer has a rule-derived or heuristic tier (#30, migration 037):
+every grammar value shown is read from a named source, and a value no source
+states is left blank. The dashed "Unverified rule — our inference" treatment
+was removed with the readings it marked. The scholar-cited vs rule-derived vs
+inference distinction still applies elsewhere (etymology lookups, IPA).

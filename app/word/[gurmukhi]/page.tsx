@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
-import { buildGrammarView, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
+import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { fetchMorphVariants, fetchPosMap, fetchRulesByCode, fetchUsage, fetchWriterStats } from "@/lib/word-data";
+import { fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
@@ -130,10 +130,9 @@ export default async function WordPage({ params, searchParams }: Props) {
   const romanPractical = (wordRow as unknown as { roman_practical: string | null }).roman_practical;
   const grammar = ((wordRow as unknown as { word_grammar: WordGrammarWithRule[] }).word_grammar ?? []);
   // Regroup the raw rows into one view per attribute: each value with its
-  // distinct sources (cited scholar > dictionary > rule > heuristic), so the UI
+  // distinct sources (cited scholar > dictionary marker), so the UI
   // can corroborate agreement and flag conflicts instead of stacking raw rows.
   const grammarView = buildGrammarView(grammar, posMap);
-  const hasSourcedGrammar = grammar.some((g) => g.provenance === "imported");
 
   // Step 2: fire remaining queries in parallel — but only the ones the active
   // tab actually renders. Every tab still pays for the header (word row +
@@ -144,7 +143,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const needsForms = tab === "overview";
   const EMPTY = Promise.resolve({ data: null });
 
-  const [defsResult, etymResult, occsResult, examplesResult, rulesByCode, corpusStatsResult] = await Promise.all([
+  const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     needsDefs
       ? supabase
@@ -195,10 +194,6 @@ export default async function WordPage({ params, searchParams }: Props) {
           .order("id", { ascending: true })
       : EMPTY,
 
-    // Rule registry: Related-forms labels are derived live from the form's
-    // ending (#56), so each label needs its rule's verified status.
-    needsForms ? fetchRulesByCode() : new Map<string, { rule_code: string; title: string; verified: boolean }>(),
-
     // Per-corpus frequencies (#65): every displayed count names its text.
     supabase
       .from("word_corpus_stats")
@@ -241,10 +236,10 @@ export default async function WordPage({ params, searchParams }: Props) {
     }
   }
 
-  // Step 3: sibling inflected forms, across every lexeme this word belongs to
-  // (lib/word-data.ts — shared with the JSON API, labels derived live per #56,
-  // #52 unverified-rule treatment applied exactly as in the grammar section).
-  const morphForms = needsForms ? await fetchMorphVariants(wordId, word, rulesByCode) : [];
+  // Step 3: sibling inflected forms, across every lexeme this word belongs to,
+  // from source-asserted memberships only (lib/word-data.ts — shared with the
+  // JSON API). Each label is the source's own wording.
+  const morphForms = needsForms ? await fetchMorphVariants(wordId, word) : [];
 
   // Group definitions by source
   const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
@@ -327,18 +322,8 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Display a grammar value: POS uses the long label table, others just capitalize.
   const fmtGrammar = (attribute: string, value: string) =>
     attribute === "pos" ? GRAMMAR_LABELS[value.toLowerCase()] ?? value : cap(value);
-  // Map a source kind to the existing provenance pill, an honest tier label, and
-  // the adjective used when noting a disagreeing reading.
-  const KIND_PROVENANCE: Record<string, string> = {
-    scholar: "imported", dictionary: "scraped", rule: "rule_derived", heuristic: "computed",
-  };
-  const KIND_TIER: Record<string, string> = {
-    scholar: "Read from a cited source", dictionary: "Read from a cited source",
-    rule: "Established grammar rule", heuristic: "Our grouping heuristic",
-  };
-  const KIND_WORD: Record<string, string> = {
-    scholar: "cited", dictionary: "dictionary", rule: "rule-derived", heuristic: "heuristic",
-  };
+  // Map a source kind to the existing provenance pill.
+  const KIND_PROVENANCE: Record<string, string> = { scholar: "imported", dictionary: "scraped" };
 
   // Usage tab: common phrases (bigrams) + statistical collocations + writer
   // breakdown (lib/word-data.ts — shared with the JSON API).
@@ -445,22 +430,9 @@ export default async function WordPage({ params, searchParams }: Props) {
               <a
                 key={f.gurmukhi}
                 href={`/word/${encodeURIComponent(f.gurmukhi)}`}
-                title={
-                  f.label
-                    ? f.ruleVerified
-                      ? f.label
-                      : `${f.label}? — rests on an unverified rule (${f.ruleTitle ?? "ending heuristic"}); our inference, not a scholar's reading`
-                    : undefined
-                }
+                title={`${f.label ? `${f.label} — ` : ""}${sourceDisplayLabel(f.sourceCode)}`}
                 className="gurmukhi"
-                style={{
-                  color: "var(--accent)",
-                  textDecoration: "none",
-                  fontSize: "1.1rem",
-                  // A label resting on an unverified rule is visibly tentative,
-                  // matching the grammar section's dashed treatment (#52/#56).
-                  borderBottom: f.label && !f.ruleVerified ? "1px dashed var(--border)" : undefined,
-                }}
+                style={{ color: "var(--accent)", textDecoration: "none", fontSize: "1.1rem" }}
               >
                 {f.gurmukhi}
               </a>
@@ -606,76 +578,33 @@ export default async function WordPage({ params, searchParams }: Props) {
       )}
 
       {/* ── 4. Grammar (grammar tab) ── */}
-      {tab === "grammar" && grammar.length > 0 && (
+      {tab === "grammar" && grammarView.length > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Grammar</SectionHeading>
 
-          {/* Honest framing: distinguish facts read from a scholar from rule-derived ones. */}
+          {/* Honest framing: every value shown is read from a named source. */}
           <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
-            {hasSourcedGrammar && (
-              <>
-                Entries marked <em>Imported</em> are read directly from a cited scholarly
-                source — Prof. Sahib Singh&apos;s grammar notes in his <em>Sri Guru Granth
-                Sahib Darpan</em> pad-arth (with the line cited), or Christopher
-                Shackle&apos;s <em>A Guru Nanak Glossary</em>. Each entry names the source it
-                came from. Where two scholars read a word differently we show both rather
-                than choose between them.{" "}
-              </>
-            )}
-            The remaining analysis is <em>our own</em>: we apply rules from Prof. Sahib
-            Singh&apos;s <em>Viakaran</em>{" "}to each word&apos;s form, alongside the
-            part-of-speech markers in its Mahan Kosh entry. Those readings are applied
-            uniformly by rule rather than judged word by word — which makes them
-            consistent, but no more reliable than the rule behind them. A rule marked{" "}
-            <em>unverified</em>{" "}has not been confirmed against the published text, and in
-            some cases the text is now known to contradict it. Treat those as our working
-            inference, not as a scholar&apos;s statement. Expand &ldquo;How we determined
-            this&rdquo; on any entry to see the exact rule, its status, and its source.
+            Every entry here is read from a named source: Prof. Sahib Singh&apos;s grammar
+            notes in his <em>Sri Guru Granth Sahib Darpan</em> pad-arth (with the line
+            cited), Christopher Shackle&apos;s <em>A Guru Nanak Glossary</em>, or, for part
+            of speech, the marker that opens each sense in Bhai Kahn Singh Nabha&apos;s{" "}
+            <em>Mahan Kosh</em>. Where sources read a word differently we show both rather
+            than choose between them. Where no source gives a word&apos;s gender, number or
+            case, we leave it blank rather than infer it from the spelling. Expand
+            &ldquo;How we determined this&rdquo; on any entry to see its source.
           </p>
 
           {grammarView.map((av: AttributeView) => {
             const lead: AttributeReading = av.readings[0];
             const others = av.readings.slice(1);
             const leadSource = lead.attestations[0];
-            // Our own rule/heuristic, resting on a rule not yet confirmed against the
-            // published source. Corroboration by any other source clears it — the point
-            // is an uncorroborated inference, not the rule's mere presence.
-            const leadIsUnverifiedRule =
-              (leadSource.sourceKind === "rule" || leadSource.sourceKind === "heuristic") &&
-              !leadSource.verified &&
-              lead.attestations.length === 1;
             return (
               <div key={av.attribute} style={{ ...CARD, marginBottom: "0.75rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
                   <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                     {av.label}
                   </span>
-                  {/* A reading that rests on an unverified rule must not look like a
-                      cited scholar's. Same information, visibly lower confidence: the
-                      solid badge is reserved for readings a source actually attests. */}
-                  <span
-                    className={leadIsUnverifiedRule ? undefined : "badge"}
-                    style={leadIsUnverifiedRule
-                      ? {
-                          fontFamily: '"Inter", sans-serif',
-                          fontSize: "0.8rem",
-                          color: "var(--text-secondary)",
-                          border: "1px dashed var(--border)",
-                          borderRadius: "4px",
-                          padding: "0.05rem 0.45rem",
-                        }
-                      : undefined}
-                  >
-                    {fmtGrammar(av.attribute, lead.value)}
-                  </span>
-                  {leadIsUnverifiedRule && (
-                    <span
-                      title={leadSource.citation ?? undefined}
-                      style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.68rem", fontWeight: 600, color: "#8a6d1f", background: "#f7efd8", borderRadius: "999px", padding: "0.05rem 0.5rem" }}
-                    >
-                      Unverified rule — our inference
-                    </span>
-                  )}
+                  <span className="badge">{fmtGrammar(av.attribute, lead.value)}</span>
                   {lead.attestations.length > 1 && (
                     <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.7rem", fontWeight: 600, color: "#1d7333", background: "#e1f1e6", borderRadius: "999px", padding: "0.05rem 0.5rem" }}>
                       Corroborated by {lead.attestations.length} sources
@@ -705,30 +634,16 @@ export default async function WordPage({ params, searchParams }: Props) {
                   </div>
                 ))}
 
-                {/* Conflict: a disagreeing reading. Two cases that must be presented
-                    differently — when OUR derived rule is overruled by a cited source we
-                    demote it, but when two cited scholars differ we present both plainly
-                    and let the reader weigh them. We are not the authority here, so no
-                    strikethrough and no "takes precedence" on a scholar's reading. */}
-                {av.conflict && others.map((r) => {
-                  const kind = r.attestations[0].sourceKind;
-                  const ours = kind === "rule" || kind === "heuristic";
-                  return (
-                    <div key={r.value} style={{ marginTop: "0.55rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                      <span
-                        className={ours ? undefined : "badge"}
-                        style={ours
-                          ? { textDecoration: "line-through", opacity: 0.7, marginRight: "0.4rem" }
-                          : { marginRight: "0.4rem", opacity: 0.85 }}
-                      >
-                        {fmtGrammar(av.attribute, r.value)}
-                      </span>
-                      {ours
-                        ? `Our ${KIND_WORD[kind]} reading disagrees with the cited source above — this rule may need adjusting.`
-                        : `${r.attestations[0].sourceLabel} reads it this way. Both readings are recorded here so you can weigh them.`}
-                    </div>
-                  );
-                })}
+                {/* Conflict: a source reads it differently. We are not the authority,
+                    so both readings are presented plainly for the reader to weigh. */}
+                {av.conflict && others.map((r) => (
+                  <div key={r.value} style={{ marginTop: "0.55rem", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                    <span className="badge" style={{ marginRight: "0.4rem", opacity: 0.85 }}>
+                      {fmtGrammar(av.attribute, r.value)}
+                    </span>
+                    {`${r.attestations[0].sourceLabel} reads it this way. Both readings are recorded here so you can weigh them.`}
+                  </div>
+                ))}
 
                 <FlagForm
                   wordId={wordId}
@@ -751,9 +666,9 @@ export default async function WordPage({ params, searchParams }: Props) {
                             {a.explanation && <div>{a.explanation}</div>}
                             {a.citation && <div style={{ fontStyle: "italic", marginTop: "0.2rem" }}>Source: {a.citation}</div>}
                             <div style={{ marginTop: "0.25rem", fontSize: "0.78rem" }}>
-                              {KIND_TIER[a.sourceKind]}
+                              Read from a cited source
                               {" · "}
-                              {a.verified ? "Verified against source" : a.confidenceLabel ? `Confidence: ${a.confidenceLabel}` : "Not yet scholar-verified"}
+                              {a.verified ? "Verified against source" : "Extraction not yet verified"}
                             </div>
                           </div>
                         ))}
@@ -768,8 +683,8 @@ export default async function WordPage({ params, searchParams }: Props) {
       )}
 
       {/* ── Grammar empty state ── */}
-      {tab === "grammar" && grammar.length === 0 && (
-        <EmptyState>No grammatical analysis yet. Rule-based grammar candidates arrive in a later phase.</EmptyState>
+      {tab === "grammar" && grammarView.length === 0 && (
+        <EmptyState>No source states this word&apos;s grammar yet. We show grammar only where a source states it.</EmptyState>
       )}
 
       {/* ── 5. Etymology (etymology tab) ── */}
@@ -1086,16 +1001,16 @@ export default async function WordPage({ params, searchParams }: Props) {
               </div>
             ))}
 
-          {/* Grammar provenance: be explicit that grammar is rule-derived. */}
-          {grammar.length > 0 && (
+          {/* Grammar provenance: every value is read from a named source. */}
+          {grammarView.length > 0 && (
             <div style={{ ...CARD, display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
               <div>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Grammar analysis</span>
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", marginLeft: "0.5rem" }}>
-                  rule-derived from Sahib Singh&apos;s Viakaran + Mahan Kosh markers (see the Grammar tab for each rule and its source)
+                  read from Sahib Singh&apos;s pad-arth, Shackle&apos;s glossary and Mahan Kosh part-of-speech markers (see the Grammar tab for each value&apos;s source)
                 </span>
               </div>
-              <ProvenanceBadge provenance="rule_derived" reviewStatus="unreviewed" />
+              <ProvenanceBadge provenance="imported" reviewStatus="unreviewed" />
             </div>
           )}
 

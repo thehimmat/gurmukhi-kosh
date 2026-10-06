@@ -11,7 +11,7 @@ every non-superseded story must be referenced by at least one test.
 | US-001 | Read every word of SGGS with a full dictionary entry | delivered | — | yes |
 | US-002 | Browse and search the corpus to reach any word | delivered | — | yes |
 | US-003 | Trust every datum through visible source citations/provenance | delivered | — | yes |
-| US-004 | See grammar with scholarly citations grouped by attribute | active | #18, #21 | yes |
+| US-004 | See grammar with scholarly citations grouped by attribute | active | #18, #30 | yes |
 | US-005 | See per-line commentary and etymology alongside occurrences | active | #33, #66 | yes |
 | US-006 | Flag errors and monitor data quality (curation + admin) | active | #2 | yes |
 | US-007 | Full entries across all ingested corpora | active | #96, #66, #26, #40 | yes |
