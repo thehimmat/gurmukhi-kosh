@@ -22,6 +22,7 @@ The PDFs themselves are not committed. They are fetched from Drive by id when ne
   compilation's own wording is kept as a witness. Collections never change counts, but they can be
   used as a filter.
 - **Hanuman Natak**: for the kosh, the 1899 Lahore print is canonical and Kamalroop's typed text is a witness. This is "for our purposes", not a ruling for the wider Panth. Compare the two in gurbani-diff.
+- **Sarbloh**: the undated, pre-2000 Budha Dal text-only print is canonical. The June 2000 Budha Dal steek is a witness: its corrections and footnoted pathantar become explanatory notes on why readings differ. Budha Dal reserves the rights to the mool bani, and the user is checking permission before public use.
 - **Every scripture is a first-class corpus**, filterable at every stage. SGGS is the core corpus, not
   the only one.
 - **Tiers**: `gurbani` (scripture), `historical` (Sikh literature: Sri Gur Sobha, Shaheed Bilas,
@@ -58,10 +59,6 @@ Historical ingest candidates: Sri Gur Sobha, Shaheed Bilas, Sau Sakhi, Hanuman N
 ## Follow-ups found during triage
 
 - **Decisions for the user**
-  - Which edition is canonical for Sarbloh: the text-only print or the steek. Both are Budha Dal editions published by Baba Santa Singh:
-    - the text-only print is undated but from before 2000;
-    - the steek is dated 5 June 2000.
-    Budha Dal reserves the rights to the mool bani, so ask before ingesting it.
   - Whether philosophical texts (Vichar Sagar, Sankhep Bibek) get their own tag inside `historical`.
 - **Possible BaniDB data issues (Bhai Nand Lal, source N)**
   - Ghazal 1 lacks ਆਮਦਨ, which the metre needs.

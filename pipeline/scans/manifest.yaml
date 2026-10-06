@@ -1154,7 +1154,7 @@ files:
   - punjabi
   content_type: text+commentary(steek)
   tier: gurbani
-  decision: ingest-candidate
+  decision: witness
   sections:
   - title:
       gurmukhi: 'ਸਟੀਕ ਭਾਗ ਪਹਿਲਾ: ਮੁੱਢਲੇ ਪੰਨੇ, ਭੂਮਿਕਾ, ਤਤਕਰੇ'
@@ -1253,7 +1253,9 @@ files:
     in footnotes, so it is the best candidate for the canonical Sarbloh text. Two physical volumes in one PDF (vol
     1 = Adhyay 1-4 in two ''bhags'' with separate pagination; vol 2 = Adhyay 5). Sarbloh not in BaniDB: 14 lines
     from different parts tested, all not_found. Bhumika and pingal appendix are reference tier; footnote glosses
-    are commentary (do not count toward word stats). Small pages (324x422pt), legible at 100dpi.'
+    are commentary (do not count toward word stats). Small pages (324x422pt), legible at 100dpi. USER DECISION (2026-10-06):
+    witness to the canonical text-only print (1kv7Ew4x…). Its corrections and footnoted pathantar are to be recorded
+    as explanatory notes on why readings differ, not merged into the canonical text.'
   rights: The bhumika states Budha Dal holds the full copyright of the Sarbloh mool bani and its prakash
 - batch: Sri Sarbloh Granth
   file: Sarbloh santheya bhag 1.pdf
@@ -4418,7 +4420,8 @@ files:
     and pages 1-4 and 1115-1117 are blank or stained. This is a strong ingest candidate: the scan would become the
     canonical Sarbloh text. Title page (PDF 5) and colophons (PDF 384, 1114) name Baba Santa Singh as publisher
     and the Budha Dal Panjvan Takht Printing Press, Guru ka Bagh, Anandpur Sahib (Ropar) as printer, with no date.
-    The text ends with a running chhand total of 14,843 (PDF 1112).'
+    The text ends with a running chhand total of 14,843 (PDF 1112). USER DECISION (2026-10-06): canonical Sarbloh
+    text for the kosh (needs OCR). Copyright status is pending; the user is checking with Budha Dal circles.'
   rights: 'Title page: ''ਮੂਲ ਬਾਣੀ ਦੇ ਸਭ ਹੱਕ ਰਾਖਵੇਂ ਹਨ'' (all rights to the mool bani reserved, Budha Dal)'
 - batch: Reference material and unnamed files
   file: BK-000934.pdf
