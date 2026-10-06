@@ -636,7 +636,7 @@ files:
   - english
   content_type: text
   tier: historical
-  decision: ingest-candidate
+  decision: witness
   sections:
   - title:
       english: 'Foreword (English, in roman-numbered pages i-x): Hanuman Natak, pre-colonial Punjab education, Buddha
@@ -792,16 +792,18 @@ files:
     work: reference/hanuman-natak-kamalroop-refs
     banidb:
       status: not_checked
-  notes: Hanuman Natak is a Braj Ramayana drama, not part of Dasam Granth or any BaniDB source; 4 lines from acts
+  notes: 'Hanuman Natak is a Braj Ramayana drama, not part of Dasam Granth or any BaniDB source; 4 lines from acts
     1 and 14 return not_found (best hit 0.28, an unrelated SGGS line). Printed page = PDF page - 12 for the text
     (PDF 13 = 1, PDF 400 = 388). The Gurmukhi is GurbaniAkhar and converts cleanly with legacy2uni.js. The English
     is Unicode Cambria, but the converter garbles it, so run it only on GurbaniAkhar spans. Some foreword verses
     also have a roman transliteration in a special-character font. Compared with the 1899 Lahore print (1J5-Emvt...),
     this is the same recension with the same 14 acts, the same colophon and 160 verses in act 14, but the typing
-    has slips. Verse 3 drops 'ਚਰਣ ਸਰੋਜ ਰਸ ਭਰੇ ਤਾਂਕੋ ਭਯੋ ਅਲਿ ਜਾਂ ਦਿਨ ਪਰਾਗ ਪਾਊਂ ਤਾਂਹੀ ਛਿਨ' and repeats 'ਜਿਯੋਂ ਨੇਹੁ
-    ਬਾਂਧਯੋ'. Verse 2 ends 'ਸਭ ਹੋਹਿ ਰਾਮ ਕਹੈਯਾ' where Lahore has 'ਸਬ ਹੋਹਿ ਸਹੈਯਾ'. Verse 4 shows duplicated phrases.
+    has slips. Verse 3 drops ''ਚਰਣ ਸਰੋਜ ਰਸ ਭਰੇ ਤਾਂਕੋ ਭਯੋ ਅਲਿ ਜਾਂ ਦਿਨ ਪਰਾਗ ਪਾਊਂ ਤਾਂਹੀ ਛਿਨ'' and repeats ''ਜਿਯੋਂ ਨੇਹੁ
+    ਬਾਂਧਯੋ''. Verse 2 ends ''ਸਭ ਹੋਹਿ ਰਾਮ ਕਹੈਯਾ'' where Lahore has ''ਸਬ ਹੋਹਿ ਸਹੈਯਾ''. Verse 4 shows duplicated phrases.
     As a ready-made digital text it is the cheapest ingest base, but it should be corrected against the Lahore print.
-    Alternatively, make the Lahore print canonical after OCR and keep this one as a witness; the user decides.
+    Alternatively, make the Lahore print canonical after OCR and keep this one as a witness; the user decides. USER
+    DECISION (2026-10-06): kept as a witness to the 1899 Lahore print (1J5-Emvt…), which is canonical for the kosh.
+    Its digital text is a useful OCR cross-check.'
 - batch: Dasam-related
   file: ਹਨੂਮਾਨ ਨਾਟਕ.pdf
   drive_id: 1J5-EmvtopdSXJbWy3IWB_UhDmvOdfpHc
@@ -819,7 +821,7 @@ files:
   - braj
   content_type: text
   tier: historical
-  decision: witness
+  decision: ingest-candidate
   sections:
   - title:
       english: Cover (handwritten library label, Punjabi Sahit Akademi Ludhiana stamp no. 27410, Dr Davinder Singh
@@ -853,10 +855,12 @@ files:
     work: back-matter
     banidb:
       status: not_checked
-  notes: Panjab Digital Library digitization (footer on every page) of an ex-library copy; ABBYY output but no text
-    layer. The scan is binarized with speckle, and ink blots obscure a few words on PDF 5 (first page of text).
-    It is the mool text only, without commentary. It is the same recension as Kamalroop's typed text and is the
-    better authority for correcting it.
+  notes: 'Panjab Digital Library digitization (footer on every page) of an ex-library copy; ABBYY output but no
+    text layer. The scan is binarized with speckle, and ink blots obscure a few words on PDF 5 (first page of text).
+    It is the mool text only, without commentary. It is the same recension as Kamalroop''s typed text and is the
+    better authority for correcting it. USER DECISION (2026-10-06): for the kosh, this 1899 Lahore print is the
+    canonical Hanuman Natak (needs OCR); the Kamalroop typing is kept as a witness. Compare the two in the user''s
+    gurbani-diff app.'
 - batch: Dasam-related
   file: Jaap.Sahib.Arth.Parbodh.by.Sant.Kartar.Singh.pdf
   drive_id: 1E6pN4oqSfMWtcEmDJpnaVNE9z9jmIdmR
@@ -1136,10 +1140,12 @@ files:
     gurmukhi: 'ਸੰਪੂਰਨ ਸਟੀਕ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ (ਸ੍ਰੀ ਮੰਗਲਾ ਚਰਨ ਜੀ) ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦'
     english: Complete Steek of Sri Sarbloh Granth Sahib Ji (Sri Manglacharan Ji)
   author: Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) as printed
-  editor_or_commentator: unknown (steek prepared under Budha Dal; commentator not named on title/imprint pages seen;
-    bhumika pp.7-21 not read in full)
-  publisher: 'Printer & publisher: Singh Sahib Baba Santa Singh Ji, Jathedar Chhianven Krori, Shiromani Panth Akali
-    Budha Dal (Budha Dal Panjvan Takht Printing Press); printed at Takht Sri Damdama Sahib, Talwandi Sabo'
+  editor_or_commentator: Commentary and corrections by 'many renowned Panthic scholars' (bhumika, unnamed). The
+    bhumika (PDF 4-21) is signed by Jathedar Dyal Singh (Likhari), managing in-charge of the Budha Dal Panjvan Takht
+    Printing Press, Bagichi Baba Bamba Singh, Patiala
+  publisher: Baba Santa Singh, Jathedar 96 Crori, Budha Dal Panjvan Takht (Chalda Vahir). Printed at Bagichi Baba
+    Bamba Singh, Lower Mall Road, Patiala, under Jathedar Dyal Singh, and issued from Takht Sri Damdama Sahib, Talwandi
+    Sabo
   year: Khalsa Samvat 302, Jeth sudi; 5 June 2000 (as printed). PDF digitized/signed by Prabhjot Singh 2010-03-17
   languages:
   - braj
@@ -1248,6 +1254,7 @@ files:
     1 = Adhyay 1-4 in two ''bhags'' with separate pagination; vol 2 = Adhyay 5). Sarbloh not in BaniDB: 14 lines
     from different parts tested, all not_found. Bhumika and pingal appendix are reference tier; footnote glosses
     are commentary (do not count toward word stats). Small pages (324x422pt), legible at 100dpi.'
+  rights: The bhumika states Budha Dal holds the full copyright of the Sarbloh mool bani and its prakash
 - batch: Sri Sarbloh Granth
   file: Sarbloh santheya bhag 1.pdf
   drive_id: 1y7lxQt2c01eSB_veqLv8gmn6SbYa7xGq
@@ -1260,9 +1267,10 @@ files:
     english: Sampooran Sri Sarbloh Granth Sahib Ji, pothi parts 1 & 2 (mool), with handwritten santhiya annotations
   author: Attributed to Guru Gobind Singh (as printed)
   editor_or_commentator: Handwritten santhiya/grammar annotations by an unknown student/teacher
-  publisher: Cover faded; publisher line appears to read 'ਸਿੰਘ ਸਾਹਿਬ ਬਾਬਾ ਸੰਤਾ ਸਿੰਘ ਜੀ ਜਥੇਦਾਰ ਛਿਆਨਵੇਂ ਕ੍ਰੋੜੀ' (Budha
-    Dal) – partly illegible, treat as probable
-  year: unknown (no imprint page captured)
+  publisher: Baba Santa Singh, Jathedar 96 Crori, Budha Dal; issued from Guru ka Bagh, Anandpur Sahib (inner title
+    page, PDF 2, confirmed). Same edition as the text-only print 1kv7Ew4x…
+  year: undated; probably a reprint after 2000, because its title page reserves rights to the 'mool bani and steek'
+    (the earlier print says mool bani only)
   languages:
   - braj
   - sanskrit-in-gurmukhi
@@ -1302,6 +1310,7 @@ files:
     Dal recension as the steek). The handwritten santhiya layer is reference-tier material and could be valuable
     for pronunciation/vishram but needs manual reading. ''Bhag 1'' in the filename is the santhiya series part;
     the printed pothi it photographs is ''Pothi bhag 1 & 2''.'
+  rights: 'Title page: ''ਮੂਲ ਬਾਣੀ ਅਤੇ ਸਟੀਕ ਦੇ ਸਭ ਹੱਕ ਰਾਖਵੇਂ ਹਨ'''
 - batch: Sri Sarbloh Granth
   file: Sarbloh Granth Manglacharan.pdf
   drive_id: 1cqBDhgc76X3t1vpZIlenXnSACbbLgxEX
@@ -1543,7 +1552,8 @@ files:
   editor_or_commentator: 'Sangreh karta: Giani Gurvinder Singh Ji Jatha Nangli, Giani Mehtab Singh Ji Bhamboi'
   publisher: 'Seva: Singh Sahib Jathedar Baba Gajjan Singh Ji (15th head, Misl Shaheedan Taruna Dal, Baba Bakala
     Sahib)'
-  year: unknown as printed; PDF created 2020-10-08 (from a PageMaker .pmd file)
+  year: undated; it repeats the 2019 edition's 'first printed 17 October 2019' note, and the PDF was made 2020-10-08,
+    so probably the Diwali 2020 reprint
   languages:
   - braj
   - punjabi
@@ -1712,8 +1722,7 @@ files:
     gurmukhi: ਸ੍ਰੀ ਭਵਾਨੀ ਉਸਤਤਿ + ੩. ਸਰਬ ਲੋਹ ਕਵਚ
     english: Sri Bhavani Ustat (Manglacharan ch.1-106) and Sarbloh Kavach, from a gutka
   author: Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)
-  publisher: unknown (pages photographed from a printed gutka; running heads show page numbers in the 500s, e.g.
-    'ਕਵਚ/੫੮੪' – exact numbers uncertain at scan resolution)
+  publisher: 'unknown: the photos cover only the Bhavani Ustat and Kavach pages, with no title or imprint page'
   year: unknown
   languages:
   - braj
@@ -4358,7 +4367,8 @@ files:
   author: attributed on the title page to Guru Gobind Singh (Sri Mukhvak Patshahi 10)
   publisher: Singh Sahib Baba Santa Singh Ji, Jathedar 96 Crori, Budha Dal Panjvan Takht; printed at Budha Dal Panjvan
     Takht Printing Press, Guru ka Bagh, Sri Anandpur Sahib (Ropar)
-  year: unknown (no date found on title or imprint pages)
+  year: undated; before June 2000 (the 2000 Budha Dal steek's bhumika refers back to this complete printing at the
+    Anandpur Sahib press)
   languages:
   - braj
   content_type: text
@@ -4406,7 +4416,10 @@ files:
     plus closing lines) returned not_found. Text only, no steek. The printed pagination runs across both volumes
     (1-1028), and the verse numbering is running as well (e.g. ॥੧੦੪॥੧॥੨੩੨੦॥). Some pages have bleed-through or speckle,
     and pages 1-4 and 1115-1117 are blank or stained. This is a strong ingest candidate: the scan would become the
-    canonical Sarbloh text.'
+    canonical Sarbloh text. Title page (PDF 5) and colophons (PDF 384, 1114) name Baba Santa Singh as publisher
+    and the Budha Dal Panjvan Takht Printing Press, Guru ka Bagh, Anandpur Sahib (Ropar) as printer, with no date.
+    The text ends with a running chhand total of 14,843 (PDF 1112).'
+  rights: 'Title page: ''ਮੂਲ ਬਾਣੀ ਦੇ ਸਭ ਹੱਕ ਰਾਖਵੇਂ ਹਨ'' (all rights to the mool bani reserved, Budha Dal)'
 - batch: Reference material and unnamed files
   file: BK-000934.pdf
   drive_id: 1wtt5u7ypC3PwDA-kzosOiNhMVQG774lG
