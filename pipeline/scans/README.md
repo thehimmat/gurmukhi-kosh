@@ -34,6 +34,53 @@ The PDFs themselves are not committed. They are fetched from Drive by id when ne
 - OCR for scans that have no usable text layer.
 - Persian originals of Bhai Nand Lal's works, tracked in issue #120.
 
+## Triage results (manifest.yaml)
+
+There are 50 PDFs:
+- 17 witnesses
+- 11 ingest candidates
+- 9 collections
+- 10 reference-only
+- 3 skipped: a duplicate, a contemporary kavishri booklet, and a personal letter
+
+Gurbani not in BaniDB:
+- **Sri Sarbloh Granth.** There are two complete Budha Dal editions:
+  - the 1118-page text-only print (`5_6147…pdf`, Panjab Digital Library), which is the easier OCR source;
+  - the 1761-page steek, which records variant readings in its footnotes.
+  Several Manglacharan and Diwali-pothi files are partial witnesses or collections of it.
+- **Nangali Nitnem gutka:** about 17 banis, including Sansahar Sukhmana, Asfotak Kabitt, Bhagauti di Var and Brahm Kavach. The PDF has real text, but in the Satluj font.
+- **Bhai Nand Lal:** Joti Bigas (Punjabi), his Rehatnama, Khatima, and Ghazal 61 of the user's edition.
+- **Smaller pieces:** Braham Kavach, and some lines from the Sandhia gutka.
+
+Historical ingest candidates: Sri Gur Sobha, Shaheed Bilas, Sau Sakhi, Hanuman Natak, Vichar Sagar, Sankhep Bibek, and the 1898 Uthanka (occasion stories keyed to SGGS shabad first lines).
+
+## Follow-ups found during triage
+
+- **Decisions for the user**
+  - Which edition is canonical for Hanuman Natak: Kamalroop's typed text (it has typing slips) or the 1899 Lahore print (needs OCR).
+  - Which edition is canonical for Sarbloh: the text-only print or the steek.
+  - Whether philosophical texts (Vichar Sagar, Sankhep Bibek) get their own tag inside `historical`.
+- **Possible BaniDB data issues (Bhai Nand Lal, source N)**
+  - Ghazal 1 lacks ਆਮਦਨ, which the metre needs.
+  - Rubai 1 lacks ਕਿ.
+  - Shabad 30062 duplicates 30060.
+  - The user's edition orders ghazals 7–9 differently.
+  - Ghazal 52 has 7 couplets in BaniDB against 8 in the scan, and ਕਾਲ looks like a typo for ਫ਼ਾਲਿ.
+  - These are worth reporting upstream once checked.
+- **Cross-check tool**
+  - Accept an expected source and prefer it: Bhai Gurdas quotes SGGS, which caused one false match.
+  - Join consecutive BaniDB part-lines, since Dasam passages are often stored as half-lines.
+  - Try adding nukta as well as removing it, for when BaniDB has ਖ਼ but the scan has ਖ.
+- **Converters**
+  - Encodings still unsupported: Satluj (Nangali gutka), DrChatrik/Joy (a Chandi Charitar), Asees (Sri Gur Sobha), AnandpurSahib + UrduNaqsh (Zafarnama, the only file with Persian script; see #120).
+  - Bugs in the user's own converter are tracked in thehimmat/gurmukhi-transliterate#14.
+- **Incomplete scans**
+  - The Hazur Sahib Dasehra pothi stops at printed p.167, so three day-10 items are missing.
+  - Vaaran Vol I is missing printed pp. 366–367.
+  - Vaaran Vol II has its last pages out of order.
+  - The Granthavali excerpt is missing Joti Bigas couplets 1–69.
+  - Reet Ratnavali Part 1 is only a 44-page preview.
+
 ## Tooling
 
 `npm run scans:check < lines.txt` reads Unicode Gurmukhi sample lines from a section and prints its

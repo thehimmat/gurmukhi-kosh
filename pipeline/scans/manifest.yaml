@@ -1,0 +1,4804 @@
+# Triage of the user's scanned PDFs (Drive: Gurbani Docs / Santhiā), 2026-10-06.
+#
+# One entry per PDF: what it is, its edition and scan quality, its sections with
+# PDF page ranges, and whether each Gurbani section is already in BaniDB.
+# See README.md for the decisions this follows (BaniDB canonical; other editions
+# are witnesses; compilations are collections; tiers gurbani/historical/reference).
+#
+# decision:
+#   witness           - BaniDB already has the text; keep this edition for comparing readings
+#   ingest-candidate  - no online source; this scan would become the canonical text
+#   collection        - a compilation: an ordered list of references plus rubrics
+#   reference-only    - not corpus (translation-only, pronunciation, music, prosody)
+#   skip              - not useful for the kosh, a duplicate, or personal material
+#
+# Readings from scans without a text layer were read off page images and checked with
+# `npm run scans:check`; single-vowel-sign variants from low-resolution renders are tentative.
+
+files:
+- batch: Bhai Nand Lal and Zafarnama
+  file: Ghazals Bhai Nand Laal Goyaa Complete.pdf
+  drive_id: 1E0Ev6lOwuvTRz41vqw_uC8RzJjMslVSW
+  sha256_12: 0bf83da42b17
+  pages: 71
+  text_layer: legacy-GurbaniAkhar
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਭਾਈ ਨੰਦ ਲਾਲ ਗੋਇਆ ਗ਼ਜ਼ਲਾਂ
+    english: Ghazals of Bhai Nand Lal Goya (complete)
+  author: Bhai Nand Lal Goya (one rubai headed Patshahi 10)
+  editor_or_commentator: unknown; typed in Word, PDF metadata author 'Himmat Singh Khalsa' (2021), i.e. the user's
+    own typed copy of an unnamed printed edition
+  publisher: none (self-typed document)
+  year: unknown (PDF created 2021)
+  languages:
+  - persian-in-gurmukhi
+  content_type: text
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਗ਼ਜ਼ਲਾਂ ੧-੬੩
+      english: Ghazals 1-63 (Diwan-e-Goya)
+    pdf_pages:
+    - 1
+    - 65
+    work: nand-lal/ghazals
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30000
+      - 30062
+      similarity_range:
+      - 0.85
+      - 0.96
+    variants_observed: 'Same text, systematically different transliteration. The scan follows Indo-Persian (classical)
+      vowels: yā/wāw-e majhūl written ੇ/ੋ where BaniDB writes ੀ/ੂ (ਨਮੇ/ਨਮੀ, ਮੇ/ਮੀ, ਨੇਸ੍ਤ/ਨੀਸਤ, ਤੋ/ਤੂ, ਦੋਸਤ/ਦੂਸਤ);
+      poet''s name ਗੋਇਆ vs BaniDB ਗੋਯਾ; nasal noon written with bindi (ਈਂ, ਜਹਾਂ, ਆਂ) where BaniDB uses ਣ (ਈਣ, ਜਹਾਣ,
+      ਆਣ); silent final he written ਹ (ਜੁਮਲਹ, ਗਸ਼ਤਹ, ਦੀਦਹ) vs BaniDB ਾ (ਜੁਮਲਾ, ਗਸ਼ਤਾ, ਦੀਦਾ); ਕਿ: / ਚਿ: with visarga
+      vs BaniDB ਕਿ/ਕਿਹ, ਚਿ/ਚਿਹ; half-letters ਅਸ੍ਤ/ਨੇਸ੍ਤ vs ਅਸਤ/ਨੀਸਤ; doubled consonant marked (ਸ਼ਵੱਦ, ਕੁਨੱਦ) vs
+      ਸ਼ਵਦ/ਕੁਨਦ; heavier nukta use (ਕ਼, ਅ਼); izafat shown with ਿ plus hyphens and commas. Genuine readings also
+      differ, e.g. ghazal 1.1 scan ''ਵਗਰਨਹ, ਜ਼ੂਕਿ਼ ਚੁਨੀਂ ਆਮਦਨ, ਨਬੂਦ ਮਰਾ'' vs BaniDB ''ਵਗਰਨਾ ਜ਼ੋਕਿ ਚੁਨੀਂ ਨ ਬੂਦ ਮਰਾ'';
+      ghazal 52.6 scan ''ਫ਼ਾਲਿ ਮੁਬਾਰਕ'' vs BaniDB ''ਕਾਲ ਮੁਬਾਰਿਕ'' (BaniDB looks like a typo); ghazal 52 has 8 couplets
+      in the scan vs 7 in BaniDB. One alternative reading is given inline in parentheses (p11: ''ਈਂ (ਅਈਂ) ਮਤਾਇ ਹੱਕ'').'
+    notes: 'Mapped every scan ghazal to BaniDB by first line (local fuzzy match against the N shabad list) plus
+      scans:check on ghazal 1 (online, 30000, 0.85-0.96). Order and coverage: scan 1-6 = BaniDB 1-6; scan 7, 8,
+      9 = BaniDB 8, 9, 7 (BaniDB''s 7th, ''ਗਦਾਇ ਕੂਇ ਤੁਰਾ'', is the scan''s 9th); scan 10-60 = BaniDB 10-60; scan
+      61 ''ਗਿਰੀਆਂ ਸ਼ੁਦਾ ਇੰਦਲੀਬ, ਅਜ਼ ਨਿਗਾਹਿ ਤੋ'' (p63) is NOT in BaniDB (scans:check not_found); scan 62 ''ਸਾਕੀ,
+      ਮਰਾ ਤੋ, ਜੁੱਰਾ-ਇ ਜਾਂ'' = BaniDB 30061 (numbered 62); scan 63 ''ਬੇਵਫ਼ਾ ਨੇਸ੍ਤ ਕਸੇ'' = BaniDB 30060 (numbered
+      61) AND again 30062 (numbered 63). So BaniDB has 63 ghazal shabads but only 62 distinct ghazals (30062 is
+      a duplicate of 30060, and its spelling (ਕਿ:, ਨੇਸਤ, ਨਸਾਰਿ) matches this scan''s edition, suggesting it was
+      keyed from the same edition). Distinct ghazals overall: 61 shared with BaniDB''s 1-61 numbering + ''Saqi mara
+      to'' (both have it as 62) + ''Giriyan shuda andalib'' (scan only) = 63. Whether the two ghazals beyond 61
+      come from works other than the Diwan cannot be settled from this file: it gives no source notes for them;
+      the classic Diwan-e-Goya count is usually given as 61 (not verified here). None of the 63 come from Zindagi
+      Nama, Ganj Nama or Joti Bigas (those are masnavi couplets, and the scan''s ghazals did not match them).'
+  - title:
+      gurmukhi: ਰੁਬਾਈ ਪਾਤਸ਼ਾਹੀ ੧੦
+      english: Rubai headed 'Patshahi 10'
+    pdf_pages:
+    - 66
+    - 66
+    work: dasam/rubai-patna (attributed to Guru Gobind Singh)
+    banidb:
+      status: not_found
+    notes: 'One 4-line rubai ''ਗਰ ਅਸ਼ਨਾਏ ਮਾ ਸ਼ਵੀ ਅਜ਼ ਦੀਗਰਾਂ ਬਿਗਾਨਾਂ ਸ਼ਉ ...'' headed ''ੴ ਰੁਬਾਈ ਪਾਤਸ਼ਾਹੀ ੧੦ ॥ ਤ੍ਵ
+      ਪ੍ਰਸਾਦਿ ॥'', with the note ''(ਏਹ ਰੁਬਾਈ ਪੁਰਾਤਨ ਪਟਨੇ ਵਾਲੇ ਦਸਮ ਗ੍ਰਥ ਦੇ ਪਾਵਨ ਸਰੂਪ ਚ ਲਿਖੀ ਮਿਲਦੀ ਹੈ।)''. Not Bhai
+      Nand Lal: attributed to Guru Gobind Singh, from the old Patna Dasam Granth manuscript. scans:check not_found
+      (tried raw and cleaned lines). Small ingest candidate if the user wants Patna-bir extras; route to the Dasam
+      group.'
+  - title:
+      gurmukhi: ਰੁਬਾਈਆਂ ੧-੧੮
+      english: Rubaiyan 1-18
+    pdf_pages:
+    - 66
+    - 70
+    work: nand-lal/rubaiyan
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30063
+      similarity_range:
+      - 0.85
+      - 0.95
+    variants_observed: Same conventions as the ghazals (scan 'ਮੌਜੂਦ ਖ਼ੁਦਾ ਅਸਤ, ਤੂ ਕਿਰਾ ਮੇ ਜੋਈ' vs BaniDB 'ਮੌਜੂਦ
+      ਖ਼ੁਦਾਸਤ ਤੂ ਕਿਰਾ ਮੀ ਜੋਈ'; scan 'ਗਾਹੇ ਲਾਜ਼ਿਮ ਸ਼ਵੀ' vs BaniDB 'ਗਾਹੇ ਲਾਜ਼ਮ ਸ਼ਵਦ'; scan 'ਜੰਗ ਕੁਨੀ' vs BaniDB 'ਜੰਗ
+      ਕੁਨੇਮ').
+    notes: Compared against the full text of BaniDB 30063 (19 rubaiyan). Scan 1-12 = BaniDB 1-12; BaniDB rubai 13
+      ('ਦਿਲਿ ਜ਼ਾਲਮਿ ਬ-ਕਸਦਿ ਕੁਸ਼ਤਨਿ ਮਾ-ਸਤ') is printed in the scan as baint 1-2 instead; scan 13-16 = BaniDB 14-17;
+      scan 17/18 = BaniDB 19/18 (order swapped). Similarity range is estimated by eye; not scored by scans:check.
+  - title:
+      gurmukhi: ਬੈਂਤ
+      english: Baint (6 couplets)
+    pdf_pages:
+    - 71
+    - 71
+    work: nand-lal/rubaiyan (baint)
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30063
+    variants_observed: e.g. scan 'ਕੈ ਸ਼ਵੱਦ ਆਤਸ਼ਿ ਦੋ ਰੰਗ' vs BaniDB 'ਕੈ ਬਵਦ ਆਤਿਸ਼ਿ ਦੋ ਰੰਗ'; scan 'ਖ਼ਾਦਮ' vs BaniDB
+      'ਖ਼ਾਕਮ'.
+    notes: Baint 1-2 = BaniDB rubai 13; baint 3-6 = the 4 baint at the end of BaniDB 30063.
+  notes: Clean typed document in GurbaniAkhar; legacy2uni.js converts it cleanly (nukta letters included). No Persian
+    script. Everything except ghazal 61 ('Giriyan shuda andalib') and the Patshahi 10 rubai is in BaniDB, so the
+    file is a witness; those two items are the only new text. Its edition is unnamed. It is useful as a witness
+    because its transliteration follows a different (Indo-Persian, majhul-vowel) convention, and it exposes BaniDB's
+    duplicate ghazal 30062 and the ghazal 7/8/9 order difference.
+- batch: Bhai Nand Lal and Zafarnama
+  file: zafarnama.pdf
+  drive_id: 1zNfcihiRSuoOgsZPSqz477eSmm2BxeTB
+  sha256_12: 386cdf3cf363
+  pages: 40
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਜ਼ਫ਼ਰਨਾਮਾ
+    english: Zafarnama (with Persian script, roman transliteration, glossary and English translation)
+  author: Guru Gobind Singh
+  editor_or_commentator: 'unknown (PDF metadata: ''Administrator'', Microsoft Word ''Zafarnama.doc'', 2005)'
+  publisher: unknown
+  year: unknown (PDF created 2005)
+  languages:
+  - persian
+  - persian-in-gurmukhi
+  - english
+  content_type: text+translation
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਜ਼ਫ਼ਰਨਾਮਾ
+      english: Zafarnama, couplets 1-111
+    pdf_pages:
+    - 1
+    - 40
+    work: dasam/zafarnama
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 12797
+      similarity_range:
+      - 0.83
+      - 1.0
+    variants_observed: Couplet 1.2 scan 'ਰਜ਼ਾ ਬਖ਼ਸ਼ ਰਾਜ਼ਕ ਰਹਾਕੁਨ ਰਹੀਮ' (Persian 'رهاکن') vs BaniDB 'ਰਜ਼ਾ ਬਖ਼ਸ਼ੋ
+      ਰਾਜ਼ਿਕ ਰਿਹਾਕੋ ਰਹੀਮ'; 2.2 scan 'ਖ਼ਤਾ ਬਖ਼ਸ਼ ਰੋਜ਼ੀ ਦਿਹੋ ਦਿਲਪਜ਼ੀਰ' vs BaniDB 'ਰਜ਼ਾ ਬਖ਼ਸ਼ ਰੋਜ਼ੀ ਦਿਹੋ ਦਿਲ ਪਜ਼ੀਰ';
+      3.2 'ਬੇਗੂਨੋ ਬੇਚੂਨੋ' vs 'ਬੇਗੂੰਨ ਬੇਚੂੰਨ'; 111.2 'ਨ ਯਕ ਮੂਏ ਓਰਾ ਆਜ਼ਾਰ' vs 'ਨ ਯਕ ਮੂਇ ਊ ਰਾ ਅਜ਼ਾਰ'.
+    notes: 'Each couplet is given in Gurmukhi, original Persian (Arabic) script, roman transliteration, a word glossary
+      and an English rendering, plus occasional exegetical notes (e.g. on ''Shah-e Shab'', ''but shikast''). Complete:
+      ends at couplet 111. Sample lines were read off page images; one line (111.2) did not hit because of the spelling
+      difference.'
+  notes: 'ORIGINAL PERSIAN SCRIPT PRESENT (relevant to issue #120): the Persian is set in the legacy ''UrduNaqsh''
+    font, so its text layer is not Unicode (it extracts as Latin gibberish such as ''Cm/b Cm"a''); it needs a font
+    map or OCR from the page images. The Gurmukhi is in the legacy ''AnandpurSahib'' font ('';'' = ਾ, ''J'' = ਜ਼,
+    ''<'' = ਖ਼ ...), which legacy2uni.js only partly converts. The roman transliteration and the English are real
+    text. A typeset Word document, not a scan. Belongs with Dasam (BaniDB D 12797, ang 1389-1394); a witness with
+    a Persian-script layer.'
+- batch: Bhai Nand Lal and Zafarnama
+  file: BHAI NAND LAL SINGH JI.pdf
+  drive_id: 1WQeHNQB2EYP_BhA6rS6T_UZtzDhneP8H
+  sha256_12: 94934b2b2c91
+  pages: 53
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਭਾਈ ਨੰਦ ਲਾਲ ਗ੍ਰੰਥਾਵਲੀ (ਅੰਸ਼, ਪੰਨੇ ੨੦੧-੨੫੨)
+    english: Bhai Nand Lal Granthavali (excerpt, printed pp. 201-252)
+  author: Bhai Nand Lal Goya
+  editor_or_commentator: Ganda Singh (sampadak)
+  publisher: Publication Bureau, Punjabi University, Patiala
+  year: unknown (no imprint page in the excerpt)
+  languages:
+  - persian-in-gurmukhi
+  - braj
+  - punjabi
+  content_type: text+translation
+  tier: gurbani
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਜੋਤਿ ਬਿਗਾਸ (ਫ਼ਾਰਸੀ) ਬੈਤ ੭੦-੧੭੫
+      english: Joti Bigas (Persian), couplets 70-175 only
+    pdf_pages:
+    - 2
+    - 17
+    work: nand-lal/joti-bigas
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30081
+      similarity_range:
+      - 0.95
+      - 1.0
+    variants_observed: Very close to BaniDB (BaniDB looks keyed from this same edition). 73.2 scan 'ਬ ਸਾਨੀ ਹਮਾ ਜ਼ੁਲਮ
+      ਜ਼ੁਲਮਤ ਜ਼ੁਦਾ' vs BaniDB 'ਬ-ਸਾਨੀ ਹਮਾ ਜ਼ੁਲਮੋ ਜ਼ੁਲਮਤ ਜ਼ਦਾ'; 71.1 scan 'ਨੂਰਸ਼' vs BaniDB 'ਨੁਰਸ਼' (BaniDB typo);
+      174.1 'ਚੁ' vs 'ਚੂ'.
+    notes: Each couplet is followed by a 2-line Punjabi translation. Couplets 1-69 are not in this excerpt (they
+      are on earlier pages of the book).
+  - title:
+      gurmukhi: ਜੋਤਿ ਬਿਗਾਸ (ਪੰਜਾਬੀ)
+      english: Joti Bigas (Punjabi/Braj version), 43 couplets
+    pdf_pages:
+    - 18
+    - 21
+    work: nand-lal/joti-bigas-punjabi
+    banidb:
+      status: not_found
+    notes: Opens with 'ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ ॥', with 'ਵਾਹੁ ਵਾਹੁ ਗੁਰ ਪਤਿਤ ਉਧਾਰਨੰ'. It ends at 43, followed by 'ਜੋਤਿ ਬਿਗਾਸ
+      ਸੰਪੂਰਣ ਹੋਇਆ ਰਚਿਤ ਮੁਨਸ਼ੀ ਨੰਦ ਲਾਲ ਜੀ ਮੁਲਤਾਨੀ ...'. scans:check not_found (4 lines). Ingest candidate.
+  - title:
+      gurmukhi: ਰਹਿਤ ਨਾਮਾ
+      english: 'Rehatnama of Bhai Nand Lal (dialogue: ''ਤੀਨ ਰੂਪ ਹੈ ਮੋਹਿ ਕੇ ...'')'
+    pdf_pages:
+    - 22
+    - 25
+    work: nand-lal/rehatnama
+    banidb:
+      status: not_found
+      source: R
+    notes: 'Opens ''ਸ੍ਰੀ ਗੁਰੂ ਵਾਚ / ਚੌਪਈ / ਗੁਰ ਸਿਖ ਰਹਿਤ ਸੁਨਹੁ ਮੇਰੇ ਮੀਤ'', with dohras and chaupais. It ends at about
+      40 and is followed by a dohra (pdf 25). Two scans:check runs (8 lines): none matched Nand Lal; one line hit
+      a Bhai Desa Singh rehatnama (R 31036) by coincidence. Walking BaniDB R from 31000 shows the Nand Lal items
+      are 31000-31018, all Tankhahnama, so this Rehatnama is not online. Ingest candidate.'
+  - title:
+      gurmukhi: ਤਨਖ਼ਾਹ ਨਾਮਾ
+      english: Tankhahnama
+    pdf_pages:
+    - 25
+    - 30
+    work: nand-lal/tankhahnama
+    banidb:
+      status: online
+      source: R
+      shabad_ids:
+      - 31000
+      - 31018
+      similarity_range:
+      - 0.93
+      - 1.0
+    variants_observed: 'Minor spelling differences: scan ''ਮੂਲ ਨਾ ਜਾਵੇ'' vs BaniDB ''ਜਾਵੈ''; scan ''ਪਾਗ ਚੁਣੈ'' vs
+      BaniDB ''ਪੱਗ ਚੁਣੇੈ'' (BaniDB has a malformed vowel); ''ਗੁਰੂ'' vs ''ਗੁਰੁ''.'
+    notes: Ends with a colophon-like line on pdf 30. BaniDB has it as R 31000 onward, attributed to Bhai Nand Lal.
+  - title:
+      gurmukhi: ਦਸਤੂਰੁਲ ਇਨਸ਼ਾ
+      english: Dastur-ul-Insha (letters; Punjabi translation only)
+    pdf_pages:
+    - 31
+    - 42
+    work: nand-lal/dastur-ul-insha
+    banidb:
+      status: not_checked
+    notes: 'Prose: Punjabi translation of the Persian epistolary manual, with a few verse passages. The original
+      text is not printed here. Not Gurbani verse; historical/prose interest only.'
+  - title:
+      gurmukhi: ਅਰਜ਼ੁਲ-ਅਲਫ਼ਾਜ਼ (ਵਿਚੋਂ ਸ਼ੁਰੂ ਅਤੇ ਅੰਤਮ ਭੇਦ)
+      english: Arz-ul-Alfaz (opening and closing portions only)
+    pdf_pages:
+    - 43
+    - 48
+    work: nand-lal/arz-ul-alfaz
+    banidb:
+      status: not_found
+    notes: Persian verse in Gurmukhi with a Punjabi translation (e.g. 'ਸਪਾਸਿ ਖ਼ੁਦਾਇ ਕਰੀਮੁਲ ਰਹੀਮ / ਕਿ ਜ਼ਾਤਿਸ਼ ਕਦੀਮ
+      ਅਸਤ ਨਾਮਸ਼ ਅਜ਼ੀਮ ॥੧੧॥'). It is a lexicon, so only the frame sections are given. scans:check not_found. Ingest
+      candidate (partial text).
+  - title:
+      gurmukhi: ਤੌਸੀਫ਼ੋ-ਸਨਾ
+      english: Tausif-o-Sana (Punjabi translation only)
+    pdf_pages:
+    - 49
+    - 50
+    work: nand-lal/tausif-o-sana
+    banidb:
+      status: not_checked
+    notes: Prose Punjabi translation under 'ਵਾਹਿਗੁਰੂ ਹਾਜ਼ਰ ਨਾਜ਼ਰ'. The Persian prose original is not printed, so
+      there is nothing to cross-check.
+  - title:
+      gurmukhi: ਖ਼ਾਤਿਮਾ
+      english: Khatima (epilogue verse)
+    pdf_pages:
+    - 50
+    - 53
+    work: nand-lal/khatima
+    banidb:
+      status: not_found
+    notes: Persian verse in Gurmukhi with a Punjabi translation (e.g. 'ਸਤਿਗੁਰ ਪਾਕ ਯਾਰੋ ਯਾਵਰਿ ਸ਼ਾਂ / ਦਸਤਿ ਫ਼ਜ਼ਲਸ਼
+      ਹਮੇਸ਼ਾਂ ਬਰ ਸਰਿ ਸ਼ਾਂ ॥੧੯॥'). It ends on printed p. 252 with a colophon naming Nand Lal Goya Multani. scans:check
+      not_found. Ingest candidate.
+  notes: 'The file is an excerpt: the cover plus printed pages 201-252 of Ganda Singh''s Bhai Nand Lal Granthavali
+    (PDF page = printed page - 199). It lacks the title/imprint pages, the Diwan, Zindagi Nama, Ganj Nama and Joti
+    Bigas 1-69. Image-only scan (PaperPort), slightly yellowed but legible. Mixed decision: the Joti Bigas (Persian)
+    and Tankhahnama sections are witnesses (BaniDB''s Joti Bigas appears to come from this edition). The Joti Bigas
+    (Punjabi), Rehatnama, Khatima and the Arz-ul-Alfaz excerpt are not online and are ingest candidates. The two
+    prose items appear only in Punjabi translation. No Persian script.'
+- batch: Bhai Nand Lal and Zafarnama
+  file: GanjNamah.pdf
+  drive_id: 1QIdsPmQLRSK8QyrrGtMEC6hmyFXdeYiA
+  sha256_12: 69505e48a180
+  pages: 191
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਗੰਜ ਨਾਮਹ — ਬਾਲ ਬੋਧਨੀ ਸੰਪ੍ਰਦਾਈ ਸਟੀਕ
+    english: Ganj Namah, Bal Bodhni Sampardai steek
+  author: Bhai Nand Lal Goya
+  editor_or_commentator: Giani Gurwinder Singh Nangli (student, Damdami Taksal), tikakar; sodhak Maulvi Atiq Ahmad
+  publisher: Bhai Chatar Singh Jiwan Singh, Amritsar
+  year: July 2012 (first edition)
+  languages:
+  - persian-in-gurmukhi
+  - punjabi
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਭੂਮਿਕਾ (ਜਾਣ-ਪਛਾਣ, ਜੀਵਨ ਭਾਈ ਨੰਦ ਲਾਲ ਜੀ, ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ, ਸੰਪ੍ਰਦਾਇ ਭੇਦ, ਅਨੁਬੰਧ)
+      english: 'Front matter: introduction, life of Bhai Nand Lal, pronunciation notes, sampardai readings'
+    pdf_pages:
+    - 1
+    - 43
+    work: reference/front-matter
+    banidb:
+      status: not_checked
+    notes: Includes endorsement letters (pdf 5-6) and a TOC (pdf 7). The pronunciation notes (printed pp. 34-40)
+      are santhiya-style guidance for the Persian.
+  - title:
+      gurmukhi: ਗੰਜ ਨਾਮਹ (ਮੰਗਲਾ ਚਰਨ, ਗੁਰ ਮਹਿਮਾ, ਸਲਤਨਤੇ ਅੱਵਲ - ਦਹੁਮ)
+      english: 'Ganj Nama: invocation, Gur mahima, the ten ''Saltanat'' sections (Guru Nanak to Guru Gobind Singh)'
+    pdf_pages:
+    - 44
+    - 186
+    work: nand-lal/ganj-nama
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30065
+      - 30080
+      similarity_range:
+      - 0.93
+      - 1.0
+    variants_observed: 'Close to BaniDB apart from izafat spelling: scan ''ਸਗਾਂਨੇ'' / ''ਇਨਆਮੇ'' (izafat as ੇ) vs
+      BaniDB ''ਸਗਾਨਿ'' / ''ਇਨਆਮਿ'' (ਿ); ''ਰੂਏ'' vs ''ਰੂਇ''. The steek''s pad-arth, uchāran notes and sampardai alternate
+      readings are a source of variant data.'
+    notes: 'Printed page = PDF page - 1. Sections per the TOC (printed pages): Mangla charan 43, Gur mahima 43,
+      Saltanat 1 51, 2 80, 3 93, 4 103, 5 112, 6 120, 7 128, 8 137, 9 145, 10 155. Interleaved are ''Jivan biora''
+      notes on each Guru and five sakhis (pp. 46, 62, 85, 88, 93). Each line comes with ਪਦ ਅਰਥ / ਅਰਥ / ਉਚਾਰਨ notes
+      and cross-references to SGGS. scans:check: online N (lines from mangla charan and couplet 158-159). One of
+      my hand-transcribed lines missed.'
+  - title:
+      gurmukhi: ਧੰਨਵਾਦ, ਬੇਨਤੀ, ਸਹਾਇਕ ਗ੍ਰੰਥ
+      english: 'Back matter: thanks, appeal, bibliography'
+    pdf_pages:
+    - 187
+    - 191
+    work: reference/back-matter
+    banidb:
+      status: not_checked
+    notes: 'The bibliography page announces forthcoming steeks by the same author: Zindagi Nama, Joti Bigas (Punjabi
+      and Persian), Diwan Goya.'
+  notes: Clean greyscale scan, but every page sits in the lower half of a tall MediaBox (CropBox offset); renders
+    need -trim. No Persian script. Persian is given in Gurmukhi only. A Damdami Taksal sampardai steek, so useful
+    for santhiya readings as well as text variants.
+- batch: Bhai Nand Lal and Zafarnama
+  file: ਗੰਜ ਨਾਮਗ ਭਾਈ ਨੰਦ ਲਾਲ ਜੀ.pdf
+  drive_id: 1TDckaEsq-_oeUHButhOyvRJ7BpEJkwfJ
+  sha256_12: 69505e48a180
+  pages: 191
+  duplicate_of: 1QIdsPmQLRSK8QyrrGtMEC6hmyFXdeYiA
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਗੰਜ ਨਾਮਹ — ਬਾਲ ਬੋਧਨੀ ਸੰਪ੍ਰਦਾਈ ਸਟੀਕ
+    english: Ganj Namah steek (duplicate)
+  author: Bhai Nand Lal Goya
+  editor_or_commentator: Giani Gurwinder Singh Nangli
+  publisher: Bhai Chatar Singh Jiwan Singh, Amritsar
+  year: July 2012
+  tier: gurbani
+  decision: skip
+  notes: 'Byte-identical to GanjNamah.pdf: full sha256 69505e48a180d82c88761222ab3426453507d33b848705719c3d18092eaf9927
+    for both. Keep one.'
+- batch: Bhai Nand Lal and Zafarnama
+  file: ZINDGINAMA.pdf
+  drive_id: 1fKpSLqKcSKe-sD2HCfTUqG79K-54YbbG
+  sha256_12: 1480f5b95bec
+  pages: 147
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਜੀਵਨ ਜਾਗ ਅਰਥਾਤ ਜ਼ਿੰਦਗੀਨਾਮਾ
+    english: Jivan Jag, i.e. Zindagi Nama
+  author: Bhai Nand Lal Singh 'Goya'
+  editor_or_commentator: 'Jaswant Singh (Master): ''arthaya ate gurmat rahin jagmagaya'''
+  publisher: unknown (no imprint page found among the front pages viewed)
+  year: c. 2007 (prefaces dated 1-06-2007 and 31-5-2007; no imprint)
+  languages:
+  - persian-in-gurmukhi
+  - punjabi
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਮੁਖਬੰਧ, ਭੂਮਿਕਾ, ਸ਼ੁਕਰਾਨਾ
+      english: Front matter
+    pdf_pages:
+    - 1
+    - 10
+    work: reference/front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਜ਼ਿੰਦਗੀਨਾਮਾ
+      english: Zindagi Nama, couplets 1-510
+    pdf_pages:
+    - 11
+    - 147
+    work: nand-lal/zindagi-nama
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 32001
+      - 32510
+      similarity_range:
+      - 0.87
+      - 1.0
+    variants_observed: BaniDB uses ਣ for the nasal (ਆਣ, ਆਸਮਾਣ, ਜਾਣ) where the scan has bindi (ਆਂ, ਆਸਮਾਂ, ਜਾਂ). 247.1
+      scan 'ਸ਼ੁਮਾਰ' vs BaniDB 'ਸ਼ੁਆਰ' (likely a BaniDB typo); 510.2 scan 'ਅਜ਼ ਖ਼ਾਤਿਰੋ ਦਿਲ' vs BaniDB 'ਅਜ਼ ਖ਼ਾਤਰਿ
+      ਦਿਲਿ'.
+    notes: 'Printed page = PDF page. For each couplet: the text, then ''ਉਲਥਾ'' (Punjabi meaning) and ''ਗੁਰਬਾਣੀ''
+      parallel quotations from SGGS. Complete: ends at couplet 510, matching BaniDB''s 510 shabads (32001-32510).'
+  notes: Clean colour scan, image only. No Persian script. A popular gurmat-oriented commentary; witness.
+- batch: Dasam-related
+  file: Uggardanti-Punjabi-and-English-Translation-Dalsingh-veerji.pdf
+  drive_id: 1Pvr6MIJnUqrGGn2s0gtOr1GlmFQVoFw8
+  sha256_12: 30f7a2598e2d
+  pages: 31
+  text_layer: none
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਉਗ੍ਰਦੰਤੀ
+    english: 'Uggardanti: the ''Bani'' (holy sermon) of Sri Guru Gobind Singh Ji Maharaj'
+  author: attributed in the PDF to Guru Gobind Singh (Ugardanti / Bhagauti Chhand, six chhakkas)
+  editor_or_commentator: unknown; the filename says 'Dalsingh veerji', but no name appears on the pages sampled
+  publisher: sikhbookclub.com (footer and watermark on every page)
+  year: unknown
+  languages:
+  - braj
+  - punjabi
+  - english
+  content_type: text+translation
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਭੂਮਿਕਾ
+      english: Introduction on Bhagauti/Shakti (Punjabi + English)
+    pdf_pages:
+    - 1
+    - 4
+    work: reference/ugardanti-intro
+    banidb:
+      status: not_checked
+    notes: Prose essay. It quotes Chandi di Var, Bachittar Natak and the Ardas.
+  - title:
+      gurmukhi: ਉਗ੍ਰਦੰਤੀ (ਭਗਉਤੀ ਛੰਦ ਛੱਕਾ ੧-੬)
+      english: Ugardanti, six Bhagauti stanzas
+    pdf_pages:
+    - 5
+    - 30
+    work: dasam/ugardanti
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 555555
+      - 555567
+      similarity_range:
+      - 1.0
+      - 1.0
+    variants_observed: None in 6 sampled lines from the start, middle and end (e.g. 'ਨਮੋ ਉਗ੍ਰਦੰਤੀ ਅਨੰਤੀ ਸੈਵਯਾ ॥',
+      'ਇਤ ਬਿਧਿ ਦੁਰਗੇ ਕਿਰਪਾ ਧਾਰੀ ॥' are identical). The closing colophon reads 'ਸ੍ਰੀ ਇਤਿ ਗੋਬਿੰਦ ਸਿੰਘ ਵਿਰਚਿਤੇ ਸ੍ਰੀ
+      ਭਗਵਤੀ ਛੰਦ ਖਸਟਮੰ ਸਮਾਪਤੰਮ ਸਤ ਸੁਭਮ ਸਤ ॥੬॥'.
+    notes: Each couplet is followed by a Punjabi paraphrase (in red) and an English translation. BaniDB carries
+      Ugardanti both as bani token 'ogardanti' (ID 53) and in source D, at ang 1428 (shabads 555555-555567).
+  - title:
+      gurmukhi: ਸੁਭਮਸਤ
+      english: Note on the colophon 'Shubhamasat'
+    pdf_pages:
+    - 31
+    - 31
+    work: reference/ugardanti-note
+    banidb:
+      status: not_checked
+  notes: This is a born-digital PDF of web-published text, but it has no text layer (printed to image), so OCR would
+    be needed. The Gurbani text exactly matches BaniDB D on the sampled lines; the two most likely share an upstream
+    source, so its value as an independent witness is low. The translations do not count as corpus.
+- batch: Dasam-related
+  file: Chritropakhyaan Vol I.pdf
+  drive_id: 1BEDCX8HQTGcgvarBhr_K1uhi8N8Q1AsM
+  sha256_12: 15b6f830c5fb
+  pages: 399
+  text_layer: english
+  scan_quality: typeset-digital
+  title:
+    english: 'Chritro Pakhyaan: Tales of Male-Female Tricky Deceptions from Sri Dasam Granth, Volume I'
+  author: Sri Dasam Granth (Charitropakhyan) source text
+  editor_or_commentator: Pritpal Singh Bindra (English adaptation)
+  publisher: B. Chattar Singh Jiwan Singh, Amritsar
+  year: January 2002 (first edition); ISBN 81-7601-482-6
+  languages:
+  - english
+  content_type: other
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      english: 'Front matter: author''s note, acknowledgments, index of charitars'
+    pdf_pages:
+    - 1
+    - 13
+    work: reference/charitropakhyan-bindra-front
+    banidb:
+      status: not_checked
+  - title:
+      english: Charitars 1-201 (Chandi Chritar ... Yousaf Zulaikhan), English prose/verse translation only
+    pdf_pages:
+    - 14
+    - 399
+    work: dasam/charitropakhyan (translation only)
+    banidb:
+      status: not_checked
+    notes: The PDF page numbers equal the printed page numbers. Each charitar keeps the chhand labels (Dohira, Chaupaee,
+      Arril), verse numbers and the running total, e.g. '201st Parable ... (201)(3787)'.
+  notes: This is an English translation only. The only fonts are Times; there is no Gurmukhi anywhere, so there
+    is nothing to cross-check and no witness value. Volume II (Charitars 202-404) is not in this batch. Its verse
+    numbers could align the translation to BaniDB D Charitropakhyan if an English gloss layer is ever wanted.
+- batch: Dasam-related
+  file: Chandi_Charitar_Part_2.pdf
+  drive_id: 1Viw3It4-7al6fbN9W75J9KGzFPKW-9us
+  sha256_12: bb4b49fc349d
+  pages: 27
+  text_layer: legacy-unknown
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਚੰਡੀ ਚਰਿਤ੍ਰ-੨
+    english: Chandi Charitar 2 (with Punjabi translation)
+  author: Sri Dasam Granth (Chandi Charitar II)
+  editor_or_commentator: unknown; an excerpt from a Punjabi-translated Dasam Granth whose running header is 'ਸ੍ਰੀ
+    ਦਸਮ-ਗ੍ਰੰਥ ਸਾਹਿਬ'
+  publisher: unknown (no title or imprint page; this is an extract)
+  year: unknown
+  languages:
+  - braj
+  - punjabi
+  content_type: text+translation
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਚੰਡੀ ਚਰਿਤ੍ਰ (੨), ਅਧਿਆਇ ੧-੮ incl. ਚੰਡੀ ਚਰਿਤ੍ਰ ਉਸਤਤ ਬਰਨਨੰ
+      english: Chandi Charitar II, verses 1-262 (complete)
+    pdf_pages:
+    - 1
+    - 27
+    work: dasam/chandi-charitar-2
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7673
+      - 7737
+      similarity_range:
+      - 1.0
+      - 1.0
+    variants_observed: Sampled half-lines (e.g. 'ਸੁ ਦੇਵ ਰਾਜ ਜੀਤਯੰ', 'ਡਹ ਡਹਤ ਡਵਰ ਡਮੰਕਯੰ', 'ਨਮੋ ਤਾਰਣੀ ਕਾਰਣੀ ਲੋਕ ਮਾਤਾ',
+      'ਜੇ ਜੇ ਤੁਮਰੇ ਧਿਆਨ ਕੋ ਨਿਤ ਉਠਿ ਧਿਐਹੈ ਸੰਤ') match BaniDB exactly. Differences are in presentation. (1) The opening
+      has no 'ੴ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ' (BaniDB has it); the scan begins 'ਸ੍ਰੀ ਭਗਉਤੀ ਜੀ ਸਹਾਇ। ਅਥ ਚੰਡੀ ਚਰਿਤ੍ਰ ਲਿਖ੍ਯਤੇ।'.
+      Footnote 1 says printed birs added the mool mantar and that the Patna bir reads 'ੴ ਅਥ ਚੰਡੀ ਚਰਿਤ੍ਰ ਤ੍ਰਿਤੀ ਮਹਾਤਮ
+      ਲਿਖ੍ਯਤੇ'. (2) Single danda '।' is used throughout where BaniDB has '॥'. (3) Paired half-lines are printed
+      on one line, while BaniDB splits them (full-line queries fail and half-line queries match). (4) Verses carry
+      both chapter-local and running numbers (e.g. '੧। ੨੫੭।').
+    notes: Each spread has the Gurmukhi text on the left and the Punjabi translation on the right. Printed page
+      numbers run about 131-152; facing pages seem to share a number, so there is no fixed offset. Chhand names
+      and adhyay colophons are present. The footnotes record readings from old birs (Patna), which is of interest
+      for variants.
+  notes: The text layer uses a non-GurbaniAkhar legacy font (MSTT31c5cb etc.; the mapping looks like the DrChatrik/Joy
+    family, e.g. 'uzvh'=ਚੰਡੀ, 'ufosq'=ਚਰਿਤ੍ਰ). legacy2uni.js produces garbage, so lines were read from page images.
+    A converter for that font family would make the text layer usable. 'Part 2' means Chandi Charitar II (the second
+    Chandi Charitar), not part 2 of a file set.
+- batch: Dasam-related
+  file: ਹਨੂਮਾਨ ਨਾਟਕ Kamalroop.pdf
+  drive_id: 1WyaaSGAb-n_Nx5Q8U0znU6KGfP3tqLuy
+  sha256_12: c003a9a319db
+  pages: 401
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਹਨੂਮਾਨ ਨਾਟਕ (ਅਥ ਹਨੂਮਾਨ ਨਾਟਕ ਕ੍ਰਿਤ ਕਵਿ ਹਿਰਦੇ ਰਾਮ ਕੀ)
+    english: Hanūmān Nāṭak by Hirdaya Ram Bhalla
+  author: Hirdaya Ram Bhalla (colophon chhappai dates it Samvat 1680, Chet sudi 2, in Jahangir's reign = 1623 CE)
+  editor_or_commentator: Akali Nihang Dr Kamalroop Singh (foreword; he typed the text himself and calls it a 'first
+    edition' that is proofread but likely to have mistakes)
+  publisher: Archimedes Press Ltd (UK)
+  year: unknown (not printed; the bibliography cites a 2013 web page, so 2013 or later)
+  languages:
+  - braj
+  - english
+  content_type: text
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      english: 'Foreword (English, in roman-numbered pages i-x): Hanuman Natak, pre-colonial Punjab education, Buddha
+        Dal tradition, links with Dasam Granth'
+    pdf_pages:
+    - 1
+    - 12
+    work: reference/hanuman-natak-kamalroop-intro
+    banidb:
+      status: not_checked
+    notes: It quotes a few verses of Hanuman Natak with transliteration and translation, and Ram Avtar 579 from
+      Dasam Granth (p7). It argues that Ram Avtar and Charitropakhyan reference the Natak.
+  - title:
+      gurmukhi: ਅੰਕ ੧ (ਮੰਗਲ, ਤਾੜਕਾ ਬਧ, ਸੁਬਾਹੁ ਮਰੀਚ ਬਧ, ਅਜੁਧਯਾ ਪ੍ਰਵੇਸ਼)
+      english: Act 1
+    pdf_pages:
+    - 13
+    - 48
+    work: historical/hanuman-natak/ank-01
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0.0
+      - 0.28
+  - title:
+      gurmukhi: ਅੰਕ ੨ (ਰਾਮ ਚੰਦ੍ਰ ਬਿਯੋਗ)
+      english: Act 2
+    pdf_pages:
+    - 49
+    - 76
+    work: historical/hanuman-natak/ank-02
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੩
+      english: Act 3
+    pdf_pages:
+    - 76
+    - 108
+    work: historical/hanuman-natak/ank-03
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੪
+      english: Act 4
+    pdf_pages:
+    - 108
+    - 112
+    work: historical/hanuman-natak/ank-04
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੫ (ਬਾਲੀ ਬਧ)
+      english: Act 5
+    pdf_pages:
+    - 113
+    - 142
+    work: historical/hanuman-natak/ank-05
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੬
+      english: Act 6
+    pdf_pages:
+    - 142
+    - 177
+    work: historical/hanuman-natak/ank-06
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੭ (ਸਮੁੰਦਰ ਬਾਂਧ ਪਾਰ ਜਾਇਬੋ)
+      english: Act 7
+    pdf_pages:
+    - 178
+    - 192
+    work: historical/hanuman-natak/ank-07
+    banidb:
+      status: not_checked
+    notes: Colophon misnumbered '॥੯॥' for the 7th act.
+  - title:
+      gurmukhi: ਅੰਕ ੮ (ਅੰਗਦ ਸੰਬੋਧ)
+      english: Act 8
+    pdf_pages:
+    - 193
+    - 218
+    work: historical/hanuman-natak/ank-08
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੯ (ਮੰਤ੍ਰੀ ਉਪਦੇਸ)
+      english: Act 9
+    pdf_pages:
+    - 218
+    - 247
+    work: historical/hanuman-natak/ank-09
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੧੦ (ਰਾਵਣ ਛਲ ਬਰਨਨੰ)
+      english: Act 10
+    pdf_pages:
+    - 248
+    - 271
+    work: historical/hanuman-natak/ank-10
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੧੧ (ਕੁੰਭਕਰਨ ਬਧ)
+      english: Act 11
+    pdf_pages:
+    - 272
+    - 293
+    work: historical/hanuman-natak/ank-11
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੧੨ (ਮੇਘਨਾਦ ਬਧ)
+      english: Act 12
+    pdf_pages:
+    - 294
+    - 310
+    work: historical/hanuman-natak/ank-12
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੧੩ (ਲਛਮਨ ਜਿਆਇਬੋ)
+      english: Act 13
+    pdf_pages:
+    - 311
+    - 354
+    work: historical/hanuman-natak/ank-13
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅੰਕ ੧੪ (ਰਾਵਨ ਬਧ)
+      english: Act 14
+    pdf_pages:
+    - 355
+    - 400
+    work: historical/hanuman-natak/ank-14
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0.0
+      - 0.0
+    notes: Ends with verse 160 (the Samvat 1680 chhappai) and 'ਇਤਿ ਸ੍ਰੀ ਰਾਮ ਗੀਤੇ ਹਨੂਮਾਨ ਨਾਟਕੇ ਰਾਵਨਬਧ ਚੌਧਵੋਂ ਅੰਕ
+      ਸਮਾਪਤਹ॥੧੪॥'.
+  - title:
+      english: References (bibliography)
+    pdf_pages:
+    - 401
+    - 401
+    work: reference/hanuman-natak-kamalroop-refs
+    banidb:
+      status: not_checked
+  notes: Hanuman Natak is a Braj Ramayana drama, not part of Dasam Granth or any BaniDB source; 4 lines from acts
+    1 and 14 return not_found (best hit 0.28, an unrelated SGGS line). Printed page = PDF page - 12 for the text
+    (PDF 13 = 1, PDF 400 = 388). The Gurmukhi is GurbaniAkhar and converts cleanly with legacy2uni.js. The English
+    is Unicode Cambria, but the converter garbles it, so run it only on GurbaniAkhar spans. Some foreword verses
+    also have a roman transliteration in a special-character font. Compared with the 1899 Lahore print (1J5-Emvt...),
+    this is the same recension with the same 14 acts, the same colophon and 160 verses in act 14, but the typing
+    has slips. Verse 3 drops 'ਚਰਣ ਸਰੋਜ ਰਸ ਭਰੇ ਤਾਂਕੋ ਭਯੋ ਅਲਿ ਜਾਂ ਦਿਨ ਪਰਾਗ ਪਾਊਂ ਤਾਂਹੀ ਛਿਨ' and repeats 'ਜਿਯੋਂ ਨੇਹੁ
+    ਬਾਂਧਯੋ'. Verse 2 ends 'ਸਭ ਹੋਹਿ ਰਾਮ ਕਹੈਯਾ' where Lahore has 'ਸਬ ਹੋਹਿ ਸਹੈਯਾ'. Verse 4 shows duplicated phrases.
+    As a ready-made digital text it is the cheapest ingest base, but it should be corrected against the Lahore print.
+    Alternatively, make the Lahore print canonical after OCR and keep this one as a witness; the user decides.
+- batch: Dasam-related
+  file: ਹਨੂਮਾਨ ਨਾਟਕ.pdf
+  drive_id: 1J5-EmvtopdSXJbWy3IWB_UhDmvOdfpHc
+  sha256_12: b1ce55e94397
+  pages: 260
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਹਨੂਮਾਨ ਨਾਟਕ ਕ੍ਰਿਤ ਕਵਿ ਹਿਰਦਾ ਰਾਮ
+    english: Hanuman Natak by Kavi Hirda Ram
+  author: Hirdaya Ram Bhalla
+  publisher: Rai Sahib Munshi Gulab Singh & Sons, Matba Mufid-i-Aam, Lahore
+  year: 1899 CE (from a handwritten library label on the cover, 'ਛਾਪਾ 1899 ਈ.'; no printed date seen)
+  languages:
+  - braj
+  content_type: text
+  tier: historical
+  decision: witness
+  sections:
+  - title:
+      english: Cover (handwritten library label, Punjabi Sahit Akademi Ludhiana stamp no. 27410, Dr Davinder Singh
+        Vidyarthi stamp), blank, title page
+    pdf_pages:
+    - 1
+    - 4
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅਥ ਹਨੂਮਾਨ ਨਾਟਕ ਲਿਖਯਤੇ (ਅੰਕ ੧-੧੪)
+      english: Hanuman Natak, full text, acts 1-14
+    pdf_pages:
+    - 5
+    - 256
+    work: historical/hanuman-natak
+    banidb:
+      status: not_found
+    variants_observed: 'Against Kamalroop''s typed edition: verse 3 here has ''ਚਰਣ ਸਰੋਜ ਰਸ ਭਰੇ ਤਾਂਕੋ ਭਯੋ ਅਲਿ ਜਾਂ
+      ਦਿਨ ਪਰਾਗ ਪਾਊਂ ਤਾਂਹੀ ਛਿਨ ਕਾਮ ਕੋ'', which Kamalroop omits. Verse 2 ends ''ਸਬ ਹੋਹਿ ਸਹੈਯਾ'' (Kamalroop has ''ਸਭ
+      ਹੋਹਿ ਰਾਮ ਕਹੈਯਾ''). The heading is ''ਅਥ ਹਨੂਮਾਨ ਨਾਟਕ ਲਿਖਯਤੇ'' (Kamalroop has ''...ਕ੍ਰਿਤ ਕਵਿ ਹਿਰਦੇ ਰਾਮ ਕੀ'').'
+    notes: Printed page = PDF page - 4 (PDF 6 = 2, PDF 256 = 252). Running headers give the act ('ਅੰਕ ੧੪'). Act
+      14 ends at verse 160 with the same Samvat 1680 chhappai and colophon as Kamalroop's edition. Per-act page
+      ranges were not mapped; read them from the running headers if needed.
+  - title:
+      english: Publisher's adverts (Bani Bhagtan steek, Sri Guru Nanak Parkash, Alif Laila) and back cover
+    pdf_pages:
+    - 257
+    - 260
+    work: back-matter
+    banidb:
+      status: not_checked
+  notes: Panjab Digital Library digitization (footer on every page) of an ex-library copy; ABBYY output but no text
+    layer. The scan is binarized with speckle, and ink blots obscure a few words on PDF 5 (first page of text).
+    It is the mool text only, without commentary. It is the same recension as Kamalroop's typed text and is the
+    better authority for correcting it.
+- batch: Dasam-related
+  file: Jaap.Sahib.Arth.Parbodh.by.Sant.Kartar.Singh.pdf
+  drive_id: 1E6pN4oqSfMWtcEmDJpnaVNE9z9jmIdmR
+  sha256_12: ff55f6b11b0c
+  pages: 575
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਜਾਪੁ ਸਾਹਿਬ ਅਰਥ ਪ੍ਰਬੋਧ
+    english: Jaap Sahib Arth Prabodh
+  author: Guru Gobind Singh (Jaap Sahib, mool)
+  editor_or_commentator: Sant Kartar Singh (Nirmala), Vishvakarma Mandir, Kang Sahbu, tehsil Nakodar, Jalandhar
+    (author and publisher)
+  publisher: Sant Kartar Singh; rights with Sri Nirmal Panchayati Akhara, Haridwar Kankhal; typeset by Sharma Graphics,
+    printed at Saint Printers, Jalandhar
+  year: 2010 (first edition, 1000 copies; front-matter blessing dated 20/10/2010)
+  languages:
+  - braj
+  - punjabi
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਤਤਕਰਾ, ਭੂਮਿਕਾ, ਸੰਤਾਂ ਦੇ ਵਿਚਾਰ
+      english: Cover, title, imprint, contents (special discussions + sakhis), forewords
+    pdf_pages:
+    - 1
+    - 29
+    work: reference/jaap-arth-prabodh-front
+    banidb:
+      status: not_checked
+    notes: Front matter has its own page numbering (PDF 20 = printed 15).
+  - title:
+      gurmukhi: ਦਸਮ ਗ੍ਰੰਥ ਦੀ ਉਥਾਨਕਾ; ਜਾਪੁ ਬਾਣੀ ਦੀ ਉਥਾਨਕਾ
+      english: Introduction to Dasam Granth and to Jaap
+    pdf_pages:
+    - 30
+    - 31
+    work: reference/jaap-arth-prabodh-uthanka
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਜਾਪੁ ਸਾਹਿਬ ਕਾ ਟੀਕਾ ਲਿਖ੍ਯਤੇ (ੴ ... ਛੰਦ ੧੯੯)
+      english: Jaap Sahib, pada-by-pada mool with arth, bhav, and 'yatha' proof-texts
+    pdf_pages:
+    - 32
+    - 575
+    work: dasam/jaap
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 7423
+      similarity_range:
+      - 1.0
+      - 1.0
+    variants_observed: '''ਚੱਤ੍ਰ ਚੱਕ੍ਰ ਵਰਤੀ, ਚੱਤ੍ਰ ਚੱਕ੍ਰ ਭੁਗਤੇ ॥'' (PDF 570) matches BaniDB exactly. The pada heading
+      ''ਕਰੀਮੁਲ ਰਹੀਮੈ ॥ ੧੯੮ ॥'' (PDF 570) differs from BaniDB ''ਕਰੀਮਲੁ ਰਹੀਮੇ ॥੧੯੮॥'' in the placement of aunkar (ਕਰੀਮੁਲ
+      vs ਕਰੀਮਲੁ), and the final matra looks like ੈ at this resolution. There is a footnote marker on ਰਹੀਮੈ, so the
+      author may discuss the reading.'
+    notes: Printed page = PDF page - 29 for the main text (PDF 30 = 1, PDF 570 = 541). The mool is given in fragments
+      (one or two padas at a time, as bold headings, e.g. 'ਨਮਸਤੰ ਅਲੋਕੇ ॥੧੨॥' on PDF 150), each followed by long
+      Vedantic commentary. That commentary includes discussions of Oankar, chakras, sat-chit-anand, gian/dhian,
+      and sakhis listed in the contents. Many SGGS lines and some Gian Prabodh lines are quoted as 'ਯਥਾ' proofs
+      with ang references. The text ends 'ਜਾਪੁ ਜੀ ਸਾਹਿਬ - ਇਤਿ' on PDF 575. The short pada fragments are below the
+      checker's minimum query length, which is why the status is partial; only the one full-line sample could be
+      scored. No start-of-text verse line was isolated within the time budget.
+  notes: 'Decision: the mool Jaap text is a witness (a Nirmala sampradaya reading, with possible footnoted variant
+    readings), and the commentary is reference-only and must not feed word counts. The SGGS quotations embedded
+    in the commentary are also not corpus. Each page image sits in the lower ~60% of a larger grey scanner frame,
+    so crop before OCR. Extracting the mool requires OCR and then picking out the bold pada headings.'
+- batch: Dasam-related
+  file: v3 DHAN GURU TEG BAHADAR SAHIB - ALL BANI MAHALLA NAVA SM9 v2.pdf
+  drive_id: 1-Xli29lWGbxGCVM82ZaVuR1jLvNco1h2
+  sha256_12: dfada1c01c5c
+  pages: 14
+  text_layer: legacy-GurbaniAkhar
+  scan_quality: typeset-digital
+  title:
+    english: Dhan Guru Teg Bahadar Sahib - All Bani Mahalla Nava (SM9)
+  author: Guru Tegh Bahadur (SGGS bani)
+  publisher: unknown (Word 2007 document, author metadata 'admin')
+  year: unknown
+  languages:
+  - braj
+  - punjabi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਰਾਗੁ ਗਉੜੀ ਮਹਲਾ ੯ (ਸਾਧੋ ਮਨ ਕਾ ਮਾਨੁ ਤਿਆਗਉ ...)
+      english: Gauri, 9 shabads
+    pdf_pages:
+    - 1
+    - 2
+    work: sggs/m9/gauri
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 693
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਆਸਾ ਮਹਲਾ ੯
+      english: Asa, 1 shabad
+    pdf_pages:
+    - 2
+    - 2
+    work: sggs/m9/asa
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਦੇਵਗੰਧਾਰੀ ਮਹਲਾ ੯
+      english: Devgandhari, 3 shabads
+    pdf_pages:
+    - 2
+    - 3
+    work: sggs/m9/devgandhari
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਬਿਹਾਗੜਾ ਮਹਲਾ ੯
+      english: Bihagra, 1 shabad
+    pdf_pages:
+    - 3
+    - 3
+    work: sggs/m9/bihagra
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਸੋਰਠਿ ਮਹਲਾ ੯
+      english: Sorath, 12 shabads
+    pdf_pages:
+    - 3
+    - 6
+    work: sggs/m9/sorath
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਧਨਾਸਰੀ ਮਹਲਾ ੯ (ਕਾਹੇ ਰੇ ਬਨ ਖੋਜਨ ਜਾਈ ...)
+      english: Dhanasri, 4 shabads
+    pdf_pages:
+    - 6
+    - 6
+    work: sggs/m9/dhanasri
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 2614
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਜੈਤਸਰੀ ਮਹਲਾ ੯
+      english: Jaitsri, 3 shabads
+    pdf_pages:
+    - 6
+    - 7
+    work: sggs/m9/jaitsri
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਟੋਡੀ ਮਹਲਾ ੯
+      english: Todi, 1 shabad
+    pdf_pages:
+    - 7
+    - 7
+    work: sggs/m9/todi
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਤਿਲੰਗ ਮਹਲਾ ੯
+      english: Tilang, 3 shabads
+    pdf_pages:
+    - 7
+    - 8
+    work: sggs/m9/tilang
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਬਿਲਾਵਲੁ ਮਹਲਾ ੯
+      english: Bilaval, 3 shabads
+    pdf_pages:
+    - 8
+    - 8
+    work: sggs/m9/bilaval
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਰਾਮਕਲੀ ਮਹਲਾ ੯
+      english: Ramkali, 3 shabads
+    pdf_pages:
+    - 8
+    - 9
+    work: sggs/m9/ramkali
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਮਾਰੂ ਮਹਲਾ ੯
+      english: Maru, 3 shabads
+    pdf_pages:
+    - 9
+    - 9
+    work: sggs/m9/maru
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਬਸੰਤੁ ਮਹਲਾ ੯ (incl. ਬਸੰਤੁ ਹਿੰਡੋਲ ਮਹਲਾ ੯; ਜੋਗੀ ਜੰਗਮ ਅਰੁ ਸੰਨਿਆਸ ...)
+      english: Basant, 5 shabads
+    pdf_pages:
+    - 9
+    - 10
+    work: sggs/m9/basant
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 4219
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਸਾਰੰਗ ਮਹਲਾ ੯
+      english: Sarang, 4 shabads
+    pdf_pages:
+    - 10
+    - 11
+    work: sggs/m9/sarang
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਜੈਜਾਵੰਤੀ ਮਹਲਾ ੯
+      english: Jaijavanti, 4 shabads
+    pdf_pages:
+    - 11
+    - 12
+    work: sggs/m9/jaijavanti
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਸਲੋਕ ਮਹਲਾ ੯ (੧-੫੭)
+      english: Salok Mahalla 9, 57 saloks
+    pdf_pages:
+    - 12
+    - 14
+    work: sggs/m9/salok
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 5481
+      - 5537
+      similarity_range:
+      - 1.0
+      - 1.0
+    variants_observed: None. The final line '...ਦਰਸੁ ਤੁਹਾਰੋ ਹੋਇ ॥੫੭॥੧॥' is identical to BaniDB.
+  notes: This is a complete, ordered compilation of all of Guru Tegh Bahadur's bani as it appears in SGGS (59 shabads
+    in 15 ragas, then 57 saloks), in SGGS order. It is typed in GurbaniAkhar-Heavy, converts cleanly, and is laid
+    out as a narrow tall strip (8 x 55 cm pages, phone-reading format). Raga sections are separated by '*****' and
+    end with SGGS running totals (e.g. '॥੩॥੧੨॥੧੩੯॥'). There are no rubrics or occasion beyond the title. 6/6 sampled
+    lines (ang 219, 684, 1186, 1426, 1429) match exactly, so it adds no new corpus. Keep it as a collection (an
+    ordered list of references into SGGS); its value is only as a 'Mahalla 9 complete' reading list. 'Asa', 'Bihagra'
+    and 'Todi' were detected from headings but not individually checked.
+- batch: Sri Sarbloh Granth
+  file: 28563324-Complete-Sri-Sarbloh-Granth-Sahib-Ji-Steek.pdf
+  drive_id: 1SbJxTbQZ6WnHcZ6mn8TuKriAtxZvswvl
+  sha256_12: 9f599872fa29
+  pages: 1761
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: 'ਸੰਪੂਰਨ ਸਟੀਕ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ (ਸ੍ਰੀ ਮੰਗਲਾ ਚਰਨ ਜੀ) ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦'
+    english: Complete Steek of Sri Sarbloh Granth Sahib Ji (Sri Manglacharan Ji)
+  author: Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) as printed
+  editor_or_commentator: unknown (steek prepared under Budha Dal; commentator not named on title/imprint pages seen;
+    bhumika pp.7-21 not read in full)
+  publisher: 'Printer & publisher: Singh Sahib Baba Santa Singh Ji, Jathedar Chhianven Krori, Shiromani Panth Akali
+    Budha Dal (Budha Dal Panjvan Takht Printing Press); printed at Takht Sri Damdama Sahib, Talwandi Sabo'
+  year: Khalsa Samvat 302, Jeth sudi; 5 June 2000 (as printed). PDF digitized/signed by Prabhjot Singh 2010-03-17
+  languages:
+  - braj
+  - sanskrit-in-gurmukhi
+  - persian-in-gurmukhi
+  - punjabi
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: 'ਸਟੀਕ ਭਾਗ ਪਹਿਲਾ: ਮੁੱਢਲੇ ਪੰਨੇ, ਭੂਮਿਕਾ, ਤਤਕਰੇ'
+      english: 'Vol.1 front matter: cover, title, imprint, bhumika, chhand/raag TOCs, first-line index'
+    pdf_pages:
+    - 1
+    - 62
+    work: sarbloh/front-matter
+    banidb:
+      status: not_checked
+    notes: p1 cover, p2 title, p3 imprint, ~pp7-21 bhumika (Punjabi prose), p22-25 tatkara of chhands & raags for
+      Adhyay 1 (bhag 1) and Adhyays 2-3-4 (bhag 2), ~pp26-61 first-line index (pad / safa), p62 divider 'ਭਾਗ ਪਹਿਲਾ
+      / ਅਧਿਆਇ ੧'.
+  - title:
+      gurmukhi: ਅਧਿਆਇ ੧ (ਭਾਗ ਪਹਿਲਾ) – ਸ੍ਰੀ ਮਾਯਾ/ਭਵਾਨੀ ਉਸਤਤਿ ਆਦਿ
+      english: Adhyay 1 (Manglacharan Puran)
+    pdf_pages:
+    - 63
+    - 256
+    work: sarbloh/adhyay-1
+    banidb:
+      status: not_found
+    variants_observed: 'Mool carries its own pathantar footnotes (star / A,B,C ''ਪਾ:'' notes). E.g. chhand 4: mool
+      ''ਪ੍ਰਜਾਨਾਥ ਜਗਨਾਥ ਸੇਵਿ ਰੱਛਕ ਜਗਦੰਬੈ'' with footnote noting reading ''ਸੇਵਕ ਰੱਛਕ'' (which is the reading of the
+      Kamalroop Singh typeset file 1cqBD...).'
+    notes: Printed page = PDF page - 62 (p63 = printed 1, p257 = printed 195). Opens with commentary on Ik Oankar;
+      mool starts printed p5 (PDF 67) 'ਛਾਯਾ ਰੂਪੀ ਹੋਇ ਕੈ...'. Each page = mool with superscript footnote numbers
+      + word glosses/pathantar in the footer.
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਜੀ ਦਾ ਪਿੰਗਲ-ਵਿਸਤਾਰ
+      english: Prosody appendix of Sarbloh Granth
+    pdf_pages:
+    - 257
+    - 274
+    work: sarbloh/steek-pingal-appendix
+    banidb:
+      status: not_checked
+    notes: Reference material (chhand/matra tables). Tier reference.
+  - title:
+      gurmukhi: ਭਾਗ ਦੂਜਾ – ਅਧਿਆਇ ੨
+      english: Bhag 2 – Adhyay 2
+    pdf_pages:
+    - 275
+    - 453
+    work: sarbloh/adhyay-2
+    banidb:
+      status: not_found
+    notes: 'p275 divider ''ਭਾਗ ਦੂਜਾ / ਅਧਿਆਇ ੨-੩-੪''; printed page = PDF - 275 (restarts at 1). Colophon on p453
+      (printed 178): ''ਇਤਿ ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ ਪੁਰਾਣੇ ... ਨਾਮ ਦ੍ਵਿਤੀਯ ਧ੍ਯਾਯ ਸਮਾਪਤ ॥੨॥''.'
+  - title:
+      gurmukhi: ਅਧਿਆਇ ੩
+      english: Adhyay 3
+    pdf_pages:
+    - 454
+    - 539
+    work: sarbloh/adhyay-3
+    banidb:
+      status: not_found
+    notes: 'Start verified (p454 = printed 179). End is approximate: TOC puts Adhyay 4 start at printed ~265 (Basant
+      Malari) = PDF ~540; no explicit colophon found on pp537-544 at thumbnail resolution.'
+  - title:
+      gurmukhi: ਅਧਿਆਇ ੪
+      english: Adhyay 4
+    pdf_pages:
+    - 540
+    - 663
+    work: sarbloh/adhyay-4
+    banidb:
+      status: not_found
+    notes: 'Start approximate (see above). End verified: p663 (printed 388) colophon ''...ਚਤੁਰਥੋ ਅਧ੍ਯਾਯ ਸਮਾਪਤ''.'
+  - title:
+      gurmukhi: 'ਸਟੀਕ ਭਾਗ ਦੂਜਾ: ਮੁੱਢਲੇ ਪੰਨੇ + ਤਤਕਰਾ (ਅਧਿਆਇ ੫)'
+      english: Vol.2 cover, title, 'Bhag Teeja / Adhyay 5' divider, TOC and index
+    pdf_pages:
+    - 664
+    - 697
+    work: sarbloh/front-matter-vol2
+    banidb:
+      status: not_checked
+    notes: p664 cover (steek 'ਭਾਗ ਦੂਜਾ'), p665 title, p666 divider 'ਭਾਗ ਤੀਜਾ / ਅਧਿਆਇ ੫', p667+ tatkara of chhands
+      for Adhyay 5 then first-line index.
+  - title:
+      gurmukhi: ਭਾਗ ਤੀਜਾ – ਅਧਿਆਇ ੫
+      english: Bhag 3 – Adhyay 5
+    pdf_pages:
+    - 698
+    - 1760
+    work: sarbloh/adhyay-5
+    banidb:
+      status: not_found
+    notes: Printed page = PDF - 697 (p698 = printed 1, p1760 = ~1063). Contains long Krishna/Bhagvat narrative sections
+      with colophons like 'ਇਤਿ ਸ੍ਰੀ ਦਸਮ ਸਕੰਧੇ ਮਹਾਪੁਰਾਣੇ ... ਧ੍ਯਾਯ' (p1700) and ends p1760 'ਇਤਿ ਸ੍ਰੀ ਭਾਗਵਤ ਮਹਾਤਮ
+      ਕ੍ਰਿਸ਼ਨਾਵਤਾਰ ਮੇਂ ... ਸੁਭ ਮਸਤੁ'. p1761 = emblem (back page).
+  notes: 'Image-only scan (no text layer; OCR needed). This is the only file in the group with ALL FIVE adhyays
+    (matches the Path Maryada statement that the Granth has 5 adhyays), and it records pathantar (variant readings)
+    in footnotes, so it is the best candidate for the canonical Sarbloh text. Two physical volumes in one PDF (vol
+    1 = Adhyay 1-4 in two ''bhags'' with separate pagination; vol 2 = Adhyay 5). Sarbloh not in BaniDB: 14 lines
+    from different parts tested, all not_found. Bhumika and pingal appendix are reference tier; footnote glosses
+    are commentary (do not count toward word stats). Small pages (324x422pt), legible at 100dpi.'
+- batch: Sri Sarbloh Granth
+  file: Sarbloh santheya bhag 1.pdf
+  drive_id: 1y7lxQt2c01eSB_veqLv8gmn6SbYa7xGq
+  sha256_12: 1bc88e1e4f0f
+  pages: 193
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: 'ਸੰਪੂਰਨ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ – ਪੋਥੀ ਭਾਗ ਪਹਿਲਾ ਤੇ ਦੂਜਾ – ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦'
+    english: Sampooran Sri Sarbloh Granth Sahib Ji, pothi parts 1 & 2 (mool), with handwritten santhiya annotations
+  author: Attributed to Guru Gobind Singh (as printed)
+  editor_or_commentator: Handwritten santhiya/grammar annotations by an unknown student/teacher
+  publisher: Cover faded; publisher line appears to read 'ਸਿੰਘ ਸਾਹਿਬ ਬਾਬਾ ਸੰਤਾ ਸਿੰਘ ਜੀ ਜਥੇਦਾਰ ਛਿਆਨਵੇਂ ਕ੍ਰੋੜੀ' (Budha
+    Dal) – partly illegible, treat as probable
+  year: unknown (no imprint page captured)
+  languages:
+  - braj
+  - sanskrit-in-gurmukhi
+  - punjabi
+  content_type: text
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਤਤਕਰਾ + ਪਦ-ਸੂਚੀ
+      english: Chhand/raag TOC and first-line index
+    pdf_pages:
+    - 1
+    - 23
+    work: sarbloh/front-matter
+    banidb:
+      status: not_checked
+    notes: p1 cover; p2-3 blank; p4-5 tatkara of chhands (incl. ਤੀਜਾ/ਚੌਥਾ ਅਧਿਆਇ); p6-23 first-line index (numbered
+      entries, up to at least 1506 at index page 36).
+  - title:
+      gurmukhi: ਅਧਿਆਇ ੧–੪ (ਮੂਲ ਪਾਠ)
+      english: Mool text, Adhyays 1-4
+    pdf_pages:
+    - 24
+    - 193
+    work: sarbloh/adhyay-1..4
+    banidb:
+      status: not_found
+    variants_observed: Not compared word-by-word. Uses padchhed (word-separated) printing with running chhand counts
+      (e.g. ॥੩੫੨॥੧੧੦੬॥ at printed p132).
+    notes: Each PDF page is a 2-page book spread (printed ≈ 2×(PDF−24)+few; e.g. PDF60=pp72-73, PDF100=pp150-151,
+      PDF170=pp290-291). Ends PDF193 (printed 329) with colophon 'ਇਤਿ ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ ਪੁਰਾਣੇ ... ਚਤੁਰਥੋ ਅਧ੍ਯਾਯ ਸਮਾਪਤ'
+      – i.e. covers Adhyays 1-4 only (no Adhyay 5). Adhyay internal boundaries not mapped.
+  notes: 'Phone (CamScanner) photos of a printed mool pothi, heavily annotated by hand in the margins and between
+    lines: santhiya marks (word splits, vishram, corrected readings), meanings and grammar notes (e.g. ''ਸੁਭ = ਚੰਗਾ
+    (ਮ = ਕ੍ਰਿਆ ਵਿਸ਼ੇਸ਼ਣ)''). Fingers/page curl visible; 172 MB. As text: a witness of Adhyays 1-4 (likely same Budha
+    Dal recension as the steek). The handwritten santhiya layer is reference-tier material and could be valuable
+    for pronunciation/vishram but needs manual reading. ''Bhag 1'' in the filename is the santhiya series part;
+    the printed pothi it photographs is ''Pothi bhag 1 & 2''.'
+- batch: Sri Sarbloh Granth
+  file: Sarbloh Granth Manglacharan.pdf
+  drive_id: 1cqBDhgc76X3t1vpZIlenXnSACbbLgxEX
+  sha256_12: 86a6185e4074
+  pages: 22
+  text_layer: legacy-GurbaniAkhar
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਉਸਤਤਿ ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ (ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ)
+    english: Sarbloh Granth Manglacharan – Ustat Sri Maya Lachhmi Ji ki (opening of Adhyay 1)
+  author: Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)
+  editor_or_commentator: Typeset by Kamalroop Singh (PDF author metadata kamalroop_singh@...)
+  publisher: 'Footer: Shiromani Panth Khalsa Akali Budha Dal Nihang Singh, Panjvan Takht; www.sarblohgranth.com'
+  year: PDF created 2012-04-11
+  languages:
+  - braj
+  - persian-in-gurmukhi
+  content_type: text
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ ਉਸਤਤਿ / ਮੰਗਲਾਚਰਨ ਛੰਦ ੧–੩੩੭
+      english: Manglacharan chhands 1-337
+    pdf_pages:
+    - 1
+    - 22
+    work: sarbloh/adhyay-1 (manglacharan ch.1-337)
+    banidb:
+      status: not_found
+    variants_observed: Chhand 4 reads 'ਪ੍ਰਜਾਨਾਥ ਜਗਨਾਥ ਸੇਵਕ ਰੱਛਕ ਜਗਦੰਬੈ' where the Budha Dal steek, both Tarna Dal
+      Diwali pothis and the gutka (sarbloh-1-1) read 'ਸੇਵਿ ਰੱਛਕ' (the steek footnotes 'ਸੇਵਕ' as a pathantar). Chhand
+      2 'ਇਨ ਬਿਨ ਸਰੈ ਨ ਏਕ ਛਿਨ' (= steek) vs Tarna Dal 'ਇਨ ਬਿਨੁ ਸਰੈ ਨ ਏਕਛਿਨੁ'.
+    notes: Continuous running text, chhand 1 to 337 (goes 15 chhands beyond the 322 used in the Diwali pothis, into
+      the devta-army bisanpads). Includes the Persian bisanpad (Raag Telang 'ਮਉਲਾ ਮਾਲਕ ਮਿਹਰਬਾਨ...'). Legacy→Unicode
+      conversion works (minor stray matra glyphs such as '੍ਰੈ' artefacts at page tops and split vowel signs at line
+      wraps).
+  notes: 'Only digital (non-OCR) text of the Manglacharan in the group: cheapest seed for Adhyay 1 ch.1-337, to
+    be proofread against the steek (1SbJx...) which should be canonical. Same passage as the Diwali pothis'' ''Sri
+    Maya da Astotr'' (ch.1-322) and the gutka''s ''Sri Bhavani Ustat'' (ch.1-106/107), just a longer excerpt.'
+- batch: Sri Sarbloh Granth
+  file: SARBLOH GRANTH MANAGAL CHARAN - 322.pdf
+  drive_id: 1V9mpXdiMZvaY2KSY2dOzyKcQovorFprM
+  sha256_12: 98fe156329db
+  pages: 90
+  text_layer: legacy-GurbaniLipi
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਸ੍ਰੀ ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ (ਮਰਿਆਦਾ ਸਹਿਤ) – ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ ਜੀ ਸ੍ਰੀ ਮੁਖਿਵਾਕ ਪਾਤਿਸਾਹੀ ੧੦
+    english: Sri Diwali Path Mahatam (with maryada) – 2019 first edition
+  author: Compilation
+  editor_or_commentator: 'Sangreh karta: Giani Gurvinder Singh Ji Nangli, Giani Mehtab Singh Ji Bhamboi'
+  publisher: 'Prem bheta: Singh Sahib Jathedar Baba Gajjan Singh Ji (15th head, Misl Shaheedan Tarna Dal, Baba Bakala
+    Sahib)'
+  year: 1 Kattak Nanakshahi 551 (17 Oct 2019), Guru Nanak 550th prakash purab
+  languages:
+  - braj
+  - punjabi
+  - persian-in-gurmukhi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੁੱਖਬੰਦ
+      english: Introduction
+    pdf_pages:
+    - 4
+    - 13
+    work: commentary (prose)
+    banidb:
+      status: not_checked
+    notes: Historical narrative of Guru Gobind Singh at Nanded/Diwali; reference/historical prose.
+  - title:
+      gurmukhi: ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ ਦਾ ਫਲ
+      english: Merit of the paath
+    pdf_pages:
+    - 14
+    - 15
+    work: commentary (prose)
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ ਕਰਨ ਦੀ ਮਰਿਆਦਾ
+      english: Maryada (rubrics)
+    pdf_pages:
+    - 16
+    - 17
+    work: rubric
+    banidb:
+      status: not_checked
+    notes: 'Begin 6 days before Diwali at amritvela or midnight; days 1-6: arambhak shabads, ch.1-107, then Kavach,
+      Astotr, Brahm Kavach, Bhagauti Astotr, Khalsa Mahima, Aarti, Anand Sahib, Ardas; 7th day (Diwali): whole pothi,
+      Sarbloh + Adi + Dasam aartis, deepmala; 7 kinds of naibed; optionally a 7-day sahaj paath of the whole Sarbloh
+      Granth ending on Diwali.'
+  - title:
+      gurmukhi: ਆਰੰਭਕ ਸ਼ਬਦ
+      english: Opening shabads
+    pdf_pages:
+    - 18
+    - 21
+    work: 'mixed: sggs/mool-mantar+jap salok, dasam/jaap ch.1, bhai-gurdas/vaar-1 pauri 48, sggs shabads (e.g. ''ਦੀਵਾ
+      ਮੇਰਾ ਏਕੁ ਨਾਮੁ'' ang 358), nand-lal/ganjnama (to couplet 85)'
+    banidb:
+      status: online
+      source: G,D,B,N
+      shabad_ids:
+      - 1401
+      - 40048
+      - 30073
+      similarity_range:
+      - 0.75
+      - 1.0
+    variants_observed: Vaar 1.48 'ਪੰਜਿ ਪਿਆਲੇ ਪੰਜਿ ਪੀਰ' vs BaniDB 'ਪੰਜ ਪੀਰ' (0.97); Ganjnama 85 'ਹਮਹ ਤਿਸ਼ਨਹਏ ਫ਼ੈਜ਼ੇ
+      ਦੀਦਾਰੇ ਊ' vs BaniDB 'ਹਮਾ ਤਿਸ਼ਨਾਇ ਫ਼ੈਜ਼ਿ ਦੀਦਾਰਿ ਊ' (0.75, transliteration convention).
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਮਾਯਾ ਦਾ ਅਸਤੋਤ੍ਰ ਪਾਤਿਸਾਹੀ ੧੦ (ਉਸਤਤਿ ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ)
+      english: Sri Maya Astotr = Sarbloh Manglacharan ch.1-322
+    pdf_pages:
+    - 22
+    - 70
+    work: sarbloh/adhyay-1 (ch.1-322)
+    banidb:
+      status: not_found
+    variants_observed: Chhand 4 'ਸੇਵਿ ਰੱਛਕ' (= steek mool; Kamalroop file has 'ਸੇਵਕ'). Chhand 2 'ਇਨ ਬਿਨੁ ਸਰੈ ਨ ਏਕਛਿਨੁ'.
+    notes: Stops at ch.322 'ਏਕ ਬ੍ਰਹਮ ਸਭ ਘਟਿ ਘਟਿ ਪੂਰਨ ਆਦਿਪੁਰਖੁ ਭਗਵਾਨੋ ॥੧੦॥੩੨੨॥' (hence the '322' filename).
+  - title:
+      gurmukhi: 'ਭੋਗ: ਅਥ ਮਾਤਾ ਮਿਲਣੰ (ਰਾਮ ਅਵਤਾਰ ੬੬੯–੬੭੯), ਮੁੰਦਾਵਣੀ, ਸਲੋਕ, ਜਾਪੁ ੧੯੭–੧੯੯'
+      english: Bhog sequence
+    pdf_pages:
+    - 70
+    - 72
+    work: dasam/ram-avtar 669-679; sggs/mundavani + salok; dasam/jaap 197-199
+    banidb:
+      status: online
+      source: D,G
+      shabad_ids:
+      - 8049
+      - 5538
+    notes: Ram Avtar 669 is D shabad 8049 (ang 270, stored as quarter-lines so the checker misses whole lines; first-letter/word
+      search finds it). Mundavani G 5538 ang 1429 similarity 1.0.
+  - title:
+      gurmukhi: ਸਰਬਲੋਹ ਕਵਚ (ਅਥ ਪ੍ਰਾਰਥਨਾ ਪੰਚ ਸਲੋਕੀ)
+      english: Sarbloh Kavach (ch.208-212 numbering)
+    pdf_pages:
+    - 73
+    - 73
+    work: sarbloh/sarbloh-kavach
+    banidb:
+      status: not_found
+    notes: Followed by 'ਅਕਾਲ ਪੁਰਖ ਕੀ ਰਛਾ ਹਮਨੈ...' lines which ARE in BaniDB (D 7424, ang 11, similarity 1.0). Path
+      Maryada cites the Kavach as chhand 2877 of the Granth.
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਸਰਬਲੋਹ ਅਸਤੋਤ੍ਰ (ਬਿਸਨੁਪਦ ਜਬਲੀਧਰ)
+      english: Sarbloh Astotr (ch.2862-2863)
+    pdf_pages:
+    - 74
+    - 77
+    work: sarbloh/sarbloh-astotr
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ਅਥ ਭਗਉਤੀ ਬ੍ਰਹਮ ਕਵਚ ਲਿਖ੍ਯਤੇ ਪਾਤਿਸ਼ਾਹੀ ੧੦
+      english: Bhagauti Brahm Kavach
+    pdf_pages:
+    - 77
+    - 77
+    work: other/bhagauti-brahm-kavach
+    banidb:
+      status: not_found
+    notes: 'Not Sarbloh; 6 stanzas + dohra ''ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ''. Not in BaniDB (4 lines tested):
+      possible ingest candidate if the user wants apocrypha.'
+  - title:
+      gurmukhi: ਅਥ ਜੁੱਧ ਪ੍ਰਬੰਧ – ਸ੍ਰੀ ਸਾਹਿਬ ਜੀ ਕੀ ਉਸਤਤਿ (ਭਗਉਤੀ ਅਸਤੋਤ੍ਰ)
+      english: Bhagauti Astotr
+    pdf_pages:
+    - 78
+    - 79
+    work: dasam/bhagauti-astotr
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 555568
+      similarity_range:
+      - 0.47
+      - 0.9
+    variants_observed: '''ਨਮੋ ਸ੍ਰੀ ਭਗਉਤੀ'' vs BaniDB ''ਨਮੋ ਸ੍ਰੀ ਭਗੌਤੀ''; ''ਕਰੈ ਏਕ ਤੇ'' vs ''ਕਰੇ''; ''ਤੇਗ ਤਰਵਾਰਿ
+      ਸ੍ਰੀ ਖਗ ਖੰਡਾ'' vs ''ਤਰਵਾਰ ... ਖੱਗ''; pothi line 2 ''ਮਹਾਲੋਹ ਕੀ ਪੁਤ੍ਰਿਕਾ ਝਲਹਲੰਤੀ'' where BaniDB has ''ਨਮੋ ਲੋਹ
+      ਪੁੱਤ੍ਰੀ ਅਛੋਹੰ ਰਹੰਤੀ'' (check order/recension). Low similarities partly because BaniDB stores half-lines.'
+    notes: 'BaniDB: Dasam Bani ang 1428, Guru Gobind Singh.'
+  - title:
+      gurmukhi: ਖਾਲਸਾ ਮਹਿਮਾ (ਬਿਸਨੁਪਦ ਪੁਨ੍ਯਾਕੀ ਦੇਵ ਪਲਾਸੀ – ਬਖਸਸ ਹਜੂਰ)
+      english: Khalsa Mahima (Sarbloh ch.3309-3310)
+    pdf_pages:
+    - 79
+    - 82
+    work: sarbloh/khalsa-mahima
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 43000
+      similarity_range:
+      - 0.71
+      - 1.0
+    variants_observed: Scan 'ਖਾਲਸਹ ਮਹਿ ਹਉਂ ਕਰਹੁੰ ਨਿਵਾਸ' vs BaniDB 'ਖ਼ਾਲਸੇ ਮਹਿ ਹੌ ਕਰੌ ਨਿਵਾਸ' (0.71); 'ਖਾਲਸਾ ਮੇਰੋ
+      ਮੁਖ ਹੈ ਅੰਗ ॥ ਖਾਲਸੇ ਕੇ ਹਉ ਬਸਤਿ ਸਦ ਸੰਗ' vs BaniDB 'ਮੁਖ ਹੈ ਅੰਗਾ ॥ ਖ਼ਾਲਸੇ ਕੇ ਹੌਂ ਸਦ ਸਦ ਸੰਗਾ'; 'ਪੱਛ ਰੁ ਪਾਦ' vs
+      'ਪਛ ਅਰ ਪਾਤਾ'. BaniDB uses nukta ਖ਼, so first-letter search with ਖ misses some lines.
+    notes: The only Sarbloh passage with an online counterpart, and it is a different (popular/rehatnama) recension
+      of 46 half-lines under source R. Treat Sarbloh version as its own text; record R 43000 as a related witness.
+  - title:
+      gurmukhi: ਆਰਤੀ ਸਰਬਲੋਹ ਜੀ ਕੀ + ਹੋਰ ਸਰਬਲੋਹ/ਦਸਮ ਸ਼ਬਦ
+      english: Aarti Sarbloh ji ki and closing shabads
+    pdf_pages:
+    - 83
+    - 90
+    work: sarbloh/aarti (+ sarbloh bisanpads & savaiye cited to Granth pp.255, 741-742; dasam/jaap closing chhands)
+    banidb:
+      status: not_found
+    notes: Aarti line 'ਬ੍ਰਹਮ ਮਹੇਸ ਸਚੀਪਤਿ ਦੇਵਨ ਆਰਤੀ ਕਰਤ ਬਿਧਾਨਾ' not in BaniDB; Sarbloh savaiye 'ਸੇਵ ਕਰੋ ਕਰੁਨਾਨਿਧਿ
+      ਕੀ', 'ਜੇ ਉਪਮਾ ਸ੍ਰੀਨਾਥ ਕੀ', 'ਸਤਿਗੁਰੁ ਜਹਾਜੁ ਸਬਦਿ ਗੁਰੁ ਖੇਵਟੁ', 'ਆਪਨਪੌ ਸ੍ਰੀ ਖਾਲਸਹਿ ਸੌਂਪਾ' all not_found. Ends
+      with Jaap chhands (Dasam p.6 cited).
+  notes: 'Printed page numbers = PDF page numbers. Tarna Dal''s Diwali paath pothi built around the Sarbloh Manglacharan
+    (Sri Maya/Lakshmi astotr): its value is the selection, order and rubrics, not new corpus. Superseded by the
+    expanded 2020 edition (12GTA...), which is not a byte duplicate. Pure Sarbloh items here are not online; Gurbani
+    items it quotes from SGGS/Dasam/Vaaran/Nand Lal are online.'
+- batch: Sri Sarbloh Granth
+  file: Sarbloh Granth Managal 33333.pdf
+  drive_id: 12GTAjUFgVFYbQu05WUSB9ODy-RiGUve4
+  sha256_12: 4f7a46d372aa
+  pages: 96
+  text_layer: legacy-GurbaniLipi
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਸ੍ਰੀ ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ (ਦੀਪਮਾਲਾ ਅਥਵਾ ਬੰਦੀਛੋੜ ਦਿਵਸ ਤੇ ਪੜੇ ਜਾਣ ਵਾਲੇ ਸ਼ਬਦਾਂ ਦਾ ਸੰਗ੍ਰਹਿ ਮਰਿਆਦਾ ਸਹਿਤ)
+    english: Sri Diwali Path Mahatam – revised/expanded edition
+  author: Compilation
+  editor_or_commentator: 'Sangreh karta: Giani Gurvinder Singh Ji Jatha Nangli, Giani Mehtab Singh Ji Bhamboi'
+  publisher: 'Seva: Singh Sahib Jathedar Baba Gajjan Singh Ji (15th head, Misl Shaheedan Taruna Dal, Baba Bakala
+    Sahib)'
+  year: unknown as printed; PDF created 2020-10-08 (from a PageMaker .pmd file)
+  languages:
+  - braj
+  - punjabi
+  - persian-in-gurmukhi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੁੱਖਬੰਦ
+      english: Introduction
+    pdf_pages:
+    - 3
+    - 14
+    work: commentary (prose)
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ ਦਾ ਫਲ
+      english: Merit of the paath
+    pdf_pages:
+    - 15
+    - 16
+    work: commentary (prose)
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਮਰਿਆਦਾ
+      english: Maryada (rubrics)
+    pdf_pages:
+    - 17
+    - 19
+    work: rubric
+    banidb:
+      status: not_checked
+    notes: Same rules as the 2019 edition (6+1 days, amritvela or midnight, 7 kinds of naibed, deepmala).
+  - title:
+      gurmukhi: ਆਰੰਭਕ ਸ਼ਬਦ
+      english: Opening shabads
+    pdf_pages:
+    - 20
+    - 23
+    work: 'mixed: sggs/mool-mantar, dasam/jaap, bhai-gurdas/vaar-1.48, sggs shabads, nand-lal/ganjnama'
+    banidb:
+      status: online
+      source: G,D,B,N
+      shabad_ids:
+      - 1401
+      - 40048
+      - 30073
+    notes: Same items as 2019 edition (cross-checked there).
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਮਾਯਾ ਦਾ ਅਸਤੋਤ੍ਰ ਪਾਤਿਸਾਹੀ ੧੦
+      english: Sarbloh Manglacharan ch.1-322
+    pdf_pages:
+    - 24
+    - 71
+    work: sarbloh/adhyay-1 (ch.1-322)
+    banidb:
+      status: not_found
+    variants_observed: Same readings as 2019 edition ('ਸੇਵਿ ਰੱਛਕ', 'ਅਪਦਬਿਨਾਸਨਿ ਸੁਖਕਰਨ' joined spellings).
+  - title:
+      gurmukhi: ਬਿਸਨੁਪਦ ਪੁਨ੍ਯਾਕੀ ਤਰਹ ਦੂਜੀ ॥ ਛੰਦ ਬਹਰ ਤਵੀਲ ॥ ਕਬ੍ਯੋਬਾਚ ਬੇਨਤੀ
+      english: Kabyobach Benti (Sarbloh ch.2888) – new in this edition
+    pdf_pages:
+    - 71
+    - 73
+    work: sarbloh/kabyobach-benti (ch.2888)
+    banidb:
+      status: not_found
+    notes: '''ਪ੍ਰਨਮਊ ਪ੍ਰਮਾਤਮ ਪਰਧਾਮਾ...'' 8 stanzas ending ॥੨॥੨੯॥੫੬੧॥੨੮੮੮॥. Not in BaniDB.'
+  - title:
+      gurmukhi: 'ਭੋਗ: ਮਾਤਾ ਮਿਲਣੰ (ਰਾਮ ਅਵਤਾਰ ੬੬੯–੬੭੯), ਕਬਿਯੋ ਬਾਚ ਬੇਨਤੀ ਚੌਪਈ ਅੰਤ (੮੬੩ + ਦੋਹਰਾ), ਮੁੰਦਾਵਣੀ, ਸਲੋਕ, ਜਾਪੁ
+        ੧੯੭–੧੯੯'
+      english: Bhog sequence (expanded)
+    pdf_pages:
+    - 73
+    - 76
+    work: dasam/ram-avtar 669-679; dasam/benti-chaupai end (863); sggs/mundavani; dasam/jaap 197-199
+    banidb:
+      status: online
+      source: D,G
+      shabad_ids:
+      - 8049
+      - 8095
+      - 5538
+      similarity_range:
+      - 0.97
+      - 1.0
+    variants_observed: '''ਪਾਂਇ ਗਹੇ ਜਬ ਤੇ ਤੁਮਰੇ ... ਆਨ੍ਯੋ'' vs BaniDB ''ਪਾਇ ਗਹੇ ... ਆਨਯੋ'' (0.97, D 8095 ang 290).'
+  - title:
+      gurmukhi: ਸਰਬਲੋਹ ਕਵਚ
+      english: Sarbloh Kavach
+    pdf_pages:
+    - 77
+    - 77
+    work: sarbloh/sarbloh-kavach
+    banidb:
+      status: not_found
+    notes: Ends with 'ਅਕਾਲ ਪੁਰਖ ਕੀ ਰਛਾ ਹਮਨੈ...' cited '(ਸ੍ਰੀ ਦਸਮ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ-੧੧)' = D 7424.
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਸਰਬਲੋਹ ਅਸਤੋਤ੍ਰ
+      english: Sarbloh Astotr
+    pdf_pages:
+    - 78
+    - 81
+    work: sarbloh/sarbloh-astotr
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ਭਗਉਤੀ ਬ੍ਰਹਮ ਕਵਚ
+      english: Bhagauti Brahm Kavach
+    pdf_pages:
+    - 82
+    - 82
+    work: other/bhagauti-brahm-kavach
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ਭਗਉਤੀ ਅਸਤੋਤ੍ਰ
+      english: Bhagauti Astotr
+    pdf_pages:
+    - 83
+    - 84
+    work: dasam/bhagauti-astotr
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 555568
+    notes: Same text as 2019 edition.
+  - title:
+      gurmukhi: ਖਾਲਸਾ ਮਹਿਮਾ (ਰਾਜਪਲਾਸੀ ਬਖਸਸ ਹਜੂਰ ਕਬਿਉਬਾਚੁ ...)
+      english: Khalsa Mahima (expanded)
+    pdf_pages:
+    - 85
+    - 88
+    work: sarbloh/khalsa-mahima
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 43000
+    notes: Opens with an extra bisanpad (Rajpalasi) before 'ਖਾਲਸਾ ਮੇਰੋ ਰੂਪ ਹੈ ਖਾਸ'; see 2019 entry for variants.
+  - title:
+      gurmukhi: ਆਰਤੀ ਸਰਬਲੋਹ ਜੀ ਕੀ + ਹੋਰ ਸ਼ਬਦ
+      english: Aarti and closing shabads
+    pdf_pages:
+    - 89
+    - 96
+    work: sarbloh/aarti (+ sarbloh shabads cited to Granth pp.255, 741-742, 985; dasam/jaap 94-95)
+    banidb:
+      status: not_found
+  notes: 'Printed page = PDF page. Revised, expanded edition of the 2019 Diwali Path Mahatam (1V9mp...): same compilers/sponsor,
+    adds Kabyobach Benti (Sarbloh ch.2888), the Dasam benti-chaupai ending and an extra Khalsa Mahima bisanpad,
+    and re-paginates. Not a duplicate. Same collection decision; if only one is kept as the collection, prefer this
+    later edition and note the 2019 one as earlier.'
+- batch: Sri Sarbloh Granth
+  file: sarbloh-1-1.pdf
+  drive_id: 1GV3x_uz5-KjJsCPypjlamQpTTgsw_o_7
+  sha256_12: 722cba18e68c
+  pages: 20
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਸ੍ਰੀ ਭਵਾਨੀ ਉਸਤਤਿ + ੩. ਸਰਬ ਲੋਹ ਕਵਚ
+    english: Sri Bhavani Ustat (Manglacharan ch.1-106) and Sarbloh Kavach, from a gutka
+  author: Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)
+  publisher: unknown (pages photographed from a printed gutka; running heads show page numbers in the 500s, e.g.
+    'ਕਵਚ/੫੮੪' – exact numbers uncertain at scan resolution)
+  year: unknown
+  languages:
+  - braj
+  - sanskrit-in-gurmukhi
+  content_type: text
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਭਵਾਨੀ ਉਸਤਤਿ (ਉਸਤਤਿ ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ)
+      english: Sri Bhavani Ustat = Manglacharan ch.1-106
+    pdf_pages:
+    - 1
+    - 18
+    work: sarbloh/adhyay-1 (ch.1-106)
+    banidb:
+      status: not_found
+    variants_observed: Reads 'ਸੇਵਿ ਰੱਛਕ' in ch.4 (like steek/Tarna Dal). Ends at ch.106 '...ਸੁਮੰਤ੍ਰ ਜਾਪ ਠਾਨਿਯੈ ॥੧੦੬॥'
+      followed by 'ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖਾਲਸਾ' – omits the closing dohra 'ਸਤਿ ਸਤਿ...' (ch.107) that the Kamalroop file
+      and Diwali pothis include and that the Path Maryada's '1-107' reading assumes.
+    notes: This is the daily-paath unit (ch.1-107) prescribed by the Path Maryada / Diwali maryada.
+  - title:
+      gurmukhi: ੩. ਸਰਬ ਲੋਹ ਕਵਚ – ਅਥ ਪ੍ਰਾਰਥਨਾ ਪੰਚ ਸਲੋਕੀ ਸ੍ਰੀ ਸਰਬਲੋਹ ਕਵਚੰ
+      english: Sarbloh Kavach (ch.208-212)
+    pdf_pages:
+    - 19
+    - 20
+    work: sarbloh/sarbloh-kavach
+    banidb:
+      status: not_found
+    notes: Numbered '3.' in the source gutka, so the gutka had other items (1, 2) not photographed. Ends '॥੫॥੨੧੨॥
+      (ਸਰਬ ਲੋਹ)'.
+  notes: CamScanner phone photos of a large-type gutka (red/black printing, page border). Readable at 60-100 dpi.
+    Small excerpt; witness only.
+- batch: Sri Sarbloh Granth
+  file: Shri Sarbloh Granth Path Maryada .pdf
+  drive_id: 19k_f_KpuuP50h6LN9_6EDF6_ubudsYFF
+  sha256_12: 5228d99e660c
+  pages: 7
+  text_layer: legacy-GurbaniLipi
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਸ੍ਰੀ ਸਹਿਜ ਪਾਠ ਮਰਿਆਦਾ ਸ੍ਰੀ ਮੁਖਵਾਕ ਪਾਤਸ਼ਾਹੀ ੧੦ – ਸ੍ਰੀ ਸਰਬਲੋਹ ਪ੍ਰਕਾਸ਼ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ
+    english: Sahaj Paath Maryada of Sri Sarbloh Prakash Granth Sahib
+  author: 'Sangreh karta: Giani Gurvinder Singh Ji Nangli'
+  publisher: 'Prem bheta: Singh Sahib Jathedar Baba Gajjan Singh Ji (15th head, Misl Shaheedan Tarna Dal, Baba Bakala
+    Sahib)'
+  year: unknown as printed; PDF created 2020-05-01
+  languages:
+  - punjabi
+  content_type: other
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਸਰਬਲੋਹ ਪਾਠ ਦਾ ਫਲ
+      english: Merit of Sarbloh paath
+    pdf_pages:
+    - 2
+    - 3
+    work: reference/sarbloh-path-maryada
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: (ੳ) ਸਹਿਜ ਪਾਠ ਅਰੰਭ ਕਰਨ ਦੀ ਪਾਠ ਮਰਿਆਦਾ; (ਅ) ਅਧਿਆਏ ਦੀ ਸਮਾਪਤੀ ਉਪਰ ਅਰਦਾਸ; (ੲ) ਮੱਧ; (ਸ) ਭੋਗ
+      english: Rules for starting, adhyay-end ardas, madh and bhog
+    pdf_pages:
+    - 4
+    - 7
+    work: reference/sarbloh-path-maryada
+    banidb:
+      status: not_checked
+    notes: 'States the Granth has 5 adhyays. Start: Japji mool + Jaap + Benti Chaupai (to 405) + Anand + Ardas,
+      hukam from the three darbars (Adi, Dasam, Sarbloh), then ''Sri Bhavani Astotr'' ch.1-107. Each adhyay end:
+      Sarbloh Kavach (ch.2877), Sarbloh Astotr (ch.2862-2863), Aarti. Madh at Sarbloh Astotr (ch.2862-2863). Bhog:
+      after Krishna Avtar, read Bhavani Astotr 1-107, ''Gur-gaddi patshahi dasak'' (ch.3159-3162), Khalsa Mahima
+      (ch.3308-3309), Kavach (2877), Astotr (2862-2863), Kabyobach Benti (2888), Aarti. Last page lists Google Drive
+      / Panjab Digital Library links (garbled by legacy conversion) for SGGS, Dasam Granth and Sarbloh Granth bhag
+      1 & 2.'
+  notes: 'Paath-procedure leaflet from the Tarna Dal circle (same compiler as the Diwali pothis). Useful metadata:
+    gives absolute chhand numbers for the key Sarbloh banis (Kavach 2877, Astotr 2862-63, Kabyobach Benti 2888,
+    Gurgaddi 3159-62, Khalsa Mahima 3308-09), which can anchor the canonical text''s numbering.'
+- batch: Bhai Gurdas Vaaran
+  file: VaranBhaiGurdasJi-VolumeI.pdf
+  drive_id: 10NMBg0eRUcnQUG1woErQtxfuyR7Xh54P
+  sha256_12: e09deee35707
+  pages: 990
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ (ਭਾਗ ੧)
+    english: 'Vārāṅ Bhai Gurdas Ji, Vol. I [Vārs 1 to 20]: text in Gurmukhi and Roman along with English translation'
+  author: Bhai Gurdas (Bhalla)
+  editor_or_commentator: Shamsher Singh Puri (English translation; President, Academy of Sikh Studies Inc., Lilburn
+    GA, USA); revised by Col. Devinder Singh (Retd.)
+  publisher: Singh Brothers, Amritsar (printed at Printwell, Amritsar)
+  year: First Edition August 2009
+  languages:
+  - punjabi
+  - braj
+  - english
+  content_type: text+translation
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      english: 'Front matter: cover, title, imprint (ISBN 81-7205-433-5 vol I, 81-7205-435-1 set), dedication, thanks,
+        acknowledgements, publisher''s note, photo, transliteration key'
+    pdf_pages:
+    - 1
+    - 9
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      english: 'Introduction: Life and Works of Bhai Gurdas; Bhai Gurdas a Scholar and Philosopher; Works of Bhai
+        Gurdas'
+    pdf_pages:
+    - 10
+    - 52
+    work: commentary/introduction
+    banidb:
+      status: not_checked
+    notes: English prose by the translator.
+  - title:
+      english: Glossary of commonly used terms
+    pdf_pages:
+    - 53
+    - 60
+    work: reference/glossary
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ, ਵਾਰ ੧-੨੦
+      english: Vaars 1-20 (Gurmukhi text with numbered lines, Roman transliteration, English translation and 'In
+        Essence' note per pauri)
+    pdf_pages:
+    - 61
+    - 988
+    work: bhai-gurdas/vaaran
+    banidb:
+      status: online
+      source: B
+      shabad_ids:
+      - 40001
+      - 40464
+      similarity_range:
+      - 0.89
+      - 1.0
+    variants_observed: 'Mostly orthographic (lagamatra) differences, plus some word variants. V1 P3: scan ''ਖਟਿ
+      ਖਵਾਲਣੁ ਭਾਇ ਕਰੇਹੀ'' vs BaniDB ''ਖਟਿ ਖਵਾਲਣੁ ਕਾਰਿ ਕਰੇਹੀ'' (SGPC edition also has ਕਾਰਿ); V1 P3 ''ਮੁਖਿ ਸੁਭ ਬੋਲਣੁ''
+      vs BaniDB ''ਮੁਖਿ ਸੁਭਿ ਬੋਲਣਿ''; ''ਉਤਮੁ ਜਨਮ'' vs ''ਉਤਮੁ ਜਨਮੁ''; ''ਗੁਰ ਭਾਈ ... ਮੁਖ ਪਿਵੇਹੀ'' vs ''ਗੁਰਭਾਈ ... ਮੁਖਿ
+      ਪਿਵੇਹੀ''. V6 P5: ''ਵਾਹਿਗੁਰੂ'' vs BaniDB ''ਵਾਹਗੁਰੂ''; ''ਪਵਿਤ੍ਰ ... ਪੰਥ ਨਿਵਾਣ'' vs ''ਪਵਿਤ੍ਰੁ ... ਪੰਥਿ ਨਿਵਾਣਿ'';
+      ''ਮਹਤ ਕਰਿ ਓਤਿਪੋਤਿ'' vs ''ਮਹਤੁ ਕਰਿ ਓਤਿ ਪੋਤਿ''. V1 P5 line 1 agrees with BaniDB (''ਸਤਿਜੁਗ ... ਦੁਆਪਰੁ'') where
+      the SGPC edition differs.'
+    notes: 'Each vaar opens on an ornamented Gurmukhi page (odd PDF page); Gurmukhi + Roman on the left (odd) page,
+      English on the facing (even) page. Pauri headings are the translator''s own (e.g. V6 P5 ''ਜਪੁਜੀ—ਅੰਤਲੇ ਸਲੋਕ
+      ਪਵਨ ਗੁਰੂ ਦਾ ਅਰਥ''), not the SGPC/BaniDB headings. Vaar start pages (PDF): V1 63, V2 161, V3 201, V4 241, V5
+      283, V6 325, V7 363, V8 403, V9 451, V10 495, V11 541, V12 603, V13 643, V14 693, V15 733, V16 775, V17 817,
+      V18 859, V19 905, V20 947; each vaar runs to the page before the next one starts; V20 ends at 988.'
+  notes: 'Clean photocopier (Konica bizhub) scan of a typeset book, grayscale, with the scanner''s ''Page N'' label
+    stamped at bottom-left. Printed page = PDF+3 up to PDF 362, then PDF+5: printed pp. 366-367 are MISSING (between
+    PDF 362 = V6 P19 English and PDF 363 = V7 start), i.e. Vaar 6 pauri 20 (Gurmukhi + English) is absent from the
+    scan. PDF 989 is a blank frame page, 990 the back cover. Witness: BaniDB already has all 40 vaars (source B);
+    this is an English-translation edition whose Gurmukhi text shows real readings that differ from BaniDB (e.g.
+    ਭਾਇ/ਕਾਰਿ). Companion volume: VaranBhaiGurdasJi-VolumeII.pdf.'
+- batch: Bhai Gurdas Vaaran
+  file: VaranBhaiGurdasJi-VolumeII.pdf
+  drive_id: 1Lz7U8AKN711EMC4QMFd9uV6ffYo8p7zU
+  sha256_12: b45f057d5e00
+  pages: 900
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ (ਭਾਗ ੨)
+    english: Vārāṅ Bhai Gurdas Ji, Vol. II [Vārs 21 to 40]
+  author: Bhai Gurdas (Bhalla)
+  editor_or_commentator: Shamsher Singh Puri (English translation); Vol I credits revision to Col. Devinder Singh
+    (Retd.)
+  publisher: Singh Brothers, Amritsar
+  year: 'unknown (imprint page not in this scan; Vol I of the set: First Edition August 2009)'
+  languages:
+  - punjabi
+  - braj
+  - english
+  content_type: text+translation
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      english: Cover, half-title, title page
+    pdf_pages:
+    - 1
+    - 3
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ, ਵਾਰ ੨੧-੪੦
+      english: Vaars 21-40 (Gurmukhi, Roman transliteration, English translation, 'In Essence')
+    pdf_pages:
+    - 4
+    - 900
+    work: bhai-gurdas/vaaran
+    banidb:
+      status: online
+      source: B
+      shabad_ids:
+      - 40465
+      - 40913
+      similarity_range:
+      - 0.94
+      - 1.0
+    variants_observed: 'V21 P1: scan ''ਪਾਤਿਸਾਹੁ ਪਾਤਿਸਾਹੁ ਸਤਿ ਸੁਹਾਣੀਐ'' vs BaniDB (and SGPC) ''ਪਾਤਿਸਾਹਾ ਪਾਤਿਸਾਹੁ
+      ...''; ''ਵਡਾ ਬੇ ਪਰਵਾਹੁ'' vs ''ਵਡਾ ਬੇਪਰਵਾਹੁ''. V40 P1: ''ਅਉਗੁਨ ਲੈ ਗੁਨ ਵਿਕਣੈ'' vs BaniDB ''ਅਉਗੁਣ ਲੈ ਗੁਣ ਵਿਕਣੈ'';
+      other sampled lines identical.'
+    notes: 'Here the Gurmukhi page is the even PDF page, English the odd one. Vaar start pages (PDF): V21 4, V22
+      42, V23 84, V24 126, V25 176, V26 216, V27 286, V28 332, V29 376, V30 418, V31 458, V32 498, V33 538, V34
+      582, V35 624, V36 670, V37 712, V38 774, V39 814, V40 856 (to 900). The (first scan-check line of V21 P1 was
+      mismatched by the checker to an SGGS line; the BaniDB shabad 40465 was compared manually.)'
+  notes: 'Same scanner and layout as Vol I. No imprint/contents page and no back cover scanned. The last pages of
+    Vaar 40 (about PDF 894-900) are out of order: English of pauri 22 (PDF 895) comes before pauris 20 (897) and
+    21 (899). Does NOT contain the 41st vaar (Bhai Gurdas Singh), unlike the SGPC edition. Witness for BaniDB source
+    B.'
+- batch: Bhai Gurdas Vaaran
+  file: Vaaran Bhai Gurdaas Ji - SGPC.pdf
+  drive_id: 1agc7NcK3UVDDPIaV8inLG6WGj3eQ5r9j
+  sha256_12: b90d61e16f38
+  pages: 233
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਵਾਰਾਂ ਗਿਆਨ ਰਤਨਾਵਲੀ ਭਾਈ ਗੁਰਦਾਸ ਜੀ — ਕਠਨ ਸ਼ਬਦਾਂ ਆਦਿ ਦੀ ਟਿੱਪਣੀ ਤੇ ਪ੍ਰਯਾਵਾਂ ਸਹਿਤ
+    english: Vaaran Gyan Ratanavali Bhai Gurdas Ji, with notes and synonyms for difficult words
+  author: Bhai Gurdas (Bhalla); Vaar 41 by Bhai Gurdas II (Bhai Gurdas Singh)
+  editor_or_commentator: Editor (ਸੰਪਾਦਕ) S. Amar Singh 'Chakar'; revised (ਸੰਸ਼ੋਧਕ) by S. Shamsher Singh 'Ashok',
+    who also wrote the ਭੂਮਿਕਾ
+  publisher: Shiromani Gurdwara Parbandhak Committee, Amritsar (printed at Golden Offset Press, Gurdwara Ramsar
+    Sahib, Amritsar)
+  year: November 2011 printing (ਨਵੰਬਰ ੨੦੧੧, 5000 copies); cover shows 'ਭੇਟ 65/-'
+  languages:
+  - punjabi
+  - braj
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      english: Cover, title, imprint, contents (ਵਿਸ਼ੇ ਸੂਚੀ)
+    pdf_pages:
+    - 1
+    - 4
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਭੂਮਿਕਾ
+      english: Introduction by Shamsher Singh Ashok (life of the poet, etc.)
+    pdf_pages:
+    - 4
+    - 8
+    work: commentary/introduction
+    banidb:
+      status: not_checked
+    notes: Printed pp. 5-12 per TOC. Says the 40 vaars are by Bhai Gurdas Bhalla and that the 41st, 'Vaar Sri Bhagauti
+      Ji Ki', is by Bhai Gurdas II, a court poet of Guru Gobind Singh.
+  - title:
+      gurmukhi: ਵਾਰ ੧-੪੦
+      english: Vaars 1-40 of Bhai Gurdas
+    pdf_pages:
+    - 8
+    - 225
+    work: bhai-gurdas/vaaran
+    banidb:
+      status: online
+      source: B
+      shabad_ids:
+      - 40001
+      - 40913
+      similarity_range:
+      - 0.95
+      - 1.0
+    variants_observed: 'Very close to BaniDB. The pauri headings are identical to BaniDB''s (e.g. V1 P3 ''ਮਨੁੱਖ
+      ਜਨਮ ਦੀ ਉੱਤਮਤਾ'', V6 P5 ''ਜਪੁ ਜੀ ਦੇ ਸਲੋਕ ਪਵਣ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ ਦਾ ਅਰਥ''), so BaniDB''s source B text likely derives
+      from this SGPC edition. Small differences: V1 P5 ''ਸਤਿਜੁਗੁ ਤ੍ਰੇਤਾ ਦੁਆਪਰ'' vs BaniDB ''ਸਤਿਜੁਗ ਤ੍ਰੇਤਾ ਦੁਆਪਰੁ'';
+      V6 P5 ''ਪਉਣੁ ਗੁਰੂ'' vs ''ਪਉਣ ਗੁਰੂ''; V21 P1 ''ਬੇਪਰਵਾਹ'' vs ''ਬੇਪਰਵਾਹੁ''. The edition records alternative readings
+      in footnotes (e.g. V1 P3 ''ਪਵਣੁ*'' with the note ''ਪਾਠਾਂਤਰ ਪਉਣ ਵੀ ਹੈ'').'
+    notes: 'Two printed pages per PDF page (open-book spreads). Mapping: printed text page n is on PDF floor(n/2)+8
+      (even n on the left, odd n on the right). Vaar PDF ranges (from the TOC): V1 8-20, V2 21-24, V3 25-29, V4
+      30-34, V5 34-38, V6 39-43, V7 44-48, V8 49-54, V9 54-58, V10 59-64, V11 65-72, V12 73-77, V13 77-82, V14 82-86,
+      V15 87-92, V16 92-98, V17 98-103, V18 104-109, V19 110-114, V20 114-118, V21 119-123, V22 123-129, V23 129-134,
+      V24 135-141, V25 141-146, V26 146-155, V27 155-160, V28 160-165, V29 166-170, V30 171-175, V31 175-179, V32
+      180-184, V33 184-189, V34 189-193, V35 194-198, V36 198-202, V37 203-210, V38 210-214, V39 214-220, V40 220-225.
+      Each pauri has a ਪ੍ਰਸੰਗ heading in parentheses and footnoted word glosses and synonyms (ਕਠਨ ਸ਼ਬਦਾਂ ਦੀ ਟਿੱਪਣੀ),
+      not a full steek.'
+  - title:
+      gurmukhi: ਵਾਰ ੪੧ (ਵਾਰ ਸ੍ਰੀ ਭਗਉਤੀ ਜੀ ਕੀ ਪਾਤਿਸਾਹੀ ਦਸਵੀਂ ਕੀ — ਬੋਲਣਾ ਭਾਈ ਗੁਰਦਾਸ ਕਾ)
+      english: Vaar 41, by Bhai Gurdas II
+    pdf_pages:
+    - 226
+    - 233
+    work: bhai-gurdas-singh/vaar
+    banidb:
+      status: online
+      source: S
+      shabad_ids:
+      - 41000
+      - 41026
+      similarity_range:
+      - 0.81
+      - 1.0
+    variants_observed: P1 'ਪੀਓ ਪਾਹੁਲ ਖੰਡਧਾਰ ਹੋਇ ਜਨਮ ਸੁਹੇਲਾ' vs BaniDB 'ਪੀਵਹੁ ਪਾਹੁਲ ਖੰਡਧਾਰ ਹੁਇ ਜਨਮੁ ਸੁਹੇਲਾ' (the
+      standalone Bhai_Gurdas_Singh.pdf agrees with SGPC); P2 'ਸਚਾ ਅਮਰੁ ਗੋਬਿੰਦ ਕਾ' vs 'ਸਚਾ ਅਮਰ'. A footnote cites
+      hand-written MS no. 1361 reading the title as 'ਵਾਰ ਭਾਈ ਗੁਰਦਾਸ ਜੀ ਕੀ ॥ ਪਉੜੀ ॥', and another footnote says 'ਸਿਮਰਿ'
+      is also a reading.
+    notes: Printed pp. 436-451.
+  notes: 'Scanned with a ScanSnap SV600 overhead scanner as open-book two-page spreads in colour, with some page
+    curvature near the gutter but readable throughout. No usable text layer (only a stray Helvetica OCR fragment
+    on PDF 1 and 89). The front cover carries a ''www.vidhia.com Khalsa Foundation, 2019'' scan watermark. The edition
+    is complete (TOC pp. 1-451 all present, PDF 233 = pp. 450-451). Witness: BaniDB source B appears to be built
+    from this edition (identical pauri headings), so expect few differences. Its value is the glosses, the footnoted
+    ਪਾਠਾਂਤਰ (variant readings) and the Vaar 41 text.'
+- batch: Bhai Gurdas Vaaran
+  file: Bhai_Gurdas_Singh.pdf
+  drive_id: 1bK_ozg_3Fy_e4EytWhm65vwuFxLc5pn5
+  sha256_12: ce12ec5759e3
+  pages: 16
+  text_layer: legacy-GurbaniLipi
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਵਾਰ ਭਾਈ ਗੁਰਦਾਸ ਸਿੰਘ (ਵਾਰ ਸ੍ਰੀ ਭਗਉਤੀ ਜੀ ਕੀ) — 'ਵਾਹ ਵਾਹ ਗੋਬਿੰਦ ਸਿੰਘ ਆਪੇ ਗੁਰੁ ਚੇਲਾ'
+    english: Vaar of Bhai Gurdas Singh (Bhai Gurdas II), 28 pauris
+  author: Bhai Gurdas Singh (Bhai Gurdas II)
+  editor_or_commentator: unknown (no title or imprint; the file opens directly with '< ਸਤਿਗੁਰਪ੍ਰਸਾਦਿ ॥')
+  publisher: unknown (OpenOffice.org 2.2 document, created January 2008)
+  year: unknown
+  languages:
+  - punjabi
+  - braj
+  content_type: text
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਵਾਰ ਭਾਈ ਗੁਰਦਾਸ ਸਿੰਘ, ਪਉੜੀ ੧-੨੮
+      english: Bhai Gurdas Singh's vaar, pauris 1-28
+    pdf_pages:
+    - 1
+    - 16
+    work: bhai-gurdas-singh/vaar
+    banidb:
+      status: online
+      source: S
+      shabad_ids:
+      - 41000
+      - 41027
+      similarity_range:
+      - 0.85
+      - 1.0
+    variants_observed: 'Near-identical to BaniDB S; differences are mostly addhak and lagamatra: P1 ''ਹਰਿ ਸਚੇ ਤਖਤ''
+      vs BaniDB ''ਹਰਿ ਸੱਚੇ ਤਖਤ''; P18 ''ਤਬ ਵੈ ਨਿਰਖੈਂ ਸੁਰਗ ਮਹਿ'' vs BaniDB ''ਤਬ ਵੈ ਨਿਰਖੈਗੇ ਸੁਰਗ ਮੈਂ''; P1 ''ਪੀਓ ਪਾਹੁਲ
+      ... ਹੋਇ ਜਨਮ'' (as in the SGPC edition) vs BaniDB ''ਪੀਵਹੁ ਪਾਹੁਲ ... ਹੁਇ ਜਨਮੁ''.'
+    notes: 'Pauris per PDF page: 1-3 p1, 4-7 p2, 8-10 p3, 11-14 p4, then about one per page; 27 and 28 (chaupai
+      closing, ''ਇਉਂ ਕਰਿ ਹੈ ਗੁਰਦਾਸ ਪੁਕਾਰਾ'') are on pp. 15-16. GurbaniLipi legacy font converts cleanly with legacy2uni.js.'
+  notes: Digital typeset text, not a scan; the GurbaniLipi encoding converts cleanly. It has no provenance information.
+    The same text is in BaniDB source S (41000-41027) and as Vaar 41 of the SGPC edition. Keep it as a minor witness,
+    or skip it, since it adds little beyond BaniDB.
+- batch: Compilations (pothis and gutkas)
+  file: ਦਸ਼ਹਰਾ_ਮਹਾਤਮ_ਪੋਥੀ_ਹਜੂਰ_ਸਾਹਿਬ.pdf
+  drive_id: 1JwArUCWtX1I0hI4JxXZU509n7ghgaUPZ
+  sha256_12: a150981768bb
+  pages: 179
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਪੋਥੀ ਸ੍ਰੀ ਦਸੈਹਰਾ ਮਹਾਤਮ (ਸ਼ਸਤ੍ਰ ਪੂਜਾ ਸਮੇਂ ਪੜ੍ਹੀ ਜਾਣ ਵਾਲੀ ਬਾਣੀ)
+    english: Pothi Sri Dasehra Mahatam (bani recited at Shastar Puja), Hazur Sahib edition
+  author: Guru Gobind Singh (all items are Dasam Granth extracts)
+  publisher: Takht Sachkhand Sri Hazur Abchalnagar Sahib, Nanded (Maharashtra)
+  year: 2009 (first printing, 550 pothis; released Poh sudi 7 / 24 Dec 2009, Guru Gobind Singh's gurpurab)
+  languages:
+  - braj
+  - punjabi
+  - persian-in-gurmukhi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੁੱਖ-ਬੰਦ, ਤਤਕਰਾ, ਪਾਠ ਦੀ ਵਿਧੀ
+      english: 'Front matter: imprint, preface, TOC, recitation rubric'
+    pdf_pages:
+    - 1
+    - 10
+    work: front-matter
+    banidb:
+      status: not_checked
+    notes: 'PDF 1 title, 2 imprint, 3-7 preface (ੳ-ਹ), 8-9 TOC (ਕ, ਖ) with columns: chapter, chhand, opening line,
+      verse range, pothi page, page in the 1428-page Dasam Granth. PDF 10 (ਗ) = path bidhi (see notes).'
+  - title:
+      gurmukhi: ਜਾਪੁ ਸਾਹਿਬ
+      english: Jaap Sahib 1-199
+    pdf_pages:
+    - 11
+    - 23
+    work: dasam/jaap
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7402
+      - 7423
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਅਕਾਲ ਉਸਤਤਿ (ਚੌਪਈ ੧-੧੦; ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਦੀਰਘ ਤ੍ਰਿਭੰਗੀ ੨੧੧-੨੩੦; ਪਾਧੜੀ ੨੬੧-੨੭੧)
+      english: Akal Ustat, three extracts
+    pdf_pages:
+    - 24
+    - 29
+    work: dasam/akal-ustat
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7424
+      - 7436
+      - 7440
+      similarity_range:
+      - 0.83
+      - 1.0
+    variants_observed: 'Tribhangi lines read without final sihari: scan ਪ੍ਰਹਾਸਨ / ਨਿਵਾਸਨ / ਸ੍ਰਿਸਟ vs BaniDB ਪ੍ਰਹਾਸਨਿ
+      / ਨਿਵਾਸਨਿ / ਸ੍ਰਿਸਟਿ; scan ਪ੍ਰਣਾਸਨ / ਪ੍ਰਤੇਜਨ vs BaniDB ਪ੍ਰਣਾਸਣਿ / ਪ੍ਰਤੇਜਣਿ (tentative, low-res).'
+  - title:
+      gurmukhi: ਬਚਿਤ੍ਰ ਨਾਟਕ (ਤ੍ਵ ਪ੍ਰਸਾਦਿ ੧-੧੦੧; ਚੌਪਈ ੧-੧੧)
+      english: Bachitar Natak ch.1 + chaupai
+    pdf_pages:
+    - 30
+    - 41
+    work: dasam/bachitar-natak
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7441
+      - 7564
+      similarity_range:
+      - 0.9
+      - 1.0
+    variants_observed: ਕਰੌ vs BaniDB ਕਰੋਂ; ਇਹ vs ਇਹੁ (ਪੂਰਨ ਕਰੌ ਗਿਰੰਥ ਇਹ).
+  - title:
+      gurmukhi: ਚੰਡੀ ਚਰਿਤ੍ਰ ਉਕਤਿ ਬਿਲਾਸ ੧-੨੩੩
+      english: Chandi Charitar Ukti Bilas (complete)
+    pdf_pages:
+    - 42
+    - 76
+    work: dasam/chandi-charitar-1
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7565
+      - 7567
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਚੰਡੀ ਚਰਿਤ੍ਰ ਲਿਖਯਤੇ ੧-੨੬੨
+      english: Chandi Charitar II (complete)
+    pdf_pages:
+    - 77
+    - 103
+    work: dasam/chandi-charitar-2
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7673
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: Only 1 of 4 sample lines matched; misses were my readings of nirāj-chhand half-lines (too short for the
+      first-letter search), not evidence of absence.
+  - title:
+      gurmukhi: ਚੰਡੀ ਦੀ ਵਾਰ ੧-੫੫
+      english: Var Sri Bhagauti Ji Ki (Chandi di Var)
+    pdf_pages:
+    - 104
+    - 114
+    work: dasam/chandi-di-var
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7738
+      similarity_range:
+      - 0.97
+      - 1.0
+    variants_observed: ਸਿਮਰ vs BaniDB ਸਿਮਰਿ; ਤੈਥੋ vs ਤੈਥੋਂ.
+  - title:
+      gurmukhi: ਗਿਆਨ ਪ੍ਰਬੋਧ (ਭੁਜੰਗ ੧-੮ ॥੪੭॥; ਰੂਆਲ ੩੩੪-੩੩੬)
+      english: Gian Prabodh, opening + closing extract
+    pdf_pages:
+    - 115
+    - 123
+    work: dasam/gian-prabodh
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7741
+      - 7783
+      similarity_range:
+      - 0.89
+      - 1.0
+    variants_observed: 'Scan adds addhak: ਸਿੱਧ, ਬਿੱਪਨ, ਮਿੱਤ੍ਰਨ, ਜੱਗ vs BaniDB ਸਿਧ, ਬਿਪਨ, ਮਿਤ੍ਰਨ, ਜਗ; ਹੋਹ vs ਹੋਹੁ.'
+  - title:
+      gurmukhi: ਅਥ ਚੌਬੀਸ ਅਵਤਾਰ ਚਉਪਈ ੧-੩੮
+      english: Chaubis Avtar opening chaupai
+    pdf_pages:
+    - 124
+    - 129
+    work: dasam/chaubis-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7784
+      similarity_range:
+      - 0.93
+      - 1.0
+    variants_observed: ਹੋਤ vs ਹੋਤਿ; ਪੇਖ vs ਪੇਖਿ; ਨਾਮੁ vs ਨਾਮ.
+  - title:
+      gurmukhi: ਬੀਸਵਾਂ ਰਾਮਾਵਤਾਰ (ਚੌਪਈ ੧-੩; ਕਲਸ ੫੮੮-੬੨੨; ਚੌਪਈ ੮੫੯-੮੬੪)
+      english: Ram Avtar, extracts
+    pdf_pages:
+    - 130
+    - 137
+    work: dasam/ram-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7899
+      - 8039
+      similarity_range:
+      - 0.94
+      - 0.97
+    variants_observed: ਘਨੇ ਘਰ ਘਾਏ (scan) vs ਘਨੋ ਘਰ ਘਾਏ (BaniDB) in 614; ਕਹੌ vs ਕਹੋ.
+  - title:
+      gurmukhi: ਕ੍ਰਿਸਨਾਵਤਾਰ (ਚੌਪਈ ੧-੮; ਭੁਜੰਗ ੪੨੧-੪੪੦; ਪ੍ਰੇਮ ਕਥਾ ਚੌਪਈ ੨੪੮੦-੨੪੯੨)
+      english: Krishna Avtar, extracts
+    pdf_pages:
+    - 138
+    - 143
+    work: dasam/krishna-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 8097
+      - 8309
+      - 9170
+      - 9171
+      similarity_range:
+      - 0.94
+      - 1.0
+    variants_observed: ਕਿਸਨਾ vs ਕ੍ਰਿਸਨਾ; ਮਨਾਊਂ vs ਮਨਾਊ; ਤਾਤੇ vs ਤਾ ਤੇ; ਸੁਨ vs ਸੁਨਿ.
+  - title:
+      gurmukhi: ਨਿਹਕਲੰਕੀ ਅਵਤਾਰ (ਸ੍ਵੈਯਾ ੧੪੧-੧੫੬; ਸਿਰਖੰਡੀ ਛੰਦ ੧੭੯-੧੮੧)
+      english: Nihkalanki Avtar, extracts
+    pdf_pages:
+    - 144
+    - 147
+    work: dasam/nihkalanki-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9213
+      - 9220
+      similarity_range:
+      - 0.87
+      - 1.0
+    variants_observed: 'Addhak added: ਵੱਜੇ, ਧੱਗਾ, ਵੱਜੀਆਂ vs BaniDB ਵਜੇ, ਧਗਾ, ਵਜੀਆਂ; ਕਹਾਵਹਗੇ vs ਕਹਾਵਹਿਗੇ; ਝਾੜ vs
+      ਝਾੜਿ.'
+  - title:
+      gurmukhi: ਪਾਰਸਨਾਥ ਰੁਦ੍ਰ ਅਵਤਾਰ, ਮੋਹਣੀ ਛੰਦ ੪੫-੫੧ ॥੮੯॥
+      english: Paras Nath (Rudra Avtar) mohni chhand
+    pdf_pages:
+    - 148
+    - 153
+    work: dasam/rudra-avtar-paras-nath
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 9384
+      similarity_range:
+      - 0.94
+      - 0.94
+    notes: Only the first sample line matched; short mohni half-lines are hard for first-letter search. Same passage
+      as BaniDB 9384; treat as online.
+  - title:
+      gurmukhi: ਰਾਮਕਲੀ ਪਾਤਸਾਹੀ ੧੦, ਸ਼ਬਦ ਦਸ
+      english: Shabad Hazare Patshahi 10 (10 shabads)
+    pdf_pages:
+    - 154
+    - 157
+    work: dasam/shabad-hazare
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9465
+      - 9466
+      similarity_range:
+      - 0.94
+      - 1.0
+  - title:
+      gurmukhi: ਬੱਤੀ ਸਵਯੈ (ਸੱਤ ਸਦੈਵ ਸਰੂਪ...)
+      english: 32 Savaiye (the 33 Savaiye numbered from the 2nd)
+    pdf_pages:
+    - 158
+    - 163
+    work: dasam/33-savaiye
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9475
+      similarity_range:
+      - 0.94
+      - 0.97
+    variants_observed: TOC calls it 'ਬੱਤੀ ਸਵਯੈ', 1-32, starting 'ਸੱਤ ਸਦੈਵ ਸਰੂਪ'; verse numbers run one behind BaniDB
+      (scan ॥੩॥ = BaniDB ॥੪॥). Also ਮਨ vs ਮਨਿ, ਅਭੇਖ vs BaniDB ਅਵੇਖ.
+  - title:
+      gurmukhi: ਖਾਲਸਾ ਮਹਿਮਾ (੩ ਸ੍ਵੈਯੇ ੧ ਦੋਹਰਾ)
+      english: Khalsa Mahima (Dasam)
+    pdf_pages:
+    - 164
+    - 164
+    work: dasam/khalsa-mahima
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9476
+      - 9477
+      similarity_range:
+      - 0.97
+      - 1.0
+  - title:
+      gurmukhi: ਸ਼ਸਤ੍ਰ ਨਾਮ ਮਾਲਾ, ਦੋਹਰਾ ੧-੨੭
+      english: Shastar Nam Mala opening dohras
+    pdf_pages:
+    - 165
+    - 167
+    work: dasam/shastar-nam-mala
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9478
+      similarity_range:
+      - 0.92
+      - 1.0
+    variants_observed: ਸਾਂਗ vs ਸਾਗ; ਅਸ vs ਅਸਿ; ਤਰਵਾਰ vs ਤਰਵਾਰਿ.
+  - title:
+      gurmukhi: ਅਥ ਪਖਿਆਨ ਚਰਿਤ੍ਰ (ਭੁਜੰਗ ੧-੪੮ ॥੧॥; ਦੋਹਰਾ ਮਹਾਂਕਾਲ ਕੀ ਜੇ ਸਰਨ ੩੬੬-੩੭੬; ਕਬਯੋ ਬਾਚ ਬੇਨਤੀ ਚੌਪਈ ੩੭੭-੪੦੫)
+      english: 'Charitropakhyan: charitar 1 opening, charitar 404/405 dohra + Benti Chaupai'
+    pdf_pages:
+    - 168
+    - 178
+    work: dasam/charitropakhyan (+ dasam/benti-chaupai)
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9663
+      - 12793
+      - 12794
+      similarity_range:
+      - 0.95
+      - 1.0
+  notes: 'Dasam Granth extracts recited at the Dasehra Shastar Puja. Offset: PDF = printed + 10 up to printed p.82
+    (PDF 92), then printed + 11 (an extra leaf around PDF 93). PDF 179 is the back cover. INCOMPLETE SCAN: the TOC
+    lists three day-10 items on pothi pp.169-274 (18 Jaap Sahib 169-181; 19 whole Ram Avtar chaupai 1-864 182-269;
+    20 Tria Charitar dohra 366-376 + Benti Chaupai 377-405 270-274) and none of them is in the PDF, which stops
+    at printed p.167. RUBRICS (PDF 10, ''ਗ''): (ੳ) for the first nine days, begin on the first Navratra of Assu
+    in the last pahar (after 12 noon) and read the whole path akhand. One or more Singhs may read it in relays,
+    after bathing, in clean clothes and sitting on a mat. Read only pothi pp.1-167 for the nine days. Fix a time
+    in the last pahar each day and begin with an Ardas. Offer karah prasad and Shaheedi Degh at the start, middle
+    and end. On the other days distribute seven kinds of dry fruit. Keep dhoop and a jot burning and a kumbh with
+    a coconut from start to finish each day. TOC note: ''all the banis above are to be read on the first (nine)
+    days''. (ਅ) On Dasehra (tenth Navratra), read only Jaap (pp.169-191), the whole Ram Avtar (192-269) and dohra
+    ''ਮਹਾਕਾਲ ਕੀ ਜੇ ਸਰਨਿ ਪਰੇ'' (270-274), then Aarta-Aarti and Ardas. Begin that day in the morning, not the last
+    pahar. RELATION TO ''Dushera Mahatam Pothi.pdf'': not the same scan or edition. This is the 2009 Takht Hazur
+    Sahib printing. Its TOC layout (chapter / chhand / opening line / verse range / pothi page / Dasam-1428 page)
+    and bidhi copy the Budha Dal pothi, but the selection differs (see that entry). No text was found that is missing
+    from BaniDB.'
+- batch: Compilations (pothis and gutkas)
+  file: Dushera Mahatam Pothi.pdf
+  drive_id: 1HA9l75k7YwPHHCEVbnzOyCB6WV-PWB43
+  sha256_12: ef9ecd936408
+  pages: 182
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਪੋਥੀ ਸ੍ਰੀ ਦਸੈਹਰਾ ਮਹਾਤਮ ਅਰਥਾਤ ਸ਼ਸਤ੍ਰ ਪੂਜਾ-ਪਾਠ ਬਿਧੀ
+    english: Pothi Sri Dasehra Mahatam, i.e. Shastar Puja path bidhi (Budha Dal edition)
+  author: Guru Gobind Singh (all items are Dasam Granth extracts)
+  editor_or_commentator: Supervision Jathedar Dial Singh; proof reader Giani Baldev Singh MA (editor 'Nihang Singh
+    Sandesh')
+  publisher: Shiromani Panth Akali Budha Dal, Panjvan Takht (publisher named as Singh Sahib Jathedar Baba Santa
+    Singh Ji Akali, 96 Crori); printed at Budha Dal Panjvan Takht Printing Press, Lower Mall, Patiala
+  year: 2nd printing October 1999 (101 pothis); 1st printing April 1980 (51 pothis)
+  languages:
+  - braj
+  - punjabi
+  - persian-in-gurmukhi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੁਖ-ਬੰਦ, ਤਤਕਰਾ, ਪਾਠ ਬਿਧੀ
+      english: 'Front matter: title, imprint, preface, TOC, bidhi'
+    pdf_pages:
+    - 1
+    - 13
+    work: front-matter
+    banidb:
+      status: not_checked
+    notes: 'PDF 2 title page, 3 imprint, 4-9 preface, 10-12 TOC (same column scheme as the Hazur pothi), 13 path
+      bidhi. Title-page motto: ''ਗੁਰ ਗਿਆਨ ਸਾਚਾ ਸਦਾ ਤੀਰਥ ਦਸ ਪੁਰਬ ਸਦਾ ਦਸਾਹਰਾ''.'
+  - title:
+      gurmukhi: ੧. ਜਾਪੁ ਸਾਹਿਬ ੧-੧੯੯
+      english: Jaap Sahib
+    pdf_pages:
+    - 14
+    - 22
+    work: dasam/jaap
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7402
+      - 7423
+    notes: Not separately sampled here (same text as Hazur item, checked there).
+  - title:
+      gurmukhi: ੨. ਅਕਾਲ ਉਸਤਤਿ (ਚੌਪਈ ੧-੧੦; ਦੋਹਰਾ ਏਕ ਸਮੈ ਸ੍ਰੀ ਆਤਮਾ ੨੦੧-੨੩੦; ਪਾਧੜੀ ੨੬੧-੨੭੧)
+      english: Akal Ustat extracts
+    pdf_pages:
+    - 23
+    - 27
+    work: dasam/akal-ustat
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7435
+      - 7436
+      similarity_range:
+      - 0.88
+      - 0.97
+    variants_observed: ਮਤ vs ਮਤਿ; 'ਸਭ ਪ੍ਰਤਾਪ ... ਸਗਲ ਬਿਧ' vs BaniDB 'ਸਬ ਪ੍ਰਤਾਪ ... ਸਕਲ ਬਿਧਿ'; ਨਿਕੰਦਣ vs ਨਿਕੰਦਣਿ.
+    notes: 'Differs from Hazur: starts the middle extract at dohra 201 ''ਏਕ ਸਮੈ ਸ੍ਰੀ ਆਤਮਾ'', where Hazur starts
+      at 211.'
+  - title:
+      gurmukhi: ੩. ਬਚਿਤ੍ਰ ਨਾਟਕ (ਤ੍ਵ ਪ੍ਰਸਾਦਿ ੧-੧੦੧; ਚੌਪਈ ਸਰਬ ਕਾਲ ੧-੧੧)
+      english: Bachitar Natak
+    pdf_pages:
+    - 28
+    - 35
+    work: dasam/bachitar-natak
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7441
+      - 7564
+    notes: Same extract as Hazur; not separately sampled.
+  - title:
+      gurmukhi: ੪. ਚੰਡੀ ਚਰਿਤ੍ਰ ਉਕਤਿ ਬਿਲਾਸ (ਸਾਰਾ ਪੜ੍ਹਨਾ) ੧-੨੩੩
+      english: Chandi Charitar I, complete
+    pdf_pages:
+    - 36
+    - 56
+    work: dasam/chandi-charitar-1
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7565
+      - 7567
+  - title:
+      gurmukhi: ੫. ਚੰਡੀ ਚਰਿਤ੍ਰ ਲਿਖਯਤੇ (ਸਾਰਾ ਪੜ੍ਹਨਾ) ੧-੨੬੨
+      english: Chandi Charitar II, complete
+    pdf_pages:
+    - 57
+    - 73
+    work: dasam/chandi-charitar-2
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7733
+      - 7735
+      similarity_range:
+      - 0.9
+      - 1.0
+    variants_observed: 'ਹੀਂ vs BaniDB ਹੀ; ''ਨਮੋ ਕਾਲਕਾ ਰੂਪ ਜੁਆਲਾ ਜਲੰਤੀ'' vs BaniDB ''ਨਮੋ ਕਾਲਿਕਾ ਰੂਪ ਜੁਆਲਾ ਜਯੰਤੀ''
+      (substantive: ਜਲੰਤੀ/ਜਯੰਤੀ).'
+  - title:
+      gurmukhi: ੬. ਚੰਡੀ ਦੀ ਵਾਰ (ਸਾਰੀ) ੧-੫੫
+      english: Chandi di Var
+    pdf_pages:
+    - 74
+    - 80
+    work: dasam/chandi-di-var
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7738
+  - title:
+      gurmukhi: ੭. ਗਿਆਨ ਪ੍ਰਬੋਧ (ਭੁਜੰਗ ੧-੮ ॥੪੭॥; ਤੋਮਰ ਛੰਦ ਤ੍ਵਪ੍ਰਸਾਦਿ ੩੨੦-੩੩੬)
+      english: Gian Prabodh extracts
+    pdf_pages:
+    - 81
+    - 86
+    work: dasam/gian-prabodh
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7741
+      - 7782
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: 'Differs from Hazur: the closing extract is tomar 320-336 (''ਪੁਨ ਭਏ ਮੁਨੀ''); Hazur has only ruaal 334-336.'
+  - title:
+      gurmukhi: ੮. ਅਥ ਚਉਬੀਸ ਅਉਤਾਰ ਚਉਪਈ ੧-੩੮
+      english: Chaubis Avtar opening
+    pdf_pages:
+    - 87
+    - 90
+    work: dasam/chaubis-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7784
+  - title:
+      gurmukhi: ੯. ਰਾਮ ਅਵਤਾਰ (ਕਲਸ ੫੮੮-੬੨੨; ਚੌਪਈ ੮੫੯-੮੬੪)
+      english: Ram Avtar extracts
+    pdf_pages:
+    - 91
+    - 96
+    work: dasam/ram-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 8039
+  - title:
+      gurmukhi: ੧੦. ਕ੍ਰਿਸ਼ਨਾ ਅਵਤਾਰ (ਚੌਪਈ ੧-੮; ਭੁਜੰਗ ੪੨੧-੪੪੦; ਪ੍ਰੇਮ ਕਥਾ ਚੌਪਈ ੨੪੮੦-੨੪੯੨)
+      english: Krishna Avtar extracts
+    pdf_pages:
+    - 96
+    - 101
+    work: dasam/krishna-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 8097
+      - 8309
+      - 9170
+      - 9171
+  - title:
+      gurmukhi: ੧੧. ਨਿਹਕਲੰਕੀ ਅਵਤਾਰ (ਸ੍ਵੈਯਾ ੧੪੧-੧੫੬; ਛਪੈ ਛੰਦ ਲਏ ਸੰਗ ਨ੍ਰਿਪ ੫੪੨-੫੮੮?)
+      english: Nihkalanki Avtar extracts
+    pdf_pages:
+    - 101
+    - 102
+    work: dasam/nihkalanki-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9273
+      - 9274
+      similarity_range:
+      - 0.94
+      - 1.0
+    notes: 'Differs from Hazur: closes with the end of Nihkalanki (''ਅਰਿ ਮਾਰਿ ਕੈ ਰਿਪੁ ਟਾਰ ਕੈ'', ''ਸਤਿਜੁਗ ਆਦਿ ਕਲਿਜੁਗ
+      ਅੰਤਹ''), not Hazur''s sirkhandi 179-181. Verse range in the TOC is hard to read.'
+  - title:
+      gurmukhi: ੧੨. ਪਾਰਸ ਨਾਥ ਰੁਦ੍ਰ ਅਵਤਾਰ (ਭੁਜੰਗ ਬਿਤੇ ਬਰਖ ਦ੍ਵੈ ੨੧-੨੭; ਮੋਹਣੀ ਛੰਦ ੮੫-੧੫੧ ॥੮੯॥)
+      english: Paras Nath extracts
+    pdf_pages:
+    - 103
+    - 106
+    work: dasam/rudra-avtar-paras-nath
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9382
+      - 9384
+      similarity_range:
+      - 0.96
+      - 1.0
+    variants_observed: ਬਿਤੇ vs BaniDB ਬਿਤੈ; 'ਭਯੋ ਸੁ ਪ੍ਰਭੰ ... ਬਿਦਯਾ' vs BaniDB 'ਭਯੋ ਸੁਪ੍ਰਭੰ ... ਬਿਦ੍ਯਾ' (word split
+      differs).
+    notes: Adds the bhujang opening that Hazur lacks.
+  - title:
+      gurmukhi: ੧੩. ਰਾਮਕਲੀ ਸ਼ਬਦ ਦਸ (੧੦)
+      english: Shabad Hazare P.10
+    pdf_pages:
+    - 107
+    - 109
+    work: dasam/shabad-hazare
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9465
+      - 9474
+  - title:
+      gurmukhi: ੧੪. ਸ੍ਵੈਯੇ (ਉਪਦੇਸ਼) ੩੩ ਸ੍ਵੈਯੇ, ਜਾਗਤ ਜੋਤ ਜਪੈ ੧-੩੩
+      english: 33 Savaiye
+    pdf_pages:
+    - 110
+    - 113
+    work: dasam/33-savaiye
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9475
+  - title:
+      gurmukhi: ੧੫. ਖਾਲਸੇ ਦੀ ਉਸਤਤਿ (੩ ਸ੍ਵੈਯੇ ਤੇ ੧ ਦੋਹਰਾ)
+      english: Khalsa Mahima
+    pdf_pages:
+    - 113
+    - 113
+    work: dasam/khalsa-mahima
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9476
+      - 9477
+  - title:
+      gurmukhi: ੧੬. ਸ਼ਸਤ੍ਰ ਨਾਮ ਮਾਲਾ ਦੋਹਰਾ ੧-੨੭
+      english: Shastar Nam Mala
+    pdf_pages:
+    - 114
+    - 115
+    work: dasam/shastar-nam-mala
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9478
+  - title:
+      gurmukhi: ੧੭. ਤ੍ਰਿਯਾ ਚਰਿਤ੍ਰ (ਭੁਜੰਗ ਤੁਹੀ ਖੜਗਧਾਰਾ ੧-੪੯ ॥੧॥; ਦੋਹਰਾ ਮਹਾਂ ਕਾਲ ਕੀ ਜੇ ੩੬੬-੩੭੬; ਚੌਪਈ ਹਮਰੀ ਕਰੋ ਹਾਥ
+        ਦੈ ੩੭੭-੪੦੫)
+      english: 'Charitropakhyan: charitar 1 + charitar 404/405 dohra + Benti Chaupai'
+    pdf_pages:
+    - 116
+    - 122
+    work: dasam/charitropakhyan (+ dasam/benti-chaupai)
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9663
+      - 12793
+      - 12794
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: '੧੮. ਜ਼ਫ਼ਰਨਾਮਹ (ਪਾ: ੧੦) ਹਿਕਾਯਤ: ਕਮਾਲੇ ਕਰਾਮਾਤ ੧-੧੨ + ''ਬਿਦਿਹ ਸਾਕੀਆ'' ਬੈਂਤ ਹਰ ਹਿਕਾਇਤ ਦੇ ਅੰਤ ਤੋਂ'
+      english: Zafarnama opening + the closing 'saqi' couplets of each Hikayat
+    pdf_pages:
+    - 123
+    - 124
+    work: dasam/zafarnama + dasam/hikayats (saqi couplets)
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 12797
+      - 12798
+      similarity_range:
+      - 0.9
+      - 1.0
+    variants_observed: ਸਾਕੀਆ vs BaniDB ਸਾਕੀਯਾ; Hikayat verse numbers differ (scan ॥੫੬॥ where BaniDB has ॥੬੪॥ for
+      'ਕਿ ਮਾਰਾ ਬਕਾਰ ਅਸਤ ਦਰ ਵਕਤ ਜੰਗ'). Zafarnama 1 reads 'ਕਾਇਮ' vs BaniDB 'ਕਾਯਮ', 'ਰਜ਼ਾ ਬਖ਼ਸ਼ ਰਾਜ਼ਕ ਰਹਾ ਕੋ' vs 'ਰਜ਼ਾ
+      ਬਖ਼ਸ਼ੋ ਰਾਜ਼ਿਕ ਰਿਹਾਕੋ'.
+    notes: A florilegium of single couplets from Zafarnama and the 11 Hikayats, cited by Dasam page (1389-1428).
+      The material exists in BaniDB, but some sample lines missed because of different spelling and word division.
+      Not in the Hazur edition.
+  - title:
+      gurmukhi: ੧੯. ਰਾਮ ਅਵਤਾਰ ਚੌਪਈ ਅਬ ਮੈ ਕਹੌ ਰਾਮ ੧-੮੬੪ (ਦਸਮ ੧੮੮-੨੫੪)
+      english: Ram Avtar complete (for Dasehra day)
+    pdf_pages:
+    - 125
+    - 181
+    work: dasam/ram-avtar
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7899
+      - 8096
+    notes: Present in full here; it is missing from the Hazur scan. Not separately sampled. Start page approximate
+      (125-127).
+  notes: 'Printed pothi-page offset: PDF = printed + 13 up to about printed p.47 (PDF 60), then + 15 (from about
+    PDF 66 to PDF 124, printed 109), then + 17 from about PDF 130 (printed 113) to PDF 181 (printed 164). Some extra
+    leaves and decorated half-title plates cause the jumps; the section boundaries above are ±1 page. PDF 182 is
+    the back cover. The PDF has no text layer (exported from Word as images). RUBRICS (TOC notes): items 1-19 are
+    read akhand over the nine days, but Ram Avtar is not read in full each day. The whole Ram Avtar is read only
+    on Dasehra. On Dasehra the 1-19 sequence is not read, only: item 1 Jaap (pp.1-9), item 17 Mahakal dohra + Benti
+    Chaupai ''ਹਮਰੀ ਕਰੋ ਹਾਥ ਦੈ ਰੱਛਾ'' (pp.105-109), item 19 Ram Avtar katha (pp.110-164), and item 13 (33 Savaiye,
+    1 to 4, pp.95-98) before the bhog. The full bidhi is on the page after the TOC (PDF 13). SAME POTHI AS HAZUR?
+    No. The two are distinct editions of the same tradition. This is the Budha Dal original (1980, reprinted 1999).
+    The Hazur Sahib 2009 printing copies its format but differs in selection: Budha Dal adds Akal Ustat 201-210,
+    Gian Prabodh tomar 320-333, the Paras Nath bhujang, the Zafarnama/Hikayat saqi couplets and the Nihkalanki closing
+    verses. Hazur has 32 Savaiye (numbered from ''ਸੱਤ ਸਦੈਵ'') and Nihkalanki sirkhandi. Both are wholly Dasam Granth,
+    so collection only, with no new corpus.'
+- batch: Compilations (pothis and gutkas)
+  file: ਸੰਧਿਆ ਨਿਤਨੇਮ ਗੁਟਕਾ - ਸ਼ਹੀਦੀ ਬਾਗ.pdf
+  drive_id: 1IAUIgUXYL6-ZmezgmOC10V30gHH3q8IL
+  sha256_12: 72fd2d3c31a0
+  pages: 134
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਸੰਧਿਆ ਨਿਤਨੇਮ
+    english: Sandhia Nitnem (evening nitnem gutka)
+  publisher: Sampardai Dal Baba Deep Singh Ji Shaheed, Sri Misl Shaheedan Tarna Dal, Sri Baba Bakala Sahib; Gurdwara
+    Shaheedi Bagh, Sri Anandpur Sahib
+  year: unknown (not seen on the pages viewed; the scan's metadata is dated 2018-01-21)
+  languages:
+  - punjabi
+  - braj
+  - sant-bhasha
+  - persian-in-gurmukhi
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੂਲ ਮੰਤ੍ਰ / ਗੁਰ ਮੰਤ੍ਰ / ਤਤਕਰਾ / ਮੁਖ ਬੰਦ / ਧਿਆਨ ਰੱਖਣ ਯੋਗ ਗੱਲਾਂ
+      english: Front matter
+    pdf_pages:
+    - 1
+    - 12
+    work: front-matter
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 43004
+      similarity_range:
+      - 0.88
+      - 0.95
+    notes: 'PDF 3 Mool Mantar. PDF 4 Gur Mantar ''ਵਾਹਿਗੁਰੂ ਗੁਰ ਮੰਤ੍ਰ ਹੈ ... ਬਿਸਨੁਪਦ ਪੁੰਨਿਜਾਕੀ ... ਸਾ ਮੰਤ੍ਰ ਪ੍ਰਭੂ
+      ਖਾਲਸਹ ਦੀਨਾ'', cited as ''ਸ੍ਰੀ ਸਰਬਲੋਹ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ ਪਾ. ੧੦, ਅੰਗ ੬੪੨''; BaniDB has it under R 43004 (attributed
+      Guru Gobind Singh) with spelling variants (ਪ੍ਰਤਿ ਅਖੵਰ vs ਪ੍ਰਤ ਅਖਛਰ). PDF 5 TOC: Rehras 1, Aarti Aarta 67,
+      Ardas 104, Sohila 111. PDF 6-9 preface: history of this extended Rehras as recited at Takht Kesgarh Sahib,
+      per Sant Giani Kartar Singh ''Mota Akhar''. PDF 10-11: notes on bisram/pronunciation.'
+  - title:
+      gurmukhi: ਰਹਰਾਸਿ ਸਾਹਿਬ (ਵਿਸਥਾਰਤ)
+      english: Rehras Sahib, extended Budha Dal / Tarna Dal form
+    pdf_pages:
+    - 13
+    - 78
+    work: 'collection: sggs/rehras + dasam extracts'
+    banidb:
+      status: online
+      source: G+D
+      shabad_ids:
+      - 4686
+      - 40
+      - 44
+      - 47
+      - 1943
+      - 7493
+      - 7494
+      - 7867
+      - 8092
+      - 8309
+      - 9159
+      - 9171
+      - 9172
+      - 12794
+      similarity_range:
+      - 0.91
+      - 1.0
+    variants_observed: ਠੀਕਰਿ ... ਦਿਲੀਸਿ ... ਪੁਰ vs BaniDB ਠੀਕਰ ... ਦਿਲੀਸ ... ਪੁਰਿ (Bachitar Natak 5.14); ਪੈਤਾਲ vs
+      ਪੈਤਾਲਿ.
+    notes: 'Order: Salok M1 ''ਧੰਨੁ ਸੁ ਕਾਗਦੁ'' (ang 1291) + ''ਆਪੇ ਪਟੀ''; Salok M1 ''ਦੁਖੁ ਦਾਰੂ''; So Dar block (Asa
+      M1, Gujri M4, Gujri M5, So Purakh, Asa M4, Asa M1, Asa M5); then Dasam: ''ਪਾਤਸ਼ਾਹੀ ੧੦ ਚੌਪਈ'' Benti Chaupai
+      377-405 + arril ''ਸੁਨੈ ਗੁੰਗ'' + chaupai ''ਸੰਬਤ ਸੱਤ੍ਰਹ ਸਹਸ'' + dohra ''ਦਾਸ ਜਾਨ ਕਰਿ''; Krishna Avtar chaupai
+      ''ਮੈ ਨ ਗਨੇਸਹਿ'' 434-440 (Dasam 310); kabi bach dohra ''ਜੋ ਨਿਜ ਪ੍ਰਭ''; Bachitar Natak dohras and the chaupai
+      on the Guru lineage 5.1-16; ''ਕਾਲ ਪੁਰਖ ਕੀ ਦੇਹਿ ਮੋ'' (Dasam 192); Krishna Avtar swaiye ''ਛਤ੍ਰੀ ਕੋ ਪੂਤ ਹੌ''
+      and 2489-2492; charni dohra ''ਜਿਸਨੋ ਸਾਜਨ ਰਾਖਸੀ'' (marked ''ਦਸਮ-੭੨'', NOT FOUND in BaniDB on my reading); Rudra/Ram
+      Avtar sortha ''ਰੁਦ੍ਰ ਭਗਤ'', dohra ''ਰਾਮ ਕਥਾ ਜੁਗ ਜੁਗ ਅਟਲ''; Ram Avtar 858-864 (''ਪਾਇ ਗਹੇ'', ''ਸਗਲ ਦੁਆਰ'');
+      Anand Sahib pauris 1-5 + 40; Mundavani M5; Saloks M5; ending ''ਰਖੇ ਰਖਣਹਾਰਿ'' (517). Each page footnotes ang
+      or Dasam-page references and ''ਉਚਾਰਨ ਸੇਧ'' pronunciation notes.'
+  - title:
+      gurmukhi: ਆਰਤੀ-ਆਰਤਾ
+      english: Aarti-Aarta
+    pdf_pages:
+    - 79
+    - 115
+    work: 'collection: sggs/aarti + dasam extracts + panthic sources'
+    banidb:
+      status: partial
+      source: G+D+R
+      shabad_ids:
+      - 51
+      - 2638
+      - 2640
+      - 7449
+      - 7451
+      - 8875
+      - 9478
+      - 31016
+      - 31017
+      - 31092
+      similarity_range:
+      - 0.69
+      - 1.0
+    variants_observed: '''ਮਾਇ ਕ੍ਰਿਪਾ ਕਰਿ ਸਯਾਮ ਇਹੈ ਬਰੁ'' vs BaniDB ''ਕ੍ਰਿਪਾ ਕਰ ਸ੍ਯਾਮ ਇਹੈ ਵਰੁ'' (Krishna Avtar 1900);
+      ''ਮਾਨੀਓ/ਮਾਨੀਐ'' vs ''ਮਾਨਿਯੋ'' in ''ਆਗਿਆ ਭਈ''.'
+    notes: 'SGGS: Dhanasri M1 Aarti, Ravidas ''ਨਾਮੁ ਤੇਰੋ ਆਰਤੀ'', Sain ''ਧੂਪ ਦੀਪ'', Kabir Prabhati ''ਸੁੰਨ ਸੰਧਿਆ'',
+      Dhanna ''ਗੋਪਾਲ ਤੇਰਾ ਆਰਤਾ'', Kabir Sorath ''ਭੂਖੇ ਭਗਤਿ ਨ ਕੀਜੈ''. Dasam: Chandi Charitar I dohras/swaiye 53-55,
+      222-233; Krishna Avtar 1900 ''ਹੇ ਰਵਿ ਹੇ ਸਸਿ''; kabitt ''ਸੰਕਟ ਹਰਨ'' (Dasam 255); Akal Ustat swaiye ''ਕਾਲ ਹੀ
+      ਪਾਇ'', ''ਮੇਰ ਕਰੋ ਤ੍ਰਿਣ''; Bachitar Natak ''ਖਗ ਖੰਡ ਬਿਹੰਡੰ''; ''ਰੋਗਨ ਤੇ ਅਰ ਸੋਗਨ''; ''ਪਾਇ ਗਹੇ''; Salok M9 (1429);
+      Jaap bhujang ''ਨਮਸਤੁਲ ਪ੍ਰਣਾਮੇ'' 191-199; Bachitar Natak ''ਸਰਣਿ ਨਾਥ ਤੋਰੀਅੰ'', ''ਬਚੈਗੋ ਨ ਕਿਉ ਹੂੰ''; Shastar
+      Nam Mala dohra ''ਅਸ ਕ੍ਰਿਪਾਨ ਖੰਡੋ ਖੜਗ''; SGGS saloks ''ਡਿਠੇ ਸਭੇ ਥਾਵ'', ''ਸਤਿਗੁਰ ਸਚੁ ਸਾਖੀਐ'', ''ਜਾਚਕੁ ਮੰਗੈ'';
+      closes with Chandi di Var final pauri ''ਦੁਰਗਾ ਪਾਠ ਬਣਾਇਆ''. *** NOT FOUND IN BANIDB (corpus candidates, short):
+      (1) dohra ''ਨਾਨਕ ਗੁਰੁ ਗੋਬਿੰਦ ਸਿੰਘ ਜੀ ਪੂਰਨ ਹਰਿ ਅਵਤਾਰ / ਜਗਮਗ ਜੋਤਿ ਬਿਰਾਜ ਰਹੀ ਸ੍ਰੀ ਅਬਿਚਲ ਨਗਰ ਅਪਾਰ'', cited ''(ਸ੍ਰੀ
+      ਗੁ.ਪੰ.ਪ੍ਰ. ਅਧਿ ੭੧)'' = Rattan Singh Bhangu''s Gur Panth Prakash ch.71; (2) the Khalsa seal couplet ''ਸਿੱਕਾ
+      ਜ਼ਦ ਬਰ ਹਰ ਦੋ ਆਲਮ ਫ਼ਜ਼ਲਿ ਸਚੇ ਸਾਹਿਬਸਤ / ਦੇਗ਼ ਤੇਗ਼ ਫ਼ਤਹ ਨੁਸਰਤ ਬੇਦਿਰੰਗ ਯਾਫ਼ਤਜ਼ ਨਾਨਕ ਗੁਰੂ ਗੋਬਿੰਦ ਸਿੰਘ''; (3) items
+      marked ''(ਖ਼ਾਲਸਾ ਨਿਤਨੇਮ, ਬੁੱਢਾ ਦਲ)'': ''ਦੋਹੀ ਫਿਰੇ ਅਕਾਲ ਕੀ ਨਿੰਦਕ ਟਿਕੇ ਨ ਕੋਇ'', ''ਤੀਰੋ ਤੁਫ਼ੰਗੋ ਬਡੋ ਰਾਮਜੰਗੋ'',
+      ''ਧਨੁਖ-ਧਾਰ-ਅਣੀਅਰ ਕਮੰਦ-ਕੋਰੜਾ ਪੰਜ ਸਸਤਰ ਪਰਵਾਨ'', ''ਉਠ ਗਈ ਸਭਾ ਮਲੇਛ ਕੀ ... ਨਿਹਕਲੰਕ ਅਵਤਾਰ''; (4) Tankhahnama-attributed
+      lines, partly online: ''ਰਾਜ ਕਰੇਗਾ ਖਾਲਸਾ'' and ''ਸੁਣੋ ਨੰਦ ਲਾਲ'' found (R 31017, 31016), but ''ਲੰਕ ਲੂਟ ਲਿਆਊਂ''
+      bijai chhand and ''ਖੁਆਰ ਹੋਇ ਸਭ ਮਿਲੈਂਗੇ'' not found.'
+  - title:
+      gurmukhi: ਅਰਦਾਸਿ
+      english: Ardas
+    pdf_pages:
+    - 116
+    - 122
+    work: 'collection: ardas (sggs 268 ''ਤੂ ਠਾਕੁਰ'' + dasam/chandi-di-var pauri 1 + prose ardas + dohras)'
+    banidb:
+      status: partial
+      source: G+D+R
+      shabad_ids:
+      - 906
+      - 7738
+      - 31092
+      - 31017
+    notes: 'Opens with ''ਤੂ ਠਾਕੁਰ ਤੁਮ ਪਹਿ ਅਰਦਾਸਿ'' (269), then Var Sri Bhagauti pauri 1 (Dasam 119), then the prose
+      Ardas (Nihang/Tarna Dal wording) and the gajj ke jaikare/bole (''ਗੁਰ ਬਰ ਅਕਾਲ ... ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ''). Closing
+      dohras: ''ਆਗਿਆ ਭਈ'' (Gur Panth Prakash ch.71; BaniDB R 31092 attributes it to Giani Gian Singh), ''ਰਾਜ ਕਰੇਗਾ
+      ਖਾਲਸਾ'' (Tankhahnama). *** NOT FOUND: ''ਨਾਨਕ ਗੁਰੁ ਗੋਬਿੰਦ ਸਿੰਘ ਜੀ ... ਖੰਡਾ ਜਾ ਕੇ ਹਾਥ ਮੈ ਕਲਗੀ ਸੋਹੈ ਸੀਸ / ਸੋ
+      ਹਮਰੀ ਰੱਛਿਆ ਕਰੈ ਗੁਰੂ ਕਲਗੀਧਰ ਜਗਦੀਸ'' (''ਖਾਲਸਾ ਨਿਤਨੇਮ ਬੁੱਢਾ ਦਲ''). RUBRIC footnote: ''* ਜਿਸ ਬਾਣੀ ਜਾਂ ਜਿਸ ਕਾਰਜ
+      ਲਈ ਅਰਦਾਸ ਕਰਨੀ ਹੈ, ਇਥੇ ਉਸਦਾ ਜ਼ਿਕਰ ਕਰੋ ਜੀ'' (name here the bani or purpose of the Ardas).'
+  - title:
+      gurmukhi: ਕੀਰਤਨ ਸੋਹਿਲਾ (ਰੱਖਿਆ ਦੇ ਸ਼ਬਦ ਸਮੇਤ)
+      english: Kirtan Sohila, preceded by protection shabads
+    pdf_pages:
+    - 123
+    - 132
+    work: sggs/kirtan-sohila (+ sggs rakhya shabads)
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 3085
+      - 49
+      - 52
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: 'PDF 123-126: Sorath M5 ''ਗੁਰ ਕਾ ਸਬਦੁ ਰਖਵਾਰੇ'', Bilaval M5 ''ਤਾਤੀ ਵਾਉ ਨ ਲਗਈ'', Saloks ''ਜਹ ਸਾਧੂ ਗੋਬਿਦ
+      ਭਜਨੁ'' and ''ਮਨ ਮਹਿ ਚਿਤਵਉ ਚਿਤਵਨੀ'', Pauri ''ਰੈਣਿ ਦਿਨਸੁ ਪਰਭਾਤਿ''. PDF 127-132: Sohila (5 shabads).'
+  notes: 'Printed page = PDF - 12 (printed 1 = PDF 13). PDF 133-134 not inspected (probably back matter). Every
+    page has a running header, a source reference (ang no. or ''ਦਸਮ-NNN''), and ''ਉਚਾਰਨ ਸੇਧ'' pronunciation footnotes.
+    Words marked with * have pronunciation notes, which could be harvested as reference data. Core content is SGGS
+    + Dasam. The evening Rehras is much longer than the SGPC form: it includes Benti Chaupai to 405, Krishna Avtar
+    434-440, Bachitar Natak guru lineage, Ram/Krishna Avtar dohras, and Anand 1-5+40. The only non-BaniDB material
+    is a handful of Panthic dohras and couplets (Gur Panth Prakash, Khalsa seal, Budha Dal ''Khalsa Nitnem'' lines),
+    flagged above. Text layer is only ''Scanned by CamScanner''.'
+- batch: Compilations (pothis and gutkas)
+  file: Nitnem Sahib Nangali Ji.pdf
+  drive_id: 1Y7R9o8Or7RIvGoHWAYnKuRL_iBJ4G86b
+  sha256_12: 04c67192589d
+  pages: 332
+  text_layer: legacy-Satluj
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਨਿਤਨੇਮ ਤੇ ਹੋਰ ਬਾਣੀਆਂ (ਨਿਤਨੇਮ ਸਾਹਿਬ, ਨੰਗਲੀ)
+    english: Nitnem and other banis (Nangali gutka)
+  editor_or_commentator: Jasvir Singh (village Kohala, Jalandhar), student of Sampardai Bhai Nand Lal Ji Gurmat
+    Vidyala, Sri Sarbloh Bunga, Nangli; with Giani Gurvinder Singh Nangli, Giani Hardeep Singh (ex-head granthi,
+    Takht Hazur Sahib), Sant Darshan Singh and Sant Jasvinder Singh Shastri (Kashi), Giani Mehtab Singh (Bhamboi)
+  publisher: Gurmat Vidyala Sri Sarbloh Bunga, Nangli; with Hazuri Taksal (Sachkhand Sri Hazur Sahib), Gurmat Vidyala
+    Gurdwara Shaheed Baba Naudh Singh Chabba, Nirmal Panchayati Akhara Kashi, Gurmat Vidyala Bhamboi
+  year: first edition, Nanakshahi 549 (CE 2017-18)
+  languages:
+  - punjabi
+  - braj
+  - sant-bhasha
+  - persian-in-gurmukhi
+  - sanskritized-braj
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੰਗਲ, ਤਤਕਰਾ, ਮੂਲਮੰਤ੍ਰ/ਗੁਰਮੰਤ੍ਰ, ਸਲੋਕੁ ਗੁਰਦੇਵ ਮਾਤਾ
+      english: Front matter
+    pdf_pages:
+    - 1
+    - 8
+    work: front-matter
+    banidb:
+      status: not_checked
+    notes: PDF 2 imprint/collaborators, 3 mangals, 4-5 TOC (36 items), 7 Mool mantar + Gur mantar, 8 Salok 'ਗੁਰਦੇਵ
+      ਮਾਤਾ' (SGGS 250) with RUBRIC 'ਏਹੁ ਸਲੋਕੁ ਆਦਿ ਅੰਤਿ ਪੜਣਾ' (recite this salok at the beginning and end). Each
+      bani ends 'ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖਾਲਸਾ ॥ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹਿ ॥'.
+  - title:
+      gurmukhi: ੧. ਸ੍ਰੀ ਜਪੁ ਜੀ ਸਾਹਿਬ
+      english: Japji
+    pdf_pages:
+    - 9
+    - 28
+    work: sggs/japji
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 1
+      - 26
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ੨. ਸ੍ਰੀ ਜਾਪੁ ਸਾਹਿਬ
+      english: Jaap
+    pdf_pages:
+    - 29
+    - 50
+    work: dasam/jaap
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7402
+      - 7407
+      similarity_range:
+      - 0.88
+      - 1.0
+    notes: Afterword (PDF 322-323) gives pronunciation (ਉਚਾਰਨ ਸੇਧ) for Jaap 50, 51, 53, 60, e.g. written 'ਨਮੋ ਰਾਜ
+      ਰਾਜੇ॥ ਸ੍ਵਰੰ ਪਰਮ ਰੂਪੇ' is read 'ਨਮੋ ਰਾਜ ਰਾਜੇਸ੍ਵਰੰ, ਪਰਮ ਰੂਪੇ'.
+  - title:
+      gurmukhi: ੩. ਤ੍ਵਪ੍ਰਸਾਦਿ ਸ੍ਵਯੇ
+      english: Tav Prasad Savaiye
+    pdf_pages:
+    - 51
+    - 55
+    work: dasam/akal-ustat (tav-prasad-savaiye)
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7426
+      similarity_range:
+      - 0.9
+      - 0.95
+  - title:
+      gurmukhi: ੪. ਬੇਨਤੀ ਚੌਪਈ ਸਾਹਿਬ
+      english: Benti Chaupai
+    pdf_pages:
+    - 56
+    - 63
+    work: dasam/benti-chaupai
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 12794
+      similarity_range:
+      - 0.75
+      - 0.95
+    variants_observed: Double numbering ॥੧੦॥੩੮੬॥ (local + charitar count) vs BaniDB ॥੩੮੬॥; ਚਿਤਿ vs ਚਿਤ; ਪਗਿ vs ਪਗ.
+  - title:
+      gurmukhi: ੫. ਅਨੰਦੁ ਸਾਹਿਬ
+      english: Anand Sahib (40 pauris)
+    pdf_pages:
+    - 64
+    - 80
+    work: sggs/anand
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 1927
+      - 3375
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ੬. ਸ਼ਬਦ ਹਜ਼ਾਰੇ
+      english: Shabad Hazare (SGGS)
+    pdf_pages:
+    - 81
+    - 88
+    work: sggs/shabad-hazare
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 277
+      - 2525
+      - 2766
+      similarity_range:
+      - 0.97
+      - 1.0
+  - title:
+      gurmukhi: ੭. ਸ਼ਬਦ ਹਜ਼ਾਰੇ ਪਾ. ੧੦
+      english: Shabad Hazare Patshahi 10
+    pdf_pages:
+    - 89
+    - 94
+    work: dasam/shabad-hazare
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 9468
+      - 9472
+      similarity_range:
+      - 0.97
+      - 1.0
+  - title:
+      gurmukhi: ੮. ਰਹਰਾਸਿ ਸਾਹਿਬ
+      english: Rehras (extended, incl. Benti Chaupai)
+    pdf_pages:
+    - 95
+    - 123
+    work: 'collection: sggs/rehras + dasam extracts'
+    banidb:
+      status: online
+      source: G+D
+      shabad_ids:
+      - 1661
+      - 12794
+      similarity_range:
+      - 0.88
+      - 1.0
+    notes: Opens 'ਹਰਿ ਜੁਗੁ ਜੁਗੁ ਭਗਤ ਉਪਾਇਆ' (Asa M4, 451) as in the Tarna Dal/Taksal-style Rehras.
+  - title:
+      gurmukhi: ੯. ਆਰਤੀ/ਆਰਤਾ
+      english: Aarti-Aarta
+    pdf_pages:
+    - 124
+    - 128
+    work: 'collection: sggs/aarti + dasam'
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 51
+      - 2638
+      - 2640
+      similarity_range:
+      - 0.94
+      - 1.0
+  - title:
+      gurmukhi: ੧੦. ਅਰਦਾਸਿ
+      english: Ardas
+    pdf_pages:
+    - 129
+    - 133
+    work: 'collection: ardas'
+    banidb:
+      status: partial
+      source: G+D+R
+      shabad_ids:
+      - 906
+      - 7424
+      - 31092
+      similarity_range:
+      - 0.96
+      - 1.0
+  - title:
+      gurmukhi: ੧੧. ਰੱਖਿਆ ਦੇ ਸ਼ਬਦ
+      english: Rakhya de Shabad
+    pdf_pages:
+    - 134
+    - 135
+    work: sggs/rakhya-shabads
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 2367
+      - 2070
+      similarity_range:
+      - 0.89
+      - 1.0
+  - title:
+      gurmukhi: ੧੨. ਕੀਰਤਨ ਸੋਹਿਲਾ
+      english: Kirtan Sohila
+    pdf_pages:
+    - 136
+    - 141
+    work: sggs/kirtan-sohila
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 49
+      - 51
+      - 52
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ੧੩. ਸ੍ਰੀ ਸਰਬਲੋਹ ਅਸਤੋਤ੍ਰ ('ਬਿਸਨੁਪਦ ਜਬਲੀਧਰ ... ਜੈ ਮਾਧਵ ਜੈ ਬਿਸ੍ਵਰੂਪ ਹਰਿ')
+      english: '*** NOT IN BANIDB *** Sri Sarbloh Astotar'
+    pdf_pages:
+    - 142
+    - 148
+    work: sarbloh/astotar? (heading 'ਪਾਤਿਸਾਹੀ ੧੦')
+    banidb:
+      status: not_found
+    notes: 11 sample lines, none found. Verse numbering (e.g. ॥੨॥੧੧॥੫੪੩॥੨੮੬੨॥) suggests it is lifted from a long
+      work, most likely Sri Sarbloh Granth. Cross-check against group C (Sarbloh) scans.
+  - title:
+      gurmukhi: ੧੪. ਸ੍ਰੀ ਕਾਲ ਅਸਤੋਤ੍ਰ ('ਰਾਮਚੰਦ ਇਹ ਜਿਨੈ ਬਖਾਨੈ')
+      english: Sri Kal Astotar (partly Charitropakhyan 404)
+    pdf_pages:
+    - 149
+    - 150
+    work: dasam/charitropakhyan-404 (rearranged extract) + unidentified
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 12384
+      - 12390
+      similarity_range:
+      - 0.8
+      - 0.94
+    variants_observed: Restarts numbering at ॥੧॥ (BaniDB ॥੧੧੫॥); 'ਕਾਲਿ ਪਾਇ ਕਰਿ ਬਹੁਰਿ ਸਵਾਰੇ' vs BaniDB 'ਕਾਲ ਪਾਇ ਕੈ
+      ਬਹੁਰਿ ਸਵਾਰੇ'; 'ਵਹੀ ਪੁਰਖੁ ਪ੍ਰਤਿਪਾਲ ਹਮਾਰੇ' vs 'ਵਹੈ ਪੁਰਖ ਪ੍ਰਤਿਪਾਲ ਹਮਾਰਾ'.
+    notes: 'About half of the lines map to Charitar 404 chaupais (ang 1199-1200); the others, including the opening
+      ''ਰਾਮਚੰਦ ਇਹ ਜਿਨੈ ਬਖਾਨੈ'' and ''ਤੈਸਿ ਜੂਨਿ ਇਕ ਦੇਵਤਾ ਜਨਿਯਤ'', were not found. Treat as a variant recension: witness
+      plus new lines.'
+  - title:
+      gurmukhi: ੧੫. ਸ੍ਰੀ ਭਗਉਤੀ ਅਸਤੋਤ੍ਰ (ਉਸਤਤਿ ਸ੍ਰੀ ਸਾਹਿਬ) 'ਨਮੋ ਸ੍ਰੀ ਭਗਉਤੀ ਬਢੈਲੀ ਸਰੋਹੀ'
+      english: Sri Bhagauti Astotar
+    pdf_pages:
+    - 151
+    - 153
+    work: dasam-appendix/bhagauti-astotar
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 555568
+      - 555569
+      similarity_range:
+      - 0.84
+      - 0.95
+    variants_observed: Heavily variant recension. Scan 'ਮਹਾ ਲੋਹ ਕੀ ਪੁਤ੍ਰਿਕਾ ਞਲਹਲੰਤੀ / ਨਮੋ ਜੋਗ ਜ੍ਵਾਲਾਮੁਖੀ ਜਿਯੋ ਬਲੰਤੀ'
+      vs BaniDB 555568 'ਨਮੋ ਲੋਹ ਪੁੱਤ੍ਰੀ ਅਛੋਹੰ ਰਹੰਤੀ / ਨਮੋ ਜੀਭ ਜ੍ਵਾਲਾ ਮੁਖੀ ਜਿਉ ਬੋਲੰਤੀ' and 555569 'ਨਮੋ ਲੋਹ ਕੀ ਪੁਤ੍ਰਿਕਾ
+      ਝਲ ਝਲੰਤੀ'; 'ਜੇਊ ਮਿਯਾਨ' vs 'ਜਬੈ ਮਿਯਾਨ'. Several lines not found ('ਮਹਾ ਬਿਗ੍ਰਹੀ ਬੁਧਿ ਕੀ ਸਿਧਿ ਉਰਧੰ', 'ਮਹਾਭੂਪ ਹ੍ਵੈ
+      ਔਤਰੈ ਰਾਜ ਪਾਵੈ', colophon 'ਉਸਤਤਿ ਸੰਪੂਰਨ ਮਸਤੁ ਸੁਭ ਮਸਤੁ').
+    notes: BaniDB holds two versions in the Dasam appendix at ang 1428 (shabads 555568 and 555569). This scan is
+      a third reading.
+  - title:
+      gurmukhi: ੧੬. ਬ੍ਰਹਮ ਕਵਚ (ਭਗਉਤੀ ਕਵਚ) 'ਖੜਗ ਖੰਡਾ ਅਸੀ ਅਰਿਗਰਿ'
+      english: '*** NOT IN BANIDB *** Brahm Kavach (Bhagauti Kavach)'
+    pdf_pages:
+    - 154
+    - 155
+    work: asfotak/brahm-kavach
+    banidb:
+      status: not_found
+    notes: 'Ends ''ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ''. Afterword: this text is also in Panth Prakash. Udasin
+      Sant Brahm Dev copied 12 lines from the end of a handwritten Sarbloh manuscript, among Dasam ''asfotak'' banis,
+      and that copy reached Giani Hardeep Singh. The editors also saw it in hand-written pothis.'
+  - title:
+      gurmukhi: ੧੭. ਸਰਬਲੋਹ ਕਵਚ (ਪੰਚ ਸਲੋਕੀ) 'ਸਕਲਾਨਿ ਭੂਧਰਾਨਿ ਭਵੰਤਿ ਕੱਜਲ'
+      english: '*** NOT IN BANIDB *** Sarbloh Kavach'
+    pdf_pages:
+    - 156
+    - 157
+    work: sarbloh/kavach
+    banidb:
+      status: not_found
+    notes: Verse numbers ॥੧॥੨੦੮॥ onward show it is an excerpt from a larger work (probably Sarbloh Granth). It ends
+      with the common rakhya formula ('ਅਕਾਲ ਪੁਰਖ ਕੀ ਰਛਾ ਹਮਨੈ ... ਸਰਬਕਾਲ ਜੀ ਦੀ ਰਛਿਆ ਹਮਨੈ'), whose first line matches
+      D7424 only incidentally.
+  - title:
+      gurmukhi: ੧੮. ਸਰਬਲੋਹ ਕਵਚ ਅਸਤੋਤ੍ਰ 'ਤੁਮ ਮਮ ਰੱਛਕ ਤੁਮ ਮਮ ਨਾਥੰ'
+      english: '*** NOT IN BANIDB *** Sarbloh Kavach Astotar'
+    pdf_pages:
+    - 158
+    - 160
+    work: sarbloh/kavach-astotar
+    banidb:
+      status: not_found
+    notes: Colophon 'ਇਤਿ ਸ੍ਰੀ ਸਰਬਲੋਹ ਕਵਚ ਸੰਪੂਰਨੰ ਸੁਭੰ'.
+  - title:
+      gurmukhi: ੧੯. ਉਗ੍ਰਦੰਤੀ (ਭਗਉਤੀ ਕੇ ਛੰਦ ਛਕੇ) 'ਨਮੋ ਉਗ੍ਰਦੰਤੀ ਅਨੰਤੀ ਸ੍ਵੈਯਾ'
+      english: Ugardanti (Chhand Chhaka Bhagauti Ju Ka)
+    pdf_pages:
+    - 161
+    - 177
+    work: dasam-appendix/ugardanti
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 555555
+      - 555567
+      similarity_range:
+      - 0.89
+      - 0.89
+    variants_observed: '''ਸਕਲ ਹਿੰਦੁ ਸਿਉ ਤੁਰਕਿ ਦੁਸਟਾ ਬਿਦਾਰਹੁ'' vs BaniDB ''ਸਕਲ ਹਿੰਦ ਸਿਉਂ ਤੁਰਕ ਦੁਸਟਾ ਬਿਦਾਰਹੁ''. Other
+      sample lines not found (''ਤੁਹੀ ਪਾਪਖੰਡਣਿ ਉਦਰਿ ਜਗਤਿ ਭਰਣੀ'').'
+    notes: BaniDB has Ugardanti in the Dasam appendix (ang 1428, shabads 555555-555567, six bhagauti chhands with
+      dohras + a chaupai). Low match suggests a substantially different recension. Good witness; a full line-by-line
+      comparison is needed.
+  - title:
+      gurmukhi: ੨੦. ਭਗਉਤੀ ਦੀ ਵਾਰ 'ਭਗਤ ਭਗਉਤੀ ਤਿਸਹਿ ਕੀ ਜੋ ਰਣਿ ਧੀਰ ਧਰੈ'
+      english: '*** NOT IN BANIDB *** Bhagauti di Var (not Chandi di Var)'
+    pdf_pages:
+    - 178
+    - 180
+    work: asfotak/bhagauti-di-var
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੨੧. ਮਾਲਕਉਸ ਕੀ ਵਾਰ ਪਾ. ੧੦ 'ਮਾਲਕਉਸ ਧੁਨਿ ਬਿਮਲ ਬਨਾਈ'
+      english: '*** NOT IN BANIDB *** Malkauns ki Var'
+    pdf_pages:
+    - 181
+    - 185
+    work: asfotak/malkauns-ki-var
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੨੨. ਸੰਸਾਹਰ ਸੁਖਮਨਾ ਸ੍ਰੀ ਮੁਖਵਾਕ ਪਾਤਿਸਾਹੀ ੧੦
+      english: '*** NOT IN BANIDB *** Sansahar Sukhmana (long, 37 pp.)'
+    pdf_pages:
+    - 186
+    - 222
+    work: asfotak/sansahar-sukhmana
+    banidb:
+      status: not_found
+    notes: 'Largest new item: an acrostic/ashtpadi-style work (''ਰਾਰਾ ਰਾਮੁ ਨਾਮੁ ਮਨਿ ਚੀਨਾ''), 7 sample lines, none
+      found.'
+  - title:
+      gurmukhi: ੨੩. ਸੰਤ ਕਾਜ 'ਆਜ ਹਮਾਰੇ ਸੰਤ ਕਾਜ ਸਸਤ੍ਰ ਬੂਧ ਦਰਿ ਆਵਹੁ ਰੇ'
+      english: '*** NOT IN BANIDB *** Sant Kaj'
+    pdf_pages:
+    - 223
+    - 225
+    work: asfotak/sant-kaj
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੨੪. ਰਾਜਪੂਤ ਘੋੜੇ (ਰਾਗੁ ਸੋਰਠਿ ਪਾਤਿਸਾਹੀ ੧੦) 'ਅਬ ਕੈ ਤੋ ਰਾਜਪੂਤ ਕਹਾਊਂ'
+      english: '*** NOT IN BANIDB *** Rajput Ghore shabad'
+    pdf_pages:
+    - 226
+    - 227
+    work: asfotak/rajput-ghore
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੨੫. ਅਸਫੋਟਕ ਕਬਿਤ 'ਅਥ ਅਸਫੋਟਕ ਕਬਿਤ ਲਿਖ੍ਯਤੇ'
+      english: '*** NOT IN BANIDB *** Asfotak Kabitt (miscellaneous kabitts/swaiyas, ~50)'
+    pdf_pages:
+    - 228
+    - 250
+    work: asfotak/kabitt
+    banidb:
+      status: not_found
+    notes: One line had a 0.67 resemblance to a Charitropakhyan verse; that looks coincidental. Includes Punjabi-register
+      lines ('ਯਾਰੜੀ ਜਰੂਰ ਸਾਥੇ ਆਵਣਾ ਹੀ ਆਵਣਾ').
+  - title:
+      gurmukhi: ੨੬. ਸੱਦ ਤੇ ਸਿੱਖੀ ਰਹਿਤ
+      english: Sadd (Majh P.10 'ਲੱਖੀ ਜੰਗਲ ਖਾਲਸਾ') + Persian Sikhi Rehat
+    pdf_pages:
+    - 251
+    - 252
+    work: panthic/sadd (R 43003) + *** NOT IN BANIDB *** persian rehat couplets
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 43003
+      similarity_range:
+      - 0.89
+      - 0.91
+    notes: The Sadd is in BaniDB (R 43003, Guru Gobind Singh). The Persian Rehat couplets ('ਕੜਾ ਕਾਰਦੋ ਕੱਛ ਕੰਘੇ ਬਿਦਾਂ
+      / ਬਿਲਾ ਕੇਸ ਹੇਚੁਅਸਤ ਜੁਮਲੇ ਨਿਸ਼ਾਂ', 'ਹੁੱਕਾ ਹਜਾਮਤ ...') were not found.
+  - title:
+      gurmukhi: ੨੭. ਵਾਹਿਗੁਰੂ ਮੰਤ੍ਰ ਮਹਾਤਮ
+      english: '*** NOT IN BANIDB (sampled lines) *** Vahiguru Mantra Mahatam'
+    pdf_pages:
+    - 253
+    - 256
+    work: sarbloh/vahiguru-mantra-mahatam?
+    banidb:
+      status: not_found
+    notes: Sampled lines ('ਵਾਵਾ ਹਾਹਾ ਗੱਗਾ ਠਾਨੁ', 'ਚਾਰ ਜੁਗਿ ਕੋ ਜਾਪੁ ਨਿਰਧਾਰ') not found. BaniDB R 43004 ('ਸਾਰ ਮੰਤ੍ਰ
+      ਚਾਰੋਂ ਕਾ ਚਾਰ / ਵਾਹਿਗੁਰੂ ਮੰਤ੍ਰ ਨਿਰਧਾਰ / ਕਲਪ ਕਲਪ ਪ੍ਰਤ ਅਖਛਰ ਕਹੀ', which the Sandhia gutka cites as Sarbloh Granth
+      ang 642) may overlap part of this section. Check before ingesting.
+  - title:
+      gurmukhi: ੨੮. ਪਾਤਿਸਾਹੀ ਬਰਨਨੰ
+      english: Patshahi Barnanan (Bachitar Natak guru lineage)
+    pdf_pages:
+    - 257
+    - 263
+    work: dasam/bachitar-natak (ch.5)
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7493
+      - 7497
+      similarity_range:
+      - 0.88
+      - 1.0
+    variants_observed: '''ਤਿਨਿ ਇਹੱ ਕਲ'' vs ''ਤਿਨ ਇਹ ਕਲ''; ''ਠਾਂ/ਠੂ'' reading.'
+  - title:
+      gurmukhi: ੨੯. ਗੁਰੁ ਗਾਦੀ ਪਾਤਿਸਾਹੀ ਦਸਕ
+      english: '*** NOT IN BANIDB *** Guru Gadi Patshahi Dasak'
+    pdf_pages:
+    - 264
+    - 269
+    work: asfotak/guru-gadi-patshahi-dasak
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੩੦. ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਥਾਪਨ ਦੇ ਬਿਸਨਪਦੇ ਅਤੇ ਦੋਹਰੇ
+      english: Bisanpade and dohras on installing Guru Granth
+    pdf_pages:
+    - 270
+    - 272
+    work: panthic/guru-granth-sthapan (mostly *** NOT IN BANIDB ***)
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 31092
+      similarity_range:
+      - 0.82
+      - 0.9
+    notes: Only the 'ਗੁਰੂ ਗ੍ਰੰਥ ਜੀ ਮਾਨੀਐ' dohra is online (R 31092). Bisanpade ('ਦੁਤੀਆ ਰੂਪ ਸਤਿਗੁਰੂ ਗ੍ਰੰਥਾ', 'ਗ੍ਰੰਥ
+      ਪੰਥ ਖਾਲਸ ਵਰਤੰਤਾ') and the dohra 'ਵਾਹਿਗੁਰੂ ਗੁਰੂ ਗ੍ਰੰਥ ਜੀ ਉਭੈ ਜਹਾਜ ਉਦਾਰ' were not found.
+  - title:
+      gurmukhi: ੩੧. ਸਵੱਯੇ ਖਾਲਸਾ ਪ੍ਰਕਾਸ ਕੇ
+      english: '*** NOT IN BANIDB *** Savaiye from ''Khalsa Prakash'''
+    pdf_pages:
+    - 273
+    - 282
+    work: historical-or-sarbloh/khalsa-prakash-savaiye
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ੩੨. ਖਾਲਸਾ ਮਹਿਮਾ
+      english: Khalsa Mahima (Sarbloh-type 'ਖਾਲਸਾ ਮੇਰੋ ਰੂਪ ਹੈ ਖਾਸ'), not the Dasam one
+    pdf_pages:
+    - 283
+    - 289
+    work: sarbloh/khalsa-mahima (R 43000)
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 43000
+      similarity_range:
+      - 0.94
+      - 0.94
+    notes: One line matches R 43000 ('ਖ਼ਾਲਸਾ ਮੇਰੋ ਭਵਨ ਭੰਡਾਰਾ'); the other sampled lines ('ਭਗਤਿ ਗ੍ਯਾਨੀ ਰਾਜ ਜੋਗੇਸ੍ਵਰ',
+      'ਉਪਮਾ ਖਾਲਸਹਿ ਜਾਤ ਨ ਕਹੀ', 'ਖਾਲਸੇ ਕੇ ਪ੍ਰਸਾਦਿ ਕਰਿ ਸੁਤ ਵਿਤ ਕੋਸ ਭੰਡਾਰੁ') were not found. Longer than BaniDB's 46-line
+      version.
+  - title:
+      gurmukhi: ੩੩. ਸਸਤ੍ਰਨਾਮਮਾਲਾ ਮੰਤ੍ਰ
+      english: Shastar Nam Mala Mantra (composite)
+    pdf_pages:
+    - 290
+    - 294
+    work: 'composite: dasam/shastar-nam-mala dohras + war chhands + *** NOT IN BANIDB *** ''bole'''
+    banidb:
+      status: partial
+      source: D
+      shabad_ids:
+      - 9478
+      - 9487
+      similarity_range:
+      - 0.91
+      - 1.0
+    notes: 'Afterword: Singhs composed it from Shastar Nam Mala dohras, battle chhands from various banis and ''bole''
+      of old Singhs; it is found in old hand-written gutkas. Lines like ''ਸਤਿਨਾਮੁ ਵਾਹਿਗੁਰੂ ਅਕਾਲ ਪੁਰਖੁ ਤੁਹੀ ਹੈਂ'',
+      ''ਮਿਲੇ ਅਸੰਤ ਮਸਟ ਕਰਿ ਰਹੀਏ'' were not found.'
+  - title:
+      gurmukhi: ੩੪. ਫ਼ਤਹਨਾਮਹ ਪਾਤਿਸ਼ਾਹੀ ੧੦ 'ਬਨਾਮਿ ਖ਼ੁਦਾਵੰਦਿ ਤੇਗ਼ੋ ਤਬਰ'
+      english: '*** NOT IN BANIDB *** Fatehnama (Persian)'
+    pdf_pages:
+    - 295
+    - 297
+    work: asfotak/fatehnama
+    banidb:
+      status: not_found
+    notes: 'Afterword: a letter from Machhiwara to Aurangzeb that predates the Zafarnama. Copy held by Baba Sumer
+      Singh (Patna), copied by Babu Jagannath Ratnakar, published by Bhai Vir Singh in Khalsa Samachar, July 1942
+      (year printed in Latin-digit glyphs ''AIDB'', read as 1942). Present in some old hand-written Dasam birs.
+      24 couplets.'
+  - title:
+      gurmukhi: ੩੫. ਜ਼ਫ਼ਰਨਾਮਹ ਦਾਸਤਾਨ
+      english: Zafarnama (complete, 111 couplets)
+    pdf_pages:
+    - 298
+    - 309
+    work: dasam/zafarnama
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 12797
+      similarity_range:
+      - 0.83
+      - 0.95
+    variants_observed: '''ਰਜ਼ਾ ਬਖ਼ਸ਼ ਰਾਜ਼ਿਕ ਰਹਾਕੋ'' vs BaniDB ''ਰਜ਼ਾ ਬਖ਼ਸ਼ੋ ਰਾਜ਼ਿਕ ਰਿਹਾਕੋ''; ''ਬੇਦਿਰੰਗ ਆਮਦੰਦ'' vs
+      ''ਬੇਦਰੰਗ ਅਮਾਦੰਦ''; ''ਕਸ਼ਾ ਕਸ਼'' vs ''ਕਸੇ ਕਸ''; ''ਰਹੁਨਮੂੰ'' vs ''ਰਹ ਨਮੂੰ''. Persian orthography differs throughout,
+      so some lines are not found by first-letter search.'
+  - title:
+      gurmukhi: ੩੬. ਮੂਲ ਮੰਤਰ ਖਾਲਸਾ
+      english: '*** NOT IN BANIDB *** Mool Mantar Khalsa (verse narrative of Panj Pyare / amrit)'
+    pdf_pages:
+    - 310
+    - 314
+    work: panthic/mool-mantar-khalsa
+    banidb:
+      status: not_found
+    notes: Names Panj Pyare and others ('ਦੇਵਾ ਸਿੰਘ ਫੁਨਿ ਰਾਮ ਸਿੰਘ ਟਹਿਲ ਸਿੰਘ', 'ਮੋਹਕਮ ਸਿੰਘ ਛੀਪਾ ਦਵਾਰਵਤੀ', 'ਹਸਤਨਾਪੁਰਿ
+      ਕਾ ਜਨਮ ਸੋ ਧੰਨਾ'). Likely tier historical/panthic rather than gurbani.
+  - title:
+      gurmukhi: ੩੭. ਅੰਮ੍ਰਿਤਬਿਧਿ
+      english: Amrit Bidhi (partly Rehatnama Bhai Jeevan Singh)
+    pdf_pages:
+    - 315
+    - 321
+    work: rehatnama/bhai-jeevan-singh (R 31070) + *** NOT IN BANIDB *** opening
+    banidb:
+      status: partial
+      source: R
+      shabad_ids:
+      - 31070
+      similarity_range:
+      - 0.86
+      - 0.95
+    notes: Verses 116-122 match Rehatnama Bhai Jeevan Singh (Bhai Jaita), with verse numbers aligned (॥੧੧੬॥ to ॥੧੨੨॥).
+      The earlier verses ~110-115 ('ਪਾਤਰਿ ਦੂਸਰ ਹਾਥ ਧਰੀਜੈ ॥੧੧੨॥') and the closing '॥੧੨੪॥ ਇਤੀ' were not found, so
+      BaniDB's text may be shorter than this one.
+  - title:
+      gurmukhi: ਬੇਨਤੀਆਂ / ਵਿਸ਼ਰਾਮ / ਸੰਪਾਦਕੀ (ੳ-ਚ)
+      english: 'Afterword: bisram notes, Jaap pronunciation, Dasam Granth history, sources of the asfotak banis'
+    pdf_pages:
+    - 322
+    - 332
+    work: reference
+    banidb:
+      status: not_checked
+  notes: 'Printed page = PDF page (offset 0). Typeset digitally in Satluj (body) with some Sarover/Satluj-Bold;
+    Latin digits A-J in the Satluj glyphs stand for 1-0 in a few places. The supplied legacy2uni.js (GurbaniAkhar)
+    does NOT handle this font. I wrote a best-effort Satluj mapper (scratchpad/tools/E_satluj.py). Converted full
+    text: scratchpad/triage/E_work/nangali.txt. It is good enough for search, but needs QA before ingestion: ੍ਹ/ੈ,
+    ਞ and some ligatures are imperfect. Items 1-12 are a standard Nihang/Taksal nitnem (SGGS + Dasam) and all online.
+    Items 13-37 are the ''obscure banis'' the user mentioned. The editors call them asfotak banis of Guru Gobind
+    Singh, gathered by Giani Hardeep Singh (Hazur Sahib) from Patna/old birs and Sarbloh manuscripts. Gobind Gita
+    was omitted for length and is printed separately by the Kashi Shastris. NEW CORPUS CANDIDATES (not in BaniDB):
+    Sri Sarbloh Astotar, Brahm Kavach, Sarbloh Kavach, Sarbloh Kavach Astotar, Bhagauti di Var, Malkauns ki Var,
+    Sansahar Sukhmana, Sant Kaj, Rajput Ghore, Asfotak Kabitt, Vahiguru Mantra Mahatam, Guru Gadi Patshahi Dasak,
+    Savaiye Khalsa Prakash ke, Fatehnama, Mool Mantar Khalsa, most of Guru Granth Sthapan, the Persian rehat couplets,
+    and much of Khalsa Mahima (Sarbloh-type), Shastar Nam Mala Mantra and Amrit Bidhi. Kal Astotar, Bhagauti Astotar
+    and Ugardanti exist in BaniDB (Charitar 404; Dasam appendix ang 1428) but this text differs heavily. Since this
+    gutka is born-digital, it is the best ingest source for these items. Decision ''collection'' for the gutka as
+    a whole, but split out the not_found items as ingest-candidates (tier gurbani by attribution, though authenticity
+    is contested; Mool Mantar Khalsa probably historical). Sarbloh-labelled items should be reconciled with group
+    C.'
+- batch: Compilations (pothis and gutkas)
+  file: gutka sahib nitnem - 20-6-2019.pdf
+  drive_id: 1AZFUqaK8Frj3Jh_M8he45aOXKwm2iCA2
+  sha256_12: 8b1e6f9ee900
+  pages: 224
+  text_layer: legacy-GurbaniAkhar
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਗੁਟਕਾ ਸਾਹਿਬ (ਨਿਤਨੇਮ)
+    english: Nitnem gutka (2019 print file)
+  publisher: unknown (no imprint page; PDF metadata title 'nitnem (20x32) -1 - 18-6-2019 (to party) (full).pmd',
+    i.e. a PageMaker print-ready file sent to a client)
+  year: 2019 (from file name / metadata, 18-20 June 2019)
+  languages:
+  - punjabi
+  - braj
+  - sant-bhasha
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਮੂਲ ਮੰਤਰ / ਗੁਰ ਮੰਤਰ / ਬੀਜ ਮੰਤਰ; ਤਤਕਰਾ
+      english: 'Front: Mool, Gur (ਵਾਹਿਗੁਰੂ) and Beej (ਸਤਿਨਾਮੁ) mantras; TOC'
+    pdf_pages:
+    - 1
+    - 2
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਜਪੁ ਜੀ ਸਾਹਿਬ
+      english: Japji
+    pdf_pages:
+    - 3
+    - 41
+    work: sggs/japji
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 1
+      - 39
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਸ਼ਬਦ ਹਜ਼ਾਰੇ
+      english: Shabad Hazare (SGGS)
+    pdf_pages:
+    - 42
+    - 56
+    work: sggs/shabad-hazare
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 277
+      - 2991
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: Ends with Dhanasri M5 'ਜੀਅ ਜੰਤ ਸਭਿ ਸਰਣਿ ਤੁਮ੍ਹਾਰੀ ... ਇਕ ਨਾਨਕ ਕੀ ਅਰਦਾਸੇ' (795).
+  - title:
+      gurmukhi: ਜਾਪੁ ਸਾਹਿਬ
+      english: Jaap
+    pdf_pages:
+    - 57
+    - 116
+    work: dasam/jaap
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7402
+      - 7423
+      similarity_range:
+      - 0.97
+      - 1.0
+  - title:
+      gurmukhi: ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਸ੍ਵਯੇ
+      english: Tav Prasad Savaiye (10)
+    pdf_pages:
+    - 117
+    - 123
+    work: dasam/akal-ustat (tav-prasad-savaiye)
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 7426
+      similarity_range:
+      - 0.95
+      - 0.97
+    variants_observed: ਸੁਧ vs ਸੁੱਧ; ਧਰਿਓ vs ਧਰਯੋ; ਜਗੁ vs ਜਗ.
+  - title:
+      gurmukhi: ਚੌਪਈ ਸਾਹਿਬ
+      english: Benti Chaupai (to 405 + dohras)
+    pdf_pages:
+    - 124
+    - 134
+    work: dasam/benti-chaupai
+    banidb:
+      status: online
+      source: D
+      shabad_ids:
+      - 12794
+      - 8096
+      similarity_range:
+      - 0.93
+      - 1.0
+  - title:
+      gurmukhi: ਅਨੰਦੁ ਸਾਹਿਬ
+      english: Anand Sahib (40 pauris)
+    pdf_pages:
+    - 135
+    - 167
+    work: sggs/anand
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 333375
+      - 333376
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਰਹਰਾਸਿ ਸਾਹਿਬ
+      english: Rehras (extended; begins 'ਹਰਿ ਜੁਗੁ ਜੁਗੁ ਭਗਤ ਉਪਾਇਆ'; includes Benti Chaupai, Anand 6 pauris, Mundavani,
+        saloks)
+    pdf_pages:
+    - 168
+    - 208
+    work: 'collection: sggs/rehras + dasam/benti-chaupai'
+    banidb:
+      status: online
+      source: G+D
+      shabad_ids:
+      - 1661
+      - 12794
+      - 1944
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਅਰਦਾਸਿ
+      english: Ardas (with 'ਆਗਿਆ ਭਈ', 'ਰਾਜ ਕਰੇਗਾ ਖਾਲਸਾ' dohras; footnoted sources)
+    pdf_pages:
+    - 209
+    - 216
+    work: 'collection: ardas'
+    banidb:
+      status: not_checked
+    notes: 'Footnotes: ''੧. ਸ੍ਰੀ ਮੁਖਵਾਕ ਪਾਤਿਸ਼ਾਹੀ ਦਸਵੀਂ'' and ''੨. ਸ੍ਰੀ ਗੁਰ ਪ੍ਰਤਾਪ ਸੂਰਜ (?) ... ਅੰ. ੪੮, ਪੰਨਾ ੫੭੬'',
+      attributing the closing dohras. Same dohras checked in the Sandhia gutka (R 31092, R 31017).'
+  - title:
+      gurmukhi: ਕੀਰਤਨ ਸੋਹਿਲਾ
+      english: Kirtan Sohila
+    pdf_pages:
+    - 217
+    - 224
+    work: sggs/kirtan-sohila
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 53
+      similarity_range:
+      - 1.0
+      - 1.0
+  notes: 'Printed page = PDF page. Body text is GurbaniAkhar-style legacy font, which legacy2uni.js converts cleanly.
+    Running heads, titles and the TOC use other legacy fonts (LORD/SONY/GOD families), which convert to garbage,
+    so read those from page images. An ordinary Taksal/Nihang-style nitnem (Japji, Shabad Hazare, Jaap, Swaiye,
+    Chaupai, Anand, extended Rehras, Ardas, Sohila), all in BaniDB. Its only value is the selection and order. No
+    obscure banis. Converted text: scratchpad/triage/E_work/g19.txt (body only).'
+- batch: Historical and philosophical literature
+  file: ਵੀਚਾਰ ਸਾਗਰ(ਸਾਧੂ ਸ੍ਰੀ ਨਿਸਚਲ ਦਾਸ ਜੀ).pdf
+  drive_id: 1f33LrNIf6_0AWsIjGyufgeYx_w2uYsz9
+  sha256_12: 28466f58277d
+  pages: 450
+  text_layer: ocr-garbled
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਸ੍ਰੀ ਵਿਚਾਰ ਸਾਗਰ (ਗ੍ਰੰਥ)
+    english: Vichar Sagar (Ocean of Inquiry)
+  author: Sadhu Nischal Das (1791-1863), a Dadupanthi Advaita Vedanta author
+  editor_or_commentator: unknown (an unattributed prose ṭīkā follows the verses; no commentator's name seen on the
+    pages examined)
+  publisher: Matba Munshi Nawal Kishore (C.I.E.) press, Kanpur ('ਮੁਕਾਮ ਕਾਨਪੁਰ ਮੈਂ ਛਪਾ')
+  year: 2nd edition, Samvat 1950 Bikrami = July 1893 CE (colophon, PDF p443)
+  languages:
+  - braj
+  - sadhukari-hindi-in-gurmukhi
+  content_type: text+commentary(steek)
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਅਨੁਕ੍ਰਮਣਿਕਾ
+      english: Table of contents
+    pdf_pages:
+    - 5
+    - 8
+    work: front-matter
+    banidb:
+      status: not_checked
+    notes: Lists 7 tarangas (chapters) with printed page numbers. PDF p4 is the publisher's advertisement page (Nawal
+      Kishore presses at Lucknow, Kanpur and Lahore; it also advertises Panj Granthi and Prem Sagar in Gurmukhi).
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਵਿਚਾਰ ਸਾਗਰ (ਤਰੰਗ ੧-੭)
+      english: Vichar Sagar, tarangas 1-7
+    pdf_pages:
+    - 9
+    - 443
+    work: nischal-das/vichar-sagar
+    banidb:
+      status: not_found
+    variants_observed: 'Compared with the manglacharan.com chapter-1 booklet (drive 1qGj8KwQJ7daHEMLFk...): the
+      1893 print reads ''ਲਹਰੀ ਵਿਸ਼ਨੁ ਮਹੇਸ਼'' where the booklet has ''ਵਿਸ਼ਨ''. In doha 3 the 1893 print reads ''ਸੋ
+      ਮੇਰੋ ਹੈ ਆਤਮਾ'' and the booklet ''ਸੋ ਮੇਰੇ ਹੈ''. These were read off low-resolution page images, so recheck
+      them before relying on them.'
+    notes: 'Printed page = PDF page - 8 (PDF p9 = printed 1; colophon on PDF p443 = printed 435). The taranga starts
+      below are approximate, worked out from the index plus the offset: T1 p9, T2 ~p26, T3 ~p74, T4 ~p84, T5 ~p168,
+      T6 ~p252, T7 ~p377. Layout: the original verses (doha, chaupai, kavitt, sortha) are set in large type and
+      each is followed by a smaller-type ''ਟੀਕਾ:'' prose explanation. Later tarangas carry long prose passages.
+      Spacing between words is uneven (old typeset style), which will hurt both OCR and tokenisation.'
+  - title:
+      gurmukhi: ਪ੍ਰਕਾਸ਼ਕ ਦੀ ਸੂਚੀ
+      english: Publisher's catalogue / advertisements
+    pdf_pages:
+    - 444
+    - 447
+    work: back-matter
+    banidb:
+      status: not_checked
+  notes: 'Panjab Digital Library scan of a Language Department Punjab library copy (PDL watermark on every page;
+    PDF p1-2 are the binding and a date-due slip; p448-450 are blank or the back board). The ABBYY text layer is
+    essentially empty or junk, so new OCR would be needed. Classification: this is not Sikh literature in the strict
+    sense. It is a 19th-century Hindi/Braj Advaita Vedanta treatise by a Dadupanthi sadhu, widely studied in Udasi
+    and Nirmala deras and in sant tradition, and here printed in Gurmukhi script. Suggest marking it in metadata
+    as ''non-Sikh philosophical text used in Sikh scholarly traditions'' under the historical tier. Treat it as
+    an ingest candidate (no online Gurmukhi source found), but the verse and the ṭīkā must be kept as separate layers.
+    Its vocabulary is heavily Sanskritic Vedanta (ਅਨੁਬੰਧ, ਅਧਿਕਾਰੀ, ਉਪਾਧਿ, ਅਧਿਸ਼ਟਾਨ), which is useful for glossing
+    Nirmala-influenced steeks. This 1893 print is a good candidate to be the canonical edition; the manglacharan
+    booklet should be its witness for taranga 1.'
+- batch: Historical and philosophical literature
+  file: VicharSagarC1.pdf
+  drive_id: 1qGj8KwQJ7daHEMLFk_spdwb1VwuL-ECQ
+  sha256_12: 9198819ec687
+  pages: 15
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਵਿਚਾਰ ਸਾਗਰ (ਪਹਿਲੀ ਤਰੰਗ)
+    english: 'Vichar Sagar: The Ocean of Inquiry, chapter one'
+  author: Sadhu Nischal Das
+  editor_or_commentator: Manglacharan (manglacharan.com); translator not named
+  publisher: manglacharan.com (web booklet)
+  year: unknown (no date printed; other Manglacharan items are copyright 2009-2019)
+  languages:
+  - braj
+  - english
+  content_type: text+translation
+  tier: historical
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ''
+      english: Cover, English introduction, chapter overview, illustrations
+    pdf_pages:
+    - 1
+    - 6
+    work: front-matter
+    banidb:
+      status: not_checked
+    notes: The English intro calls Nischal Das (1791-1863) a Dadu Panthi and says the text spread across 'numerous
+      Hindu and Sikh religious groups'.
+  - title:
+      gurmukhi: ਅਥ ਵਿਚਾਰ ਸਾਗਰ ਪ੍ਰਾਰੰਭ ... ਇਤਿ ਅਨੁਬੰਧ ਸਾਮਾਨ੍ਯ ਨਿਰੂਪਣੰ ਨਾਮ ਪਹਿਲੀ ਤਰੰਗ ਸਮਾਪਤਹ
+      english: Taranga 1 (Anubandh Samanya Nirupan), Gurmukhi with interlinear English
+    pdf_pages:
+    - 7
+    - 13
+    work: nischal-das/vichar-sagar
+    banidb:
+      status: not_found
+    variants_observed: 'Versus the 1893 Nawal Kishore print, this booklet has modernised spelling and adds Punjabi
+      sub-headings such as ''ਚਾਰ ਸਾਧਨ ਦੇ ਨਾਮ'', ''ਵਿਵੇਕ ਲੱਛਣ'' and ''ਸ਼ਮ ਦਮ ਦੇ ਲੱਛਣ'' that are not in the 1893 print.
+      One reading: ''ਲਹਰੀ ਵਿਸ਼ਨ ਮਹੇਸ਼'' here against ''ਵਿਸ਼ਨੁ'' in the 1893 print. It has no ṭīkā.'
+    notes: Chapter 1 ends PDF p13 ('End of Chapter 1' is on p14, the back cover on p15).
+  notes: This covers only taranga 1 of the work in the 450-page 1893 scan. The Gurmukhi is a real Unicode text layer,
+    but pdftotext gives it in visual order (sihari placed before the consonant, e.g. 'ਿਵਚਾਰ') and drops subjoined
+    letters (e.g. 'ਪ ਾਰੰਭ' for ਪ੍ਰਾਰੰਭ). It needs reordering and a check against the image before use. Its value
+    is as a witness and an English gloss aid. It cannot be canonical because it is a single chapter from a modern
+    web booklet.
+- batch: Historical and philosophical literature
+  file: santa di mahema.pdf
+  drive_id: 1kQuxQLDctyEli72znRfRe6i3daG3Ix9d
+  sha256_12: 55951567042e
+  pages: 41
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਸੰਤਾਂ ਦੀ ਮਹਿਮਾਂ — ਕਵੀਸ਼ਰੀ ਕਵਿਤਾਵਾਂ ਦੀ ਪੁਸਤਕ
+    english: 'Santan di Mahima: a book of kavishri poems'
+  author: Bhai Gurjant Singh Bainka, Hazuri kavishar of the Sampardai Dal Baba Bidhi Chand (kavishri jatha)
+  editor_or_commentator: none; blessings (ਅਸੀਸ) from Sant Baba Avtar Singh (Sur Singh wale, Baba Bidhi Chand sampardai)
+  publisher: unknown (appears to be self-published by the jatha)
+  year: unknown (contemporary, 21st century; no date seen)
+  languages:
+  - punjabi
+  content_type: text
+  tier: reference
+  decision: skip
+  sections:
+  - title:
+      gurmukhi: ਕਵੀਸ਼ਰੀ ਕਵਿਤਾਵਾਂ
+      english: Kavishri poems in praise of sants of the Baba Bidhi Chand sampardai
+    pdf_pages:
+    - 7
+    - 40
+    work: contemporary/kavishri-santan-di-mahima
+    banidb:
+      status: not_checked
+    notes: 'Front matter on PDF p1-6: cover, title, photos of the sants, and ਅਸੀਸ / ਧੰਨਵਾਦ pages. PDF p41 is the
+      back cover. The pages are small booklet scans with no text layer.'
+  notes: This is not a historical Sikh text. It is modern devotional kavishri (folk ballad verse) in plain contemporary
+    Punjabi, presumably still in copyright. None of the three tiers fits ('reference' is used only so it never counts
+    toward word stats). Recommend skipping it for the corpus. The cover and dedication pages carry the jatha members'
+    personal mobile numbers, so do not republish those pages.
+- batch: Historical and philosophical literature
+  file: Shaheed-Bilas-bhai-mani-singh-by-Kavi-Sewa-Singh.pdf
+  drive_id: 1zKVZOVlbx6UvZQI8ILb-_LFVpwliIagS
+  sha256_12: 2f2d9f380c4b
+  pages: 113
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਸ਼ਹੀਦ ਬਿਲਾਸ ਭਾਈ ਮਨੀ ਸਿੰਘ
+    english: Shaheed Bilas Bhai Mani Singh
+  author: Kavi Seva Singh (early 19th c.)
+  editor_or_commentator: Giani Garja Singh (editor; introduction, footnotes and appendices); presented by Gurbhajan
+    Gill
+  publisher: Punjabi Sahit Akademi, Ludhiana
+  year: 1st ed. 1961; this is the 2nd ed. 2007
+  languages:
+  - braj
+  - punjabi
+  content_type: text
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਦੋ ਸ਼ਬਦ, ਭੂਮਿਕਾ
+      english: Foreword and Garja Singh's introduction
+    pdf_pages:
+    - 6
+    - 48
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਮੂਲ ਪਾਠ — ਅਥ ਸ਼ਹੀਦ ਬਿਲਾਸ ਪੋਥੀ ਲਿਖਯਤੇ, ਕ੍ਰਿਤ ਕਵਿ ਸੇਵਾ ਸਿੰਘ
+      english: Main text
+    pdf_pages:
+    - 49
+    - 87
+    work: seva-singh/shaheed-bilas
+    banidb:
+      status: not_found
+    notes: Verse in doha, savaiya and chaupai, numbered, with editor's footnotes at the foot of the pages. The section
+      title page is PDF p49 and the text starts on p51. PDF page = printed page (the footer reads 'Page N').
+  - title:
+      gurmukhi: ਅੰਤਿਕਾ ੧-੫, ਨਾਵਾਂ ਦੀ ਸੂਚੀ
+      english: Appendices 1-5 and name index
+    pdf_pages:
+    - 88
+    - 113
+    work: back-matter
+    banidb:
+      status: not_checked
+    notes: The appendices include a family-tree diagram. The name index starts around p101.
+  notes: This is the standard (only) printed edition of Shaheed Bilas. The scan is a sikhbookclub.com download with
+    a watermark on every page and no text layer, so it needs OCR. The typeset print is clean, so OCR should go well.
+    The main text is short (about 37 pages of verse). The work itself is out of copyright, but the edition (2007,
+    Punjabi Sahit Akademi) and Garja Singh's apparatus are in copyright. Use only the verse text.
+- batch: Historical and philosophical literature
+  file: documents.tips_gur-shabad-sidhi-shardha-puran-granth-bhai-mani-singh-ji-punjabi.pdf
+  drive_id: 1LgrioVeD35agiQfDsXaOuzV0c5BzMSsA
+  sha256_12: bec77caad650
+  pages: 160
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਗੁਰ ਸ਼ਬਦ ਸਿੱਧੀ ਅਰਥਾਤ ਸ਼ਰਧਾ ਪੂਰਨ ਗ੍ਰੰਥ
+    english: Gur Shabad Sidhi, or Shardha Puran Granth
+  author: Attributed on the title page to 'Sri Man Bhai Mani Singh ji wala' (traditional attribution, unverified)
+  editor_or_commentator: Sodhi Teja Singh (compiler, ਸੰਗ੍ਰਹਿ ਕਰਤਾ); Giani Mahinder Singh 'Ratan' (reviser, ਸੰਸ਼ੋਧਕ)
+  publisher: Bhai Chatar Singh Jiwan Singh, Amritsar
+  year: 18th ed. Aug 2006; this is the 19th ed. Dec 2008
+  languages:
+  - punjabi
+  - sant-bhasha
+  content_type: compilation
+  tier: gurbani
+  decision: collection
+  sections:
+  - title:
+      gurmukhi: ਪ੍ਰਕਰਣ ਪਹਿਲਾ — ਸ੍ਰੀ ਜਪੁ ਜੀ ਸਾਹਿਬ
+      english: Japji Sahib, each pauri followed by its ਮਹਾਤਮ
+    pdf_pages:
+    - 10
+    - 30
+    work: sggs/japji
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 1
+      similarity_range:
+      - 1.0
+      - 1.0
+  - title:
+      gurmukhi: ਪ੍ਰਕਰਣ ੨-੧੫ — ਘਰ ਵਿਚ ਆਨੰਦ ... ਭੀੜ ਆਪਦਾ ਸਮੇਂ ਸਹਾਇਤਾ ਹੋਵੇ
+      english: 'Chapters 2-15: 201 SGGS shabads grouped by the wish they are said to fulfil'
+    pdf_pages:
+    - 31
+    - 159
+    work: sggs/various (201 shabads)
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 1677
+      - 4210
+      - 4491
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: 'Each shabad comes with a ''ਸ਼ਬਦ ਨੰ:'', the raga/mahala heading and its SGGS ang (e.g. ''ਆਸਾ ਮਹਲਾ ੫ ਛੰਤ
+      (ਪੰਨਾ ੪੫੭)''), followed by a ਮਹਾਤਮ in Punjabi prose that prescribes the practice (e.g. 40 days, 101 recitations
+      at amrit vela) and the benefit. Chapter starts, from the printed TOC plus 1 for PDF pages: 2 ਘਰ ਵਿਚ ਆਨੰਦ p31;
+      3 ਪ੍ਰਭੂ ਭਗਤੀ p35; 4 ਮਾਨ ਵਡਿਆਈ p41; 5 ਰਾਜ ਦਰਬਾਰ p44; 6 ਮੁਕਤੀ p48; 7 ਮਨੋਕਾਮਨਾ p50; 8 ਧਨ p54; 9 (ਕਾਰਜ, ਖੇਤੀ,
+      ਵਪਾਰ, ਗੁਆਚੀ ਵਸਤੂ, ਵਿਦਿਆ) p67; 10 ਬੀਮਾਰੀ p77; 11 ਚਿੰਤਾ/ਕੈਦ p90; 12 ਪਤੀ/ਪ੍ਰੇਮੀ ਮੁੜ ਆਵੇ p97; 13 ਪੁੱਤਰ ਪ੍ਰਾਪਤੀ
+      p113; 14 (ਪੁੱਤਰ, ਪਤੀ ਦੀ ਉਮਰ ...) p118; 15 (ਭੂਤ ਪ੍ਰੇਤ, ਮੁਕੱਦਮਾ, ਭੀੜ) p138-159. The last item is shabad ਨੰ:
+      ੨੦੧, a Salok Mahala 5. PDF p160 is the back cover. Spot-checked shabads 29 (ang 457), 30 (ang 1184) and the
+      Sarang vaar pauri (ang 1247): all match BaniDB exactly.'
+  notes: 'Front matter: PDF p1 cover, p2 title page (with a 2010 ''PrabhjotSingh'' digital-signature stamp, which
+    is the only text in the layer), p3 imprint, p4 ''ਇਸ ਨੂੰ ਕਿਵੇਂ ਪੜ੍ਹੀਏ'' (rules for recitation, signed ''ਰਤਨ''),
+    p5 TOC, p6-9 a ''ਤਤਕਰਾ'' indexing wishes to pauri/shabad numbers. All the Gurbani is SGGS and online, so this
+    adds no new corpus. Its value is the selection, ordering and the ਮਹਾਤਮ / phal-desh rubrics, which suits a collection.
+    The ਮਹਾਤਮ prose is modern Punjabi. Despite the hint, this is not a rehatnama or panthic prose by Bhai Mani Singh.
+    The attribution is a publisher''s claim (''ਸਭ ਤੋਂ ਵੱਡਾ ਅਸਲੀ ਤੇ ਪੁਰਾਤਨ ਗ੍ਰੰਥ'') and should be recorded as ''attributed''.'
+- batch: Historical and philosophical literature
+  file: Nihangnama.pdf
+  drive_id: 1LZAVo0hRkjdNyy9s9cPA8VmguKCHlJE4
+  sha256_12: 22c53095df0c
+  pages: 40
+  text_layer: legacy-prabhki
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਨਿਹੰਗਨਾਮਾ
+    english: Nihangnama (The Nihang Treatise)
+  author: Anthology; excerpts by Rattan Singh Bhangu, Santokh Singh, Giani Gian Singh, Baba Sumer Singh and (attrib.)
+    Bhai Daya Singh
+  editor_or_commentator: 'Manglacharan (compiler and English translator; the opening mangal kabit is ''ਕ੍ਰਿਤ: ਮੰਗਲਾਚਰਨ'')'
+  publisher: manglacharan.com
+  year: © 2009-2019 (as printed)
+  languages:
+  - braj
+  - punjabi
+  - english
+  content_type: text+translation
+  tier: historical
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਮੰਗਲ
+      english: Foreword, compiler's mangal kabit, contents
+    pdf_pages:
+    - 1
+    - 4
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਪ੍ਰਾਚੀਨ ਪੰਥ ਪ੍ਰਕਾਸ਼
+      english: 'Pracheen Panth Prakash (Rattan Singh Bhangu, given as 1830): excerpt'
+    pdf_pages:
+    - 5
+    - 9
+    work: bhangu/pracheen-panth-prakash
+    banidb:
+      status: not_found
+  - title:
+      gurmukhi: ਗੁਰਪ੍ਰਤਾਪ ਸੂਰਜ ਪ੍ਰਕਾਸ਼ ਗ੍ਰੰਥ
+      english: 'Gur Pratap Suraj Prakash (Santokh Singh, 1843): excerpt'
+    pdf_pages:
+    - 10
+    - 13
+    work: santokh-singh/suraj-prakash
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਨਵੀਨ ਪੰਥ ਪ੍ਰਕਾਸ਼
+      english: 'Naveen Panth Prakash (Giani Gian Singh, 1880): excerpt'
+    pdf_pages:
+    - 14
+    - 31
+    work: gian-singh/panth-prakash
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਗੁਰਪਦ ਪ੍ਰੇਮ ਪ੍ਰਕਾਸ਼
+      english: 'Sri Gur Pad Prem Prakash (Baba Sumer Singh, 1880): excerpt'
+    pdf_pages:
+    - 32
+    - 37
+    work: sumer-singh/gurpad-prem-prakash
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਰਹਿਤਨਾਮਾ ਭਾਈ ਦਯਾ ਸਿੰਘ ਜੀ
+      english: 'Bhai Daya Singh Rehatnama: excerpt (two dohas on the Nihang dals)'
+    pdf_pages:
+    - 38
+    - 40
+    work: rehatnama/daya-singh
+    banidb:
+      status: not_found
+    notes: The two dohas quoted ('ਗੁਰ ਇਤਿਹਾਸ ਇਸਥਿਤ ਮਹਿ ਦਲਾਂ ਮੁੱਢ ਤੋਂ ਆਇ ...') are not in BaniDB, including its R
+      source.
+  notes: Born-digital Word export (2019). The Gurmukhi is in the Prabhki font, which converts cleanly with legacy2uni
+    (verified on PDF p7 and p40). The English in the same file comes out as junk if passed through the converter,
+    so convert only the Gurmukhi runs. Every section is a short excerpt (a few pages each) about the origin of the
+    Nihangs, from five larger works, with facing English translation. Mark it reference-only (translation aid) and
+    do not ingest it as a work. If any of these source works is later ingested from a full edition, these excerpts
+    can be attached as witnesses. Cross-checks of Pracheen Panth Prakash and the Daya Singh lines were not_found.
+- batch: Historical and philosophical literature
+  file: SahibSriGuruGobindSinghJiMaharajSauSakhi.pdf
+  drive_id: 1BS_eme3pYKNRY9h09M9-pLX0FXk3aQBd
+  sha256_12: dac6392b4e97
+  pages: 320
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਸਾਹਿਬ ਸ੍ਰੀ ਗੁਰੂ ਗੋਬਿੰਦ ਸਿੰਘ ਜੀ ਮਹਾਰਾਜ — ਸੌ ਸਾਖੀ
+    english: Sau Sakhi (Hundred Sakhis)
+  author: Attributed to Bhai Ram Kanwar (Baba Gurbakhsh Singh) as narrator; the title page names 'ਲਿਖਾਰੀ ਭਾਈ ਗੁਰਬਖਸ਼
+    ਸਿੰਘ ਜੀ'
+  editor_or_commentator: unknown (none named)
+  publisher: Bhai Chatar Singh Jiwan Singh, Amritsar
+  year: 9th ed. 1997 (ISBN 81-7601-116-9)
+  languages:
+  - punjabi
+  - braj
+  - sadhukari
+  content_type: text
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਮੰਗਲ, ਕਲਕੀ ਅਵਤਾਰ
+      english: Opening verse mangal and a 'Kalki Avtar' preface
+    pdf_pages:
+    - 3
+    - 4
+    work: sau-sakhi/front
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਅਥ ਗ੍ਰੰਥ ਸੌ ਸਾਖੀ ਲਿਖਯਤੇ — ਸਾਖੀ ਪਹਿਲੀ ਚਲੀ ...
+      english: Sau Sakhi, sakhis 1-100
+    pdf_pages:
+    - 5
+    - 316
+    work: sau-sakhi
+    banidb:
+      status: not_found
+    notes: Mostly prose in archaic Punjabi/Sadhukari, with verse openings and inserts (dohas). The running head
+      reads 'ਪੁਰਾਤਨ ਤੇ ਅਸਲੀ ... ਜਨਮ ਸਾਖੀ' and PDF page = printed page. The opening verse names 'ਸਾਹਿਬ ਦਾਸ' and 'ਗੁਰਬਖਸ਼
+      ਸਿੰਘ' as scribes. The prophecy sakhis continue to p316.
+  - title:
+      gurmukhi: ਕਰਨੀ ਨਾਮਾ (ਸ੍ਰੀ ਗੁਰੂ ਨਾਨਕ ਦੇਵ ਜੀ ਦਾ ਜਵਾਬ ਜੋ ਮਕੇ ਵਿਚ ਕਾਜ਼ੀ ਰੁਕਨਦੀਨ ਨਾਲ ਹੋਇਆ)
+      english: Karni Nama (apocryphal prophecy verse attributed to Guru Nanak)
+    pdf_pages:
+    - 317
+    - 320
+    work: apocrypha/karni-nama
+    banidb:
+      status: not_found
+    notes: Appended verse work, numbered couplets ending with 'ਇਤੀ'. It is attributed to Guru Nanak but is apocryphal
+      and not in BaniDB. Keep it as a separate work, tier historical, and never gurbani.
+  notes: The scan places each half-size book page off-centre on a larger canvas (text sits in the top or bottom
+    half), so crop before OCR. Some pages are skewed and some lines are cut at the edge. There is no text layer.
+    Sau Sakhi is an important but controversial 18th/19th-century prophecy and sakhi text (with interpolations of
+    Namdhari interest), and this bazaar edition gives no editorial apparatus or base manuscript. It is an ingest
+    candidate for the historical tier, flagged 'popular edition, no critical apparatus'. A critical edition would
+    be preferable as canonical if one is available.
+- batch: Historical and philosophical literature
+  file: sachipreet.pdf
+  drive_id: 1L24DD8Nu4pfS8fPRr5zmbDI6-CLyolKY
+  sha256_12: 8d4b019f1d54
+  pages: 298
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਸਾਚੀ ਪ੍ਰੀਤਿ — ਗ਼ਜ਼ਲਾਂ ਭਾਈ ਨੰਦ ਲਾਲ ਜੀ 'ਗੋਇਆ' ਅਤੇ 'ਗੰਜ-ਨਾਮਾ' 'ਚੋਂ 'ਸਲਤਨਤਿ ਦਹੱਮ' ਸਟੀਕ
+    english: 'Sachi Preet: an annotation of Bhai Nand Lal''s ghazals, rubaiyan, baits and Sultanat-e-Dahm from Ganj
+      Nama'
+  author: Bhai Nand Lal 'Goya'
+  editor_or_commentator: Harbhajan Singh (Bhai Sahib), former principal, Sikh Missionary College, Amritsar (word
+    meanings, meaning, summary, Punjabi verse rendering and commentary)
+  publisher: Singh Brothers, Amritsar
+  year: 1st ed. 1967; this is the 8th printing, Feb 2008 (ISBN 81-7205-126-3)
+  languages:
+  - persian-in-gurmukhi
+  - punjabi
+  content_type: text+commentary(steek)
+  tier: gurbani
+  decision: witness
+  sections:
+  - title:
+      gurmukhi: ਮੁਖ ਸ਼ਬਦ, ਭੂਮਿਕਾ (ਐਡੀਸ਼ਨ ੧-੫), ਭਾਈ ਨੰਦ ਲਾਲ ਜੀ 'ਗੋਇਆ'
+      english: Prefaces and an introduction on Bhai Nand Lal
+    pdf_pages:
+    - 7
+    - 25
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਗ਼ਜ਼ਲਾਂ ੧-੬੩
+      english: Diwan-e-Goya, ghazals 1-63
+    pdf_pages:
+    - 26
+    - 277
+    work: nand-lal/ghazals
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30000
+      - 30061
+      similarity_range:
+      - 0.88
+      - 1.0
+    variants_observed: 'Ghazal 1 couplet 1, second line: the scan reads ''ਵਗਰਨਹ ਜ਼ੌਕ਼ੇ ਚੁਨੀਂ ਆਮਦਨ ਨਬੂਦ ਮਰਾ'' and
+      BaniDB ''ਵਗਰਨਾ ਜ਼ੋਕਿ ਚੁਨੀਂ ਨ ਬੂਦ ਮਰਾ''. BaniDB lacks ''ਆਮਦਨ'', which the metre seems to need, so this looks
+      like a BaniDB omission and is worth flagging. The scan''s izafat/vowel marks differ throughout: ''ਯਾਦਿ ਤੋ''
+      vs BaniDB ''ਤੂ''; ''ਬੁਸੂਏ ਦੋਸਤ ਰਿਹਾਈ'' vs ''ਬਸੂਇ ਦੋਸਤ ਰਹਾਈ''; ''ਨ ਬੂਦ ਹੇਚ ਨਿਸ਼ਾਂਹਾ'' vs ''ਨਬੂਦ ਹੀਚ ਨਿਸ਼ਾਨ
+      ਹਾ''. In ghazal 62: ''ਗੋਯਾ'' vs ''ਗੋਇਆ'', ''ਜੁਰ੍ਰਾ'' vs ''ਜੁੱਰਾ''.'
+    notes: 'Each ghazal has the Persian text in Gurmukhi (with dotted letters ਜ਼ ਖ਼ ਗ਼ ਫ਼ ਕ਼), then a Punjabi verse
+      translation (ਪੰਜਾਬੀ ਕਾਵਿ ਅਨੁਵਾਦ), ਸ਼ਬਦਾਰਥ, ਅਰਥ and ਭਾਵਾਰਥ. Spot-checks: ghazal 1 = shabad 30000; ghazal 62
+      (PDF p271) = 30061, so the run is presumably 30000-30062. The printed-to-PDF offset drifts from 0 to +1 across
+      the book.'
+  - title:
+      gurmukhi: ਰੁਬਾਈਆਂ ੧-੧੯
+      english: Rubaiyan 1-19
+    pdf_pages:
+    - 278
+    - 287
+    work: nand-lal/rubaiyan
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30063
+      similarity_range:
+      - 0.88
+      - 0.96
+    variants_observed: 'Rubai 1: the scan reads ''ਹਰ ਕਸ ਕਿ ਜ਼ਿ ਸ਼ੌਕਿ ਤੋ ਕ਼ਦਮ ਅਜ਼ ਸਰ ਸਾਖ਼ਤ'' and BaniDB ''ਹਰ ਕਸ ਜ਼ਿ
+      ਸ਼ੌਕਿ ਤੂ ਕਦਮ ...'' (BaniDB lacks ''ਕਿ''). Also ''ਆਂ ਕਸ'' vs ''ਆਣ ਕਸ''.'
+  - title:
+      gurmukhi: ਬੈਂਤ ੧-੬
+      english: Baits 1-6
+    pdf_pages:
+    - 288
+    - 290
+    work: nand-lal/baits
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30063
+      similarity_range:
+      - 0.86
+      - 0.96
+    variants_observed: '''ਦਿਲਿ ਮਜ਼ਲੂਮ ਮਾ ਬ-ਸੂਏ ਖ਼ੁਦਾਸ੍ਤ'' (scan) vs ''ਦਿਲਿ ਮਜ਼ਲੂਮਿ ਮਨ ਬਸੂਇ ਖ਼ੁਦਾ ਸਤ'' (BaniDB).
+      Note the different pronoun, ਮਾ vs ਮਨ.'
+  - title:
+      gurmukhi: ਅਜ਼ ਸਲਤਨਤਿ ਦਹੱਮ (ਗੰਜ-ਨਾਮਾ)
+      english: 'From Ganj Nama: Sultanat-e-Dahm (verses 105 ff., ''ਨਾਸਰੋ ਮਨਸੂਰ ਗੁਰ ਗੋਬਿੰਦ ਸਿੰਘ'')'
+    pdf_pages:
+    - 291
+    - 297
+    work: nand-lal/ganj-nama
+    banidb:
+      status: online
+      source: N
+      shabad_ids:
+      - 30080
+      similarity_range:
+      - 0.91
+      - 1.0
+    variants_observed: '''ਨਾਸਰੋ ਮਨਸੂਰ ਗੁਰ'' (scan) vs ''ਨਾਸਿਰੋ ਮਨਸੂਰ ਗੁਰੁ'' (BaniDB).'
+  notes: 'Correction to the hint: this is not a historical text. It is a steek of Bhai Nand Lal''s Persian poetry
+    (gurbani tier, BaniDB source N), so it is a witness. It is a scholarly edition worth comparing, with consistent
+    nuqta use. The scan is a clean book scan carrying a 2010 ''PrabhjotSingh'' digital-signature stamp on p1 and
+    a library stamp on the title page. There is no text layer (the ''latin'' guess came only from the signature).
+    PDF p298 is the back cover. The commentary is in copyright.'
+- batch: Historical and philosophical literature
+  file: ਸੰਖਾਪ ਬਿਬੇਕ ਗ੍ਰੰਥ.pdf
+  drive_id: 1CJ4TRjjIXIr46zmTqf6TBn_KHGMFccmS
+  sha256_12: 125b0aac9541
+  pages: 79
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਸੰਖੇਪ ਬਿਬੇਕ (ਅਥ ਸੰਖੇਪ ਵਿਵੇਕ ਲਿਖ੍ਯਤੇ)
+    english: Sankhep Bibek (Concise Discrimination)
+  author: unknown. The verses carry the chhap 'ਕਹੇ ਜਗਦੀਸ਼ ਹਰੀ', so the verse author may be the same Jagdish named
+    as reviser, but this is unconfirmed
+  editor_or_commentator: Sri Man Sant Jagdish Singh ji 'Chida Kashi', Amritsar (ਅਤਿ ਪਰਿਸ਼੍ਰਮ ਦ੍ਵਾਰਾ ਸੋਧਕੇ)
+  publisher: printed at Sardar Budh Singh's 'Sri Gurmat Press', Amritsar; printer Giani Mahinder Singh 'Ratan';
+    published with sangat contributions
+  year: unknown (no date found on the cover or colophon)
+  languages:
+  - sadhukari
+  - braj
+  - punjabi
+  content_type: text
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਅਥ ਸੰਖੇਪ ਵਿਵੇਕ ਲਿਖ੍ਯਤੇ ... ਇਤੀ
+      english: Full text
+    pdf_pages:
+    - 2
+    - 78
+    work: vedanta/sankhep-bibek
+    banidb:
+      status: not_found
+    notes: 'Opens with doha and kabit verses, then mostly prose catechism (''ਪ੍ਰਸ਼ਨ – ... ਉੱਤਰ – ...'') on Advaita
+      Vedanta (the four anubandh: adhikari, sambandh, vishay, prayojan; Brahm, agyan, maya). It closes with numbered
+      kabits and ''ਇਤੀ'' on PDF p78. Printed page = PDF page - 1. PDF p79 is the colophon.'
+  notes: This is a phone (CamScanner) capture of a small pamphlet. Pages are tilted, with a coloured background
+    and shadows. There are heavy handwritten pen annotations in the margins and between lines (study notes and underlining)
+    on many pages, which will interfere with OCR, and the camera image is somewhat soft. Like Vichar Sagar, it is
+    Nirmala/Vedanta literature rather than Sikh history, and is better labelled as philosophical literature in the
+    Sikh scholarly tradition. No online source found, so it is an ingest candidate, but low priority given the image
+    quality. The 'ਸੰਖਾਪ' in the filename is a misspelling of ਸੰਖੇਪ. Giani Mahinder Singh 'Ratan' (the printer here)
+    is also the reviser of Gur Shabad Sidhi in this batch.
+- batch: Historical and philosophical literature
+  file: Sir Gur Sobha - Sainapati.pdf
+  drive_id: 14ER61YCHhfk9bknSd8-wJDx44yVTTCFN
+  sha256_12: a50ec8938fe4
+  pages: 432
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਸ੍ਰੀ ਗੁਰ ਸੋਭਾ
+    english: Sri Gur Sobha
+  author: Sainapati (Kavi Sainapat), 1711
+  editor_or_commentator: Prof. Kulwant Singh (English translation, roman transliteration, chapter summaries and
+    notes). Gurmukhi base text is S.S. Ashok's edition (Sikh History Research Board, SGPC, 1st ed. 1967, from SRL
+    MSS 3915 and 446)
+  publisher: Institute of Sikh Studies, Chandigarh
+  year: 2014 CE / 546 Nanakshahi (ISBN 81-85815-35-6)
+  languages:
+  - braj
+  - english
+  content_type: text+translation
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ''
+      english: Foreword, preface, introduction
+    pdf_pages:
+    - 1
+    - 44
+    work: front-matter
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਸ੍ਰੀ ਗੁਰ ਸੋਭਾ ਗ੍ਰੰਥ ਲਿਖ੍ਯਤੇ — ਅਧਿਆਇ ੧-੨੦
+      english: Chapters I-XX (Origin of the Khalsa Panth ... A Poetic Tribute to the Glorious Guru)
+    pdf_pages:
+    - 45
+    - 421
+    work: sainapati/sri-gur-sobha
+    banidb:
+      status: not_found
+    notes: 'Printed page = PDF page - 44 (printed 1 = PDF 45). Each stanza appears in Gurmukhi, then roman transliteration,
+      then free-verse English. Notes follow each chapter. Chapter starts (printed): I 1, II 17, III 41, IV 49, V
+      56, VI 90, VII 112, VIII 125, IX 145, X 163, XI 175, XII 196, XIII 228, XIV 250, XV 277, XVI 285, XVII 301,
+      XVIII 311, XIX 333, XX 341. Stanza numbering is double (e.g. ||31||147||: stanza in chapter, then running
+      total).'
+  - title:
+      gurmukhi: ''
+      english: Index, chronology, bibliography
+    pdf_pages:
+    - 422
+    - 432
+    work: back-matter
+    banidb:
+      status: not_checked
+  notes: 'Born-digital PageMaker export with a real text layer. The Gurmukhi is in the Asees/Joy legacy fonts (Asees
+    mapping, e.g. '';?Bk f;zx'' = ਸੈਨਾ ਸਿੰਘ), which legacy2uni (GurbaniAkhar mapping) does NOT convert correctly.
+    An Asees/DrChatrik-to-Unicode mapping is needed, but once that exists the whole Gurmukhi text should be extractable
+    without OCR. The roman transliteration and English are plain text. This is the highest-value item in the batch
+    for the historical tier: the earliest Gurbilas text, with a scholarly-edition base (Ashok 1967) that is not
+    online. Ingest the Gurmukhi verse as canonical, citing Ashok''s edition via this volume. The English translation
+    is in copyright (IOSS 2014), so use it only as a reference gloss. Cross-check of four lines from chapter 1:
+    not_found.'
+- batch: Reference material and unnamed files
+  file: 5_6147714525618503752.pdf
+  drive_id: 1kv7Ew4x7NH-nKOMWeVcd8VQ7Skw_mXn0
+  sha256_12: 2843d374dd2d
+  pages: 1118
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: 'ਸੰਪੂਰਨ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ [ਸ੍ਰੀ ਮੰਗਲਾ ਚਰਨ ਜੀ] ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦'
+    english: Sampooran Sri Sarbloh Granth Sahib Ji (Sri Manglacharan Ji)
+  author: attributed on the title page to Guru Gobind Singh (Sri Mukhvak Patshahi 10)
+  publisher: Singh Sahib Baba Santa Singh Ji, Jathedar 96 Crori, Budha Dal Panjvan Takht; printed at Budha Dal Panjvan
+    Takht Printing Press, Guru ka Bagh, Sri Anandpur Sahib (Ropar)
+  year: unknown (no date found on title or imprint pages)
+  languages:
+  - braj
+  content_type: text
+  tier: gurbani
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: 'ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ: ਮੰਗਲਾਚਰਨ ਅਧਿਆਇ ੧-੪'
+      english: Sarbloh Granth, Manglacharan adhiaye 1-4 (volume 1)
+    pdf_pages:
+    - 47
+    - 382
+    work: sarbloh/adhiaye-1-4
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0
+      - 0
+    notes: PDF 1-4 blank or stained endpapers, 5 title page, 7-8 chhand index (adhiaye 1-4), 9-10 raag index, 11-22
+      first-line index for adhiaye 1, 23-46 first-line index for adhiaye 2-4 (about 1575 padas). Text starts PDF
+      47 = printed 1 (offset +46) with 'ਉਸਤਤਿ ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ' and ends PDF 382 = printed 336. PDF 384 is the
+      printer's imprint; 385-387 are blank.
+  - title:
+      gurmukhi: 'ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ: ਮੰਗਲਾਚਰਨ ਅਧਿਆਇ ੫ (ਭਾਗ ਤੀਜਾ)'
+      english: Sarbloh Granth, adhiaye 5 (second bound volume; index headed 'bhaag teeja')
+    pdf_pages:
+    - 419
+    - 1112
+    work: sarbloh/adhiaye-5
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0
+      - 0
+    notes: 'A second volume is bound into the same PDF: 388 dark cover, 389 cover, 393 title page (same title; this
+      one says ''ਮੂਲ ਬਾਣੀ ਅਤੇ ਸਟੀਕ ਦੇ ਸਭ ਹੱਕ ਰਾਖਵੇਂ''), 394-418 first-line index. PDF 395 looks like a stray last
+      page of the volume-1 index (padas 1532-1575, up to printed p.336). Text starts PDF 419 = printed 337, headed
+      ''ਪੰਜਵਾਂ ਅਧਿਆਇ / ਅਥ ਦੁਰਦਸਾ ਦੇਵਗਨਾਨਿ ਸਮਰ ਹਾਰ ਕਥਤੇ''. It ends PDF 1112 = printed 1028 (offset drifts from +82
+      to +84). The last page closes with ''ਇਤਿ ਕਬਿ ਬਿਨਯ ਧ੍ਯਾਯ ॥੧॥'' and a short ''ਅਥ ਸ੍ਰੀ ਭਾਗਵਤ ਮਹਾਤ...ਇਤਿ ਸ੍ਰੀ
+      ਭਾਗਵਤ ਮਹਾਤਮੇ ਕ੍ਰਿਸਨਾਵਤਾਰ'' piece, so check where the Sarbloh proper ends before ingesting. PDF 1114 is the
+      imprint and 1118 the back cover.'
+  notes: 'The filename is meaningless. This is a two-volume Budha Dal edition of the complete Sarbloh Granth, digitized
+    by the Panjab Digital Library (footer on every page), with ownership stamps from the library of Dr. Trilochan
+    Singh / Anurag Singh. BaniDB has no Sarbloh source, so both cross-checks (4 lines from the opening of each volume,
+    plus closing lines) returned not_found. Text only, no steek. The printed pagination runs across both volumes
+    (1-1028), and the verse numbering is running as well (e.g. ॥੧੦੪॥੧॥੨੩੨੦॥). Some pages have bleed-through or speckle,
+    and pages 1-4 and 1115-1117 are blank or stained. This is a strong ingest candidate: the scan would become the
+    canonical Sarbloh text.'
+- batch: Reference material and unnamed files
+  file: BK-000934.pdf
+  drive_id: 1wtt5u7ypC3PwDA-kzosOiNhMVQG774lG
+  sha256_12: d39f73132bef
+  pages: 542
+  text_layer: ocr-garbled
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਉੱਥਾਨਕਾ ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ ਕੀ
+    english: Uthanka Sri Guru Granth Sahib Ji Ki (the occasions/contexts of the shabads of SGGS)
+  author: Traditional (the book presents it as a tradition from Bhai Gurdas at Guru Arjan's instruction, received
+    through Giani Sant Singh of Amritsar)
+  editor_or_commentator: compiled by Mahant Sadhu Singh of Patiala state; brought out through Sant Gulab Singh;
+    printed at the expense of Sardar Buta Singh, Rai Bahadur, of Rawalpindi
+  publisher: Sri Akal Press, Lahore
+  year: 'Poh Sammat 1955 (Bikrami) = c. Dec 1898/Jan 1899 CE; also printed ''ਸੰਮਤ ਨਾ: ੪੩੦'' (Nanakshahi 430); 1000
+    copies'
+  languages:
+  - punjabi
+  - sadh-bhasha
+  content_type: commentary-only
+  tier: historical
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਅਥ ਉਥਾਨਕਾ ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ ਕੀ
+      english: Uthanka for each shabad, from Japji to Raagmala
+    pdf_pages:
+    - 2
+    - 541
+    work: historical/uthanka-sggs-sadhu-singh
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0
+      - 0
+    notes: For every shabad, ashtapadi, chhand, slok, pauri and Bavan Akhri it gives a short 'ਪ੍ਰਸਨ ਉਤਰ' paragraph
+      (where the Guru was, who came, and why the shabad was uttered), followed by only the shabad's first line (pratik)
+      and number, e.g. 'ਜੋਤਿ ਨ ਕੀਆ ਸੋ ਸਚੁ ਥੀਆ ॥੨੦॥'. The full shabad text is not given. Printed page = PDF page
+      - 1. The cross-check used the author's opening dohra ('ਤੀਨੋਂ ਲੋਕਨ ਪਤਿ ਪ੍ਰਭੂ ਪ੍ਰਗਟ...') and found nothing.
+      PDF 542 is an advertisement (ਇਸ਼ਤਿਹਾਰ) giving the book's provenance and where to buy it.
+  notes: The filename is meaningless (it looks like a library accession number). This is the 1898 Lahore print of
+    the SGGS Uthanka, digitized by the Panjab Digital Library. The ABBYY text layer is garbage (Latin noise from
+    OCR run on Gurmukhi), so the book needs fresh OCR. It does not contain scripture text, but its shabad-to-occasion
+    links could be keyed to SGGS shabad IDs through the pratiks. That makes it a historical/commentary layer, not
+    corpus for word counts.
+- batch: Reference material and unnamed files
+  file: Roop deep pingall.pdf
+  drive_id: 1L4SZSRMn-DdjvheTYdojvleWRfe0XC-w
+  sha256_12: 26ece5a55d71
+  pages: 30
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਰੂਪਦੀਪ ਪਿੰਗਲ
+    english: Roopdeep Pingal
+  author: Jaikrishan (Jai Kishan) Das Kavi
+  editor_or_commentator: Bhai Kahn Singh Nabha (editor, with footnotes)
+  publisher: Publication Bureau, Punjabi University, Patiala
+  year: unknown (imprint page not photographed)
+  languages:
+  - braj
+  - punjabi
+  content_type: prosody
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਰੂਪਦੀਪ ਪਿੰਗਲ (ਮੂਲ)
+      english: 'Main text: laghu/guru, ganas, and 52 chhands'
+    pdf_pages:
+    - 2
+    - 21
+    work: reference/roopdeep-pingal
+    banidb:
+      status: not_checked
+    notes: 'Dohra-form verse treatise. It starts with laghu/guru rules, then ganas, then ''ਅਥ ਬਾਵਨ (੫੨) ਛੰਦ ਨਾਮ'':
+      definitions of 52 chhands (e.g. ਸਾਰਦੀ, ਤੋਮਰ, ਕੁੰਡਲੀਆ, ਦੋਹਾ, ਸੋਰਠਾ, ਚੌਪਈ, ਭੁਜੰਗ ਪ੍ਰਯਾਤ...). Each gives a matra
+      count, a pause (ਬਿਸ੍ਰਾਮ), a laghu-guru pattern in I/S notation, and an example verse. Kahn Singh''s Punjabi
+      footnotes are on each page.'
+  - title:
+      gurmukhi: ਅੰਤਿਕਾ
+      english: 'Editor''s appendix: prose chhand definitions'
+    pdf_pages:
+    - 22
+    - 28
+    work: reference/roopdeep-pingal
+    banidb:
+      status: not_checked
+  notes: These are phone photos of a printed book, taken in landscape with variable lighting and some at an angle.
+    PDF 1 is a 'ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖਾਲਸਾ' greeting graphic, PDF 29 a portrait of Guru Gobind Singh, and PDF 30 the front
+    cover (photographed last). Completeness was not verified page by page, but the 52 chhands and the appendix appear
+    to be present. Useful for chhand metadata (matra/gana patterns of chhands used in Dasam Granth and Sarbloh).
+- batch: Reference material and unnamed files
+  file: Gurbani-Sangeet-Prachin-Reet-Ratnavali-Part-1.pdf
+  drive_id: 12fmPz9lEbSSxYH1FtoHLBU3O77o5h780
+  sha256_12: 4b669dd8f370
+  pages: 44
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਗੁਰਬਾਣੀ ਸੰਗੀਤ ਪ੍ਰਾਚੀਨ ਰੀਤ ਰਤਨਾਵਲੀ (ਭਾਗ ਪਹਿਲਾ) ਅਰਥਾਤ ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ ਦੇ ਰਾਗਾਂ ਦੀਆਂ ਪੁਰਾਤਨ
+      ਕੀਰਤਨੀ ਰੀਤਾਂ
+    english: Gurbani Sangeet Prachin Reet Ratnavali, Part 1
+  author: Bhai Avtar Singh and Bhai Gurcharan Singh, Hazuri Ragis, Gurdwara Sis Ganj Sahib, Delhi
+  publisher: Publication Bureau, Punjabi University, Patiala (Sri Guru Granth Sahib Adhiain Vibhag); ISBN 81-7380-092-8
+  year: 1995 (third printing, 1100 copies)
+  languages:
+  - punjabi
+  content_type: music-notation
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਮੁਖਬੰਧ, ਭੂਮਿਕਾ
+      english: 'Front matter: messages, preface, introduction'
+    pdf_pages:
+    - 1
+    - 25
+    work: reference/reet-ratnavali
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਸੁਰ ਲਿਪੀ ਤੇ ਚਿੰਨ੍ਹ, ਤਾਲ ਅਧਿਆਇ
+      english: 'Notation key and taal chapter (thekas: Sim taal, Vishnu taal, Jhap taal, Sul phak, Mat taal, Tilwara...)'
+    pdf_pages:
+    - 26
+    - 31
+    work: reference/reet-ratnavali
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਤਤਕਰਾ
+      english: Table of contents for Part 1 (printed pp. 1-~450)
+    pdf_pages:
+    - 32
+    - 43
+    work: reference/reet-ratnavali
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 4819
+      - 408
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: 'Two TOC first lines were checked and both are SGGS: ''ਗੁਨ ਨਾਦ ਧੁਨਿ ਅਨੰਦ ਬੇਦ'' (ang 1322, Kalyan) and
+      ''ਸੀਹਾ ਬਾਜਾ ਚਰਗਾ ਕੁਹੀਆ...'' (ang 144, Majh var). The Kalyan shabad is listed under Sri Raag Purbi ang, so
+      the raag a reet is set in can differ from the shabad''s SGGS raag heading.'
+  notes: 'This PDF is only a preview: front matter, the notation and taal keys, and the TOC. The actual notations
+    of Part 1 (Sri Raag through roughly Gauri/Asa, printed pp. 1-~455) are NOT included. PDF 44 is a vendor''s ''requisition
+    form'' advert. In the TOC, every item gives the shabad''s first line, raag and raag-ang (e.g. ਸ੍ਰੀ ਰਾਗ ਪੂਰਬੀ
+    ਅੰਗ, ਸ੍ਰੀ ਰਾਗ ਕਾਫੀ ਅੰਗ, ਮਾਝ ਕਾਫੀ ਅੰਗ, ਮਾਝ ਖਮਾਜ ਅੰਗ), taal (ਚਾਰਤਾਲ, ਤਿੰਨਤਾਲ, ਝਪਤਾਲ, ਰੂਪਕ, ਧਮਾਰ, ਸੂਲਫਾਕ, ਪੰਜਤਾਲ
+    ਅਸਵਾਰੀ...) and page.'
+- batch: Reference material and unnamed files
+  file: Gurbani-Sangeet-Prachin-Reet-Ratnavali-Part-2.pdf
+  drive_id: 1TortCGjhctE3XHivhAFkkCKlaZj6Ft0q
+  sha256_12: 1b664b18ca63
+  pages: 518
+  text_layer: none
+  scan_quality: clean-scan
+  title:
+    gurmukhi: ਗੁਰਬਾਣੀ ਸੰਗੀਤ ਪ੍ਰਾਚੀਨ ਰੀਤ ਰਤਨਾਵਲੀ (ਭਾਗ ਦੂਜਾ)
+    english: Gurbani Sangeet Prachin Reet Ratnavali, Part 2
+  author: Bhai Avtar Singh and Bhai Gurcharan Singh, Hazuri Ragis, Gurdwara Sis Ganj Sahib, Delhi
+  publisher: Publication Bureau, Punjabi University, Patiala
+  year: unknown for this volume (no imprint page in the scan)
+  languages:
+  - punjabi
+  content_type: music-notation
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਤਤਕਰਾ
+      english: Table of contents
+    pdf_pages:
+    - 4
+    - 16
+    work: reference/reet-ratnavali
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਰਾਗ ਸੂਹੀ ... ਰਾਗ ਜੈਜਾਵੰਤੀ
+      english: Shabad reets with sargam notation, Raag Suhi through Jaijavanti
+    pdf_pages:
+    - 17
+    - 480
+    work: reference/reet-ratnavali
+    banidb:
+      status: online
+      source: G
+      shabad_ids:
+      - 2816
+      similarity_range:
+      - 1.0
+      - 1.0
+    notes: 'The layout for each reet is: a heading with raag, mahala and SGGS ang (''ਸੂਹੀ ਮਹਲਾ ੫, ਪੰਨਾ ੭੩੯''), then
+      the full shabad text, then the taal name and a full sargam notation grid with the bols underlaid. The cross-checked
+      Suhi M5 shabad ''ਲਾਲਨੁ ਰਾਵਿਆ ਕਵਨ ਗਤੀ ਰੀ'' matched BaniDB exactly (4/4 lines, similarity 1.0). The section
+      end page is approximate.'
+  - title:
+      gurmukhi: ਧੁਨੀਆਂ ਤੇ ਪਉੜੀਆਂ; ਲਾਵਾਂ
+      english: Var dhunis and pauris (19 vars) and Laavan
+    pdf_pages:
+    - 481
+    - 518
+    work: reference/reet-ratnavali
+    banidb:
+      status: not_checked
+    notes: The vars are tagged by name (e.g. ਆਸਾ ਦੀ ਵਾਰ, ਸੂਹੀ ਕੀ ਵਾਰ...). The shudhi patar (errata, printed p.989)
+      listed in the TOC is not in the scan.
+  notes: 'This is the full Part 2 (printed pp. 456-~984), downloaded from sikhbookclub.com (watermark on every page).
+    The printed-vs-PDF offset drifts from +438 (PDF 18 = p.456) to about +469 (PDF 510 = p.979), so roughly 30 printed
+    pages, probably blanks, are absent. It ends mid-notation at printed p.984. Every shabad is tagged with raag,
+    raag-ang sub-variety (e.g. ਸੂਹੀ ਪ੍ਰਭਾਤੀ, ਸੂਹੀ ਆਸਾ, ਸੂਹੀ ਲਲਿਤ, ਜੈਜਾਵੰਤੀ ਪੁਰਾਤਨ ਅੰਗ), taal and SGGS page. All
+    items sampled are from SGGS: no Dasam or Bhai Gurdas items were seen in the TOC. Because the full shabad text
+    is printed, this could serve as a minor SGGS witness, but its main value is as raag/taal metadata keyed to shabads.'
+- batch: Reference material and unnamed files
+  file: The Path to Learning Gurbani Pronunciation.pdf
+  drive_id: 1aSJRugWCpgoREKWwuVIJO7RqOCzC-fPf
+  sha256_12: 7abb0277ca1c
+  pages: 2
+  text_layer: english
+  scan_quality: typeset-digital
+  title:
+    english: The Path to Learning Gurbānī Pronunciation (Panthak Sampradāī Gurabāṇī Uchāraṇ Bodh)
+  author: Vidiā Gurū Gianī Gurwinder Singh Nangalī, Ustād Gurmat Vidiālā, Chabbā, Nangalī
+  editor_or_commentator: 'Translator: Bhaī Shrī Himmat Singh Khalsā Nihang Singh, student of Sarbloh Bunga Nangali'
+  languages:
+  - english
+  content_type: santhiya-guide
+  tier: reference
+  decision: reference-only
+  notes: Only a title page and an acknowledgement page exist; there is no instructional content. It is the front
+    matter of a draft English translation of the Punjabi book in this batch (ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ, drive_id
+    1FjLQwL8vI4ZWbsDZN91zrfdYlzuBN-bX). The same macOS producer and date as Lesson 1 and Lesson 2 suggest they belong
+    to the same translation project.
+- batch: Reference material and unnamed files
+  file: Lesson 1 Varags.pdf
+  drive_id: 16Kn7SvHmcqX42McAi6LfiozzP6VxJ9f9
+  sha256_12: 6c234ea36d26
+  pages: 2
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਪੈਂਤੀ ਅੱਖਰੀ / ਵਰਗ
+    english: 'Lesson 1: Varags (the 35 letters of Gurmukhi)'
+  author: unknown (no byline; probably the same English translation project as 'The Path to Learning Gurbani Pronunciation')
+  languages:
+  - english
+  - punjabi
+  content_type: lesson
+  tier: reference
+  decision: reference-only
+  notes: English with Gurmukhi in the GurbaniAkhar legacy font (converts with legacy2uni) and IAST-style transliteration.
+    It covers the 35 letters and their names, the 7 varags (pahilā, kavarag, chavarag, ṭavarag, tavarag, pavarag,
+    āḳhirī), and savarnī akkhar (homorganic sets). For each middle varag it gives the articulation point (throat,
+    palatal, retroflex, dental, bilabial), with a note not to confuse ਫ with Persian ਫ਼. Useful for the pronunciation
+    module's phonetics, with letter classes and articulation points.
+- batch: Reference material and unnamed files
+  file: Lesson 2 Gurmukhi Lippi.pdf
+  drive_id: 18qu0CINNqgBNIz6pXyi_8BoiU8TAPwE5
+  sha256_12: 9abd9cde21d5
+  pages: 1
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਗੁਰਮੁਖੀ ਲਿੱਪੀ
+    english: 'Lesson 2: Gurmukhi Lippi'
+  author: unknown (no byline; same series as Lesson 1)
+  languages:
+  - english
+  - punjabi
+  content_type: lesson
+  tier: reference
+  decision: reference-only
+  notes: One page of English prose with GurbaniAkhar Gurmukhi. It covers the history and organisation of the script
+    (Guru Nanak / Guru Angad, the takhsal at Khadur Sahib), the 3 vowel carriers (savar) versus the 32 vianjan,
+    and the inherent 'mukatā' a-sound after a consonant (with exceptions said to come 'later'). It also explains
+    the mool mantar being encoded in the script order (ੳ as first vowel, ਸ as first consonant). It is introductory
+    and has few concrete pronunciation rules.
+- batch: Reference material and unnamed files
+  file: PHOTO-2019-05-01-14-54-51.pdf
+  drive_id: 1ny46sP9uRj6qkAF6HIDwnhPMldhGezR9
+  sha256_12: d5da62bb7da6
+  pages: 1
+  text_layer: none
+  content_type: other
+  tier: reference
+  decision: skip
+  notes: Personal document (a private letter), not a text. Not transcribed.
+- batch: Reference material and unnamed files
+  file: Doc21.pdf
+  drive_id: 1Of7jbUTpHErFkoXmR9WKtnErTAUCewWM
+  sha256_12: 668e15c243b4
+  pages: 1
+  text_layer: mixed
+  scan_quality: typeset-digital
+  title:
+    gurmukhi: ਬ੍ਰਹਮ ਕਵਚ
+    english: Braham Kavach
+  author: unknown; the closing dohra reads 'ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ' (attributing it to Guru Hargobind)
+  languages:
+  - braj
+  - english
+  content_type: text+translation
+  tier: gurbani
+  decision: ingest-candidate
+  sections:
+  - title:
+      gurmukhi: ਬ੍ਰਹਮ ਕਵਚ
+      english: Braham Kavach (11 lines + 2-line dohra)
+    pdf_pages:
+    - 1
+    - 1
+    work: misc/braham-kavach
+    banidb:
+      status: not_found
+      similarity_range:
+      - 0
+      - 0
+    notes: It opens 'ਖੜਗ ਖੰਡਾ ਅਸੀ ਅਰਿਗਰ ਧਰਮ ਰੱਛ ਤੱਗ ਛੱਤ੍ਰੀ ॥' and closes 'ਫ਼ਤਿਹ ਪਾਉ ਮੈਦਾਨ ਮੈਂ ਪਕੜ ਹਾਥ ਸ਼ਮਸ਼ੀਰ॥'.
+      Four lines were checked and none matched any BaniDB source (including R and A).
+  notes: 'A Word document (2018): Gurmukhi text, then roman transliteration, a loose English rendering and a note
+    on the term. The Unicode text layer is partly broken (Gurmukhi Sangam MN glyph mapping: e.g. ਛ.1ੀ for ਛੱਤ੍ਰੀ),
+    so transcribe from the page image. Provenance is unknown and there is no edition or source citation; the tier
+    is provisional (treated as gurbani because the text attributes itself to a Guru). It is a single short piece,
+    so it fits best as a small ingest candidate or an entry in a Nihang-banis collection, once a printed source
+    is found to verify the readings.'
+- batch: Reference material and unnamed files
+  file: ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf
+  drive_id: 1FjLQwL8vI4ZWbsDZN91zrfdYlzuBN-bX
+  sha256_12: 3fe7165a0e79
+  pages: 78
+  text_layer: none
+  scan_quality: fair-scan
+  title:
+    gurmukhi: ਪੰਥਕ ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉੱਚਾਰਣ ਬੋਧ (ਭਾਗ ਪਹਿਲਾ)
+    english: Panthak Sampradai Gurbani Uchaaran Bodh, Part 1
+  author: Giani Gurwinder Singh Nangali (Ustad, Gurmat Vidyala Chabba, Nangali; Miri Piri Academy, Chheharta)
+  editor_or_commentator: 'Scribe: Giani Gagandeep Singh; editors: Giani Mahitab Singh Bhamboi, Giani Tarlochan Singh
+    Mahant (head granthi, Misl Shaheedan Tarna Dal, Baba Bakala)'
+  publisher: Singh Sahib Jathedar Baba Gajjan Singh Ji, 15th Jathedar, Sri Misl Shaheedan Tarna Dal, Baba Bakala
+    Sahib
+  year: unknown (not read; the imprint page, PDF 4, is faint)
+  languages:
+  - punjabi
+  content_type: santhiya-guide
+  tier: reference
+  decision: reference-only
+  sections:
+  - title:
+      gurmukhi: ਸੰਦੇਸ਼, ਸਨੇਹ ਅੱਖਰ, ਹਦਾਇਤਾਂ
+      english: Messages and teaching instructions
+    pdf_pages:
+    - 7
+    - 16
+    work: reference/uchaaran-bodh-nangali
+    banidb:
+      status: not_checked
+  - title:
+      gurmukhi: ਗੁਰਮੁਖੀ ਵਰਣਮਾਲਾ; ਸਕੰਧ ੧-੨੪
+      english: Alphabet and 24 skandhs (lessons) on pronunciation
+    pdf_pages:
+    - 17
+    - 54
+    work: reference/uchaaran-bodh-nangali
+    banidb:
+      status: not_checked
+    notes: Single-page scans up to about PDF 21, then photographed two-page spreads (printed page = 2 per PDF page
+      from here).
+  - title:
+      gurmukhi: ਇਕੋਤ੍ਰੀ ਸੰਪੂਰਨ ਪ੍ਰਸ਼ਨੋਤ੍ਰੀ; ਪੁਰਾਤਨ ਨਿਹੰਗ ਸਿੰਘਾਂ ਦੇ ਬੋਲੇ; ਜੀਵਨ ਬਿਉਰੇ
+      english: 101-question Q&A on Sikh numerical lists, Nihang bole, short biographies (Panj Pyare, Sahibzade,
+        Bhagats)
+    pdf_pages:
+    - 55
+    - 73
+    work: reference/uchaaran-bodh-nangali
+    banidb:
+      status: not_checked
+  notes: 'CamScanner and phone photos of a printed book. Front pages are clean; the middle and back are photographed
+    spreads with uneven light, mostly legible. PDF 74-78 are colour photo pages (school activities/adverts). The
+    rules relevant to the pronunciation module include: (1) varag and savarna classification, and muharni drills
+    for every letter with all lagaan-matras, including the Persian pair-bindi letters (ਸ਼ ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਲ਼); (2) a
+    bindi and tippi muharni, plus the tippi rule that tippi before a consonant takes the nasal of that consonant''s
+    varag (ਙ/ਞ/ਣ/ਨ/ਮ; e.g. ਸੰਗ, ਟੰਟਾ, ਤੰਤੁ, ਪੰਪਾ), with special cases before ਹ, ਯ, ਰ, ਲ, ਵ, ੜ; (3) graded word lists
+    for bindi (ੈਂ/ਾਂ etc.) by 2-, 3- and 4-letter words; (4) halant (੍) at the foot of a letter in SGGS: sampardai
+    view vs Sanskrit view (e.g. ਆਪੀਨ੍ਹੈ), with word lists for pair-halant + ਹ; (5) sanyukt (pair) yayya, with 12
+    forms and their uchaaran (ਗ੍ਯਾਨ→ਗਿਆਨ, ਜਸ੍ਯ→ਜਸਿਅ, ਮ੍ਰਿਤ੍ਯੁ→ਮ੍ਰਿਤਿਉ...); (6) dulaavan/hora vs savaiya pronunciation
+    of words like ਕੈਸਾ→ਕਈਸਾ, ਪੈਸਾ→ਪਈਸਾ. No sihari/aunkar ending rules or vishraam tables were seen in the pages
+    sampled, but skandhs 3-16 were not all read. An English translation project of this book exists in this batch
+    (''The Path to Learning Gurbani Pronunciation'', front matter only).'
