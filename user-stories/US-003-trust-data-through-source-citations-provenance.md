@@ -3,8 +3,8 @@ id: US-003
 title: Trust every datum through visible source citations/provenance
 status: delivered
 created: 2026-07-22
-updated: 2026-10-04
-linked_issues: []
+updated: 2026-10-07
+linked_issues: [125, 137]
 linked_tests: ["tests/stories/us-003.test.ts"]
 supersedes: null
 superseded_by: null
@@ -19,6 +19,9 @@ As a scholar/learner, I want each datum labeled with its source and provenance (
 - Each datum is labeled with its source and provenance.
 - Provenance distinguishes scholar-cited, rule-derived, and inference.
 - Labeling is visible to the user so authority is never assumed for an AI guess.
+  Amended 2026-10-07 (#125): public visitors see each datum's source by name and
+  the full provenance listing on the Sources tab; per-row provenance pills show
+  in curator mode (`?key=ADMIN_KEY`).
 
 ## Evidence
 
@@ -55,3 +58,14 @@ every grammar value shown is read from a named source, and a value no source
 states is left blank. The dashed "Unverified rule — our inference" treatment
 was removed with the readings it marked. The scholar-cited vs rule-derived vs
 inference distinction still applies elsewhere (etymology lookups, IPA).
+
+## Addendum (2026-10-07)
+
+Per-row provenance pills, the unverified-spelling badges and the methodology
+paragraphs moved behind curator mode (#125) to declutter public word pages;
+the Sources tab keeps every pill publicly and each definition group still
+names its source. This is acceptable only because of a stricter direction
+recorded in #137: for now nothing AI- or rule-derived should appear on an
+entry at all — every datum sourced and independently verified — so the pills
+should rarely carry an "inference" signal a reader needs. Until #137's audit
+lands (IPA and etymology lookups are still derived), this is a known gap.

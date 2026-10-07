@@ -3,7 +3,7 @@ id: US-006
 title: Flag errors and monitor data quality (curation + admin)
 status: active
 created: 2026-07-22
-updated: 2026-09-01
+updated: 2026-10-07
 linked_issues: [2]
 linked_tests: ["tests/stories/us-006.test.ts"]
 supersedes: null
@@ -45,3 +45,10 @@ Stays partial:
   volume; still 0 organic flags — all 6,130 open flags are our own auto-flag
   measurement pass, 89% resting on the two #21 rules).
 - Manual annotations ingest (#2) remains a stub.
+
+## Addendum (2026-10-07)
+
+Public word pages now offer one word-level "Report an error in this entry"
+link (a flag with no target row); the per-row flag forms on definitions,
+grammar and etymology show in curator mode (`?key=ADMIN_KEY`, #125), which
+also links the flag queue and /health. The footer no longer links /health.

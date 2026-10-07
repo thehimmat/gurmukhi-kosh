@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { withCuratorKey } from '@/lib/curator';
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -14,9 +15,11 @@ const TABS = [
 interface TabNavProps {
   gurmukhi: string;
   currentTab?: string;
+  /** Set in curator mode so switching tabs keeps it (#125). */
+  curatorKey?: string | null;
 }
 
-export function TabNav({ gurmukhi, currentTab = 'overview' }: TabNavProps) {
+export function TabNav({ gurmukhi, currentTab = 'overview', curatorKey = null }: TabNavProps) {
   return (
     <nav
       style={{
@@ -29,7 +32,7 @@ export function TabNav({ gurmukhi, currentTab = 'overview' }: TabNavProps) {
     >
       {TABS.map((tab) => {
         const isActive = currentTab === tab.id;
-        const href = `/word/${encodeURIComponent(gurmukhi)}?tab=${tab.id}`;
+        const href = withCuratorKey(`/word/${encodeURIComponent(gurmukhi)}?tab=${tab.id}`, curatorKey);
         return (
           <Link
             key={tab.id}
