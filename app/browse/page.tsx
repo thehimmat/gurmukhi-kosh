@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
 import type { Metadata } from "next";
+import { pageTitle } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Browse — Gurmukhi Kosh",
+  title: pageTitle("Browse"),
 };
 
 export default async function BrowsePage({

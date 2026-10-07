@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
+import { pageTitle } from "@/lib/site";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { gurmukhi } = await params;
   const word = decodeURIComponent(gurmukhi);
   return {
-    title: `${word} — Gurmukhi Kosh`,
+    title: pageTitle(word),
     description: `Dictionary entry for the Gurmukhi word ${word} as found in Sri Guru Granth Sahib Ji and other early Sikh texts.`,
   };
 }

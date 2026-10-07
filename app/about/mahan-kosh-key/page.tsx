@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { pageTitle } from "@/lib/site";
 import type { ReactNode } from "react";
 import legendJson from "../../../pipeline/mahan-kosh/abbreviations.json";
 
 export const metadata: Metadata = {
-  title: "Mahan Kosh Key (ਸੰਕੇਤ) — Gurmukhi Kosh",
+  title: pageTitle("Mahan Kosh Key (ਸੰਕੇਤ)"),
   description:
     "A plain-English key to the shorthand inside Mahan Kosh entries: part-of-speech markers, language markers, citation abbreviations, and letter signs, with the original Gurmukhi and the provenance of every reading.",
 };

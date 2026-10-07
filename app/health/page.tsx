@@ -1,12 +1,13 @@
 import { computeHealth, type Metric, type MetricStatus, type Row } from "@/lib/health";
 
 import type { Metadata } from "next";
+import { pageTitle, SITE_NAME_EN } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Health — Gurmukhi Kosh",
-  description: "Live data-quality and coverage stats for the Gurmukhi Kosh corpus.",
+  title: pageTitle("Health"),
+  description: `Live data-quality and coverage stats for the ${SITE_NAME_EN} corpus.`,
 };
 
 const STATUS_STYLE: Record<MetricStatus, { bg: string; fg: string }> = {
