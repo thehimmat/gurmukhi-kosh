@@ -108,16 +108,27 @@ const union = (ws: OcrWord[]) => {
   return { x, y, w: Math.max(...ws.map((w) => w.left + w.width)) - x, h: Math.max(...ws.map((w) => w.top + w.height)) - y };
 };
 
-/** Crop the whole lines a span touches (for context), and box the span itself inside the crop. */
+/**
+ * Crop the lines a span touches, and box the span itself inside the crop. With `contextX`, keep only
+ * that much of the lines either side of the span (whole lines are hard to read when scaled down).
+ */
 export function cropFor(
   words: OcrWord[],
   span: { start: number; end: number },
   page: { width: number; height: number },
   pad: number,
+  contextX?: number,
 ): { crop: Box; highlights: Box[] } {
   const spanWords = words.slice(span.start, span.end + 1);
   const lines = [...new Set(spanWords.map((w) => w.line))];
   const all = union(words.filter((w) => lines.includes(w.line)));
+  if (contextX !== undefined) {
+    const s = union(spanWords);
+    const left = Math.max(all.x, s.x - contextX);
+    const right = Math.min(all.x + all.w, s.x + s.w + contextX);
+    all.x = left;
+    all.w = right - left;
+  }
   const x = Math.max(0, all.x - pad);
   const y = Math.max(0, all.y - pad);
   const crop = { x, y, w: Math.min(page.width, all.x + all.w + pad) - x, h: Math.min(page.height, all.y + all.h + pad) - y };

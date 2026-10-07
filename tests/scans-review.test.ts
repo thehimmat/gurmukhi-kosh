@@ -51,6 +51,13 @@ describe("cropFor", () => {
     ]);
   });
 
+  it("can keep only some context either side of the span instead of whole lines", () => {
+    // span = ਸੇਲ ਗਦਾ (x 240–450); 60px of context each side → x 180–510, plus the margin
+    const c = cropFor(words, { start: 1, end: 2 }, { width: 2000, height: 3000 }, 20, 60);
+    expect(c.crop).toEqual({ x: 160, y: 180, w: 370, h: 90 });
+    expect(c.highlights).toEqual([{ x: 80, y: 20, w: 210, h: 50 }]);
+  });
+
   it("never crops past the page edge", () => {
     const c = cropFor(words, { start: 0, end: 0 }, { width: 2000, height: 3000 }, 500);
     expect(c.crop.x).toBe(0);

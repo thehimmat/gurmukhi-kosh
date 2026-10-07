@@ -139,7 +139,9 @@ function build(work: string, outDir: string) {
       key === "ce" ? { label: `PDF p. ${page}`, href: archivePageUrl(SOURCES.ce.archive, page) } : { label: `Scan p. ${page}`, href: `pages/bd-${page}.jpg` };
     if (!best) return { text: reading, ...(first ? { page: link(first) } : {}), note: "Could not place the words on the scanned page." };
     const png = render(SOURCES[key].pdf, best.page, DPI, `${renders}/${key}_${best.page}`);
-    const { crop, highlights } = cropFor(best.words, best.span, size(png), 40);
+    // A small margin: a larger one slices through the neighbouring lines.
+    // Two or three words of context either side (about 300 px at 300 dpi).
+    const { crop, highlights } = cropFor(best.words, best.span, size(png), 14, 300);
     const img = `img/${it.id}-${key}.jpg`;
     const view: WitnessView = { text: reading, image: img, highlights: cut(png, crop, highlights, 0.5, `${outDir}/${img}`), page: link(best.page) };
     if (key === "bd" && !existsSync(`${outDir}/pages/bd-${best.page}.jpg`))
@@ -169,9 +171,16 @@ function build(work: string, outDir: string) {
       // Context: about one manuscript line above and below, a little to each side.
       const padX = Math.round(width * 0.03);
       const padY = Math.round(height * 0.035);
-      const x0 = Math.max(0, Math.min(...px.map((b) => b.x)) - padX);
+      // At least 60% of the page wide, so a one-word box still shows its neighbours.
+      const minW = Math.round(width * 0.6);
+      let x0 = Math.max(0, Math.min(...px.map((b) => b.x)) - padX);
+      let x1 = Math.min(width, Math.max(...px.map((b) => b.x + b.w)) + padX);
+      if (x1 - x0 < minW) {
+        const mid = (x0 + x1) / 2;
+        x0 = Math.max(0, Math.round(mid - minW / 2));
+        x1 = Math.min(width, x0 + minW);
+      }
       const y0 = Math.max(0, Math.min(...px.map((b) => b.y)) - padY);
-      const x1 = Math.min(width, Math.max(...px.map((b) => b.x + b.w)) + padX);
       const y1 = Math.min(height, Math.max(...px.map((b) => b.y + b.h)) + padY);
       const file = `${renders}/${it.id}-ms-${pg}.png`;
       const boxes = cut(png, { x: x0, y: y0, w: x1 - x0, h: y1 - y0 }, px.map((b) => ({ ...b, x: b.x - x0, y: b.y - y0 })), 1, file);
