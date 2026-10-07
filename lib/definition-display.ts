@@ -14,3 +14,14 @@ export function secondaryGloss(def: {
   if (!en || en === def.definition_text.trim()) return null;
   return def.definition_en;
 }
+
+/**
+ * The ↗ link beside a definition source: only sources with a page per entry.
+ * A whole-book link (Shackle's publisher page) is credited on /about instead.
+ */
+export function entryLink(sourceCode: string, word: string): string | null {
+  if (sourceCode === "mahan_kosh") {
+    return `https://www.searchgurbani.com/sggs-kosh/view?Word=${encodeURIComponent(word)}`;
+  }
+  return null;
+}
