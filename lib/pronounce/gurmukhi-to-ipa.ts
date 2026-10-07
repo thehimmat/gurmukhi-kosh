@@ -20,6 +20,10 @@ const NASALS = new Set(["ਂ", "ੰ"]);
 const ADDAK = "ੱ"; // gemination mark
 const VIRAMA = "੍"; // halant / virama
 const INHERENT_VOWEL = "ə";
+// Independent vowel letters are a syllable nucleus on their own, so they never
+// take the inherent schwa a bare consonant does (#124). ਅ's own value is also
+// "ə", which is why the final-schwa drop below must not key on the string.
+const INDEPENDENT_VOWELS = new Set(["ਅ", "ਆ", "ਇ", "ਈ", "ਉ", "ਊ", "ਏ", "ਐ", "ਓ", "ਔ"]);
 
 function getIPA(char: string): string {
   return (rules.primitives as Record<string, string>)[char] ?? "";
@@ -48,6 +52,9 @@ export interface IpaOptions {
 export function gurmukhiToDisplayIPA(word: string, opts: IpaOptions = {}): string {
   const chars = [...word];
   let result = "";
+  // result.length right after an inherent schwa was appended; if nothing
+  // follows it, that schwa is the word-final one the display may drop.
+  let inherentEnd = -1;
   let i = 0;
 
   while (i < chars.length) {
@@ -103,14 +110,15 @@ export function gurmukhiToDisplayIPA(word: string, opts: IpaOptions = {}): strin
       continue;
     }
 
-    if (consonantIPA !== "") {
+    if (consonantIPA !== "" && !INDEPENDENT_VOWELS.has(ch)) {
       result += INHERENT_VOWEL;
+      inherentEnd = result.length;
     }
     i++;
   }
 
   // Drop the trailing inherent schwa for display unless explicitly requested.
-  if (!opts.finalSchwa && result.endsWith(INHERENT_VOWEL)) {
+  if (!opts.finalSchwa && inherentEnd === result.length) {
     result = result.slice(0, -INHERENT_VOWEL.length);
   }
   return result;
