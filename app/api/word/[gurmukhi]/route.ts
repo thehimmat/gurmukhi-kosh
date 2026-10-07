@@ -18,7 +18,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { fetchMorphVariants, fetchUsage, fetchWriterStats } from "@/lib/word-data";
+import { DEFINITION_COLUMNS, fetchMorphVariants, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 
 type Params = { params: Promise<{ gurmukhi: string }> };
 
@@ -79,7 +79,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const [defsResult, etymResult, usage, writerRows] = await Promise.all([
     supabase
       .from("definitions")
-      .select("id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
+      .select(DEFINITION_COLUMNS)
       .eq("word_id", wordId)
       .order("dict_source_id")
       .order("sense_number"),

@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
+import { secondaryGloss } from "@/lib/definition-display";
+import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
@@ -148,7 +149,7 @@ export default async function WordPage({ params, searchParams }: Props) {
     needsDefs
       ? supabase
           .from("definitions")
-          .select("id, sense_number, definition_text, cross_refs, parsed, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)")
+          .select(`${DEFINITION_COLUMNS}, parsed`)
           .eq("word_id", wordId)
           .order("dict_source_id", { ascending: true })
           .order("sense_number", { ascending: true })
@@ -242,12 +243,12 @@ export default async function WordPage({ params, searchParams }: Props) {
   const morphForms = needsForms ? await fetchMorphVariants(wordId, word) : [];
 
   // Group definitions by source
-  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
+  const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; language: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
   for (const def of definitions) {
-    const src = def.dict_sources as unknown as { code: string; name: string; url: string | null } | null;
+    const src = def.dict_sources as unknown as { code: string; name: string; url: string | null; language: string | null } | null;
     const key = src?.code ?? "unknown";
     if (!defsBySource.has(key)) {
-      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, provenance: def.provenance ?? null, reviewStatus: def.review_status ?? null, defs: [] });
+      defsBySource.set(key, { sourceName: src?.name ?? key, sourceUrl: src?.url ?? null, language: src?.language ?? null, provenance: def.provenance ?? null, reviewStatus: def.review_status ?? null, defs: [] });
     }
     defsBySource.get(key)!.defs.push(def);
   }
@@ -445,7 +446,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       {(tab === "overview" || tab === "meanings") && defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
-          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, provenance, reviewStatus, defs }]) => (
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, language, provenance, reviewStatus, defs }]) => (
             <div key={code} style={{ marginBottom: "1.25rem" }}>
               {/* Source name */}
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -470,6 +471,7 @@ export default async function WordPage({ params, searchParams }: Props) {
               {/* Senses */}
               {defs.map((def) => {
                 const parsed = asParsedSense(def.parsed ?? null);
+                const gloss = secondaryGloss(def);
                 return (
                 <div key={def.id} style={{ ...CARD, paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
                   <div style={{ display: "flex", gap: "0.6rem", alignItems: "baseline" }}>
@@ -478,14 +480,14 @@ export default async function WordPage({ params, searchParams }: Props) {
                         {def.sense_number}.
                       </span>
                     )}
-                    <p className="gurmukhi" style={{ margin: 0, lineHeight: 1.7 }}>
+                    <p className={language === "pa" ? "gurmukhi" : undefined} style={{ margin: 0, lineHeight: 1.7 }}>
                       {def.definition_text}
                       {!parsed && <CrossRefTags refs={def.cross_refs as Record<string, string> | null} />}
                     </p>
                   </div>
-                  {def.definition_en && (
+                  {gloss && (
                     <p style={{ margin: "0.35rem 0 0", color: "var(--text-secondary)", fontSize: "0.95rem", fontStyle: "italic" }}>
-                      {def.definition_en}
+                      {gloss}
                     </p>
                   )}
                   {/* Structured layer decoded from the printed shorthand (#34 step 1). */}

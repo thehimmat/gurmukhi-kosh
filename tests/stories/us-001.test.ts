@@ -3,6 +3,7 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { anonDb, sourceId } from "./helpers";
+import { DEFINITION_COLUMNS } from "../../lib/word-data";
 
 describe("US-001: every SGGS word has a full dictionary entry", () => {
   let db: ReturnType<typeof anonDb>;
@@ -51,5 +52,25 @@ describe("US-001: every SGGS word has a full dictionary entry", () => {
     expect(defs.count).toBeGreaterThan(0);
     expect(grammar.count).toBeGreaterThan(0);
     expect(etym.count).toBeGreaterThan(0);
+  });
+
+  // #122: the page and API share DEFINITION_COLUMNS, which must carry the
+  // English gloss column.
+  it("US-001.2: the shared definitions select names the English gloss column", () => {
+    expect(DEFINITION_COLUMNS.split(",").map((c) => c.trim())).toContain("definition_en");
+  });
+
+  it("US-001.2: the shared definitions select carries the English gloss", async () => {
+    const { data: w } = await db.from("words").select("id").eq("gurmukhi", "ਹਉਮੈ").single();
+    expect(w).toBeTruthy();
+    const { data, error } = await db
+      .from("definitions")
+      .select(DEFINITION_COLUMNS)
+      .eq("word_id", (w as { id: number }).id);
+    expect(error).toBeNull();
+    const glosses = ((data ?? []) as Array<{ definition_en: string | null }>)
+      .map((d) => d.definition_en)
+      .filter(Boolean);
+    expect(glosses.join(" ")).toContain("the false I");
   });
 });
