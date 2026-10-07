@@ -54,8 +54,8 @@ describe("US-001: every SGGS word has a full dictionary entry", () => {
     expect(etym.count).toBeGreaterThan(0);
   });
 
-  // #122: the word page's select dropped definition_en, so English glosses
-  // never rendered. Page and API now share DEFINITION_COLUMNS.
+  // #122: the page and API share DEFINITION_COLUMNS, which must carry the
+  // English gloss column.
   it("US-001.2: the shared definitions select names the English gloss column", () => {
     expect(DEFINITION_COLUMNS.split(",").map((c) => c.trim())).toContain("definition_en");
   });
