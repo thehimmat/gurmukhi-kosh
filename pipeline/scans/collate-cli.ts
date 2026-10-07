@@ -9,11 +9,15 @@
  *       openings.json: [{ "page": 66, "opening": "ਦਰਿਦ੍ਰਸਾਗਰਮਹਿਡੂਬਤੇ" }, ...]
  *   npm run scans:collate -- variants <collation.json> <page-index.json> <out.json>
  *       Definite variants with the manuscript pages to check for each.
+ *   npm run scans:collate -- assemble <base.txt> <resolve-dir> <out-prefix>
+ *       Join item batches (var_*.json, spot.json) with manuscript verdicts (out_*.json) and write
+ *       <out-prefix>.txt (canonical text), <out-prefix>-variants.json and <out-prefix>-summary.json.
  *
  * Inputs are Unicode text; convert legacy-font PDFs first.
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { assemble, type Verdict } from "./assemble";
 import { align, buildPageIndex, classify, locate, pagesFor, similarity, splitPadas, type PageIndexEntry } from "./collate";
 
 const read = (f: string) => readFileSync(f, "utf8");
@@ -84,13 +88,46 @@ function variants(collationFile: string, indexFile: string, out: string) {
   console.log(`${list.length} definite variants`);
 }
 
+function assembleCmd(baseFile: string, dir: string, prefix: string) {
+  const items = new Map<string, { pada: number; bd: string; ce: string | null }>();
+  const verdicts: Verdict[] = [];
+  const spot: Array<{ supports: string }> = [];
+  for (const f of readdirSync(dir).filter((f) => /^(var_\d+|spot)\.json$/.test(f)))
+    for (const it of JSON.parse(read(`${dir}/${f}`))) items.set(it.id, it);
+  for (const f of readdirSync(dir).filter((f) => /^out_.*\.json$/.test(f))) {
+    for (const o of JSON.parse(read(`${dir}/${f}`))) {
+      const it = items.get(o.id);
+      if (!it) continue;
+      if (o.id.startsWith("s")) {
+        spot.push(o);
+        continue;
+      }
+      verdicts.push({ pada: it.pada, bd: it.bd, ce: it.ce, ms: o.ms ?? "", supports: o.supports, confidence: o.confidence, page: o.page ?? null, note: o.note || undefined });
+    }
+  }
+  const { text, variants } = assemble(splitPadas(read(baseFile)), verdicts);
+  writeFileSync(`${prefix}.txt`, text.map((p) => `${p.text} ॥${p.ref ? ` ${p.ref} ॥` : ""}`).join("\n") + "\n");
+  writeJson(`${prefix}-variants.json`, variants);
+  const tally = (xs: Array<{ supports: string }>) => xs.reduce<Record<string, number>>((t, x) => ((t[x.supports] = (t[x.supports] ?? 0) + 1), t), {});
+  const summary = {
+    halfLines: text.length,
+    checked: verdicts.length,
+    supports: tally(verdicts),
+    needsReview: variants.filter((v) => v.needsReview).length,
+    spotCheck: { checked: spot.length, supports: tally(spot) },
+  };
+  writeJson(`${prefix}-summary.json`, summary);
+  console.log(JSON.stringify(summary));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 const usage = () => {
-  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out>");
+  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix>");
   process.exit(1);
 };
 if (cmd === "collate" && args.length === 3) collate(args[0], args[1], args[2]);
 else if (cmd === "locate" && args.length === 2) locateCmd(args[0], args[1]);
 else if (cmd === "page-index" && args.length === 3) pageIndex(args[0], args[1], args[2]);
 else if (cmd === "variants" && args.length === 3) variants(args[0], args[1], args[2]);
+else if (cmd === "assemble" && args.length === 3) assembleCmd(args[0], args[1], args[2]);
 else usage();
