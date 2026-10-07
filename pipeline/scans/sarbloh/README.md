@@ -150,6 +150,32 @@ index), Tesseract as for CE.
     the appendix is a later hand.
 - One stray leaf is bound out of order.
 
+## Witness apparatus (`../data/sarbloh/canon-bd-apparatus.json`, local)
+
+```
+npm run scans:collate -- apparatus bd-core.txt core-collation.json <resolve-dir> canon-bd-apparatus.json research-notes.json review-notes.json
+```
+
+One entry per half-line where another witness differs from `canon-bd` (8,619 of 27,750). Each records the
+1878 and CE readings and a kind:
+
+| kind | half-lines | meaning |
+|---|---|---|
+| ms-agrees-with-ce | 365 | the 1878 bir and CE agree against BD: **noted** |
+| ms-own-reading | 62 | the 1878 bir reads differently from both: **noted** |
+| not-in-ms | 20 | BD's half-line is not in the 1878 bir: **noted** |
+| ce-differs | 6,126 | CE differs. 1878 checked and agrees with BD (noted, not significant), or not checked; many are CE OCR noise |
+| not-in-ce | 1,939 | no matching CE line found (not checked; may be OCR or CE's different stanza layout) |
+| ce-ocr | 49 | checked: OCR noise only |
+| heading | 58 | headings and labels |
+
+- 447 entries are marked significant. Each note says what the other sources have.
+- The checks come from the 645 definite variants plus the 42 spot checks that showed a real difference.
+- Research notes (`research-notes.json`) replace the automatic note, and can correct a misaligned check.
+- Reviewer notes from the review page (`review-notes.json`) are appended.
+- The review round stopped at r14 (user, 2026-10-07): BD is canonical, so the remaining items are recorded
+  automatically.
+
 ## Noted differences
 Places worth knowing about if a reading is questioned. The canonical text keeps Budha Dal in every case.
 
@@ -176,9 +202,6 @@ Places worth knowing about if a reading is questioned. The canonical text keeps 
     item should have been "absent".
 
 ## Next
-- Record all witness differences (the 645 definite variants, the 1878 verdicts and the review notes) as the
-  variant apparatus of `canon-bd`.
-- Finish the review round (r01–r14 done; all keep BD) for notes on r15–r83.
 - With BD canonical, further manuscript reading only adds to the apparatus; a cleaner CE text (better OCR or
   a typed CE) would separate CE noise from real readings more cheaply.
 - Spot-check the 2,389 probable slips; many are right but need the correct spelling chosen.

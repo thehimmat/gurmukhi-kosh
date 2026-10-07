@@ -16,6 +16,10 @@
  *   npm run scans:collate -- triangulate <typed.txt> <print.txt> <other.txt> <out.json>
  *       Word-level vote between a typed edition, an OCR of its print and another edition:
  *       agreed / typing slip (auto-fixed) / manuscript (recension or three-way difference).
+ *   npm run scans:collate -- apparatus <base.txt> <collation.json> <resolve-dir> <out.json> [research.json] [review.json]
+ *       Where the other witnesses differ from the canonical text, with notes on the significant places.
+ *       research.json / review.json: { "<half-line>": "note" }; a research entry may instead be
+ *       { "note": "...", "kind": "not-in-ms", "readings": {...} } to correct a misaligned check.
  *   npm run scans:collate -- apply-slips <canon.json> <triangulation.json> <variants.json> <out-prefix>
  *       Correct the typing slips in an assembled text, except where the manuscript already ruled;
  *       writes <out-prefix>.txt and <out-prefix>-slips.json.
@@ -25,6 +29,7 @@
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { applySlips, assemble, type CanonicalPada, type Verdict } from "./assemble";
+import { buildApparatus, type ResearchNote } from "./apparatus";
 import { triangulate } from "./triangulate";
 import { align, buildPageIndex, classify, locate, pagesFor, similarity, splitPadas, type PageIndexEntry } from "./collate";
 
@@ -96,27 +101,30 @@ function variants(collationFile: string, indexFile: string, out: string) {
   console.log(`${list.length} definite variants`);
 }
 
-function assembleCmd(baseFile: string, dir: string, prefix: string) {
+/** Manuscript verdicts (out_*.json) joined with their items (var_*.json, spot.json); spot checks apart. */
+function loadVerdicts(dir: string): { verdicts: Verdict[]; spot: Array<Verdict & { id: string }> } {
   const items = new Map<string, { pada: number; bd: string; ce: string | null }>();
   const verdicts: Verdict[] = [];
-  const spot: Array<{ supports: string }> = [];
+  const spot: Array<Verdict & { id: string }> = [];
   for (const f of readdirSync(dir).filter((f) => /^(var_\d+|spot)\.json$/.test(f)))
     for (const it of JSON.parse(read(`${dir}/${f}`))) items.set(it.id, it);
   for (const f of readdirSync(dir).filter((f) => /^out_.*\.json$/.test(f))) {
     for (const o of JSON.parse(read(`${dir}/${f}`))) {
       const it = items.get(o.id);
       if (!it) continue;
-      if (o.id.startsWith("s")) {
-        spot.push(o);
-        continue;
-      }
-      verdicts.push({ pada: it.pada, bd: it.bd, ce: it.ce, ms: o.ms ?? "", supports: o.supports, confidence: o.confidence, page: o.page ?? null, note: o.note || undefined });
+      const v: Verdict = { pada: it.pada, bd: it.bd, ce: it.ce, ms: o.ms ?? "", supports: o.supports, confidence: o.confidence, page: o.page ?? null, note: o.note || undefined };
+      if (o.id.startsWith("s")) spot.push({ ...v, id: o.id });
+      else verdicts.push(v);
     }
   }
+  return { verdicts, spot };
+}
+
+function assembleCmd(baseFile: string, dir: string, prefix: string) {
+  const { verdicts, spot } = loadVerdicts(dir);
   const { text, variants } = assemble(splitPadas(read(baseFile)), verdicts);
   writeJson(`${prefix}.json`, text);
   writeFileSync(`${prefix}.txt`, text.map((p) => `${p.text} ॥${p.ref ? ` ${p.ref} ॥` : ""}`).join("\n") + "\n");
-  writeJson(`${prefix}.json`, text);
   writeJson(`${prefix}-variants.json`, variants);
   const tally = (xs: Array<{ supports: string }>) => xs.reduce<Record<string, number>>((t, x) => ((t[x.supports] = (t[x.supports] ?? 0) + 1), t), {});
   const summary = {
@@ -160,9 +168,25 @@ function applySlipsCmd(canonFile: string, triFile: string, variantsFile: string,
   console.log(JSON.stringify({ halfLines: text.length, padasFixed: new Set(fixes.map((f) => f.pada)).size, wordsFixed: fixes.length }));
 }
 
+function apparatusCmd(baseFile: string, collationFile: string, dir: string, out: string, researchFile?: string, reviewFile?: string) {
+  const { verdicts, spot } = loadVerdicts(dir);
+  const notes = <T>(f?: string) => (f ? (JSON.parse(read(f)) as Record<number, T>) : {});
+  const entries = buildApparatus({
+    base: splitPadas(read(baseFile)),
+    collation: (JSON.parse(read(collationFile)) as { rows: Row[] }).rows,
+    // A spot check counts only where the manuscript showed a real difference.
+    verdicts: [...verdicts, ...spot.filter((s) => s.supports !== "both" && !verdicts.some((v) => v.pada === s.pada))],
+    research: notes<ResearchNote>(researchFile),
+    reviewNotes: notes<string>(reviewFile),
+  });
+  writeJson(out, entries);
+  const count = (pick: (e: (typeof entries)[number]) => string) => entries.reduce<Record<string, number>>((t, e) => ((t[pick(e)] = (t[pick(e)] ?? 0) + 1), t), {});
+  console.log(JSON.stringify({ entries: entries.length, significant: entries.filter((e) => e.significant).length, kinds: count((e) => e.kind), checked: count((e) => String(e.checked)) }));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 const usage = () => {
-  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix> | triangulate <typed> <print> <other> <out> | apply-slips <canon> <tri> <variants> <out-prefix>");
+  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix> | triangulate <typed> <print> <other> <out> | apparatus <base> <collation> <resolve-dir> <out> [research] [review] | apply-slips <canon> <tri> <variants> <out-prefix>");
   process.exit(1);
 };
 if (cmd === "collate" && args.length === 3) collate(args[0], args[1], args[2]);
@@ -171,5 +195,6 @@ else if (cmd === "page-index" && args.length === 3) pageIndex(args[0], args[1], 
 else if (cmd === "variants" && args.length === 3) variants(args[0], args[1], args[2]);
 else if (cmd === "assemble" && args.length === 3) assembleCmd(args[0], args[1], args[2]);
 else if (cmd === "triangulate" && args.length === 4) triangulateCmd(args[0], args[1], args[2], args[3]);
+else if (cmd === "apparatus" && args.length >= 4 && args.length <= 6) apparatusCmd(args[0], args[1], args[2], args[3], args[4], args[5]);
 else if (cmd === "apply-slips" && args.length === 4) applySlipsCmd(args[0], args[1], args[2], args[3]);
 else usage();
