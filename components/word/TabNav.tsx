@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { withCuratorKey } from '@/lib/curator';
+import { TabLabel } from './TabLabel';
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -49,7 +50,7 @@ export function TabNav({ gurmukhi, currentTab = 'overview', curatorKey = null }:
               cursor: 'pointer',
             }}
           >
-            {tab.label}
+            <TabLabel label={tab.label} />
           </Link>
         );
       })}
