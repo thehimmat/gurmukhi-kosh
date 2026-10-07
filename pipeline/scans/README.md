@@ -1,0 +1,113 @@
+# Scanned texts: triage
+
+The user's own scans (PDFs in the Google Drive folder *Gurbani Docs / Santhiā*) are being triaged before
+anything is ingested. `manifest.yaml` records, per PDF: what it is, its edition and scan quality, its
+sections with PDF page ranges, and whether each Gurbani section is already in BaniDB.
+
+The PDFs themselves are not committed. They are fetched from Drive by id when needed.
+
+## Decisions (agreed 2026-10-06)
+
+- **One canonical text per work, and BaniDB is the default.** Word counts and every other statistic come
+  only from canonical lines (`lines`). A per-work override is allowed where a scholar's edition should
+  win.
+- **Other editions are witnesses.** A scan of a text BaniDB already has is stored *beside* the
+  canonical text for comparing readings: each witness line is aligned to a canonical line, with its page
+  and how it differs. Witnesses never feed counts. Variant readings are worth studying, so record them
+  rather than discarding them.
+- **A text with no online source becomes canonical from the best scan.** It is marked as unverified OCR
+  until reviewed, the same way the Shackle import is.
+- **Compilations are collections.** A pothi or gutka (Dusshera Mahatam Pothi, nitnem gutkas) is an
+  ordered list of references into canonical texts, plus its own headings, rubrics and occasion. A
+  compilation's own wording is kept as a witness. Collections never change counts, but they can be
+  used as a filter.
+- **Hanuman Natak**: for the kosh, the 1899 Lahore print is canonical and Kamalroop's typed text is a witness. This is "for our purposes", not a ruling for the wider Panth. Compare the two in gurbani-diff.
+- **Sarbloh**: the undated, pre-2000 Budha Dal text-only print is canonical. The June 2000 Budha Dal steek is a witness: its corrections and footnoted pathantar become explanatory notes on why readings differ. Budha Dal reserves the rights to the mool bani, and the user is checking permission before public use.
+- **Sarbloh avatars** (Budha Dal's Machh-to-Krishna section after the Manglacharan Purana): stored as a separate work, recorded as part of Sarbloh according to Budha Dal.
+- **Every scripture is a first-class corpus**, filterable at every stage. SGGS is the core corpus, not
+  the only one.
+- **Tiers**: `gurbani` (scripture), `historical` (Sikh literature: Sri Gur Sobha, Shaheed Bilas,
+  rehatnamas, sakhis…), `reference` (pronunciation and santhiya guides, prosody, music, lessons).
+  Reference material never counts toward word statistics; it can feed the pronunciation module.
+
+## Not decided yet
+
+- The schema for witnesses and collections, which is drafted after triage once the kinds of
+  variation are known.
+- OCR for scans that have no usable text layer.
+- Persian originals of Bhai Nand Lal's works, tracked in issue #120.
+
+## Triage results (manifest.yaml)
+
+There are 50 PDFs:
+- 17 witnesses
+- 11 ingest candidates
+- 9 collections
+- 10 reference-only
+- 3 skipped: a duplicate, a contemporary kavishri booklet, and a personal letter
+
+Gurbani not in BaniDB:
+- **Sri Sarbloh Granth.** There are two complete Budha Dal editions:
+  - the 1118-page text-only print (`5_6147…pdf`, Panjab Digital Library), which is the easier OCR source;
+  - the 1761-page steek, which records variant readings in its footnotes.
+  Several Manglacharan and Diwali-pothi files are partial witnesses or collections of it.
+- **Nangali Nitnem gutka:** about 17 banis, including Sansahar Sukhmana, Asfotak Kabitt, Bhagauti di Var and Brahm Kavach. The PDF has real text, but in the Satluj font.
+- **Bhai Nand Lal:** Joti Bigas (Punjabi), his Rehatnama, Khatima, and Ghazal 61 of the user's edition.
+- **Smaller pieces:** Braham Kavach, and some lines from the Sandhia gutka.
+
+Historical ingest candidates: Sri Gur Sobha, Shaheed Bilas, Sau Sakhi, Hanuman Natak, Vichar Sagar, Sankhep Bibek, and the 1898 Uthanka (occasion stories keyed to SGGS shabad first lines).
+
+## Follow-ups found during triage
+
+- **Decisions for the user**
+  - Whether philosophical texts (Vichar Sagar, Sankhep Bibek) get their own tag inside `historical`.
+- **Possible BaniDB data issues (Bhai Nand Lal, source N)**
+  - Ghazal 1 lacks ਆਮਦਨ, which the metre needs.
+  - Rubai 1 lacks ਕਿ.
+  - Shabad 30062 duplicates 30060.
+  - The user's edition orders ghazals 7–9 differently.
+  - Ghazal 52 has 7 couplets in BaniDB against 8 in the scan, and ਕਾਲ looks like a typo for ਫ਼ਾਲਿ.
+  - These are worth reporting upstream once checked.
+- **Cross-check tool**
+  - Accept an expected source and prefer it: Bhai Gurdas quotes SGGS, which caused one false match.
+  - Join consecutive BaniDB part-lines, since Dasam passages are often stored as half-lines.
+  - Try adding nukta as well as removing it, for when BaniDB has ਖ਼ but the scan has ਖ.
+- **Converters**
+  - Encodings still unsupported: Satluj (Nangali gutka), DrChatrik/Joy (a Chandi Charitar), Asees (Sri Gur Sobha), AnandpurSahib + UrduNaqsh (Zafarnama, the only file with Persian script; see #120).
+  - Bugs in the user's own converter are tracked in thehimmat/gurmukhi-transliterate#14.
+- **Incomplete scans**
+  - The Hazur Sahib Dasehra pothi stops at printed p.167, so three day-10 items are missing.
+  - Vaaran Vol I is missing printed pp. 366–367.
+  - Vaaran Vol II has its last pages out of order.
+  - The Granthavali excerpt is missing Joti Bigas couplets 1–69.
+  - Reet Ratnavali Part 1 is only a 44-page preview.
+
+## Sarbloh Granth: public sources (archive.org, checked 2026-10-06)
+
+The goal is a canonical text that rests on public-domain manuscripts, with modern editions kept as witnesses.
+
+| role | item | notes |
+|---|---|---|
+| **canonical exemplar** (public domain) | 1878 CE Bhai Chanda Singh bir: `sarbloh_granth_color/sarbloh_1878ce_bhai_chanda_singh.pdf` (also `sarbloh_granth_bir`) | 1003 flat single-page scans by the Panjab Digital Library. Clear larivaar hand, red rubrics, a table of contents, numbered verses. The date is written inside in Bikrami. |
+| public-domain witness | 1698 CE Mastuana Sahib bir: `sarbloh_granth_color/sarbloh_1698ce_mastuana_sahib_bir.pdf` | 453 photos of open spreads. Older (as dated by the uploader) but smaller, crinkled and harder to read. Use it where the 1878 bir is unclear. |
+| low-value witness | Mai Bhago bir: `sarbloh_granth_color/sarbloh_mai_bhago_bir.pdf` | Handheld photos, curved pages. |
+| transcription aid / witness | Typed PDF: `sarbloh_granth/sarbloh_granth.pdf` | A 2022 page-for-page retyping of the Budha Dal print in GurbaniAkhar. Its back page names Budha Dal under Baba Maan Singh as publisher, so despite the uploader's PD mark its rights are Budha Dal's. Converts without OCR and supplies word division (the manuscripts are larivaar). |
+| scholarly witness | *Shudh Paath* critical edition, Jasvant Singh: `sarbloh_critical_edition` | Base text is the Sachkhand Hazur Sahib bir, collated with the Mastuana, Khalsa College, Shahi Samadhan Sangrur and Angitha Sahib Patiala birs, with a full apparatus. Modern scholarship, so treat it as the editor's copyright. The text layer is scrambled, so it needs OCR. |
+| witnesses | the user's Budha Dal text-only print and the 2000 steek | See manifest.yaml. |
+
+Planned method:
+1. Convert the typed PDF and align it to the 1878 bir's pages by text. The bir's verse numbering restarts per section and doesn't match the print's running numbers, so number matching won't work.
+2. Check each line against the manuscript image. Where they differ, the canonical text takes the 1878 reading and records the print's reading as a variant.
+3. Use the 1698 bir and the critical edition's apparatus to settle unclear places.
+
+## Tooling
+
+`npm run scans:check < lines.txt` reads Unicode Gurmukhi sample lines from a section and prints its
+BaniDB status (`online` / `partial` / `not_found`), the BaniDB source and shabad ids, and the lines whose
+reading differs (`crossref.ts`, tested in `tests/scans-crossref.test.ts`).
+
+Some PDFs carry text in a legacy Gurmukhi font encoding rather than Unicode. That is converted before
+lines are checked. The triage used Shabad OS's `gurmukhi-utils` outside the repo, because it is
+GPL-3.0 and this repo has no licence chosen yet.
+
+In some sandboxes Node's `fetch` ignores `HTTPS_PROXY`; set `NODE_USE_ENV_PROXY=1` there.

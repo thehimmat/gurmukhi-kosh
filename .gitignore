@@ -53,3 +53,6 @@ pipeline/shackle/data/
 
 # Python bytecode caches (pipeline scripts)
 __pycache__/
+
+# scan texts (editions, OCR output): copyright varies, kept out of git
+pipeline/scans/data/

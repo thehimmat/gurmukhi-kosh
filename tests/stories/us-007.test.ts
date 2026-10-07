@@ -10,7 +10,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { anonDb, sourceId } from "./helpers";
 
-const CORPORA = ["sggs_banidb_v2", "bhai_gurdas_banidb_v2", "dasam_banidb_v2"];
+const CORPORA = ["sggs_banidb_v2", "bhai_gurdas_banidb_v2", "dasam_banidb_v2", "sarbloh_budha_dal"];
 
 describe("US-007: full entries across all ingested corpora", () => {
   let db: ReturnType<typeof anonDb>;

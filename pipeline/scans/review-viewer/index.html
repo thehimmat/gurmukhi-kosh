@@ -1,0 +1,415 @@
+<title>Santhiā Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+Gurmukhi:wght@400;600&display=swap">
+<style>
+/* Layout: a reviewer's desk. Item list on the left, the open question on the right:
+   decision first, then the witnesses side by side, each with its reading and its page image. */
+:root {
+  --paper: #eef0f3;      /* desk */
+  --sheet: #ffffff;      /* panels */
+  --ink: #1b2130;
+  --muted: #5d6576;
+  --rule: #d5d9e1;
+  --kesri: #b85d00;      /* decisions, focus (saffron) */
+  --kesri-soft: #fbead6;
+  --rubric: #c0262d;     /* the manuscripts' red ink: highlights what differs */
+  --rubric-soft: #f9dedf;
+  --done: #23794b;
+  --done-soft: #dcefe3;
+  --wait: #8a6400;
+  --wait-soft: #f6ebc9;
+  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-gur: "Noto Serif Gurmukhi", "Mukta Mahee", "Raavi", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12151c; --sheet: #1b1f29; --ink: #e5e8ef; --muted: #9aa2b3; --rule: #2e3443;
+    --kesri: #f0a24a; --kesri-soft: #3a2a16; --rubric: #ff6b6f; --rubric-soft: #3d1e21;
+    --done: #5ccf8d; --done-soft: #183526; --wait: #e8c25c; --wait-soft: #3a3016;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12151c; --sheet: #1b1f29; --ink: #e5e8ef; --muted: #9aa2b3; --rule: #2e3443;
+  --kesri: #f0a24a; --kesri-soft: #3a2a16; --rubric: #ff6b6f; --rubric-soft: #3d1e21;
+  --done: #5ccf8d; --done-soft: #183526; --wait: #e8c25c; --wait-soft: #3a3016;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--font-ui); }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--kesri); outline-offset: 2px; }
+a { color: var(--kesri); }
+.gur { font-family: var(--font-gur); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+header.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  padding: 12px 20px; background: var(--sheet); border-bottom: 1px solid var(--rule);
+}
+header.bar h1 { margin: 0; font-size: 17px; letter-spacing: 0.01em; }
+header.bar .round { color: var(--muted); font-size: 14px; min-width: 0; }
+.progress { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 13px; color: var(--muted); }
+.meter { width: 140px; height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; display: flex; }
+.meter i { display: block; height: 100%; }
+.meter .m-done { background: var(--done); }
+.meter .m-wait { background: var(--wait); }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--rule); background: transparent; border-radius: 999px; padding: 3px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+
+.banner { margin: 12px 20px 0; padding: 10px 14px; border-radius: 6px; background: var(--wait-soft); color: var(--ink); font-size: 14px; }
+
+.desk { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding-inline: 20px; padding-block: 16px 40px; max-width: 1500px; margin: 0 auto; }
+@media (max-width: 860px) { .desk { grid-template-columns: minmax(0, 1fr); padding-inline: 16px; } nav.list { display: none; } }
+
+nav.list { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 70px); align-self: start; max-height: calc(100vh - 100px); overflow-y: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; }
+nav.list ol { list-style: none; margin: 0; padding: 4px; }
+nav.list button { width: 100%; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: center; text-align: left; padding: 7px 8px; border: 0; border-radius: 5px; background: transparent; cursor: pointer; }
+nav.list button:hover { background: var(--paper); }
+nav.list button[aria-current="true"] { background: var(--kesri-soft); }
+nav.list .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+nav.list .t { font-family: var(--font-gur); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.dot.done { background: var(--done); border-color: var(--done); }
+.dot.wait { background: var(--wait); border-color: var(--wait); }
+
+main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.empty { padding: 40px; text-align: center; color: var(--muted); background: var(--sheet); border-radius: 8px; border: 1px solid var(--rule); }
+
+.head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.head .where { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.head h2 { margin: 0; font-size: 19px; line-height: 1.35; flex-basis: 100%; text-wrap: balance; }
+.stepper { margin-left: auto; display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.btn { border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.decide { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 12px; }
+.decide .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; max-width: 100%; padding: 8px 12px; border: 1.5px solid var(--rule); border-radius: 7px; background: var(--sheet); cursor: pointer; text-align: left; }
+.choice:hover { border-color: var(--kesri); }
+.choice[aria-pressed="true"] { border-color: var(--kesri); background: var(--kesri-soft); }
+.choice .k { font-size: 13px; font-weight: 700; display: flex; gap: 6px; align-items: center; }
+.choice .k kbd { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; }
+.choice .r { font-family: var(--font-gur); font-size: 14px; color: var(--muted); max-width: 32ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.choice.unsure[aria-pressed="true"] { border-color: var(--wait); background: var(--wait-soft); }
+.row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 640px) { .row2 { grid-template-columns: minmax(0, 1fr); } }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-size: 13px; color: var(--muted); }
+.field input, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); }
+.field input.gur { font-size: 17px; }
+.field textarea { min-height: 42px; resize: vertical; }
+.status { font-size: 13px; color: var(--muted); min-height: 1.2em; }
+.status.err { color: var(--rubric); }
+
+.context { display: grid; gap: 2px; font-size: 15px; color: var(--muted); padding-inline: 4px; }
+.context .gur { color: var(--ink); opacity: 0.75; }
+.context b { font-weight: 400; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; }
+
+.witnesses { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.wit { min-width: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+.wit.chosen { border-color: var(--kesri); box-shadow: 0 0 0 1px var(--kesri); }
+.wit h3 { margin: 0; padding: 10px 14px 0; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.wit h3 span { color: var(--muted); font-weight: 400; }
+.reading { padding: 6px 14px 12px; font-family: var(--font-gur); font-size: 21px; line-height: 1.6; overflow-wrap: anywhere; }
+.reading .d { color: var(--rubric); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 5px; }
+.reading.none { font-family: var(--font-ui); font-size: 14px; color: var(--muted); font-style: italic; }
+figure { margin: 0; border-top: 1px solid var(--rule); background: var(--paper); }
+.shot { position: relative; display: block; width: 100%; cursor: zoom-in; border: 0; padding: 0; background: none; }
+.shot img { display: block; width: 100%; height: auto; }
+figcaption { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 14px; font-size: 13px; color: var(--muted); }
+.noimg { padding: 14px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--rule); }
+
+.current { font-size: 13px; color: var(--muted); }
+.current .gur { color: var(--ink); font-size: 15px; }
+.keys { font-size: 12px; color: var(--muted); }
+.keys kbd { font-family: var(--font-mono); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; }
+
+.lightbox { position: fixed; inset: 0; z-index: 20; background: color-mix(in srgb, var(--ink) 70%, transparent); display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px); }
+.lightbox .lb-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--sheet); padding-bottom: 8px; }
+.lightbox .lb-bar .btn { color: var(--ink); }
+.lightbox .lb-body { flex: 1; overflow: auto; background: var(--sheet); border-radius: 6px; }
+.lightbox img { display: block; max-width: none; width: min(1100px, 100%); margin: 0 auto; }
+
+@media (prefers-reduced-motion: no-preference) { .choice, .chip, nav.list button { transition: background-color 120ms, border-color 120ms; } }
+</style>
+
+<header class="bar">
+  <h1>Santhiā Review</h1>
+  <div class="round" id="roundName">Loading…</div>
+  <div class="filters" role="group" aria-label="Show">
+    <button class="chip" data-f="all" aria-pressed="true">All</button>
+    <button class="chip" data-f="open" aria-pressed="false">To do</button>
+    <button class="chip" data-f="wait" aria-pressed="false">Unsure</button>
+    <button class="chip" data-f="done" aria-pressed="false">Decided</button>
+  </div>
+  <div class="progress"><span id="progText" class="mono">–</span><div class="meter" aria-hidden="true"><i class="m-done" id="mDone"></i><i class="m-wait" id="mWait"></i></div></div>
+</header>
+<div class="banner" id="banner" hidden></div>
+
+<div class="desk">
+  <nav class="list" aria-label="Items"><ol id="list"></ol></nav>
+  <main id="main">
+    <div class="empty">Loading the review round…</div>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Full page">
+  <div class="lb-bar"><span id="lbTitle"></span><button class="btn" id="lbClose">Close (Esc)</button></div>
+  <div class="lb-body"><img id="lbImg" alt=""></div>
+</div>
+
+<script>
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const state = { round: null, idx: 0, filter: "all", decisions: {}, db: null, canWrite: true, draftNote: {}, draftOther: {} };
+  const prefs = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+  function status(item) {
+    const d = state.decisions[item.id];
+    if (!d || !d.choice) return "open";
+    return d.choice === "unsure" ? "wait" : "done";
+  }
+  const visible = () => state.round.items.filter((it) => state.filter === "all" || status(it) === state.filter);
+
+  function renderProgress() {
+    const items = state.round.items;
+    const done = items.filter((i) => status(i) === "done").length;
+    const wait = items.filter((i) => status(i) === "wait").length;
+    $("#progText").textContent = `${done} decided · ${wait} unsure · ${items.length - done - wait} to do`;
+    $("#mDone").style.width = `${(done / items.length) * 100}%`;
+    $("#mWait").style.width = `${(wait / items.length) * 100}%`;
+  }
+
+  function renderList() {
+    const cur = state.round.items[state.idx];
+    $("#list").innerHTML = visible().map((it) => {
+      const k = state.round.items.indexOf(it);
+      const first = it.witnesses[state.round.witnesses[1].key]?.text || it.witnesses[state.round.witnesses[0].key]?.text || "";
+      const s = status(it);
+      return `<li><button data-k="${k}" aria-current="${it === cur}"><span class="n">${esc(it.id)}</span><span class="t">${esc(first)}</span><span class="dot ${s === "open" ? "" : s}" title="${s === "done" ? "Decided" : s === "wait" ? "Unsure" : "To do"}"></span></button></li>`;
+    }).join("") || `<li class="keys" style="padding:10px">Nothing here.</li>`;
+  }
+
+  function tokensHtml(w) {
+    if (!w.text) return null;
+    if (!w.tokens) return esc(w.text);
+    return w.tokens.map((t) => (t.differs ? `<span class="d">${esc(t.text)}</span>` : esc(t.text))).join(" ");
+  }
+
+  function figureHtml(w, label) {
+    if (!w.image) return `<div class="noimg">${esc(w.note || "No image.")}${w.page ? ` <a href="${esc(w.page.href)}" target="_blank" rel="noopener" data-page="${esc(w.page.href)}" data-label="${esc(label + " · " + w.page.label)}">Open ${esc(w.page.label)} ↗</a>` : ""}</div>`;
+    const href = w.page?.href ?? "";
+    return `<figure>
+      <button class="shot" data-page="${esc(href)}" data-label="${esc(label + " · " + (w.page?.label ?? ""))}" aria-label="Open the whole page">
+        <img src="${esc(w.image)}" alt="${esc(label)}: the reading on its page">
+      </button>
+      <figcaption><span>${esc(w.note ?? "")}</span>${w.page ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-page="${esc(href)}" data-label="${esc(label + " · " + w.page.label)}">${esc(w.page.label)} ↗</a>` : ""}</figcaption>
+    </figure>`;
+  }
+
+  function renderMain() {
+    const r = state.round;
+    const it = r.items[state.idx];
+    if (!it) { $("#main").innerHTML = `<div class="empty">This round has no items.</div>`; return; }
+    const d = state.decisions[it.id] ?? {};
+    const pos = visible().indexOf(it);
+    const n = visible().length;
+    const choiceBtns = r.witnesses.map((w, k) => {
+      const wv = it.witnesses[w.key];
+      if (!wv?.text) return "";
+      return `<button class="choice" data-choice="${esc(w.key)}" aria-pressed="${d.choice === w.key}"><span class="k"><kbd>${k + 1}</kbd>${esc(w.short)}</span><span class="r">${esc(wv.text)}</span></button>`;
+    }).join("");
+    const otherText = state.draftOther[it.id] ?? (d.choice === "other" ? d.text : "") ?? "";
+    const note = state.draftNote[it.id] ?? d.note ?? "";
+    $("#main").innerHTML = `
+      <div class="head">
+        <span class="where">${esc(it.id)} · ${esc(it.where)}</span>
+        <div class="stepper"><span class="mono">${pos >= 0 ? pos + 1 : "–"} / ${n}</span>
+          <button class="btn" id="prev" ${pos <= 0 ? "disabled" : ""} aria-label="Previous (K)">←</button>
+          <button class="btn" id="next" ${pos < 0 || pos >= n - 1 ? "disabled" : ""} aria-label="Next (J)">→</button></div>
+        <h2>${esc(it.question)}</h2>
+      </div>
+      <section class="decide" aria-label="Your decision">
+        <div class="label">Your decision</div>
+        <div class="choices">
+          ${choiceBtns}
+          <button class="choice" data-choice="other" aria-pressed="${d.choice === "other"}"><span class="k"><kbd>O</kbd>Other reading</span><span class="r">Type it below</span></button>
+          <button class="choice unsure" data-choice="unsure" aria-pressed="${d.choice === "unsure"}"><span class="k"><kbd>U</kbd>Unsure</span><span class="r">Come back later</span></button>
+        </div>
+        <div class="row2">
+          <div class="field" ${d.choice === "other" ? "" : "hidden"} id="otherWrap"><label for="other">The correct reading</label><input id="other" class="gur" lang="pa" value="${esc(otherText)}" placeholder="${esc(it.current?.text ?? "")}"></div>
+          <div class="field"><label for="note">Note (optional)</label><textarea id="note" rows="1">${esc(note)}</textarea></div>
+        </div>
+        <div class="status" id="saveStatus" aria-live="polite">${d.updatedAt ? `Saved ${new Date(d.updatedAt).toLocaleString()}` : ""}</div>
+      </section>
+      ${it.context ? `<div class="context">${it.context.before ? `<div><b>Before</b><span class="gur">${esc(it.context.before)}</span></div>` : ""}${it.context.after ? `<div><b>After</b><span class="gur">${esc(it.context.after)}</span></div>` : ""}</div>` : ""}
+      <section class="witnesses">
+        ${r.witnesses.map((w) => {
+          const wv = it.witnesses[w.key] ?? { text: "" };
+          const body = tokensHtml(wv);
+          return `<article class="wit ${d.choice === w.key ? "chosen" : ""}">
+            <h3>${esc(w.short)} <span>${esc(w.label)}</span></h3>
+            <div class="reading ${body ? "" : "none"}" lang="pa">${body ?? "Not in this witness."}</div>
+            ${figureHtml(wv, w.short)}
+          </article>`;
+        }).join("")}
+      </section>
+      ${it.current ? `<div class="current">In the text now: <span class="gur">${esc(it.current.text)}</span> (${esc(it.current.from)})</div>` : ""}
+      <div class="keys">Keys: <kbd>1</kbd>–<kbd>${r.witnesses.length}</kbd> choose a reading · <kbd>O</kbd> other · <kbd>U</kbd> unsure · <kbd>J</kbd>/<kbd>K</kbd> next/previous · click an image for the whole page</div>`;
+    const disabled = !state.db || !state.canWrite;
+    $("#main").querySelectorAll(".choice, #other, #note").forEach((el) => (el.disabled = disabled));
+  }
+
+  function render() { renderProgress(); renderList(); renderMain(); }
+
+  function go(k) {
+    state.idx = k;
+    prefs.set(`review:${state.round.id}:idx`, String(k));
+    renderList(); renderMain();
+    window.scrollTo({ top: 0 });
+  }
+  function step(dir) {
+    const v = visible();
+    const pos = v.indexOf(state.round.items[state.idx]);
+    const nxt = v[pos + dir];
+    if (nxt) go(state.round.items.indexOf(nxt));
+  }
+
+  // One write at a time per item.
+  const queue = {};
+  function save(it, patch) {
+    if (!state.db || !state.canWrite) return;
+    const prev = state.decisions[it.id] ?? {};
+    const doc = { round: state.round.id, item: it.id, choice: prev.choice ?? null, text: prev.text ?? "", note: prev.note ?? "", ...patch, updatedAt: new Date().toISOString() };
+    state.decisions[it.id] = doc;
+    const ref = state.db.collection("decisions").doc(`${state.round.id}__${it.id}`);
+    const st = $("#saveStatus");
+    if (st) { st.textContent = "Saving…"; st.classList.remove("err"); }
+    queue[it.id] = (queue[it.id] ?? Promise.resolve()).then(() => ref.set(doc)).then(() => {
+      const s = $("#saveStatus");
+      if (s && state.round.items[state.idx] === it) s.textContent = `Saved ${new Date(doc.updatedAt).toLocaleString()}`;
+    }, (e) => {
+      const s = $("#saveStatus");
+      if (e?.code === "invalid_argument" || e?.code === "not_granted") { state.canWrite = false; showBanner("You can look through this round, but only the owner can record decisions."); }
+      if (s) { s.textContent = e?.code === "quota_exceeded" ? "Not saved: the decision store is full." : "Not saved. Check your connection and choose again."; s.classList.add("err"); }
+    });
+    renderProgress(); renderList();
+  }
+
+  function choose(key) {
+    const it = state.round.items[state.idx];
+    if (!state.db || !state.canWrite) return;
+    const note = $("#note")?.value ?? "";
+    if (key === "other") {
+      const text = $("#other")?.value || it.current?.text || "";
+      save(it, { choice: "other", text, note });
+      renderMain();
+      $("#other")?.focus();
+      return;
+    }
+    const text = key === "unsure" ? "" : it.witnesses[key]?.text ?? "";
+    save(it, { choice: key, text, note });
+    renderMain();
+  }
+
+  let noteTimer = null;
+  document.addEventListener("input", (e) => {
+    const it = state.round?.items[state.idx];
+    if (!it) return;
+    if (e.target.id === "note") {
+      state.draftNote[it.id] = e.target.value;
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => save(it, { note: e.target.value }), 900);
+    }
+    if (e.target.id === "other") {
+      state.draftOther[it.id] = e.target.value;
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => save(it, { choice: "other", text: e.target.value }), 900);
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    const c = e.target.closest(".choice");
+    if (c) return choose(c.dataset.choice);
+    const li = e.target.closest("nav.list button");
+    if (li) return go(+li.dataset.k);
+    const f = e.target.closest(".chip");
+    if (f) {
+      state.filter = f.dataset.f;
+      document.querySelectorAll(".chip").forEach((b) => b.setAttribute("aria-pressed", String(b === f)));
+      const v = visible();
+      if (v.length && !v.includes(state.round.items[state.idx])) state.idx = state.round.items.indexOf(v[0]);
+      return render();
+    }
+    if (e.target.closest("#prev")) return step(-1);
+    if (e.target.closest("#next")) return step(1);
+    const p = e.target.closest("[data-page]");
+    if (p && p.dataset.page && !/^https?:/.test(p.dataset.page)) { e.preventDefault(); openLightbox(p.dataset.page, p.dataset.label); return; }
+    if (p && p.classList.contains("shot") && p.dataset.page) { window.open(p.dataset.page, "_blank", "noopener") || openLightbox(p.querySelector("img").src, p.dataset.label); }
+    if (e.target.closest("#lbClose") || e.target.id === "lightbox") closeLightbox();
+  });
+
+  function openLightbox(src, label) { $("#lbImg").src = src; $("#lbImg").alt = label || "Full page"; $("#lbTitle").textContent = label || ""; $("#lightbox").hidden = false; $("#lbClose").focus(); }
+  function closeLightbox() { $("#lightbox").hidden = true; }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("#lightbox").hidden) return closeLightbox();
+    if (e.target.matches("input, textarea") || e.metaKey || e.ctrlKey || e.altKey || !state.round) return;
+    const k = e.key.toLowerCase();
+    if (k === "j") step(1);
+    else if (k === "k") step(-1);
+    else if (k === "o") choose("other");
+    else if (k === "u") choose("unsure");
+    else if (/^[1-9]$/.test(k)) { const w = state.round.witnesses[+k - 1]; if (w && state.round.items[state.idx].witnesses[w.key]?.text) choose(w.key); }
+    else return;
+    e.preventDefault();
+  });
+
+  function showBanner(text) { const b = $("#banner"); b.textContent = text; b.hidden = false; }
+
+  async function start() {
+    let rounds;
+    try {
+      rounds = await (await fetch("rounds.json")).json();
+    } catch {
+      $("#main").innerHTML = `<div class="empty">The review round could not be loaded. Reload the page to try again.</div>`;
+      return;
+    }
+    const pick = rounds.find((r) => r.id === prefs.get("review:round")) ?? rounds[0];
+    state.round = await (await fetch(pick.file)).json();
+    $("#roundName").textContent = state.round.title;
+    const saved = +(prefs.get(`review:${state.round.id}:idx`) ?? 0);
+    state.idx = saved >= 0 && saved < state.round.items.length ? saved : 0;
+    render();
+
+    const db = await window.claude?.use?.("db").catch(() => null);
+    if (!db) { showBanner("Decisions can't be saved in this view. Open the page on claude.ai while signed in to record them."); renderMain(); return; }
+    state.db = db;
+    db.collection("decisions").where("round", "==", state.round.id).onSnapshot((snap) => {
+      for (const doc of snap.docs) {
+        const v = doc.data();
+        if (!v?.item) continue;
+        const mine = state.decisions[v.item];
+        if (!mine || (v.updatedAt ?? "") >= (mine.updatedAt ?? "")) state.decisions[v.item] = v;
+      }
+      const it = state.round.items[state.idx];
+      const typing = document.activeElement && document.activeElement.matches("#note, #other");
+      renderProgress(); renderList();
+      if (!typing) renderMain();
+      else if (it) { const s = $("#saveStatus"); const d = state.decisions[it.id]; if (s && d?.updatedAt && !s.classList.contains("err")) s.textContent = `Saved ${new Date(d.updatedAt).toLocaleString()}`; }
+    }, (e) => showBanner(e?.code === "revoked" ? "Saving is no longer available in this view." : "Saved decisions could not be loaded. Reload the page to try again."));
+    renderMain();
+  }
+  start();
+})();
+</script>
