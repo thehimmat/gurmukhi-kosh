@@ -10,10 +10,9 @@ import { toMorphVariants, type MorphVariant, type SiblingFormRow } from "./morph
 
 export type { MorphVariant };
 
-// definitions columns both surfaces render. The word page once kept its own
-// copy that omitted definition_en, so English glosses never showed (#122).
-// The page appends `parsed` (the structured Mahan Kosh layer, not yet in the
-// API: #59).
+// definitions columns both surfaces render, kept in one place so the page
+// and the API cannot drift (#122). The page appends `parsed` (the structured
+// Mahan Kosh layer, not yet in the API: #59).
 export const DEFINITION_COLUMNS =
   "id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)";
 
