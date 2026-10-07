@@ -30,7 +30,7 @@ The unit compared was the half-line (pada). Spelling conventions were folded bef
 
 - **T and K are one text.** Both descend from the Budha Dal print, so K is not an independent witness.
 - **CE belongs to a different recension.** Its base text is the Hazur Sahib bir. CE also prefers older spellings (ਮਾਇਆ, ਕਰ) where T has later ones (ਮਾਯਾ, ਕਰਿ).
-- **About two-thirds of the 59 definite variants are headings:** metre and raag labels, for example ਬਿਸਨੁਪਦ … ਦੂਜੀ ਤਰਹ vs ਬਿਸਨਪਦ. That leaves about 15 genuine textual variants in 337 chhands. All are listed in `sarbloh-manglacharan-variants.yaml`.
+- **About two-thirds of the 59 definite variants are headings:** metre and raag labels, for example ਬਿਸਨੁਪਦ … ਦੂਜੀ ਤਰਹ vs ਬਿਸਨਪਦ. That leaves about 15 genuine textual variants in 337 chhands. The list is kept out of the public repo, in the git-ignored `pipeline/scans/data/sarbloh/`.
 
 ## Manuscript checks (M)
 

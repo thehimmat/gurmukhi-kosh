@@ -23,6 +23,7 @@ The PDFs themselves are not committed. They are fetched from Drive by id when ne
   used as a filter.
 - **Hanuman Natak**: for the kosh, the 1899 Lahore print is canonical and Kamalroop's typed text is a witness. This is "for our purposes", not a ruling for the wider Panth. Compare the two in gurbani-diff.
 - **Sarbloh**: the undated, pre-2000 Budha Dal text-only print is canonical. The June 2000 Budha Dal steek is a witness: its corrections and footnoted pathantar become explanatory notes on why readings differ. Budha Dal reserves the rights to the mool bani, and the user is checking permission before public use.
+- **Sarbloh avatars** (Budha Dal's Machh-to-Krishna section after the Manglacharan Purana): stored as a separate work, recorded as part of Sarbloh according to Budha Dal.
 - **Every scripture is a first-class corpus**, filterable at every stage. SGGS is the core corpus, not
   the only one.
 - **Tiers**: `gurbani` (scripture), `historical` (Sikh literature: Sri Gur Sobha, Shaheed Bilas,

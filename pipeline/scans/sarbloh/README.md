@@ -52,7 +52,9 @@ CE-only lines.
    - Dasam Skandh.
 
    The 1878 bir ends with the Purana (its last pages sit at BD ~27,600), and CE gives the avatar material only
-   as excerpts in Appendix 3.1. Treating it as part of the Sarbloh canon is a decision for the user.
+   as excerpts in Appendix 3.1.
+   **Decision (user, 2026-10-07):** the avatars are stored as a **separate work**, recorded as "part of Sarbloh
+   Granth according to Budha Dal". Their text source is BD only until a manuscript witness is found.
 2. **CE lacks a block that the 1878 bir has.** BD half-lines ~16,500–19,500 (around the *Samar Geet
    Upasana Kand*) are absent from CE. `locate` scores 38–67 everywhere in CE. The 1878 page index runs straight
    through this block with verified readings. The same holds for the post-text material at BD ~27,350–27,750
