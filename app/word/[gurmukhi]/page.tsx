@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { secondaryGloss } from "@/lib/definition-display";
+import { entryLink, secondaryGloss } from "@/lib/definition-display";
 import { isCurator, withCuratorKey } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
@@ -464,7 +464,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       {(tab === "overview" || tab === "meanings") && defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
-          {Array.from(defsBySource.entries()).map(([code, { sourceName, sourceUrl, language, provenance, reviewStatus, defs }]) => (
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, language, provenance, reviewStatus, defs }]) => (
             <div key={code} style={{ marginBottom: "1.25rem" }}>
               {/* Source name */}
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -472,11 +472,9 @@ export default async function WordPage({ params, searchParams }: Props) {
                   {sourceName}
                 </span>
                 {curator && <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />}
-                {(sourceUrl || code === "mahan_kosh") && (
+                {entryLink(code, word) && (
                   <a
-                    href={code === "mahan_kosh"
-                      ? `https://www.searchgurbani.com/sggs-kosh/view?Word=${encodeURIComponent(word)}`
-                      : sourceUrl!}
+                    href={entryLink(code, word)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", color: "var(--text-secondary)" }}
