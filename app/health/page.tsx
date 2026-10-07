@@ -166,7 +166,7 @@ export default async function HealthPage() {
             textDecoration: "none",
           }}
         >
-          ← search
+          ← Back to search
         </a>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 600, marginTop: "1rem", marginBottom: "0.25rem" }}>
           Data Health

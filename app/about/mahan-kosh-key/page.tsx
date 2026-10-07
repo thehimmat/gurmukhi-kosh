@@ -288,7 +288,7 @@ export default function MahanKoshKeyPage() {
           textDecoration: "none",
         }}
       >
-        ← sources &amp; licensing
+        ← Sources &amp; licensing
       </a>
 
       <h1 style={{ fontSize: "1.6rem", fontWeight: 600, marginTop: "1rem", marginBottom: "0.5rem" }}>

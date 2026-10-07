@@ -33,7 +33,7 @@ export default async function AngPage({ params }: Props) {
     return (
       <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
         <a href="/" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none" }}>
-          ← search
+          ← Back to search
         </a>
         <p style={{ marginTop: "2rem", fontStyle: "italic", color: "var(--text-secondary)" }}>
           Ang {ang} has not been indexed yet.

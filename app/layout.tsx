@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { SITE_NAME_EN, SITE_NAME_PA } from "@/lib/site";
+import { CORPORA, SITE_NAME_EN, SITE_NAME_PA } from "@/lib/site";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -34,10 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               margin: "0 auto",
               padding: "1rem 1.5rem",
               display: "flex",
+              flexWrap: "wrap",
               alignItems: "baseline",
-              gap: "1rem",
+              justifyContent: "space-between",
+              gap: "0.5rem 1rem",
             }}
           >
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0 0.75rem", whiteSpace: "nowrap" }}>
             <a
               href="/"
               className="gurmukhi"
@@ -59,6 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             >
               {SITE_NAME_EN}
             </span>
+            </div>
+            <SiteNav />
           </div>
         </header>
 
@@ -74,16 +80,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             fontFamily: '"Inter", sans-serif',
           }}
         >
-          <p>
-            Word data from{" "}
-            <a href="https://banidb.com" target="_blank" rel="noopener noreferrer">
-              BaniDB
-            </a>{" "}
-            · Sri Guru Granth Sahib Ji
-          </p>
+          <p>{CORPORA.join(" · ")}</p>
           <p style={{ marginTop: "0.5rem" }}>
             <a href="/about" style={{ color: "var(--accent)", textDecoration: "none" }}>
               Sources &amp; licensing
+            </a>
+            {" · "}
+            <a href="https://apps.atthebunga.com" style={{ color: "var(--accent)", textDecoration: "none" }}>
+              More tools at apps.atthebunga.com
             </a>
           </p>
         </footer>

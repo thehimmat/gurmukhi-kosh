@@ -355,7 +355,7 @@ export default async function WordPage({ params, searchParams }: Props) {
 
       {/* ── Back nav ── */}
       <a href="/" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none", display: "inline-block", marginBottom: "2rem" }}>
-        ← back to search
+        ← Back to search
       </a>
 
       {curator && (

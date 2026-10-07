@@ -55,7 +55,7 @@ type Source = {
 const SOURCES: Source[] = [
   {
     name: "BaniDB (Khalis Foundation)",
-    role: "Corpus text (Sri Guru Granth Sahib Ji and Bhai Gurdas Ji Vaaran), line metadata, and per-line commentaries.",
+    role: "Corpus text (Sri Guru Granth Sahib Ji, Bhai Gurdas Ji Vaaran and Dasam Bani), line metadata, and per-line commentaries.",
     status: "in-use",
     url: "https://banidb.com",
     note: "Licensed CC BY-NC-SA 3.0 — non-commercial, share-alike. Carries the Darpan, pad-arth, Faridkot Teeka, and Manmohan Singh readings shown under each word.",
@@ -223,7 +223,7 @@ export default function AboutPage() {
           textDecoration: "none",
         }}
       >
-        ← search
+        ← Back to search
       </a>
 
       <h1
