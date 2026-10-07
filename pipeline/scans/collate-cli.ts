@@ -12,12 +12,16 @@
  *   npm run scans:collate -- assemble <base.txt> <resolve-dir> <out-prefix>
  *       Join item batches (var_*.json, spot.json) with manuscript verdicts (out_*.json) and write
  *       <out-prefix>.txt (canonical text), <out-prefix>-variants.json and <out-prefix>-summary.json.
+ *   npm run scans:collate -- triangulate <typed.txt> <print.txt> <other.txt> <out.json>
+ *       Word-level vote between a typed edition, an OCR of its print and another edition:
+ *       agreed / typing slip (auto-fixed) / manuscript (recension or three-way difference).
  *
  * Inputs are Unicode text; convert legacy-font PDFs first.
  */
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { assemble, type Verdict } from "./assemble";
+import { triangulate } from "./triangulate";
 import { align, buildPageIndex, classify, locate, pagesFor, similarity, splitPadas, type PageIndexEntry } from "./collate";
 
 const read = (f: string) => readFileSync(f, "utf8");
@@ -120,9 +124,27 @@ function assembleCmd(baseFile: string, dir: string, prefix: string) {
   console.log(JSON.stringify(summary));
 }
 
+function triangulateCmd(typedFile: string, printFile: string, otherFile: string, out: string) {
+  const typed = splitPadas(read(typedFile));
+  const pair = (file: string) => {
+    const other = splitPadas(read(file));
+    const m = new Array<string | null>(typed.length).fill(null);
+    for (const [i, j] of align(typed.map((p) => p.text), other.map((p) => p.text))) if (i !== null && j !== null) m[i] = other[j].text;
+    return m;
+  };
+  const print = pair(printFile);
+  const other = pair(otherFile);
+  const rows = typed.map((p, i) => ({ pada: i, ref: p.ref, ...triangulate(p.text, print[i], other[i]) }));
+  const counts: Record<string, number> = {};
+  for (const r of rows) counts[r.verdict] = (counts[r.verdict] ?? 0) + 1;
+  const slips = rows.reduce((n, r) => n + r.words.filter((w) => w.kind === "typing-slip").length, 0);
+  writeJson(out, { counts, typingSlipWords: slips, rows: rows.filter((r) => r.verdict !== "agreed") });
+  console.log(JSON.stringify({ padas: rows.length, counts, typingSlipWords: slips }));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 const usage = () => {
-  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix>");
+  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix> | triangulate <typed> <print> <other> <out>");
   process.exit(1);
 };
 if (cmd === "collate" && args.length === 3) collate(args[0], args[1], args[2]);
@@ -130,4 +152,5 @@ else if (cmd === "locate" && args.length === 2) locateCmd(args[0], args[1]);
 else if (cmd === "page-index" && args.length === 3) pageIndex(args[0], args[1], args[2]);
 else if (cmd === "variants" && args.length === 3) variants(args[0], args[1], args[2]);
 else if (cmd === "assemble" && args.length === 3) assembleCmd(args[0], args[1], args[2]);
+else if (cmd === "triangulate" && args.length === 4) triangulateCmd(args[0], args[1], args[2], args[3]);
 else usage();
