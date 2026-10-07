@@ -5,6 +5,7 @@ import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule 
 import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
 import { secondaryGloss } from "@/lib/definition-display";
+import { isCurator, withCuratorKey } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ gurmukhi: string }>;
-  searchParams: Promise<{ tab?: string; page?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string; key?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -103,7 +104,12 @@ function EmptyState({ children }: { children: React.ReactNode }) {
 
 export default async function WordPage({ params, searchParams }: Props) {
   const { gurmukhi: encoded } = await params;
-  const { tab = "overview", page: pageParam } = await searchParams;
+  const { tab = "overview", page: pageParam, key } = await searchParams;
+  // Curator mode (#125): per-row flag forms, provenance pills outside the
+  // Sources tab, spelling caveats and methodology/roadmap copy show only to a
+  // curator. Public visitors get one word-level "Report an error" link.
+  const curator = isCurator(key);
+  const curatorKey = curator ? key! : null;
   const OCC_PAGE_SIZE = 50;
   const occPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const word = decodeURIComponent(encoded);
@@ -351,6 +357,15 @@ export default async function WordPage({ params, searchParams }: Props) {
         ← back to search
       </a>
 
+      {curator && (
+        <div style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", border: "1px dashed var(--border)", borderRadius: "6px", padding: "0.5rem 0.75rem", marginBottom: "1.5rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+          <strong style={{ color: "var(--text-primary)" }}>Curator mode</strong>
+          <a href={withCuratorKey("/admin/flags", curatorKey)}>Flag queue</a>
+          <a href="/health">Data health</a>
+          <a href={`/word/${encodeURIComponent(word)}?tab=${tab}`}>View as public</a>
+        </div>
+      )}
+
       {/* ── 1. Header ── */}
       <div style={{ marginBottom: "2.5rem" }}>
         <h1 className="gurmukhi-xl" style={{ marginBottom: "0.25rem" }}>
@@ -394,7 +409,7 @@ export default async function WordPage({ params, searchParams }: Props) {
             >
               Not attested in the ingested texts · dictionary head-word
             </span>
-            {spellingStatus === "derived_transliteration" && (
+            {curator && spellingStatus === "derived_transliteration" && (
               <span
                 className="badge"
                 title="No Gurmukhi is printed for this word in the source (Later-Gurus appendix); the spelling shown was reverse-transliterated from Shackle's romanization and is not yet verified."
@@ -403,7 +418,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                 Gurmukhi spelling derived — unverified
               </span>
             )}
-            {spellingStatus === "unverified_ocr" && (
+            {curator && spellingStatus === "unverified_ocr" && (
               <span
                 className="badge"
                 title="The Gurmukhi spelling is from OCR of the printed glossary and has not been verified against the corpus."
@@ -417,7 +432,10 @@ export default async function WordPage({ params, searchParams }: Props) {
       </div>
 
       {/* ── Tab Navigation ── */}
-      <TabNav gurmukhi={word} currentTab={tab} />
+      <div style={{ marginBottom: "0.75rem" }}>
+        <FlagForm wordId={wordId} contextLabel={`The entry for ${word}`} triggerLabel="Report an error in this entry" />
+      </div>
+      <TabNav gurmukhi={word} currentTab={tab} curatorKey={curatorKey} />
 
       {/* ── 2. Morphological variants (overview) ── */}
       {tab === "overview" && morphForms.length > 0 && (
@@ -453,7 +471,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                 <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--accent)" }}>
                   {sourceName}
                 </span>
-                <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />
+                {curator && <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />}
                 {(sourceUrl || code === "mahan_kosh") && (
                   <a
                     href={code === "mahan_kosh"
@@ -492,12 +510,12 @@ export default async function WordPage({ params, searchParams }: Props) {
                   )}
                   {/* Structured layer decoded from the printed shorthand (#34 step 1). */}
                   {parsed && <ParsedSenseChips parsed={parsed} linkableXrefs={linkableXrefs} />}
-                  <FlagForm
+                  {curator && (<FlagForm
                     wordId={wordId}
                     targetTable="definitions"
                     targetId={def.id}
                     contextLabel={`Definition${defs.length > 1 ? ` ${def.sense_number}` : ""} (${sourceName})`}
-                  />
+                  />)}
                 </div>
                 );
               })}
@@ -573,7 +591,7 @@ export default async function WordPage({ params, searchParams }: Props) {
               </div>
             )}
           </div>
-          {tab === "pronunciation" && (
+          {curator && tab === "pronunciation" && (
             <EmptyState>Audio pronunciation is planned for a later phase.</EmptyState>
           )}
         </section>
@@ -585,7 +603,7 @@ export default async function WordPage({ params, searchParams }: Props) {
           <SectionHeading>Grammar</SectionHeading>
 
           {/* Honest framing: every value shown is read from a named source. */}
-          <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
+          {curator && <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1.25rem", maxWidth: "44rem" }}>
             Every entry here is read from a named source: Prof. Sahib Singh&apos;s grammar
             notes in his <em>Sri Guru Granth Sahib Darpan</em> pad-arth (with the line
             cited), Christopher Shackle&apos;s <em>A Guru Nanak Glossary</em>, or, for part
@@ -594,7 +612,7 @@ export default async function WordPage({ params, searchParams }: Props) {
             than choose between them. Where no source gives a word&apos;s gender, number or
             case, we leave it blank rather than infer it from the spelling. Expand
             &ldquo;How we determined this&rdquo; on any entry to see its source.
-          </p>
+          </p>}
 
           {grammarView.map((av: AttributeView) => {
             const lead: AttributeReading = av.readings[0];
@@ -623,7 +641,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                     </span>
                   )}
                   <span style={{ marginLeft: "auto" }}>
-                    <ProvenanceBadge provenance={KIND_PROVENANCE[leadSource.sourceKind]} reviewStatus={leadSource.verified ? "approved" : "unreviewed"} />
+                    {curator && <ProvenanceBadge provenance={KIND_PROVENANCE[leadSource.sourceKind]} reviewStatus={leadSource.verified ? "approved" : "unreviewed"} />}
                   </span>
                 </div>
 
@@ -647,11 +665,11 @@ export default async function WordPage({ params, searchParams }: Props) {
                   </div>
                 ))}
 
-                <FlagForm
+                {curator && (<FlagForm
                   wordId={wordId}
                   targetTable="word_grammar"
                   contextLabel={`Grammar — ${av.label}: ${fmtGrammar(av.attribute, lead.value)}`}
-                />
+                />)}
 
                 <details style={{ marginTop: "0.65rem", fontFamily: '"Inter", sans-serif', fontSize: "0.85rem" }}>
                   <summary style={{ cursor: "pointer", color: "var(--accent)", fontWeight: 600 }}>
@@ -698,7 +716,7 @@ export default async function WordPage({ params, searchParams }: Props) {
               row is Kahn Singh's own printed marker, decoded via his 1930 key —
               a citation, not our judgment. Only the external dictionary gloss
               (Monier-Williams / Steingass / Platts) is our best-judgment layer. */}
-          {etymology.some((e) => e.provenance === "rule_derived") && (
+          {curator && etymology.some((e) => e.provenance === "rule_derived") && (
             <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: "1rem", maxWidth: "44rem" }}>
               Rows marked <em>Mahan Kosh</em> cite the origin marker Kahn Singh Nabha printed in
               that entry (ਸੰ. Sanskrit, ਫ਼ਾ. Persian, ਅ਼. Arabic, …), decoded via his own 1930
@@ -733,9 +751,9 @@ export default async function WordPage({ params, searchParams }: Props) {
                       >
                         Mahan Kosh
                       </span>
-                    ) : (
+                    ) : curator ? (
                       <ProvenanceBadge provenance={e.provenance ?? null} reviewStatus={e.review_status ?? null} />
-                    )}
+                    ) : null}
                   </div>
                   {e.derivation_note && (
                     <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", margin: "0.3rem 0 0" }}>
@@ -781,12 +799,12 @@ export default async function WordPage({ params, searchParams }: Props) {
                       ) : null}
                     </div>
                   )}
-                  <FlagForm
+                  {curator && (<FlagForm
                     wordId={wordId}
                     targetTable="etymology"
                     targetId={e.id}
                     contextLabel={`Etymology — ${e.origin_language}${e.root_form_roman ? ` (${e.root_form_roman})` : ""}`}
-                  />
+                  />)}
                 </div>
               </div>
               );
@@ -797,7 +815,7 @@ export default async function WordPage({ params, searchParams }: Props) {
 
       {/* ── Etymology empty state ── */}
       {tab === "etymology" && etymology.length === 0 && (
-        <EmptyState>No etymology recorded yet. Cross-dictionary roots (Sanskrit, Farsi, Arabic) arrive in a later phase.</EmptyState>
+        <EmptyState>No etymology recorded yet.{curator && " Cross-dictionary roots (Sanskrit, Farsi, Arabic) arrive in a later phase."}</EmptyState>
       )}
 
       {/* ── Usage (usage tab) ── */}
@@ -970,13 +988,13 @@ export default async function WordPage({ params, searchParams }: Props) {
         {wordRow.frequency > OCC_PAGE_SIZE && (
           <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", fontFamily: '"Inter", sans-serif', fontSize: "0.9rem" }}>
             {occPage > 1 ? (
-              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage - 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>← Previous</a>
+              <a href={withCuratorKey(`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage - 1}`, curatorKey)} style={{ color: "var(--accent)", textDecoration: "none" }}>← Previous</a>
             ) : <span />}
             <span style={{ color: "var(--text-secondary)" }}>
               Page {occPage} of {Math.max(1, Math.ceil(wordRow.frequency / OCC_PAGE_SIZE)).toLocaleString()}
             </span>
             {occPage * OCC_PAGE_SIZE < wordRow.frequency ? (
-              <a href={`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage + 1}`} style={{ color: "var(--accent)", textDecoration: "none" }}>Next →</a>
+              <a href={withCuratorKey(`/word/${encodeURIComponent(word)}?tab=occurrences&page=${occPage + 1}`, curatorKey)} style={{ color: "var(--accent)", textDecoration: "none" }}>Next →</a>
             ) : <span />}
           </nav>
         )}
@@ -1016,14 +1034,14 @@ export default async function WordPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          {/* Planned source, pending permission (reminder + public transparency). */}
-          <div style={{ ...CARD, borderStyle: "dashed" }}>
+          {/* Planned source, pending permission (curator reminder). */}
+          {curator && <div style={{ ...CARD, borderStyle: "dashed" }}>
             <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 600 }}>Planned: SikhRI — The Guru Granth Sahib Dictionary</span>
             <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.6, marginTop: "0.35rem", marginBottom: 0 }}>
               We intend to incorporate SikhRI&apos;s per-word meanings and grammar, with full attribution,
               once we receive their permission. Not yet integrated.
             </p>
-          </div>
+          </div>}
         </section>
       )}
     </div>

@@ -10,7 +10,7 @@
  * minimum time-since-render check, both enforced server-side too.
  */
 
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useId, useState, type CSSProperties, type FormEvent } from "react";
 
 type FlagType = "incorrect" | "unclear" | "has_better_source" | "other";
 
@@ -46,12 +46,16 @@ export function FlagForm({
   targetTable,
   targetId,
   contextLabel,
+  triggerLabel = "Flag this / suggest a correction",
 }: {
   wordId: number;
   targetTable?: "word_grammar" | "definitions" | "etymology";
   targetId?: number;
   contextLabel: string;
+  triggerLabel?: string;
 }) {
+  // Field ids must be unique per form: curator mode renders one form per row.
+  const id = useId();
   const [open, setOpen] = useState(false);
   const [renderedAt] = useState(() => Date.now());
   const [flagType, setFlagType] = useState<FlagType>("incorrect");
@@ -113,7 +117,7 @@ export function FlagForm({
           cursor: "pointer",
         }}
       >
-        Flag this / suggest a correction
+        {triggerLabel}
       </button>
     );
   }
@@ -139,9 +143,9 @@ export function FlagForm({
 
       {/* Honeypot — hidden from sighted users, left for bots to fill in. */}
       <div style={{ position: "absolute", left: "-9999px" }} aria-hidden="true">
-        <label htmlFor="flag-website">Leave blank</label>
+        <label htmlFor={`${id}-website`}>Leave blank</label>
         <input
-          id="flag-website"
+          id={`${id}-website`}
           type="text"
           tabIndex={-1}
           autoComplete="off"
@@ -151,9 +155,9 @@ export function FlagForm({
       </div>
 
       <div>
-        <label style={LABEL_STYLE} htmlFor="flag-type">What&apos;s the issue?</label>
+        <label style={LABEL_STYLE} htmlFor={`${id}-type`}>What&apos;s the issue?</label>
         <select
-          id="flag-type"
+          id={`${id}-type`}
           style={INPUT_STYLE}
           value={flagType}
           onChange={(e) => setFlagType(e.target.value as FlagType)}
@@ -165,9 +169,9 @@ export function FlagForm({
       </div>
 
       <div>
-        <label style={LABEL_STYLE} htmlFor="flag-message">Details</label>
+        <label style={LABEL_STYLE} htmlFor={`${id}-message`}>Details</label>
         <textarea
-          id="flag-message"
+          id={`${id}-message`}
           required
           rows={3}
           maxLength={2000}
@@ -178,9 +182,9 @@ export function FlagForm({
       </div>
 
       <div>
-        <label style={LABEL_STYLE} htmlFor="flag-source">Source (optional)</label>
+        <label style={LABEL_STYLE} htmlFor={`${id}-source`}>Source (optional)</label>
         <input
-          id="flag-source"
+          id={`${id}-source`}
           type="text"
           placeholder="A citation or URL, if you have one"
           style={INPUT_STYLE}
@@ -191,9 +195,9 @@ export function FlagForm({
 
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <div style={{ flex: 1 }}>
-          <label style={LABEL_STYLE} htmlFor="flag-name">Name (optional)</label>
+          <label style={LABEL_STYLE} htmlFor={`${id}-name`}>Name (optional)</label>
           <input
-            id="flag-name"
+            id={`${id}-name`}
             type="text"
             style={INPUT_STYLE}
             value={reporterName}
@@ -201,9 +205,9 @@ export function FlagForm({
           />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={LABEL_STYLE} htmlFor="flag-email">Email (optional)</label>
+          <label style={LABEL_STYLE} htmlFor={`${id}-email`}>Email (optional)</label>
           <input
-            id="flag-email"
+            id={`${id}-email`}
             type="email"
             style={INPUT_STYLE}
             value={reporterEmail}
