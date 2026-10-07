@@ -3,9 +3,10 @@ import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
-import { buildGrammarView, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
+import { buildGrammarView, normalizePos, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
 import { entryLink, secondaryGloss } from "@/lib/definition-display";
+import { homographMark, seeTargets, splitShackleGloss } from "@/lib/shackle-display";
 import { isCurator, withCuratorKey } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
@@ -71,7 +72,7 @@ function CrossRefTags({ refs }: { refs: Record<string, string> | null }) {
   return (
     <span style={{ display: "inline-flex", gap: "0.35rem", flexWrap: "wrap", marginLeft: "0.4rem" }}>
       {Object.entries(refs).map(([key, val]) =>
-        key !== "origin_lang" ? (
+        key !== "origin_lang" && key !== "see" ? (
           <span
             key={key}
             title={display[key] ?? key}
@@ -141,6 +142,14 @@ export default async function WordPage({ params, searchParams }: Props) {
   // distinct sources (cited scholar > dictionary marker), so the UI
   // can corroborate agreement and flag conflicts instead of stacking raw rows.
   const grammarView = buildGrammarView(grammar, posMap);
+  // Part of speech each Shackle sense was printed with, so homographs (hari¹
+  // 'God', a noun; hari² 'snatch', a verb) read as separate words (#131).
+  const posByDefinition = new Map<number, string>();
+  for (const g of grammar) {
+    if (g.definition_id == null || !g.pos) continue;
+    const pos = normalizePos(g.source_code ?? null, g.pos, posMap)[0];
+    if (pos) posByDefinition.set(g.definition_id, pos);
+  }
 
   // Step 2: fire remaining queries in parallel — but only the ones the active
   // tab actually renders. Every tab still pays for the header (word row +
@@ -252,6 +261,9 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Group definitions by source
   const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; language: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
   for (const def of definitions) {
+    // A Shackle cross-reference whose target the extraction lost reads only
+    // "(cross-reference)" (#131): meaningless to a reader, so curator-only.
+    if (!curator && def.definition_text === "(cross-reference)" && seeTargets(def.cross_refs).length === 0) continue;
     const src = def.dict_sources as unknown as { code: string; name: string; url: string | null; language: string | null } | null;
     const key = src?.code ?? "unknown";
     if (!defsBySource.has(key)) {
@@ -489,19 +501,53 @@ export default async function WordPage({ params, searchParams }: Props) {
               {defs.map((def) => {
                 const parsed = asParsedSense(def.parsed ?? null);
                 const gloss = secondaryGloss(def);
+                // Shackle rows (#131): each row is its own printed headword, so
+                // several are homographs, not senses; the gloss is split from
+                // the phrases/citations printed after it; "see" targets link.
+                const isShackle = code === "shackle";
+                const shackle = isShackle ? splitShackleGloss(def.definition_text) : null;
+                const targets = seeTargets(def.cross_refs);
+                const pos = isShackle ? posByDefinition.get(def.id) : undefined;
+                const seeLinks = targets.length > 0 && (
+                  <>
+                    see{" "}
+                    {targets.map((t, i) => (
+                      <span key={t}>
+                        {i > 0 && ", "}
+                        <a href={`/word/${encodeURIComponent(t)}`} className="gurmukhi">{t}</a>
+                      </span>
+                    ))}
+                  </>
+                );
+                const mainIsPointer = !!shackle && /^see\b/.test(shackle.gloss);
+                const detailIsPointer = !!shackle?.detail && /^see\b/.test(shackle.detail);
                 return (
                 <div key={def.id} style={{ ...CARD, paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
                   <div style={{ display: "flex", gap: "0.6rem", alignItems: "baseline" }}>
-                    {defs.length > 1 && (
+                    {defs.length > 1 && (isShackle ? (
+                      <span className="gurmukhi" style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-secondary)", whiteSpace: "nowrap" }} title="A separate headword in Shackle's glossary that happens to share this spelling">
+                        {word}{homographMark(def.sense_number ?? 1)}
+                      </span>
+                    ) : (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", minWidth: "1.2rem" }}>
                         {def.sense_number}.
                       </span>
+                    ))}
+                    {pos && (
+                      <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", fontWeight: 600, background: "var(--accent-bg)", color: "var(--accent)", borderRadius: "4px", padding: "0.1rem 0.45rem", whiteSpace: "nowrap" }}>
+                        {pos}
+                      </span>
                     )}
                     <p className={language === "pa" ? "gurmukhi" : undefined} style={{ margin: 0, lineHeight: 1.7 }}>
-                      {def.definition_text}
+                      {shackle ? (mainIsPointer && seeLinks ? seeLinks : shackle.gloss) : def.definition_text}
                       {!parsed && <CrossRefTags refs={def.cross_refs as Record<string, string> | null} />}
                     </p>
                   </div>
+                  {shackle?.detail && (
+                    <p style={{ margin: "0.3rem 0 0", color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.6 }}>
+                      {detailIsPointer && seeLinks ? seeLinks : shackle.detail}
+                    </p>
+                  )}
                   {gloss && (
                     <p style={{ margin: "0.35rem 0 0", color: "var(--text-secondary)", fontSize: "0.95rem", fontStyle: "italic" }}>
                       {gloss}

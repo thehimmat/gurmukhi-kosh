@@ -35,6 +35,7 @@ import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
 import type { GlossaryEntry } from "./types";
+import { buildCrossRefIndex, resolveCrossRefs } from "./cross-refs";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -126,10 +127,13 @@ function defNotes(e: GlossaryEntry): string | null {
   return parts.length ? parts.join(" | ") : null;
 }
 
-function defText(e: GlossaryEntry): string {
+function defText(e: GlossaryEntry, seeTargets: string[]): string {
   const g = (e.gloss ?? "").trim();
   if (g) return g;
   if (e.etymology?.doubletOf?.length) return `see ${e.etymology.doubletOf.join(", ")}`;
+  // A gloss-less cross-reference names its target in Gurmukhi once resolved
+  // (#131); before that it stored only this placeholder, losing the target.
+  if (seeTargets.length) return `see ${seeTargets.join(", ")}`;
   return "(cross-reference)";
 }
 
@@ -217,24 +221,41 @@ async function main() {
   type Keyed = { key: string; entry: GlossaryEntry; wordId: number; sense: number };
   const keyed: Keyed[] = [];
   const defRows: Record<string, unknown>[] = [];
+  const crossRefIndex = buildCrossRefIndex(entries);
+  let xrefOnly = 0;
+  const xrefUnresolved: string[] = [];
+  let pointersResolved = 0;
   for (const [wid, es] of byWord) {
     es.sort((a, b) => (a.homonymIndex ?? 0) - (b.homonymIndex ?? 0) || a.id.localeCompare(b.id));
     let sense = 0;
     for (const e of es) {
       sense++;
       keyed.push({ key: `${wid}:${sense}`, entry: e, wordId: wid, sense });
+      const see = resolveCrossRefs(e, crossRefIndex);
+      if (e.glossIsCrossRefOnly && !(e.gloss ?? "").trim()) {
+        xrefOnly++;
+        if (!see.length) xrefUnresolved.push(`${e.gurmukhi} (${e.headword}${e.homonymIndex ?? ""})`);
+      } else if (see.length) {
+        pointersResolved++;
+      }
       defRows.push({
         word_id: wid,
         dict_source_id: sourceId,
         entry_gurmukhi: e.gurmukhi,
         sense_number: sense,
-        definition_text: defText(e),
+        definition_text: defText(e, see),
         definition_en: (e.gloss ?? "").trim() || null,
+        cross_refs: see.length ? { see } : null,
         notes: defNotes(e),
         provenance: "imported",
       });
     }
   }
+  console.log(
+    `Cross-references: ${xrefOnly - xrefUnresolved.length}/${xrefOnly} gloss-less entries resolved; ` +
+      `${pointersResolved} printed 'see X' pointers linked`,
+  );
+  if (xrefUnresolved.length) console.log(`  unresolved (left as placeholders): ${xrefUnresolved.join(", ")}`);
   console.log(`Definitions: ${defRows.length} rows across ${byWord.size} words. Inserting...`);
   const t0 = Date.now();
   const insertedDefs = await insertReturningIds(db, "definitions", defRows, "id, word_id, sense_number");
