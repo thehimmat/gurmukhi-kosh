@@ -10,6 +10,13 @@ import { toMorphVariants, type MorphVariant, type SiblingFormRow } from "./morph
 
 export type { MorphVariant };
 
+// definitions columns both surfaces render. The word page once kept its own
+// copy that omitted definition_en, so English glosses never showed (#122).
+// The page appends `parsed` (the structured Mahan Kosh layer, not yet in the
+// API: #59).
+export const DEFINITION_COLUMNS =
+  "id, sense_number, definition_text, definition_en, cross_refs, source_url, entry_gurmukhi, notes, provenance, review_status, dict_sources(code, name, language, url)";
+
 // pos_mappings (#29): every surface that builds a grammar view must compare POS
 // through the same map, or the word page, /health and the autoflag pass drift.
 // The table is tiny (one row per distinct raw label), so no paging is needed.
