@@ -11,16 +11,20 @@
  *       Definite variants with the manuscript pages to check for each.
  *   npm run scans:collate -- assemble <base.txt> <resolve-dir> <out-prefix>
  *       Join item batches (var_*.json, spot.json) with manuscript verdicts (out_*.json) and write
- *       <out-prefix>.txt (canonical text), <out-prefix>-variants.json and <out-prefix>-summary.json.
+ *       <out-prefix>.txt (canonical text), <out-prefix>.json (the same, one entry per base half-line),
+ *       <out-prefix>-variants.json and <out-prefix>-summary.json.
  *   npm run scans:collate -- triangulate <typed.txt> <print.txt> <other.txt> <out.json>
  *       Word-level vote between a typed edition, an OCR of its print and another edition:
  *       agreed / typing slip (auto-fixed) / manuscript (recension or three-way difference).
+ *   npm run scans:collate -- apply-slips <canon.json> <triangulation.json> <variants.json> <out-prefix>
+ *       Correct the typing slips in an assembled text, except where the manuscript already ruled;
+ *       writes <out-prefix>.txt and <out-prefix>-slips.json.
  *
  * Inputs are Unicode text; convert legacy-font PDFs first.
  */
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { assemble, type Verdict } from "./assemble";
+import { applySlips, assemble, type CanonicalPada, type Verdict } from "./assemble";
 import { triangulate } from "./triangulate";
 import { align, buildPageIndex, classify, locate, pagesFor, similarity, splitPadas, type PageIndexEntry } from "./collate";
 
@@ -110,7 +114,9 @@ function assembleCmd(baseFile: string, dir: string, prefix: string) {
     }
   }
   const { text, variants } = assemble(splitPadas(read(baseFile)), verdicts);
+  writeJson(`${prefix}.json`, text);
   writeFileSync(`${prefix}.txt`, text.map((p) => `${p.text} ॥${p.ref ? ` ${p.ref} ॥` : ""}`).join("\n") + "\n");
+  writeJson(`${prefix}.json`, text);
   writeJson(`${prefix}-variants.json`, variants);
   const tally = (xs: Array<{ supports: string }>) => xs.reduce<Record<string, number>>((t, x) => ((t[x.supports] = (t[x.supports] ?? 0) + 1), t), {});
   const summary = {
@@ -142,9 +148,20 @@ function triangulateCmd(typedFile: string, printFile: string, otherFile: string,
   console.log(JSON.stringify({ padas: rows.length, counts, typingSlipWords: slips }));
 }
 
+function applySlipsCmd(canonFile: string, triFile: string, variantsFile: string, prefix: string) {
+  const canon = JSON.parse(read(canonFile)) as CanonicalPada[];
+  const { rows } = JSON.parse(read(triFile)) as { rows: Array<{ pada: number; verdict: string; text: string; words: Array<{ typed: string; print: string; kind: string }> }> };
+  const ruled = new Set((JSON.parse(read(variantsFile)) as Array<{ pada: number }>).map((v) => v.pada));
+  const { text, fixes } = applySlips(canon, rows.filter((r) => r.verdict === "typing-slip"), ruled);
+  writeJson(`${prefix}.json`, text);
+  writeFileSync(`${prefix}.txt`, text.map((p) => `${p.text} ॥${p.ref ? ` ${p.ref} ॥` : ""}`).join("\n") + "\n");
+  writeJson(`${prefix}-slips.json`, fixes);
+  console.log(JSON.stringify({ halfLines: text.length, padasFixed: new Set(fixes.map((f) => f.pada)).size, wordsFixed: fixes.length }));
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 const usage = () => {
-  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix> | triangulate <typed> <print> <other> <out>");
+  console.error("usage: collate <base> <other> <out> | locate <edition> <snippet> | page-index <edition> <openings> <out> | variants <collation> <index> <out> | assemble <base> <resolve-dir> <out-prefix> | triangulate <typed> <print> <other> <out> | apply-slips <canon> <tri> <variants> <out-prefix>");
   process.exit(1);
 };
 if (cmd === "collate" && args.length === 3) collate(args[0], args[1], args[2]);
@@ -153,4 +170,5 @@ else if (cmd === "page-index" && args.length === 3) pageIndex(args[0], args[1], 
 else if (cmd === "variants" && args.length === 3) variants(args[0], args[1], args[2]);
 else if (cmd === "assemble" && args.length === 3) assembleCmd(args[0], args[1], args[2]);
 else if (cmd === "triangulate" && args.length === 4) triangulateCmd(args[0], args[1], args[2], args[3]);
+else if (cmd === "apply-slips" && args.length === 4) applySlipsCmd(args[0], args[1], args[2], args[3]);
 else usage();

@@ -106,9 +106,34 @@ export function assemble(base: Pada[], verdicts: Verdict[]): { text: CanonicalPa
       supports: v.supports,
       confidence: v.confidence,
       page: v.page,
-      needsReview: v.confidence === "low" || REVIEW.includes(v.supports),
+      needsReview: v.confidence === "low" || REVIEW.includes(v.supports) || /[।॥]/.test(canonical),
       ...(v.note ? { note: v.note } : {}),
     });
   });
   return { text, variants };
+}
+
+export interface SlipFix {
+  pada: number;
+  from: string;
+  to: string;
+}
+
+/**
+ * Correct typing slips found by triangulation (see triangulate.ts) in an assembled text.
+ * Half-lines the manuscript already ruled on are left alone: its reading wins.
+ */
+export function applySlips(
+  text: CanonicalPada[],
+  slips: Array<{ pada: number; text: string; words: Array<{ typed: string; print: string; kind: string }> }>,
+  ruled: Set<number>,
+): { text: CanonicalPada[]; fixes: SlipFix[] } {
+  const out = text.map((p) => ({ ...p }));
+  const fixes: SlipFix[] = [];
+  for (const s of slips) {
+    if (ruled.has(s.pada) || !out[s.pada]) continue;
+    out[s.pada].text = s.text;
+    for (const w of s.words) if (w.kind === "typing-slip") fixes.push({ pada: s.pada, from: w.typed, to: w.print });
+  }
+  return { text: out, fixes };
 }
