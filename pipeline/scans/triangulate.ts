@@ -127,6 +127,9 @@ const wellFormed = (word: string) => {
   const w = clean(word);
   return w !== "" && !/[ਾਿੀੁੂੇੈੋੌ]੍|੍[ਾਿੀੁੂੇੈੋੌੰਂੱ]|੍$|^[ਾਿੀੁੂੇੈੋੌੰਂੱ੍]/.test(w);
 };
+/** Consonants only: the letters a fix may not lose. */
+const consonants = (w: string) => w.normalize("NFD").replace(/[^ਅ-ਹ]/g, "");
+
 const isSlip = (k: WordKind) => k === "typing-slip" || k === "probable-slip";
 
 const same = (x: string | null, y: string | null) => x !== null && y !== null && editionFold(fixRa(x)) === editionFold(fixRa(y));
@@ -148,6 +151,9 @@ export function triangulate(typed: string, print: string | null, ce: string | nu
       if (!skeleton(w)) continue;
       const k = c.inserted[slot].findIndex((x) => sameSkel(x, w));
       if (k < 0) continue;
+      // A word the print splits off a compound the typed text has whole is word division, not a slip.
+      const beside = [t[slot - 1], t[slot]].filter(Boolean).map(consonants);
+      if (beside.some((b) => b.length > consonants(w).length && b.includes(consonants(w)))) continue;
       const sure = same(w, c.inserted[slot][k]) && wellFormed(w);
       words.push({ typed: "", print: clean(w), ce: c.inserted[slot][k], kind: sure ? "typing-slip" : "probable-slip" });
       if (sure) out.push(clean(w));
@@ -162,9 +168,12 @@ export function triangulate(typed: string, print: string | null, ce: string | nu
     const pw = p.at[i];
     const cw = c.at[i];
     if (!skeleton(w)) return void out.push(w); // numbers, stray symbols
-    const slip = (exact: boolean) => {
+    const slip = (exactMatch: boolean) => {
+      let exact = exactMatch;
       // Not a slip if the scans only lost what OCR loses, or only divide the words differently.
       if (ocrLoss(w, pw!) || !printDiff.touched.has(w)) return void out.push(w);
+      // Losing two or more consonants means a split compound or a misaligned word: suggest only.
+      if (consonants(pw!).length <= consonants(w).length - 2) exact = false;
       const sure = exact && wellFormed(pw!);
       words.push({ typed: w, print: clean(pw!), ce: cw ?? "", kind: sure ? "typing-slip" : "probable-slip" });
       out.push(sure ? clean(pw!) : w);

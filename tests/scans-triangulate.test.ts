@@ -124,6 +124,17 @@ describe("triangulate", () => {
     expect(r.text).toBe("ਚਰਮ ਸੇਲ ਗਦਾ ਖੰਡਲ");
   });
 
+  it("never applies a fix that drops two or more consonants (a misaligned or split word)", () => {
+    const r = triangulate("ਰਨ ਰੰਗਭੂਮਿ ਮਾਹਿ", "ਰਨ ਭੂਮਿ ਮਾਹਿ", "ਰਨ ਭੂਮਿ ਮਾਹਿ");
+    expect(r.text).toBe("ਰਨ ਰੰਗਭੂਮਿ ਮਾਹਿ");
+    expect(r.words.every((w) => w.kind !== "typing-slip")).toBe(true);
+  });
+
+  it("does not insert a word whose letters are already in the typed word beside it", () => {
+    const r = triangulate("ਮਣਿਗਣ ਬਿਮਲ", "ਮਣਿ ਗਣ ਬਿਮਲ", "ਮਣਿ ਗਣ ਬਿਮਲ");
+    expect(r.text).toBe("ਮਣਿਗਣ ਬਿਮਲ");
+  });
+
   it("falls back to the manuscript when a source is missing", () => {
     const r = triangulate("ਪੈ ਪਾਯ ਸ਼ਰਨੀ ਆਇ", null, "ਢਹ ਪਏ ਸਰਨੀ ਆਇ");
     expect(r.verdict).toBe("manuscript");

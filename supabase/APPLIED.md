@@ -104,6 +104,7 @@ Migration 035 seeds the five Shackle POS labels 023 left unmapped (#29). Data on
 table's reader landed in the same change (`lib/grammar-view.ts` `normalizePos`).
 
 | 51 | 20260930143950 | 036_number_lines_drop_scalar_offsets | kosh `036_number_lines_drop_scalar_offsets.sql` |
+| 52 | 20261007192220 | 038_sarbloh_sources | kosh `038_sarbloh_sources.sql` |
 
 Migration 036 is the remove half of 034's add-then-remove: search_number_lines no longer
 returns the scalar `char_start`/`char_end`. Verified gurmukhi-search production (f6ec668,

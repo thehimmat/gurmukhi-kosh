@@ -150,6 +150,39 @@ index), Tesseract as for CE.
     the appendix is a later hand.
 - One stray leaf is bound out of order.
 
+## In the Kosh (ingested 2026-10-07)
+
+Two corpora (migration `038_sarbloh_sources`), ranked after SGGS, Dasam Bani and Bhai Gurdas:
+
+| source | half-line rows | Budha Dal pages | words | occurrences |
+|---|---|---|---|---|
+| `sarbloh_budha_dal`: Sri Sarbloh Granth | 27,804 | 1–818 | 32,619 | 191,571 |
+| `sarbloh_avatars_budha_dal`: the avatar section (part of Sarbloh according to Budha Dal) | 8,196 | 819–1028 | 9,786 | 44,620 |
+
+- **Text.** The Granth is `canon-bd`: the typed Budha Dal text with typing slips corrected against the print
+  scan. The avatars are the typed text as is (no third witness to check slips against).
+- **`ang`.** The Budha Dal page. The typed PDF is page-for-page with the print, and each page's printed
+  number is read from the page itself.
+- **Line shape.** As for Dasam Bani: one half-line per row, ending in ` ॥` or in its verse numbers,
+  e.g. `॥੧੦੫॥` or `॥੩੬੬॥੧੧੨੦॥`. `verse_id` = `line_no` = the running row number. No shabad rows.
+- **Clean-up** (`pipeline/sarbloh/lines.ts`, tested in `tests/sarbloh-lines.test.ts`):
+  - printed page numbers that had run into ~1,000 half-lines (and 77 verse numbers) are removed;
+  - `<` → ੴ;
+  - symbols the converter left for dandas (ñ ! # { } · _ →, and ਲਲ / ਿਲ beside a number) → ॥;
+  - a verse number that lost its danda is moved to the right line;
+  - 34 other stray characters (mostly quote marks and full stops) are dropped, and listed by
+    `npm run build:sarbloh`.
+  - About 22 lines keep a number in the text: mostly headings (ਛਕਾ ੧, ਅਸਟਪਦੀ ੧), plus four stray "੧"
+    in the avatars.
+- **Typing-slip guard.** A correction never removes two or more consonants. That stopped 98 bad
+  "corrections" where the print splits a compound (ਰੰਗਭੂਮਿ → ਭੂਮਿ) or a word was misaligned.
+- **Load.** `npm run build:sarbloh -- <out.json>` writes the rows. This container could not reach Supabase,
+  so the JSON was served once from a temporary branch and pulled in with the `http` extension. Words and
+  occurrences were then built in SQL with `lib/tokenizer.ts`'s rules, followed by
+  `refresh_word_frequencies` and `refresh_word_corpus_stats`.
+  - The counts matched the TypeScript tokenizer exactly (236,191 tokens, 36,578 distinct).
+  - From a machine with `.env.local`, a supabase-js loader would do the same.
+
 ## Witness apparatus (`../data/sarbloh/canon-bd-apparatus.json`, local)
 
 ```
