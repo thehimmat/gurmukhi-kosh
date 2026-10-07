@@ -78,6 +78,52 @@ describe("triangulate", () => {
     expect(r.words.map((w) => w.typed)).toEqual(["ਦੁਖ"]);
   });
 
+  it("keeps a nasal or subscript the OCR lost in both scans (shared OCR errors are not two witnesses)", () => {
+    const r = triangulate("ਮਹਾਂ ਪ੍ਰਸਾਦਿ ਹ੍ਵੈ ਹੋਤ", "ਮਹਾ ਪ੍ਸਾਦਿ ਹੈ ਹੋਤ", "ਮਹਾ ਪ੍ਸਾਦਿ ਹੈ ਹੋਤ");
+    expect(r.verdict).toBe("agreed");
+    expect(r.text).toBe("ਮਹਾਂ ਪ੍ਰਸਾਦਿ ਹ੍ਵੈ ਹੋਤ");
+  });
+
+  it("still restores a subscript the typed text lost", () => {
+    const r = triangulate("ਨਿਪ ਬਰ", "ਨ੍ਰਿਪ ਬਰ", "ਨ੍ਰਿਪ ਬਰ");
+    expect(r.verdict).toBe("typing-slip");
+    expect(r.text).toBe("ਨ੍ਰਿਪ ਬਰ");
+  });
+
+  it("does not 'correct' ਪ੍ਰਭੁ to the OCR's ਪਰ੍ਭੁ", () => {
+    const r = triangulate("ਪ੍ਰਭੁ ਕਹ", "ਪਰ੍ਭੁ ਕਹ", "ਪਰ੍ਭੁ ਕਹ");
+    expect(r.verdict).toBe("agreed");
+    expect(r.text).toBe("ਪ੍ਰਭੁ ਕਹ");
+  });
+
+  it("does not 'fix' a word whose only difference is word division in both scans", () => {
+    const r = triangulate("ਮਹਾ ਬਾਹੁ ਬੀਰ", "ਮਹਾਬਾਹੁ ਬੀਰ", "ਮਹਾਬਾਹੋ ਬੀਰ");
+    expect(r.text).toBe("ਮਹਾ ਬਾਹੁ ਬੀਰ");
+  });
+
+  it("drops OCR punctuation from a corrected word", () => {
+    expect(triangulate("ਸੁੰਦਰ ਮੋਹਨ", "ਸੁੰਦਰ ਮਨ-ਮੋਹਨ", "ਸੁੰਦਰ ਮਨਮੋਹਨ").text).toBe("ਸੁੰਦਰ ਮਨਮੋਹਨ");
+  });
+
+  it("only suggests a fix when the scans agree on consonants but not on spelling", () => {
+    const r = triangulate("ਗੰਜ ਨੈਨ", "ਕੇਜ ਨੈਨ", "ਕੰਜ ਨੈਨ");
+    expect(r.verdict).toBe("typing-slip");
+    expect(r.text).toBe("ਗੰਜ ਨੈਨ");
+    expect(r.words).toEqual([{ typed: "ਗੰਜ", print: "ਕੇਜ", ce: "ਕੰਜ", kind: "probable-slip" }]);
+  });
+
+  it("only suggests a fix when the OCR word is malformed (vowel sign before a subscript)", () => {
+    const r = triangulate("ਦਿਨ ਦੇਖ", "ਦਿ੍ਗਨ ਦੇਖ", "ਦਿ੍ਗਨ ਦੇਖ");
+    expect(r.text).toBe("ਦਿਨ ਦੇਖ");
+    expect(r.words[0].kind).toBe("probable-slip");
+  });
+
+  it("fixes a typing slip even in a half-line that also has a reading for the manuscript", () => {
+    const r = triangulate("ਚਰਮ ਸੇਲ ਦਾ ਖੰਡਲ", "ਚਰਮ ਸੇਲ ਗਦਾ ਖੰਡਲ", "ਚਰਮ ਸੇਲ ਗਦਾ ਮੰਡਲ");
+    expect(r.verdict).toBe("manuscript");
+    expect(r.text).toBe("ਚਰਮ ਸੇਲ ਗਦਾ ਖੰਡਲ");
+  });
+
   it("falls back to the manuscript when a source is missing", () => {
     const r = triangulate("ਪੈ ਪਾਯ ਸ਼ਰਨੀ ਆਇ", null, "ਢਹ ਪਏ ਸਰਨੀ ਆਇ");
     expect(r.verdict).toBe("manuscript");

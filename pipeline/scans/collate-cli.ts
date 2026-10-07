@@ -143,16 +143,17 @@ function triangulateCmd(typedFile: string, printFile: string, otherFile: string,
   const rows = typed.map((p, i) => ({ pada: i, ref: p.ref, ...triangulate(p.text, print[i], other[i]) }));
   const counts: Record<string, number> = {};
   for (const r of rows) counts[r.verdict] = (counts[r.verdict] ?? 0) + 1;
-  const slips = rows.reduce((n, r) => n + r.words.filter((w) => w.kind === "typing-slip").length, 0);
-  writeJson(out, { counts, typingSlipWords: slips, rows: rows.filter((r) => r.verdict !== "agreed") });
-  console.log(JSON.stringify({ padas: rows.length, counts, typingSlipWords: slips }));
+  const n = (kind: string) => rows.reduce((t, r) => t + r.words.filter((w) => w.kind === kind).length, 0);
+  const words = { "typing-slip": n("typing-slip"), "probable-slip": n("probable-slip"), recension: n("recension"), "three-way": n("three-way") };
+  writeJson(out, { counts, words, rows: rows.filter((r) => r.verdict !== "agreed") });
+  console.log(JSON.stringify({ padas: rows.length, counts, words }));
 }
 
 function applySlipsCmd(canonFile: string, triFile: string, variantsFile: string, prefix: string) {
   const canon = JSON.parse(read(canonFile)) as CanonicalPada[];
   const { rows } = JSON.parse(read(triFile)) as { rows: Array<{ pada: number; verdict: string; text: string; words: Array<{ typed: string; print: string; kind: string }> }> };
   const ruled = new Set((JSON.parse(read(variantsFile)) as Array<{ pada: number }>).map((v) => v.pada));
-  const { text, fixes } = applySlips(canon, rows.filter((r) => r.verdict === "typing-slip"), ruled);
+  const { text, fixes } = applySlips(canon, rows.filter((r) => r.words.some((w) => w.kind === "typing-slip")), ruled);
   writeJson(`${prefix}.json`, text);
   writeFileSync(`${prefix}.txt`, text.map((p) => `${p.text} ॥${p.ref ? ` ${p.ref} ॥` : ""}`).join("\n") + "\n");
   writeJson(`${prefix}-slips.json`, fixes);

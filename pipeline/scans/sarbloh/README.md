@@ -91,7 +91,10 @@ Each disputed half-line was read in the 1878 bir and judged against BD and CE.
 
 `triangulate.ts` votes word by word, on a consonant skeleton that ignores vowel spelling, word division and
 ra-conjunct spelling (ਛਤ੍ਰ/ਛਤਰ):
-- print = CE ≠ typed → typing slip, auto-fixed from the print;
+- print = CE ≠ typed → typing slip, auto-fixed from the print. It is only *suggested* (`probable-slip`) when
+  the scans agree on consonants alone or the OCR word is malformed (ਦਿ੍ਗਨ). Both scans went through the same
+  OCR engine and share its losses, so a difference those losses explain (dropped nasal, adhak or subscript:
+  ਮਹਾਂ→ਮਹਾ, ਪ੍ਰਸਾਦਿ→ਪ੍ਸਾਦਿ) or a pure word-division difference never counts;
 - typed = print ≠ CE → recension difference, left to the manuscript;
 - all three differ → left to the manuscript.
 
@@ -106,7 +109,30 @@ npm run scans:collate -- triangulate bd-core.txt bdprint-core.txt ce-core.txt tr
 npm run scans:collate -- apply-slips canon-v0.json tri-core.json canon-v0-variants.json canon-v1
 ```
 
-<!-- TRIANGULATION-RESULTS -->
+Inputs: BD print OCR = Panjab Digital Library scan pp. 47–382 and 419–1112 (pp. 383–418 are the volume 2
+index), Tesseract as for CE.
+
+| half-lines (27,750) | |
+|---|---|
+| agreed (spelling aside) | 9,619 |
+| heading | 1,679 |
+| typing slips only | 3,753 |
+| a word still for the manuscript | 12,699 |
+
+| words | |
+|---|---|
+| typing slips, applied | 5,923 (5,765 outside half-lines the manuscript already ruled on) |
+| probable slips, suggested only | 2,389 |
+| recension (typed = print ≠ CE) | 12,624 |
+| three-way | 4,904 |
+
+- **canon-v1** = canon-v0 + 5,765 applied slip fixes in 4,835 half-lines (list in `canon-v1-slips.json`).
+- Hand check of 40 random applied fixes: about 38 right. Most restore conjuncts and letters the typed text
+  lost (ਮੰਊ→ਮੰਤ੍ਰਿ, ਇੰਜੀਤ→ਇੰਦਰਜੀਤ, ਦੁੱਧ→ਜੁੱਧ, ਦਾ→ਗਦਾ). The doubtful ones are OCR-dependent (ਸ੍ਵਰਗ→ਸੂਰਗ).
+- The typed BD text is noisier than it looks: 8,312 of its 192,515 core words (4.3%, about 1 in 23) are
+  corrected or suggested.
+- **The remaining 12,000 half-lines are too many to read by hand.** Many "recension" words are probably CE OCR
+  noise rather than readings (CE is an OCR text). 2,831 have no aligned print or CE line at all.
 
 ## 1698 Mastuana Sahib bir
 
@@ -122,5 +148,7 @@ npm run scans:collate -- apply-slips canon-v0.json tri-core.json canon-v0-varian
 ## Next
 - Review the 83 flagged variants.
 - Decide how far to read the manuscript beyond the definite variants (see the triangulation counts above).
+  Cheaper first step: a cleaner CE text (better OCR or a typed CE) would separate CE noise from real readings.
+- Spot-check the 2,389 probable slips; many are right but need the correct spelling chosen.
 - Speed up `locate` for index building (it currently scans the whole text, taking about 1.6 s per page) by
   limiting the search window.
