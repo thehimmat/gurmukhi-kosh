@@ -36,6 +36,7 @@ import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
 import type { GlossaryEntry } from "./types";
 import { buildCrossRefIndex, resolveCrossRefs } from "./cross-refs";
+import { wipeSource } from "./wipe";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -74,22 +75,6 @@ async function readEntries(path: string): Promise<GlossaryEntry[]> {
 }
 
 type Row = Record<string, unknown>;
-
-/** Five scoped deletes = full idempotent reset AND the takedown procedure. */
-async function wipeSource(db: DB, sourceId: number) {
-  const steps: [string, PromiseLike<{ error: { message: string } | null }>][] = [
-    ["dict_examples", db.from("dict_examples").delete().eq("dict_source_id", sourceId)],
-    ["word_grammar", db.from("word_grammar").delete().eq("source_code", SOURCE_CODE)],
-    ["etymology", db.from("etymology").delete().eq("source_code", SOURCE_CODE)],
-    ["definitions", db.from("definitions").delete().eq("dict_source_id", sourceId)],
-    // off-corpus lemma rows this source introduced (cascades to any stragglers)
-    ["words(off-corpus)", db.from("words").delete().eq("origin_source", SOURCE_CODE)],
-  ];
-  for (const [name, run] of steps) {
-    const { error } = await run;
-    if (error) throw new Error(`wipe ${name}: ${error.message}`);
-  }
-}
 
 async function insertReturningIds(db: DB, table: string, rows: Row[], selectCols: string): Promise<Row[]> {
   const out: Row[] = [];
@@ -159,7 +144,7 @@ async function main() {
   // 1. Reset this source FIRST — so resolving corpus words below can't match
   //    (and then strand) off-corpus lemmas a prior run created.
   console.log("Wiping prior 'shackle' rows...");
-  await wipeSource(db, sourceId);
+  await wipeSource(db, sourceId, SOURCE_CODE);
 
   // 2. Resolve which printed Gurmukhi already exist as words (corpus, or an
   //    off-corpus lemma introduced by another source — attach either way).
