@@ -9,6 +9,9 @@
   --border: #d8d1c9;
   --accent: #5c3d2e;
   --accent-light: #f0e8e0;
+  --accent-bg: #f5ede6;
+  --card-bg: #fff;
+  --card: #fffdf9;
 }
 
 html {

@@ -44,7 +44,7 @@ export default async function BrowsePage({
             textDecoration: "none",
           }}
         >
-          ← search
+          ← Back to search
         </a>
         <h1
           style={{

@@ -10,7 +10,7 @@ export default function WordNotFound() {
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 1.5rem" }}>
       <a href="/" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none", display: "inline-block", marginBottom: "2rem" }}>
-        ← back to search
+        ← Back to search
       </a>
       {word && <h1 className="gurmukhi-xl" style={{ marginBottom: "0.5rem" }}>{word}</h1>}
       <p style={{ fontSize: "1.15rem", marginBottom: "1.5rem" }}>

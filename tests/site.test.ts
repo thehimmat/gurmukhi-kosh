@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { SITE_NAME_EN, SITE_NAME_PA, pageTitle } from "../lib/site";
+import { NAV_LINKS, SITE_NAME_EN, SITE_NAME_PA, activeNavHref, pageTitle } from "../lib/site";
 
 describe("site name", () => {
   it("is ਗੁਰਬਾਣੀ ਖੋਜ ਕੋਸ਼ with no separator dot, and Gurbani Search Dictionary in English", () => {
@@ -30,5 +30,27 @@ describe("site name", () => {
       /Gurmukhi Kosh|ਗੁਰਮੁਖੀ ਕੋਸ਼|ਖੋਜ · ਕੋਸ਼/.test(readFileSync(f, "utf8"))
     );
     expect(stale).toEqual([]);
+  });
+});
+
+describe("site nav (#127)", () => {
+  it("links Search, Browse, Read by ang and About, in that order", () => {
+    expect(NAV_LINKS.map((l) => [l.label, l.href])).toEqual([
+      ["Search", "/"],
+      ["Browse", "/browse"],
+      ["Read by ang", "/ang/1"],
+      ["About", "/about"],
+    ]);
+  });
+
+  it.each([
+    ["/", "/"],
+    [`/word/${encodeURIComponent("ਹਉਮੈ")}`, "/"],
+    ["/browse", "/browse"],
+    ["/ang/27", "/ang/1"],
+    ["/about/mahan-kosh-key", "/about"],
+    ["/health", null],
+  ])("marks %s as the %s section", (path, href) => {
+    expect(activeNavHref(path)).toBe(href);
   });
 });
