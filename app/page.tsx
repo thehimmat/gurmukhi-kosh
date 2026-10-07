@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Word } from "@/lib/supabase";
 import { useGurmukhiInput } from "@atthebunga/gurmukhi-input";
+import { SITE_NAME_PA } from "@/lib/site";
 import {
   DEFAULT_NUMERAL_ROLES,
   NUMERAL_ROLES,
@@ -152,7 +153,7 @@ export default function HomePage() {
           className="gurmukhi-xl"
           style={{ marginBottom: "0.5rem", color: "var(--text-primary)" }}
         >
-          ਗੁਰਮੁਖੀ ਕੋਸ਼
+          {SITE_NAME_PA}
         </h1>
         <p
           style={{

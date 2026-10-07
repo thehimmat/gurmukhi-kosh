@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { pageTitle, SITE_NAME_EN, SITE_NAME_PA } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Sources & Licensing — Gurmukhi Kosh",
+  title: pageTitle("Sources & Licensing"),
   description:
-    "Where every datum in Gurmukhi Kosh comes from, and the scholarly sources we cite, use, and plan to use.",
+    `Where every datum in ${SITE_NAME_EN} comes from, and the scholarly sources we cite, use, and plan to use.`,
 };
 
 type Status = "in-use" | "pending-permission" | "pending-terms";
@@ -248,7 +249,7 @@ export default function AboutPage() {
         Every datum in an entry should come from a verifiable, well-established
         scholarly source that we cite to you, or be clearly labelled as our
         best-judgment inference. We never present inference as authoritative
-        fact. Gurmukhi Kosh is entirely free and strictly non-commercial.
+        fact. {SITE_NAME_EN} ({SITE_NAME_PA}) is entirely free and strictly non-commercial.
       </p>
 
       <section style={{ marginTop: "2.5rem" }}>

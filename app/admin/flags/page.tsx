@@ -5,11 +5,12 @@ import { resolveFlag } from "./actions";
 import { AngHeatmap } from "@/components/admin/AngHeatmap";
 
 import type { Metadata } from "next";
+import { pageTitle } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Flag queue — Gurmukhi Kosh",
+  title: pageTitle("Flag queue"),
   robots: { index: false, follow: false },
 };
 

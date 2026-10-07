@@ -1,4 +1,6 @@
-# Gurmukhi Kosh
+# ਗੁਰਬਾਣੀ ਖੋਜ ਕੋਸ਼ — Gurbani Search Dictionary
+
+The dictionary half of the site at [search.atthebunga.com](https://search.atthebunga.com) (repo name: `gurmukhi-kosh`).
 
 A dictionary of Sri Guru Granth Sahib: an entry for every unique word in the text, with grammar,
 etymology, definitions, and a link to every place the word occurs in scripture. The aim is a

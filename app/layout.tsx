@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { SITE_NAME_EN, SITE_NAME_PA } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Gurmukhi Kosh — ਗੁਰਮੁਖੀ ਕੋਸ਼",
+  title: `${SITE_NAME_PA} — ${SITE_NAME_EN}`,
   description: "A comprehensive dictionary of Gurmukhi words from Sri Guru Granth Sahib Ji, with references and translations.",
 };
 
@@ -39,21 +40,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             <a
               href="/"
+              className="gurmukhi"
               style={{
-                fontFamily: '"Crimson Pro", Georgia, serif',
-                fontSize: "1.35rem",
+                fontSize: "1.3rem",
                 fontWeight: 600,
                 color: "var(--text-primary)",
                 textDecoration: "none",
               }}
             >
-              Gurmukhi Kosh
+              {SITE_NAME_PA}
             </a>
             <span
-              className="gurmukhi"
-              style={{ fontSize: "1.1rem", color: "var(--text-secondary)" }}
+              style={{
+                fontFamily: '"Crimson Pro", Georgia, serif',
+                fontSize: "1.1rem",
+                color: "var(--text-secondary)",
+              }}
             >
-              ਗੁਰਮੁਖੀ ਕੋਸ਼
+              {SITE_NAME_EN}
             </span>
           </div>
         </header>

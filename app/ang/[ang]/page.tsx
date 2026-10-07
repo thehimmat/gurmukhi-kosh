@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
+import { pageTitle } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ type Props = { params: Promise<{ ang: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { ang } = await params;
-  return { title: `Ang ${ang} — Gurmukhi Kosh` };
+  return { title: pageTitle(`Ang ${ang}`) };
 }
 
 export default async function AngPage({ params }: Props) {
