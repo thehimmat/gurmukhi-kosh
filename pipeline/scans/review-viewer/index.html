@@ -125,7 +125,6 @@ main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 figure { margin: 0; border-top: 1px solid var(--rule); background: var(--paper); }
 .shot { position: relative; display: block; width: 100%; cursor: zoom-in; border: 0; padding: 0; background: none; }
 .shot img { display: block; width: 100%; height: auto; }
-.shot .hl { position: absolute; border: 2px solid var(--rubric); border-radius: 3px; background: color-mix(in srgb, var(--rubric) 8%, transparent); pointer-events: none; }
 figcaption { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 14px; font-size: 13px; color: var(--muted); }
 .noimg { padding: 14px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--rule); }
 
@@ -212,26 +211,10 @@ figcaption { display: flex; justify-content: space-between; gap: 8px; flex-wrap:
     const href = w.page?.href ?? "";
     return `<figure>
       <button class="shot" data-page="${esc(href)}" data-label="${esc(label + " · " + (w.page?.label ?? ""))}" aria-label="Open the whole page">
-        <img src="${esc(w.image)}" alt="${esc(label)}: the reading on its page" data-hl='${esc(JSON.stringify(w.highlights ?? []))}'>
+        <img src="${esc(w.image)}" alt="${esc(label)}: the reading on its page">
       </button>
-      <figcaption><span>${esc(w.note ?? "Boxed: this reading")}</span>${w.page ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-page="${esc(href)}" data-label="${esc(label + " · " + w.page.label)}">${esc(w.page.label)} ↗</a>` : ""}</figcaption>
+      <figcaption><span>${esc(w.note ?? "")}</span>${w.page ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-page="${esc(href)}" data-label="${esc(label + " · " + w.page.label)}">${esc(w.page.label)} ↗</a>` : ""}</figcaption>
     </figure>`;
-  }
-
-  function placeHighlights(img) {
-    const boxes = JSON.parse(img.dataset.hl || "[]");
-    const wrap = img.parentElement;
-    wrap.querySelectorAll(".hl").forEach((n) => n.remove());
-    if (!img.naturalWidth) return;
-    for (const b of boxes) {
-      const d = document.createElement("span");
-      d.className = "hl";
-      d.style.left = `${(b.x / img.naturalWidth) * 100}%`;
-      d.style.top = `${(b.y / img.naturalHeight) * 100}%`;
-      d.style.width = `${(b.w / img.naturalWidth) * 100}%`;
-      d.style.height = `${(b.h / img.naturalHeight) * 100}%`;
-      wrap.appendChild(d);
-    }
   }
 
   function renderMain() {
@@ -283,7 +266,6 @@ figcaption { display: flex; justify-content: space-between; gap: 8px; flex-wrap:
       </section>
       ${it.current ? `<div class="current">In the text now: <span class="gur">${esc(it.current.text)}</span> (${esc(it.current.from)})</div>` : ""}
       <div class="keys">Keys: <kbd>1</kbd>–<kbd>${r.witnesses.length}</kbd> choose a reading · <kbd>O</kbd> other · <kbd>U</kbd> unsure · <kbd>J</kbd>/<kbd>K</kbd> next/previous · click an image for the whole page</div>`;
-    $("#main").querySelectorAll(".shot img").forEach((img) => (img.complete ? placeHighlights(img) : img.addEventListener("load", () => placeHighlights(img), { once: true })));
     const disabled = !state.db || !state.canWrite;
     $("#main").querySelectorAll(".choice, #other, #note").forEach((el) => (el.disabled = disabled));
   }
