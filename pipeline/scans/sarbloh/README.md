@@ -152,15 +152,15 @@ index), Tesseract as for CE.
 
 ## In the Kosh (ingested 2026-10-07)
 
-Two corpora (migration `038_sarbloh_sources`), ranked after SGGS, Dasam Bani and Bhai Gurdas:
+One corpus, `sarbloh_budha_dal` (Sri Sarbloh Granth), ranked after SGGS, Dasam Bani and Bhai Gurdas:
+36,000 half-line rows, Budha Dal pages 1–1028, 36,578 words, 236,191 occurrences.
 
-| source | half-line rows | Budha Dal pages | words | occurrences |
-|---|---|---|---|---|
-| `sarbloh_budha_dal`: Sri Sarbloh Granth | 27,804 | 1–818 | 32,619 | 191,571 |
-| `sarbloh_avatars_budha_dal`: the avatar section (part of Sarbloh according to Budha Dal) | 8,196 | 819–1028 | 9,786 | 44,620 |
-
-- **Text.** The Granth is `canon-bd`: the typed Budha Dal text with typing slips corrected against the print
-  scan. The avatars are the typed text as is (no third witness to check slips against).
+- **Merged (039).** First loaded as two corpora (038): the Granth proper (pages 1–818, 27,804 rows) and the
+  avatar section (pages 819–1028, 8,196 rows). The split followed the manuscripts, which end before the
+  avatars. Merged on 2026-10-07 (user decision) because Budha Dal, the canonical authority, prints them as
+  one Granth. The avatar rows continue the verse_id numbering from 27,805.
+- **Text.** Pages 1–818 are `canon-bd`: the typed Budha Dal text with typing slips corrected against the
+  print scan. The avatar pages are the typed text as is (no third witness to check slips against).
 - **`ang`.** The Budha Dal page. The typed PDF is page-for-page with the print, and each page's printed
   number is read from the page itself.
 - **Line shape.** As for Dasam Bani: one half-line per row, ending in ` ॥` or in its verse numbers,

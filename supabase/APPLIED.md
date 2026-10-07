@@ -106,6 +106,11 @@ table's reader landed in the same change (`lib/grammar-view.ts` `normalizePos`).
 | 51 | 20260930143950 | 036_number_lines_drop_scalar_offsets | kosh `036_number_lines_drop_scalar_offsets.sql` |
 | 52 | 20261007192220 | 038_sarbloh_sources | kosh `038_sarbloh_sources.sql` |
 
+Kosh `039_merge_sarbloh_sources.sql` (2026-10-07) is half applied and has no ledger entry yet. Its line move
+and the stats rebuild ran through the MCP. Its delete of the emptied avatar source row and the description
+update must be run from the dashboard SQL editor, because the MCP holds back destructive statements for a
+confirmation. The file is idempotent: run it whole.
+
 Migration 036 is the remove half of 034's add-then-remove: search_number_lines no longer
 returns the scalar `char_start`/`char_end`. Verified gurmukhi-search production (f6ec668,
 live since 2026-09-23) reads the arrays first; results for value 1 over author/ghar were

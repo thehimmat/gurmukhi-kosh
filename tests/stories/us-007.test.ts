@@ -11,8 +11,6 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { anonDb, sourceId } from "./helpers";
 
 const CORPORA = ["sggs_banidb_v2", "bhai_gurdas_banidb_v2", "dasam_banidb_v2", "sarbloh_budha_dal"];
-// Smaller corpora, checked against their own size: the Sarbloh avatar section has ~9,800 words.
-const SMALL_CORPORA: Record<string, number> = { sarbloh_avatars_budha_dal: 5000 };
 
 describe("US-007: full entries across all ingested corpora", () => {
   let db: ReturnType<typeof anonDb>;
@@ -29,15 +27,6 @@ describe("US-007: full entries across all ingested corpora", () => {
         .eq("source_fk", src);
       expect(error).toBeNull();
       expect(count, code).toBeGreaterThan(10000);
-    }
-    for (const [code, min] of Object.entries(SMALL_CORPORA)) {
-      const src = await sourceId(db, code);
-      const { count, error } = await db
-        .from("word_corpus_stats")
-        .select("word_id", { count: "exact", head: true })
-        .eq("source_fk", src);
-      expect(error).toBeNull();
-      expect(count, code).toBeGreaterThan(min);
     }
   });
 
