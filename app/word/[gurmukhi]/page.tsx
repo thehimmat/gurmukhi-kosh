@@ -535,7 +535,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                     ))}
                     {pos && (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.75rem", fontWeight: 600, background: "var(--accent-bg)", color: "var(--accent)", borderRadius: "4px", padding: "0.1rem 0.45rem", whiteSpace: "nowrap" }}>
-                        {pos}
+                        {fmtGrammar("pos", pos)}
                       </span>
                     )}
                     <p className={language === "pa" ? "gurmukhi" : undefined} style={{ margin: 0, lineHeight: 1.7 }}>
