@@ -37,6 +37,7 @@ import { sleep, progress } from "../shared/utils";
 import type { GlossaryEntry } from "./types";
 import { buildCrossRefIndex, resolveCrossRefs } from "./cross-refs";
 import { wipeSource } from "./wipe";
+import { offCorpusLemmaRow } from "./lemma-row";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -168,14 +169,9 @@ async function main() {
   // seen exclusively via a derived (appendix) entry are 'derived_transliteration'.
   const hasPrinted = new Set<string>();
   for (const e of entries) if (!e._derived) hasPrinted.add(e.gurmukhi);
-  const newWordRows = unmatched.map((g) => ({
-    gurmukhi: g,
-    frequency: 0,
-    in_corpus: false,
-    origin_source: SOURCE_CODE,
-    spelling_status: hasPrinted.has(g) ? "unverified_ocr" : "derived_transliteration",
-    roman_shackle: repByGurmukhi.get(g)?.headword ?? null,
-  }));
+  const newWordRows = unmatched.map((g) =>
+    offCorpusLemmaRow(g, { headword: repByGurmukhi.get(g)?.headword ?? null, printed: hasPrinted.has(g) }),
+  );
   console.log(`Creating ${newWordRows.length} off-corpus lemma rows...`);
   const created = await insertReturningIds(db, "words", newWordRows, "id, gurmukhi");
   for (const r of created) wordMap.set(r.gurmukhi as string, r.id as number);
