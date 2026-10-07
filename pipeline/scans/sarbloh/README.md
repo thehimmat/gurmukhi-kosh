@@ -1,9 +1,14 @@
 # Sri Sarbloh Granth: collation and the public-domain base (2026-10-07)
 
 ## Plan
-The canonical text rests on the **1878 CE Bhai Chanda Singh bir** (public domain). The typed **Budha Dal**
-text (BD) supplies words and word division. Readings that differ from Jasvant Singh's **critical edition**
-(CE, Hazur Sahib base) are checked against the manuscript images. See `../pilots/sarbloh-manglacharan.md`.
+**Decision (user, 2026-10-07): the Budha Dal print is canonical throughout**, as the present-day authority.
+The canonical text is `canon-bd`: the typed BD text with its typing slips corrected against the BD print scan
+(see "Three-way triangulation"). The manuscripts (1878 Bhai Chanda Singh, 1698 Mastuana, Mai Bhago) and
+Jasvant Singh's critical edition (CE, Hazur Sahib base) are kept as **witnesses**: every place where they
+differ is recorded as a variant, and the interesting ones get a note (see "Noted differences").
+
+The earlier plan built the canon on the 1878 bir (`canon-v0`/`canon-v1`, kept for reference); the
+manuscript verdicts below now serve as the witness record instead.
 
 ## Files
 - `ms1878-page-index.json`: 234 manuscript pages (every 4th page of PDF pp. 63–995) with each page's
@@ -145,10 +150,37 @@ index), Tesseract as for CE.
     the appendix is a later hand.
 - One stray leaf is bound out of order.
 
+## Noted differences
+Places worth knowing about if a reading is questioned. The canonical text keeps Budha Dal in every case.
+
+- **Half-line 324 (BD verse 105, Manglacharan Naraj chhand): word order.**
+  - BD: ਅਕਾਲ ਮੂਰਤਿ ਸਤਿਨਾਮੁ ਨਾਮਿ ਕੋ ਰਿਝਾਇਯੈ. The same in the earlier Budha Dal print under Baba Santa Singh
+    (PDL BK-006527 / archive.org `sarbloh-mul`, verse ੧੦੫), in Kamalroop's 2012 Manglacharan, and in a modern
+    handwritten gutka (archive.org `handwritten-sarabloh-and-dasam-gutka`, which copies BD's verse number).
+  - Every manuscript has ਸਤਨਾਮ first and ਅਨਾਸ:
+    - 1878 bir: ਸਤਨਾਮ ਅਕਾਲ ਮੂਰਤਿ ਅਨਾਸ ਕੋ ਰਿਝਾਈਯੇ (verse 107).
+    - 1698 Mastuana bir: the same (spread 9, right page, verse ੧੧੮).
+    - Mai Bhago bir: ਸਤਨਾਮ ਅਕਾਲ ਰੂਪ ਅਨਾਸ ਕੌ ਰੀਝਾਈਏ (PDF p.4, right page, verse ੧੨੨).
+    - Hazur Sahib (CE base): ਸਤਨਾਮ ਅਕਾਲ ਰੂਪ ਅਨਾਸ ਕੌ ਰੀਝਾਈਏ.
+    - Khalsa College, Sangrur and Patiala birs (CE apparatus): ਅਕਾਲ ਮੂਰਤਿ for ਅਕਾਲ ਰੂਪ, order as Hazur Sahib.
+  - So BD's order is found only in the Budha Dal print tradition. The one manuscript variant is ਰੂਪ (Hazur
+    Sahib, Mai Bhago) vs ਮੂਰਤਿ (the other five).
+- **Half-lines 4614–4615 (BD verse 368): a couplet only BD has.**
+  - BD: ਕਹੌ ਦੂਤ ਹੇਤੰ ਸੁ ਸੁਰਪਾਲ ਕੇਰੋ / ਪਠੀ ਪਤ੍ਰਿਕਾਯੰ ਭਯੋ ਕੋਊ ਝੇਰੋ.
+  - The 1878 bir (p.217) ends verse 368 at ਕਹ੍ਯੋ ਬੋਲ ਲੈ ਦੂਤ ਕੀਨੀ ਪੈਸਾਰੀ ॥੩੬੮॥ and continues with ਕਰੀ ਬੰਦਨਾ…;
+    CE (verse 370) is the same.
+  - CE also has a couplet BD and 1878 lack, just before: ਦੂਤੋ ਵਾਚ ॥ ਸੁਨੋਂ ਦ੍ਵਾਰਪਾਲੰ ਖਬਰ ਬੇਗ ਦੀਜੈ /
+    ਸਮਾਚਾਰ ਮੋਰੀ ਸਕਲ ਅਰਜ ਕੀਜੈ.
+  - The typed BD text numbers this verse 369 (twice); the print has 368.
+  - Review item r14 showed the wrong lines here (the collation had paired the couplet with a heading); the
+    item should have been "absent".
+
 ## Next
-- Review the 83 flagged variants.
-- Decide how far to read the manuscript beyond the definite variants (see the triangulation counts above).
-  Cheaper first step: a cleaner CE text (better OCR or a typed CE) would separate CE noise from real readings.
+- Record all witness differences (the 645 definite variants, the 1878 verdicts and the review notes) as the
+  variant apparatus of `canon-bd`.
+- Finish the review round (r01–r14 done; all keep BD) for notes on r15–r83.
+- With BD canonical, further manuscript reading only adds to the apparatus; a cleaner CE text (better OCR or
+  a typed CE) would separate CE noise from real readings more cheaply.
 - Spot-check the 2,389 probable slips; many are right but need the correct spelling chosen.
 - Speed up `locate` for index building (it currently scans the whole text, taking about 1.6 s per page) by
   limiting the search window.
