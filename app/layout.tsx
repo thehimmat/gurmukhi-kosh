@@ -1,19 +1,5 @@
 import type { Metadata } from "next";
-import { Crimson_Pro, Inter } from "next/font/google";
 import "./globals.css";
-
-const crimsonPro = Crimson_Pro({
-  variable: "--font-crimson-pro",
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  style: ["normal", "italic"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: "Gurmukhi Kosh — ਗੁਰਮੁਖੀ ਕੋਸ਼",
@@ -22,12 +8,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pa" className={`${crimsonPro.variable} ${inter.variable}`}>
+    <html lang="pa">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* One Google Fonts request, matching the gurmukhi-search shell so both
+            zones share cached fonts. Styles name these families literally, which
+            next/font's hashed names never matched (#123). */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
