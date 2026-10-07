@@ -151,7 +151,8 @@ function build(work: string, outDir: string) {
     const m = msBoxes.get(it.id);
     const page = m?.page ?? it.page;
     const view: WitnessView = {
-      text: it.supports === "absent" ? "(not in the manuscript)" : it.ms,
+      // A re-check while cropping can find a line judged absent; the image then shows it.
+      text: it.ms || (m?.absent === false ? "(found on re-check: see the image)" : "(not in the manuscript)"),
       page: { label: `PDF p. ${page}`, href: archivePageUrl(SOURCES.ms.archive, page) },
       ...(m?.note ? { note: m.note } : {}),
     };
