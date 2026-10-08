@@ -45,6 +45,18 @@ class NormalizeEntry(unittest.TestCase):
         self.assertEqual(out["mk_id"], 1)
         self.assertEqual(out["senses"][1]["cross_refs"], {"origin_lang": "sa"})
 
+    def test_splits_inline_senses_after_cleaning(self):
+        # #140 runs on the PUA-clean text: ਵਿਸ<F032>ਨੁ is ਵਿਸ਼ਨੁ in sense 2.
+        e = dict(FOUND, senses=[
+            {"sense_number": 1, "definition_text": f'ਹਰਾ. "ਹਰਿ ਬੂਟ." (ਰਾਮ ਮਃ ੫) ੨. ਵਿਸ{SSA}ਨੁ.', "cross_refs": None},
+        ])
+        report = []
+        out = normalize_entry(e, report)
+        self.assertEqual([s["sense_number"] for s in out["senses"]], [1, 2])
+        self.assertEqual(out["senses"][1]["definition_text"], "ਵਿਸ਼ਨੁ.")
+        self.assertEqual(out["senses"][1]["split_from"], 1)
+        self.assertEqual(report, [])
+
     def test_not_found_entry_passes_through(self):
         e = {"gurmukhi": "ਕਖ", "found": False}
         self.assertEqual(normalize_entry(e), e)
@@ -71,6 +83,23 @@ class RunNormalize(unittest.TestCase):
             self.assertEqual(stats["mapped"]["U+F032"], 2)
             self.assertEqual(stats["left"]["U+F030"], 1)
             self.assertEqual(stats["left_examples"]["U+F030"], ["ਕੋਸ#12"])
+            self.assertEqual(stats["senses_split"], 0)
+
+    def test_reports_split_counts_and_writes_the_review_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, dst = os.path.join(d, "entries.jsonl"), os.path.join(d, "normalized.jsonl")
+            e = dict(FOUND, senses=[{"sense_number": 3, "definition_text":
+                'ਭੁੱਖਾ. "ਨਾਂਗਾ ਰਹੈ." (ਗਉ ਕਬੀਰ) ੪. ਉਪਵਾਸ. (ਚੰਡੀ) ੬. ਨੰਗਾ.', "cross_refs": None}])
+            with open(src, "w", encoding="utf-8") as f:
+                f.write(json.dumps(e, ensure_ascii=False) + "\n")
+
+            stats = run_normalize(src, dst)
+
+            self.assertEqual(stats["senses_split"], 1)
+            self.assertEqual(stats["split_report"]["out_of_sequence"], 1)
+            with open(os.path.join(d, "sense_split_report.jsonl"), encoding="utf-8") as f:
+                rows = [json.loads(l) for l in f]
+            self.assertEqual([(r["kind"], r["numeral"]) for r in rows], [("out_of_sequence", 6)])
 
 
 if __name__ == "__main__":
