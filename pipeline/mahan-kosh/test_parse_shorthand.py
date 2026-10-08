@@ -241,5 +241,31 @@ class Structure(unittest.TestCase):
         self.assertIn("ਦੂਜਾ ਭਾਗ", s["residue"])
 
 
+class Scansion(unittest.TestCase):
+    """Meter patterns restored by #150: laghu । and guru ऽ. The residue
+    clean-up must not read their ।s as sentence ends (#150)."""
+
+    def test_pattern_survives_in_residue(self):
+        s = parse_sense("ਪ੍ਰਤਿ ਚਰਣ ਚਾਰ ਯਗਣ. ।ऽऽ, ।ऽऽ, ।ऽऽ, ।ऽऽ.#ਉਦਾਹਰਣ-")
+        self.assertIn("।ऽऽ, ।ऽऽ, ।ऽऽ, ।ऽऽ", s["residue"])
+
+    def test_all_laghu_run_is_not_collapsed(self):
+        s = parse_sense("ਚਰਣ ਨਗਣ, ਯਗਣ ।।।, ।ऽऽ.#ਉਦਾਹਰਣ-")
+        self.assertIn("।।।, ।ऽऽ", s["residue"])
+
+    def test_spaced_marks_keep_their_spaces(self):
+        s = parse_sense("ਤਿੰਨ ਗਣ । । ।.#ਉਦਾਹਰਣ-")
+        self.assertIn("। । ।", s["residue"])
+
+    def test_single_marks_in_a_pattern(self):
+        s = parse_sense("ਜ, ਗ, ।, ऽऽ, ऽ#ਉਦਾਹਰਣ-")
+        self.assertIn("।, ऽऽ, ऽ", s["residue"])
+
+    def test_lone_danda_still_folds_as_punctuation(self):
+        # A single । with no guru beside it is read as a sentence end.
+        s = parse_sense("ਪਹਿਲਾ ਭਾਗ । ਦੂਜਾ ਭਾਗ")
+        self.assertIn("ਭਾਗ। ਦੂਜਾ", s["residue"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -2,7 +2,7 @@
 """Deterministic Mahan Kosh sense parser (issue #32).
 
 Decomposes one Mahan Kosh sense (a `definition_text` string from
-output/entries.jsonl) into structured fields, driven entirely by the cited
+output/normalized.jsonl) into structured fields, driven entirely by the cited
 legend in abbreviations.json:
 
   language_origins  ਸੰ./ਅ਼./ਫ਼ਾ./… with the etymon when script-explicit
@@ -27,7 +27,7 @@ what made the old ਉ./ਪੰ./ਦੇਸ਼. false markers possible.
 
 Usage:
   python3 pipeline/mahan-kosh/parse_shorthand.py --run [--limit N]
-      reads output/entries.jsonl, writes output/parsed.jsonl, prints stats
+      reads output/normalized.jsonl, writes output/parsed.jsonl, prints stats
   python3 pipeline/mahan-kosh/test_parse_shorthand.py
       unit tests over real corpus senses
 """
@@ -456,6 +456,31 @@ def _skip_leading(t, spans):
     return p
 
 
+# A meter pattern of laghu । and guru ऽ marks (ਯਗਣ = ।ऽऽ), restored from the
+# source font's private-use glyphs (#150). Standalone runs only; a run counts
+# as a pattern when it has a guru or at least two marks, so a lone । keeps its
+# usual reading as a sentence end.
+RE_SCANSION = re.compile(r"(?<![^\s,.#॥(\-])[।ऽ]+(?:[ ,]+[।ऽ]+)*(?![^\s,.#)])")
+_MASK_OPEN, _MASK_CLOSE = chr(0), chr(1)
+
+
+def _mask_scansion(r):
+    runs = []
+
+    def mask(m):
+        run = m.group(0)
+        if "ऽ" not in run and len(re.findall("[।ऽ]", run)) < 2:
+            return run
+        runs.append(run)
+        return f"{_MASK_OPEN}{len(runs) - 1}{_MASK_CLOSE}"
+
+    return RE_SCANSION.sub(mask, r), runs
+
+
+def _unmask_scansion(r, runs):
+    return re.sub(f"{_MASK_OPEN}(\\d+){_MASK_CLOSE}", lambda m: runs[int(m.group(1))], r)
+
+
 def _residue(t, spans):
     keep = []
     last = 0
@@ -465,19 +490,23 @@ def _residue(t, spans):
         last = max(last, e)
     keep.append(t[last:])
     r = "".join(keep).replace("#", " ")
+    r, runs = _mask_scansion(r)
     r = re.sub(r"\s+([.।,])", r"\1", r)
     r = re.sub(r"([.।])[.।\s]*(?=[.।])", r"\1", r)
     r = re.sub(r"\s{2,}", " ", r)
-    return r.strip(" .,।-").strip() and (re.sub(r"\s{2,}", " ", r).strip(" ,-").strip()) or ""
+    r = r.strip(" .,।-").strip() and (re.sub(r"\s{2,}", " ", r).strip(" ,-").strip()) or ""
+    return _unmask_scansion(r, runs)
 
 
 # ----------------------------------------------------------------- run
 
 def run_corpus(limit=0):
-    src = os.path.join(HERE, "output", "entries.jsonl")
+    # The normalized corpus (normalize.py), never the raw scrape: the source
+    # font's private-use glyphs must be mapped before parsing (#150).
+    src = os.path.join(HERE, "output", "normalized.jsonl")
     dst = os.path.join(HERE, "output", "parsed.jsonl")
     if not os.path.exists(src):
-        sys.exit(f"corpus not found: {src}")
+        sys.exit(f"corpus not found: {src} (run normalize.py first)")
 
     stats = Counter()
     langs = Counter()

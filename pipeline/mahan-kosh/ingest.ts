@@ -1,10 +1,12 @@
 /**
  * Mahan Kosh ingestion pipeline — Phase 2.
  *
- * Reads pipeline/mahan-kosh/output/entries.jsonl (produced by scrape.py) and
- * upserts each sense into the `definitions` table in Supabase.
+ * Reads pipeline/mahan-kosh/output/normalized.jsonl (scrape.py, then
+ * normalize.py) and upserts each sense into the `definitions` table in Supabase.
  *
  * Usage (from gurmukhi-kosh project root):
+ *   python3 pipeline/mahan-kosh/normalize.py
+ *   python3 pipeline/mahan-kosh/parse_shorthand.py --run
  *   npm run ingest:mahankosh
  *
  * Requires in .env.local:
@@ -23,7 +25,9 @@ import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
 
-const JSONL_PATH = "pipeline/mahan-kosh/output/entries.jsonl";
+// Normalized, not the raw scrape: the source font's private-use glyphs are
+// mapped to Unicode there (#150).
+const JSONL_PATH = "pipeline/mahan-kosh/output/normalized.jsonl";
 const PARSED_PATH = "pipeline/mahan-kosh/output/parsed.jsonl";
 const DICT_SOURCE_CODE = "mahan_kosh";
 const BATCH_SIZE = 50; // definitions upserted per DB call
@@ -72,7 +76,9 @@ async function resolveDictSource(
 async function readJsonl(path: string): Promise<JournalEntry[]> {
   if (!fs.existsSync(path)) {
     console.error(`JSONL not found: ${path}`);
-    console.error(`Run 'python3 pipeline/mahan-kosh/scrape.py' first.`);
+    console.error(
+      `Run 'python3 pipeline/mahan-kosh/scrape.py' then 'python3 pipeline/mahan-kosh/normalize.py' first.`
+    );
     process.exit(1);
   }
 
@@ -115,7 +121,7 @@ async function readParsed(path: string): Promise<Map<string, ParsedSense>> {
         map.set(`${e.gurmukhi}#${s.sense_number}`, s as ParsedSense);
       }
     } catch {
-      // malformed line: entries.jsonl is the row driver, so just skip here
+      // malformed line: normalized.jsonl is the row driver, so just skip here
     }
   }
   return map;
