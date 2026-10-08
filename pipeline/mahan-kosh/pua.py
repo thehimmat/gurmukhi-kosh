@@ -33,8 +33,9 @@ _CONS = "\u0a15-\u0a39\u0a59-\u0a5e"
 # Dependent vowel signs, bindi, tippi, addak, yakash.
 _SIGNS = "\u0a3e-\u0a4c\u0a02\u0a70\u0a71\u0a75"
 # One akhar: conjunct consonants joined by halant (optionally ZWJ/ZWNJ), then any
-# vowel signs; or a trailing halant (ਉਸ੍).
-CLUSTER = rf"(?:[{_CONS}]{NUKTA}?{HALANT}[{JOINERS}]?)*[{_CONS}]{NUKTA}?(?:{HALANT}|[{_SIGNS}]*)"
+# vowel signs, then a trailing halant and joiner if the source left one
+# (ਉਸ੍, ਕ਼ਸ੍ + ZWNJ before ਦ, the mistyped ਅਸੌ੍ before ਟ).
+CLUSTER = rf"(?:[{_CONS}]{NUKTA}?{HALANT}[{JOINERS}]?)*[{_CONS}]{NUKTA}?[{_SIGNS}]*{HALANT}?[{JOINERS}]?"
 
 
 def _load():
