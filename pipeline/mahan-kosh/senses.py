@@ -9,7 +9,10 @@ the row there, numbering each new sense by its printed numeral.
 A numeral is a sense boundary only when it continues the row's numbering
 (n == current + 1), stays below the word's next existing row, and is not a
 citation's number (inside parentheses), a cross-reference's sense number
-(ਦੇਖੋ, ਬਾਹਰ ੩.) or a "No." reference (ਨੰ. ੧.). Numbered lists inside a sense (a shabad quoted line by
+(ਦੇਖੋ, ਬਾਹਰ ੩.) or a "No." reference (ਨੰ. ੧.). Two source slips are recovered
+on positive evidence only: a numeral that lost its period counts when it
+opens with a head marker, and an xref-shaped numeral counts when n+1 follows
+and n does not recur. Numbered lists inside a sense (a shabad quoted line by
 line, the four imams …) restart at ੧ and stay in the sense's text. When a
 list item's number could also be the next sense, it is a sense only if:
   - the text after it opens with a head marker (ਸੰ. ਫ਼ਾ. ਸੰਗ੍ਯਾ- ਵਿ- ਦੇਖੋ …), or
@@ -36,6 +39,9 @@ _GD = {c: i for i, c in enumerate(GD)}
 # A printed sense numeral: 1-2 Gurmukhi digits, a period, whitespace, at the
 # start of a word (after whitespace, '#', or closing punctuation).
 RE_NUMERAL = re.compile(r"(?:(?<=[\s#.)।\"])|^)([੧-੯][੦-੯]?)\.\s")
+# The same numeral with its period lost in the source (ਅਸ: "੩ ਸੰਗ੍ਯਾ-"). Only
+# ever a sense when it is the next number and opens with a head marker.
+RE_BARE_NUMERAL = re.compile(r"(?:(?<=[\s#.)।\"])|^)([੧-੯][੦-੯]?)(?![੦-੯.])\s")
 # "ਨੰ. ੧." is "No. 1", a reference to another sense.
 RE_NUMBER_REF = re.compile(r"ਨੰ\.\s*$")
 # "ਦੇਖੋ, ਬਾਹਰ ੩." cites sense 3 of ਬਾਹਰ: a numeral right after a ਦੇਖੋ target,
@@ -81,9 +87,11 @@ def _inside_parens(text, i):
 
 
 class _Candidate:
-    __slots__ = ("n", "num_start", "cut_start", "body_start", "sep", "quote")
+    __slots__ = ("n", "num_start", "cut_start", "body_start", "sep", "quote", "bare", "xref")
 
-    def __init__(self, text, m):
+    def __init__(self, text, m, bare=False, xref=False):
+        self.bare = bare  # period missing in the source
+        self.xref = xref  # reads as a ਦੇਖੋ target's sense number
         self.n = _to_int(m.group(1))
         self.num_start = m.start(1)
         self.body_start = m.end()
@@ -103,11 +111,27 @@ class _Candidate:
 
 
 def _candidates(text):
-    for m in RE_NUMERAL.finditer(text):
-        before = text[:m.start(1)]
-        if _inside_parens(text, m.start(1)) or RE_NUMBER_REF.search(before) or RE_XREF_NUMBER.search(before):
-            continue
-        yield _Candidate(text, m)
+    found = []
+    for regex, bare in ((RE_NUMERAL, False), (RE_BARE_NUMERAL, True)):
+        for m in regex.finditer(text):
+            before = text[:m.start(1)]
+            if _inside_parens(text, m.start(1)) or RE_NUMBER_REF.search(before):
+                continue
+            found.append(_Candidate(text, m, bare=bare, xref=bool(RE_XREF_NUMBER.search(before))))
+    return sorted(found, key=lambda c: c.num_start)
+
+
+def _weak_is_sense(c, later, text, cur, next_existing):
+    """A bare or xref-shaped numeral is a sense only on positive evidence."""
+    if c.n != cur + 1 or c.n >= next_existing:
+        return False
+    if c.bare:
+        return _opens_with_head_marker(text[c.body_start:])
+    # xref-shaped: the numbering must continue from it (n+1 follows) and n
+    # must not recur, which would mean the real sense n is still to come.
+    strong_later = [o for o in later if not o.bare]
+    return (any(o.n == c.n + 1 for o in strong_later)
+            and not any(o.n == c.n for o in strong_later))
 
 
 def load_overrides(path=OVERRIDES_PATH):
@@ -139,7 +163,8 @@ def _split_one(headword, s, next_existing, overrides, report):
             "numeral": c.n, "at": text[c.num_start:c.num_start + 30],
         })
 
-    for c in _candidates(text):
+    candidates = _candidates(text)
+    for i, c in enumerate(candidates):
         o = _override_for(overrides, headword, base, text, c)
         if o is not None:
             if o.get("keep"):
@@ -148,6 +173,12 @@ def _split_one(headword, s, next_existing, overrides, report):
             cuts.append((c, o["split_as"]))
             cur, list_next, list_shape = o["split_as"], None, None
             note("override_split", c)
+            continue
+
+        if c.bare or c.xref:
+            if _weak_is_sense(c, candidates[i + 1:], text, cur, next_existing):
+                cuts.append((c, c.n))
+                cur, list_next, list_shape = c.n, None, None
             continue
 
         can_sense = c.n == cur + 1 and c.n < next_existing

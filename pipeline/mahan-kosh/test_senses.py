@@ -79,6 +79,42 @@ class SplitsAtSenseBoundaries(unittest.TestCase):
         self.assertEqual(numbers(out), [1, 2])
 
 
+class SourceSlips(unittest.TestCase):
+    """Typing slips in the scraped text that broke the numbering chain on the
+    full-corpus run (normalize.py's out_of_sequence report)."""
+
+    def test_numeral_without_its_period(self):
+        # ਅਸ: "੩ ਸੰਗ੍ਯਾ-" lost its period; ੪. ੫. only follow once it splits.
+        out, _ = split("ਅਸ", sense(1,
+            'ਵਿ- ਅਜੇਹਾ. "ਅਸ ਸੁੰਦਰ ਨਹਿ ਕੋਊ." (ਸਲੋਹ) ੨. ਕ੍ਰਿ- ਅਸ੍ਤਿ ਹੈ.#"ਬਾਂਹ ਗਹੇ ਕੀ ਲਾਜ ਅਸ." (ਰਾਮਾਵ) '
+            '੩ ਸੰਗ੍ਯਾ- ਤਲਾਵਰ. ਦੇਖੋ, ਅਸਿ. "ਸਾਂਗ ਸਰੋਹੀ ਸੈਫ ਅਸ." (ਸਨਾਮਾ) ੪. ਘੋੜਾ. ਦੇਖੋ, ਅਸ਼੍ਵ.'),
+            sense(8, "ਹੋਰ."))
+        self.assertEqual(numbers(out), [1, 2, 3, 4, 8])
+        self.assertTrue(out[2]["definition_text"].startswith("ਸੰਗ੍ਯਾ- ਤਲਾਵਰ."))
+
+    def test_periodless_number_in_prose_is_not_a_sense(self):
+        out, _ = split("ਸੂਤਕੁ", sense(1, "ਸੂਤਕ ਦੇ ਦਿਨ. ਬ੍ਰਾਹਮਣ ਦਾ ੨ ਦਿਨ ਰਹਿੰਦਾ ਹੈ."))
+        self.assertEqual(numbers(out), [1])
+
+    def test_real_sense_right_after_a_cross_reference(self):
+        # ਕਰਮ: "ਦੇਖੋ, ਮੁਖਖੀਰੰ ੫. ਅ਼ਮਲ" — no period after the xref target, so
+        # ੫ reads like its sense number; ੬ following shows it is sense 5.
+        out, _ = split("ਕਰਮ", sense(3,
+            'ਵਿ- ਕਰਮੀ. "ਕਉਣ ਕਰਮ ਕਉਣ ਨਿਹਕਰਮਾ?" (ਮਾਝ ਮਃ ੫) ੪. ਕਰ ਮੇਂ ਦੀ ਥਾਂ ਭੀ ਕਰਮ ਸ਼ਬਦ ਆਇਆ ਹੈ. '
+            'ਦੇਖੋ, ਮੁਖਖੀਰੰ ੫. ਅ਼ਮਲ. ਕਰਣੀ. "ਕਰਮ ਕਰਿ ਤੁਅ ਦਰਸ ਪਰਸ." (ਸਵੈਯੇ ਮਃ ੪. ਕੇ)#੬. ਅ਼. [کرم] ਉਦਾਰਤਾ'),
+            sense(7, "ਹੋਰ."))
+        self.assertEqual(numbers(out), [3, 4, 5, 6, 7])
+        self.assertTrue(out[1]["definition_text"].endswith("ਦੇਖੋ, ਮੁਖਖੀਰੰ"))
+
+    def test_cross_reference_number_that_recurs_stays_a_reference(self):
+        # ਪੰਥੁ with a ੩ later: the real ੨ comes after the xref's ੨, so the
+        # xref number must not be taken even though ੩ follows.
+        out, _ = split("ਪੰਥੁ", sense(1,
+            'ਦੇਖੋ, ਪੰਥ ੨. "ਪੰਥੁ ਨਿਹਾਰੈ ਕਾਮਨੀ." (ਗਉ ਕਬੀਰ) ੨. ਸੰ. ਪਾਂਥ. ੩. ਰਾਹ.'))
+        self.assertEqual(numbers(out), [1, 2, 3])
+        self.assertTrue(out[0]["definition_text"].startswith("ਦੇਖੋ, ਪੰਥ ੨."))
+
+
 class LeavesOtherNumeralsAlone(unittest.TestCase):
     def assertUnchanged(self, headword, *senses):
         out, _ = split(headword, *senses)
