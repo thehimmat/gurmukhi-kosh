@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "issue": "#140",
+    "what": "Per-numeral corrections for senses.py. Each entry names a headword, the row's sense_number, and `at`: the text starting at the printed numeral. `split_as: N` cuts there as sense N; `keep: true` blocks a cut the rules would make.",
+    "evidence": "Use only for numerals whose reading is clear from the entry itself (the surrounding row numbers) or the printed Mahan Kosh. `pdf_check: true` marks entries not yet confirmed against the PDF."
+  },
+  "overrides": [
+    {
+      "headword": "ਧਰਮ", "sense_number": 9, "at": "੧. ਧਨੁਸ", "split_as": 10,
+      "why": "Rows 9 and 11 exist and no sense 10 does; '੧.' is ੧੦ with the zero dropped. The text after it ('ਧਨੁਸ. ਕਮਾਣ.', a bow) is a new meaning.",
+      "pdf_check": true
+    },
+    {
+      "headword": "ਪਰਾਇਣਾ", "sense_number": 1, "at": "੧. ਪਲਾਯਨ", "split_as": 2,
+      "why": "The row reads sense 1, then '੧.', then '੩.': the '੧.' stands where ੨ belongs, and '੩.' only follows once it is sense 2.",
+      "pdf_check": true
+    }
+  ]
+}

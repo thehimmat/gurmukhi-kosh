@@ -11,6 +11,9 @@ and every clean-up is re-runnable:
 
 Steps:
   - Private Use Area glyphs from the source font -> Unicode (#150, pua.py)
+  - rows holding several printed senses split at their numerals (#140,
+    senses.py); numerals left inline for review go to
+    output/sense_split_report.jsonl
 
 Usage (from the project root):
   python3 pipeline/mahan-kosh/normalize.py
@@ -22,10 +25,12 @@ import os
 from collections import Counter, defaultdict
 
 from pua import clean_pua, find_pua
+from senses import load_overrides, split_entry_senses
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "output", "entries.jsonl")
 DST = os.path.join(HERE, "output", "normalized.jsonl")
+REPORT_NAME = "sense_split_report.jsonl"
 MAX_EXAMPLES = 10
 
 
@@ -33,38 +38,58 @@ def _cp(ch: str) -> str:
     return f"U+{ord(ch):04X}"
 
 
-def normalize_entry(entry: dict) -> dict:
-    """A cleaned copy of one scraped entry; the input is not modified."""
+def normalize_entry(entry: dict, report: list | None = None, overrides: list | None = None) -> dict:
+    """A cleaned copy of one scraped entry; the input is not modified.
+    Numerals the sense splitter wants reviewed are appended to `report`."""
     if not entry.get("found"):
         return entry
     out = copy.deepcopy(entry)
     for s in out.get("senses") or []:
         s["definition_text"] = clean_pua(s.get("definition_text") or "")
+    out["senses"], notes = split_entry_senses(out["gurmukhi"], out.get("senses") or [], overrides)
+    if report is not None:
+        report.extend(notes)
     return out
 
 
 def run_normalize(src: str = SRC, dst: str = DST) -> dict:
-    """Normalize every line of `src` into `dst`. Returns per-code-point counts
-    of glyphs mapped and left over, with example `headword#sense` keys."""
+    """Normalize every line of `src` into `dst`, and the sense splitter's
+    review notes into sense_split_report.jsonl beside it. Returns
+    per-code-point counts of glyphs mapped and left over (with example
+    `headword#sense` keys), senses split off, and review notes by kind."""
     mapped, left = Counter(), Counter()
     left_examples = defaultdict(list)
-    with open(src, encoding="utf-8") as f, open(dst, "w", encoding="utf-8") as out:
+    senses_split = 0
+    split_report = Counter()
+    overrides = load_overrides()
+    report_path = os.path.join(os.path.dirname(dst), REPORT_NAME)
+    with open(src, encoding="utf-8") as f, open(dst, "w", encoding="utf-8") as out, \
+            open(report_path, "w", encoding="utf-8") as rep:
         for line in f:
             try:
                 entry = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            clean = normalize_entry(entry)
-            for raw_s, clean_s in zip(entry.get("senses") or [], clean.get("senses") or []):
-                before = Counter(map(_cp, find_pua(raw_s.get("definition_text"))))
-                after = Counter(map(_cp, find_pua(clean_s.get("definition_text"))))
-                mapped.update(before - after)
+            notes = []
+            clean = normalize_entry(entry, notes, overrides)
+            before = Counter(_cp(c) for s in entry.get("senses") or [] for c in find_pua(s.get("definition_text")))
+            mapped.update(before)
+            for s in clean.get("senses") or []:
+                after = Counter(map(_cp, find_pua(s.get("definition_text"))))
+                mapped.subtract(after)
                 left.update(after)
                 for cp in after:
                     if len(left_examples[cp]) < MAX_EXAMPLES:
-                        left_examples[cp].append(f"{entry['gurmukhi']}#{raw_s.get('sense_number')}")
+                        left_examples[cp].append(f"{entry['gurmukhi']}#{s.get('sense_number')}")
+                senses_split += "split_from" in s
+            for n in notes:
+                split_report[n["kind"]] += 1
+                rep.write(json.dumps(n, ensure_ascii=False) + "\n")
             out.write(json.dumps(clean, ensure_ascii=False) + "\n")
-    return {"mapped": mapped, "left": left, "left_examples": dict(left_examples)}
+    return {
+        "mapped": +mapped, "left": left, "left_examples": dict(left_examples),
+        "senses_split": senses_split, "split_report": split_report,
+    }
 
 
 def main():
@@ -79,7 +104,11 @@ def main():
         print("\nLeft in place (unresolved in pua_map.json, or no target letter):")
         for cp, n in sorted(stats["left"].items()):
             print(f"  {cp}  {n}  e.g. {', '.join(stats['left_examples'][cp])}")
+    print(f"\nSenses split off inline-numbered rows: {stats['senses_split']}")
+    for kind, n in sorted(stats["split_report"].items()):
+        print(f"  {kind:24s} {n}")
     print(f"\nwrote {DST}")
+    print(f"wrote {os.path.join(os.path.dirname(DST), REPORT_NAME)} (numerals to review)")
 
 
 if __name__ == "__main__":
