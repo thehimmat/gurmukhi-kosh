@@ -38,10 +38,21 @@ describe("Mahan Kosh Private Use Area glyphs (#150)", () => {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
+    // Once the text is clean the regex scans every Mahan Kosh row with no
+    // early exit, under the anon role's 3 s statement timeout. Filter on
+    // dict_source_id directly (as lib/health.ts does) rather than through an
+    // embedded dict_sources join, to keep the plan simple. The first run after
+    // the re-ingest timed out while autovacuum cleared the rewritten rows.
+    const { data: src, error: srcError } = await db
+      .from("dict_sources")
+      .select("id")
+      .eq("code", "mahan_kosh")
+      .single();
+    expect(srcError).toBeNull();
     const { data, error } = await db
       .from("definitions")
-      .select("id, sense_number, definition_text, dict_sources!inner(code)")
-      .eq("dict_sources.code", "mahan_kosh")
+      .select("id, sense_number, definition_text")
+      .eq("dict_source_id", src!.id)
       .filter("definition_text", "match", PUA_CLASS)
       .limit(200);
     expect(error).toBeNull();
