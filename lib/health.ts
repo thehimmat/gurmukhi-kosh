@@ -164,13 +164,58 @@ async function mkParseStalenessMetric(s: HealthStats): Promise<Metric[]> {
   ];
 }
 
+// Inline-numbered senses (#140). Before normalize.py's splitter runs, a
+// numeral after a citation, line break or sentence end is almost always a
+// later sense bundled into the row; after it, what remains is numbered lists
+// inside a sense and the numerals listed in sense_split_report.jsonl.
+const MK_INLINE_NUMERAL = "[.)\"#।][[:space:]]*[੧-੯][੦-੯]?[.][[:space:]]";
+
+async function mkSenseSplitMetrics(): Promise<Metric[]> {
+  const { data: src } = await supabase
+    .from("dict_sources")
+    .select("id")
+    .eq("code", "mahan_kosh")
+    .single();
+  if (!src) return [];
+  const [{ count: inline }, { count: split }] = await Promise.all([
+    supabase
+      .from("definitions")
+      .select("id", { count: "exact", head: true })
+      .eq("dict_source_id", src.id)
+      .filter("definition_text", "match", MK_INLINE_NUMERAL),
+    supabase
+      .from("definitions")
+      .select("id", { count: "exact", head: true })
+      .eq("dict_source_id", src.id)
+      .not("parsed->>split_from", "is", null),
+  ]);
+  return [
+    {
+      key: "mk_inline_numerals",
+      label: "Mahan Kosh rows with an inline numbered item",
+      group: "Definitions",
+      value: inline ?? 0,
+      status: "info",
+      note: "Numbered lists inside a sense stay inline by design; numerals the splitter declined are in pipeline/mahan-kosh/output/sense_split_report.jsonl.",
+    },
+    {
+      key: "mk_split_senses",
+      label: "Mahan Kosh senses split out of a bundled row",
+      group: "Definitions",
+      value: split ?? 0,
+      status: "info",
+      note: "Rows normalize.py cut at a printed sense numeral (#140); each carries parsed.split_from.",
+    },
+  ];
+}
+
 export async function computeHealth(): Promise<HealthReport> {
   const [{ data: statsData }, grammarConflictM] = await Promise.all([
     supabase.rpc("health_stats"),
     grammarConflictMetrics(),
   ]);
   const s = statsData as HealthStats;
-  const mkParseM = await mkParseStalenessMetric(s);
+  const [mkParseM, mkSplitM] = await Promise.all([mkParseStalenessMetric(s), mkSenseSplitMetrics()]);
 
   const metrics: Metric[] = [
     // Corpus / ingest
@@ -306,7 +351,7 @@ export async function computeHealth(): Promise<HealthReport> {
       value: s.open_flags_by_type.map((r) => ({ type: r.flag_type, count: r.rows })),
     },
   ];
-  metrics.push(...mkParseM);
+  metrics.push(...mkParseM, ...mkSplitM);
 
   return { generatedAt: new Date().toISOString(), metrics };
 }
