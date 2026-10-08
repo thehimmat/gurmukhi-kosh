@@ -24,6 +24,7 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
 import { sleep, progress } from "../shared/utils";
+import { duplicateSenseKeys } from "./sense-keys";
 
 // Normalized, not the raw scrape: the source font's private-use glyphs are
 // mapped to Unicode there (#150).
@@ -229,25 +230,28 @@ async function main() {
   }
   console.log(`Structured parse attached to ${withParsed}/${rows.length} rows.`);
 
-  // Dedupe by conflict key (word_id, sense_number): a malformed Mahan Kosh
-  // description can parse into two senses sharing a sense_number, which makes the
-  // batch upsert fail ("cannot affect row a second time"). Keep the last.
-  const byKey = new Map<string, DefRow>();
-  for (const r of rows) byKey.set(`${r.word_id}:${r.sense_number}`, r);
-  const dedupedRows = [...byKey.values()];
+  // Two senses sharing (word_id, sense_number) would fail the batch upsert,
+  // and silently keeping one used to drop a sense (#159). normalize.py
+  // repairs repeated source numerals, so any duplicate left is a bug: stop.
+  const duplicates = duplicateSenseKeys(rows);
+  if (duplicates.length) {
+    console.error(`\n${duplicates.length} duplicate (word, sense) keys — nothing upserted:`);
+    for (const d of duplicates.slice(0, 20)) console.error(`  ${d}`);
+    console.error(`Re-run 'python3 pipeline/mahan-kosh/normalize.py' and check its report.`);
+    process.exit(1);
+  }
 
   console.log(
-    `\nUpserting ${dedupedRows.length} definition rows ` +
-      `(${rows.length - dedupedRows.length} duplicate senses collapsed, ` +
-      `${skipped} words skipped — not in words table)...`
+    `\nUpserting ${rows.length} definition rows ` +
+      `(${skipped} words skipped — not in words table)...`
   );
 
   const t0 = Date.now();
   let done = 0;
   let errors = 0;
 
-  for (let i = 0; i < dedupedRows.length; i += BATCH_SIZE) {
-    const batch = dedupedRows.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
     const { error } = await db
       .from("definitions")
       .upsert(batch, { onConflict: "word_id,dict_source_id,sense_number", ignoreDuplicates: false });
@@ -258,7 +262,7 @@ async function main() {
     }
 
     done += batch.length;
-    progress(done, dedupedRows.length, t0, "Defs ");
+    progress(done, rows.length, t0, "Defs ");
     if (i + BATCH_SIZE < rows.length) await sleep(20);
   }
 

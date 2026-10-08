@@ -149,7 +149,7 @@ def _override_for(overrides, headword, sense_number, text, c):
     return None
 
 
-def _split_one(headword, s, next_existing, overrides, report):
+def _split_one(headword, s, next_existing, overrides, report, shift_next=None):
     text = s.get("definition_text") or ""
     base = s["sense_number"]
     cur = base
@@ -199,6 +199,12 @@ def _split_one(headword, s, next_existing, overrides, report):
         elif c.n == 1:
             list_next, list_shape = 1, c.shape()  # a list opens
             in_list, is_sense = True, False
+        elif c.n == cur + 1 and c.n == next_existing and shift_next and shift_next(c.n):
+            # #159: the next row repeats this numeral (a source typo); it
+            # moved up one, so this inline numeral is the real sense n.
+            next_existing = c.n + 1
+            note("renumbered_to_unblock", c)
+            is_sense = True
         else:
             note("blocked_by_existing_row" if c.n == cur + 1 else "out_of_sequence", c)
             continue
@@ -240,10 +246,22 @@ def split_entry_senses(headword, senses, overrides=None):
     override or left inline for a reason worth reviewing."""
     if overrides is None:
         overrides = load_overrides()
-    existing = sorted(s["sense_number"] for s in senses)
+    senses = [dict(s) for s in senses]  # shift_next renumbers rows in place
     report = []
     out = []
-    for s in senses:
-        later = [n for n in existing if n > s["sense_number"]]
-        out.extend(_split_one(headword, s, later[0] if later else float("inf"), overrides, report))
+    for i, s in enumerate(senses):
+
+        def shift_next(n, i=i):
+            """Move the later row numbered n up to n + 1 if that is free."""
+            rows = senses[i + 1:]
+            row = next((t for t in rows if t["sense_number"] == n), None)
+            if row is None or any(t["sense_number"] == n + 1 for t in senses):
+                return False
+            row.setdefault("printed_number", n)
+            row["sense_number"] = n + 1
+            return True
+
+        later = [t["sense_number"] for t in senses if t["sense_number"] > s["sense_number"]]
+        out.extend(_split_one(headword, s, min(later) if later else float("inf"),
+                              overrides, report, shift_next))
     return out, report

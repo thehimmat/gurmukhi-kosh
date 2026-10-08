@@ -532,10 +532,12 @@ def run_corpus(limit=0):
             for s in e.get("senses") or []:
                 p = parse_sense(s.get("definition_text") or "")
                 p["sense_number"] = s.get("sense_number")
-                if "split_from" in s:
-                    # Split out of a bundled row by normalize.py (#140);
-                    # stored in definitions.parsed so the split is reversible.
-                    p["split_from"] = s["split_from"]
+                # Stored in definitions.parsed so normalize.py's changes stay
+                # reversible: split out of a bundled row (#140), or renumbered
+                # from a repeated printed numeral (#159).
+                for key in ("split_from", "printed_number"):
+                    if key in s:
+                        p[key] = s[key]
                 parsed_entry["senses"].append(p)
                 stats["senses"] += 1
                 stats["with_language"] += bool(p["language_origins"])

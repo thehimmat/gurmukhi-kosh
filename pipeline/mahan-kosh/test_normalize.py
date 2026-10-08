@@ -57,6 +57,20 @@ class NormalizeEntry(unittest.TestCase):
         self.assertEqual(out["senses"][1]["split_from"], 1)
         self.assertEqual(report, [])
 
+    def test_repairs_numbering_before_splitting(self):
+        # #159: ਕੋਲੀ-shaped entry with a copied sense and a repeated numeral.
+        e = dict(FOUND, gurmukhi="ਕੋਲੀ", senses=[
+            {"sense_number": 1, "definition_text": 'ਵਿ- ਕੋਲ ਰਹਿਣ ਵਾਲਾ. "ਹਰਿਕੋਲੀ." (ਗਉ ਮਃ ੪) ੨. ਕੋਲ ਪਾਲਣ ਵਾਲਾ', "cross_refs": None},
+            {"sense_number": 2, "definition_text": "ਸੰਗ੍ਯਾ- ਖੇਤੀਪੇਸ਼ਾ ਇੱਕ ਜਾਤਿ.", "cross_refs": None},
+            {"sense_number": 4, "definition_text": "ਜੁਲਾਹੇ ਭੀ ਕੋਲੀ ਕਹੀਦੇ ਹਨ.", "cross_refs": None},
+            {"sense_number": 4, "definition_text": "ਜੁਲਾਹੇ ਭੀ ਕੋਲੀ ਕਹੀਦੇ ਹਨ.", "cross_refs": None},
+        ])
+        report = []
+        out = normalize_entry(e, report)
+        self.assertEqual([s["sense_number"] for s in out["senses"]], [1, 2, 3, 4])
+        self.assertEqual(sorted(r["kind"] for r in report),
+                         ["duplicate_text_dropped", "renumbered_to_unblock"])
+
     def test_not_found_entry_passes_through(self):
         e = {"gurmukhi": "ਕਖ", "found": False}
         self.assertEqual(normalize_entry(e), e)
