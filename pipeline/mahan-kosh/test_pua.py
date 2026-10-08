@@ -107,9 +107,14 @@ class Reph(unittest.TestCase):
 
 
 class Joiners(unittest.TestCase):
-    def test_cluster_joined_with_zwnj(self):
-        # ਕ਼ਸ੍\u200cਦ (قصد): ZWNJ after the halant is still one cluster.
-        self.assertEqual(clean_pua("ਕ਼ਸ੍\u200cਦ\uf02f."), "ਕ਼ਸ੍\u200cਦ.")
+    def test_mark_after_halant_and_zwnj(self):
+        # ਕ਼ਸ੍‌ਦ (قصد, headword ਕਸਦ): the source stores the mark right after
+        # the halant + ZWNJ, before ਦ.
+        self.assertEqual(clean_pua("ਕ਼ਸ੍\u200c\uf02fਦ."), "ਕ਼ਸ੍\u200cਦ.")
+
+    def test_mark_after_vowel_sign_then_halant(self):
+        # ਅਸੌ੍ਟ (अष्टौ, headword ਸਿੰਘਾਸਨ): vowel sign typed before the halant.
+        self.assertEqual(clean_pua("ਅਸੌ੍\uf032ਟ"), n("ਅਸ਼ੌ੍ਟ"))
 
 
 class Characters(unittest.TestCase):
