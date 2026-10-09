@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "issue": "#150",
+    "what": "Private Use Area code points left in the searchgurbani.com Mahan Kosh text by its source font. Applied by pua.py in the normalize stage (normalize.py), before parse_shorthand.py.",
+    "spelling": "Modern Punjabi: the ष-dot gives ਸ਼; the Perso-Arabic dots give ਜ਼ on ਜ and plain ਸ on ਸ (ਨਜ਼ਰ, ਹਜ਼ਰਤ, ਸਾਹਿਬ, ਅਸਰ). The print's ص/س and ष/श distinctions are not representable in standard Gurmukhi; the bracketed Perso-Arabic and Devanagari etymons still carry them, and the raw scrape (entries.jsonl) is never modified.",
+    "kinds": {
+      "mark": "A dot glyph the font stores AFTER the whole letter cluster (consonants, halant, vowel signs) although it is drawn under one letter. It is attached to the last letter of that cluster listed in `targets`, then removed. Each mark has a narrow variant (after a consonant or short vowel) and a wide variant (after ਾ ੀ ਾਂ).",
+      "reph": "Superscript ਰ, stored after the syllable it is pronounced before: ਰ੍ is inserted in front of the preceding cluster.",
+      "char": "A plain substitution.",
+      "unresolved": "Meaning not confirmed; left in the text and allowed by the live no-PUA test."
+    },
+    "status_values": {
+      "verified_etymon": "The intended letter is confirmed by the Devanagari or Perso-Arabic etymon printed in the same entry, across the cited headwords and the per-code-point alignment counts.",
+      "verified_gurbani": "Confirmed against the quoted Gurbani line.",
+      "verified_definition": "Confirmed by the entry's own definition (a gana's printed laghu/guru pattern).",
+      "unresolved": "Not confirmed."
+    },
+    "pdf_check": "Before merge, look up each code point's `pdf_check` headwords in the printed Mahan Kosh and confirm the glyph matches `means`."
+  },
+  "code_points": {
+    "U+F032": {
+      "kind": "mark", "variant": "narrow", "means": "ष (retroflex sibilant) dot under ਸ",
+      "targets": { "ਸ": "ਸ਼" },
+      "status": "verified_etymon", "rows": 1775, "occurrences": 2470,
+      "evidence": [
+        { "headword": "ਉਸਨ", "raw": "उष्ण- ਉਸ੍\uf032ਣ" },
+        { "headword": "ਉੱਚ", "raw": "ਸ੍ਰੇਸ੍ਠ\uf032", "etymon": "श्रेष्ठ" },
+        { "headword": "ਉਦਕਰਖ", "raw": "ਉਤਕਰ੍ਸ\uf032", "etymon": "उत्कर्ष" },
+        { "headword": "ਉਗ੍ਰਸੈਨ", "raw": "ਕ੍ਰਿਸ\uf032ਨ", "etymon": "कृष्ण" },
+        { "headword": "ਉਜਲ", "raw": "ਸ਼ੇਸ\uf032ਨਾਗ", "etymon": "शेषनाग (श written ਸ਼, ष marked)" }
+      ],
+      "pdf_check": ["ਉਸਨ", "ਉੱਚ", "ਹਰਿ"]
+    },
+    "U+F03B": {
+      "kind": "mark", "variant": "wide", "means": "ष dot under ਸ (after ਾ ੀ ਾਂ)",
+      "targets": { "ਸ": "ਸ਼" },
+      "status": "verified_etymon", "rows": 345, "occurrences": 406,
+      "evidence": [
+        { "headword": "ਊਖਾ", "raw": "ऊषा- ਊਸਾ\uf03b" },
+        { "headword": "ਅਸਾੜ", "raw": "ਆਸਾ\uf03bਢ", "etymon": "आषाढ" },
+        { "headword": "ਅਹਿਰਖ", "raw": "ਈਰ੍ਸਾ\uf03b", "etymon": "ईर्षा" },
+        { "headword": "ਨਿਸਾਦ", "raw": "ਨਿਸਾ\uf03bਦ", "etymon": "निषाद" }
+      ],
+      "pdf_check": ["ਊਖਾ", "ਅਸਾੜ"]
+    },
+    "U+F02F": {
+      "kind": "mark", "variant": "narrow", "means": "ص on ਸ, ذ on ਜ",
+      "targets": { "ਸ": "ਸ", "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 172, "occurrences": 207,
+      "evidence": [
+        { "headword": "ਅਸਰ", "raw": "[عصر] ਅ਼ਸ\uf02fਰ" },
+        { "headword": "ਸਹਨ", "raw": "[صحن] ਸ\uf02fਹ਼ਨ" },
+        { "headword": "ਸਈਆਦ", "raw": "[صیّاد] ਸ\uf02fਈਆਦ" },
+        { "headword": "ਅਜਾਨ", "raw": "ਮੁਅੱਜਿ\uf02fਨ [موذّن]" }
+      ],
+      "pdf_check": ["ਅਸਰ", "ਸਹਨ"]
+    },
+    "U+F038": {
+      "kind": "mark", "variant": "wide", "means": "ص on ਸ, ذ on ਜ (after ਾ ੀ)",
+      "targets": { "ਸ": "ਸ", "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 78, "occurrences": 85,
+      "evidence": [
+        { "headword": "ਸਾਹਿਬ", "raw": "[صاحب] ਸਾ\uf038ਹ਼ਿਬ" },
+        { "headword": "ਇਨਸਾਫ", "raw": "[انصاف] ਇਨਸਾ\uf038ਫ਼" },
+        { "headword": "ਅਜਾਨ", "raw": "[اذاں] ਅਜਾ\uf038ਨ" },
+        { "headword": "ਅਜਾਬ", "raw": "[عذاب] ਅ਼ਜਾ\uf038ਬ" }
+      ],
+      "pdf_check": ["ਸਾਹਿਬ", "ਅਜਾਬ"]
+    },
+    "U+F031": {
+      "kind": "mark", "variant": "narrow", "means": "ث on ਸ, ض on ਜ",
+      "targets": { "ਸ": "ਸ", "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 129, "occurrences": 158,
+      "evidence": [
+        { "headword": "ਅਸਰ", "raw": "[اثر] ਅਸ\uf031ਰ" },
+        { "headword": "ਅਰਜ", "raw": "[عرض] ਅ਼ਰਜ\uf031" },
+        { "headword": "ਅਜਾਨ", "raw": "ਹਜ\uf031ਰਤ", "etymon": "حضرت" },
+        { "headword": "ਅੜੀ", "raw": "ਜਿੱ\uf031ਦ", "etymon": "ضد" }
+      ],
+      "notes": "One sense (ਅਮਰਾਪਦ, ਨਾਸ\uf031) uses it on Sanskrit नाश; it becomes plain ਨਾਸ.",
+      "pdf_check": ["ਅਸਰ", "ਅਰਜ"]
+    },
+    "U+F03A": {
+      "kind": "mark", "variant": "wide", "means": "ث on ਸ, ض on ਜ (after ਾ ੀ)",
+      "targets": { "ਸ": "ਸ", "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 58, "occurrences": 61,
+      "evidence": [
+        { "headword": "ਸਾਨੀ", "raw": "[ثانی] ਸਾ\uf03aਨੀ" },
+        { "headword": "ਸਾਬਤ", "raw": "[ثابت] ਸਾ\uf03aਬਤ" },
+        { "headword": "ਅਜਾਂਇ", "raw": "[ضائِع] ਜਾ\uf03aਇਅ਼" },
+        { "headword": "ਅਰਜੀ", "raw": "[عرضی] ਅ਼ਰਜੀ\uf03a" }
+      ],
+      "pdf_check": ["ਸਾਬਤ", "ਅਰਜੀ"]
+    },
+    "U+F033": {
+      "kind": "mark", "variant": "narrow", "means": "ظ on ਜ",
+      "targets": { "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 65, "occurrences": 69,
+      "evidence": [
+        { "headword": "ਹਜ", "raw": "[حظ] ਹ਼ਜ\uf033" },
+        { "headword": "ਚਸ਼ਮ", "raw": "ਨਜ\uf033ਰ", "etymon": "نظر" },
+        { "headword": "ਕਬੂਲ", "raw": "ਮਨਜੂ\uf033ਰ", "etymon": "منظور" }
+      ],
+      "pdf_check": ["ਹਜ", "ਕਬੂਲ"]
+    },
+    "U+F03C": {
+      "kind": "mark", "variant": "wide", "means": "ظ on ਜ (after ਾ ੀ)",
+      "targets": { "ਜ": "ਜ਼" },
+      "status": "verified_etymon", "rows": 21, "occurrences": 23,
+      "evidence": [
+        { "headword": "ਜਾਲਮ", "raw": "[ظالِم] ਜਾ\uf03cਲਿਮ" },
+        { "headword": "ਜਾਹਰ", "raw": "[ظاہر] ਜਾ\uf03cਹਿਰ" },
+        { "headword": "ਜਾਫਰ", "raw": "[ظافر] ਜਾ\uf03cਫ਼ਿਰ" }
+      ],
+      "pdf_check": ["ਜਾਲਮ"]
+    },
+    "U+F02C": {
+      "kind": "reph", "means": "superscript ਰ (reph), pronounced before the preceding cluster",
+      "status": "verified_etymon", "rows": 30, "occurrences": 38,
+      "evidence": [
+        { "headword": "ਕਪੂਰ", "raw": "ਕਪੂ\uf02cਰ", "etymon": "कर्पूर" },
+        { "headword": "ਅਰਜਨ", "raw": "ਅਜੁ\uf02cਨ", "etymon": "अर्जुन" },
+        { "headword": "ਹਰਮ", "raw": "हर्म्य ਹਮ੍ਯ\uf02c" },
+        { "headword": "ਸਾਰਦੂਲ", "raw": "ਸ਼ਾਦੂ\uf02cਲ", "etymon": "शार्दूल" },
+        { "headword": "ਚਉਧਰੀ", "raw": "ਚਤੁਧੁ\uf02cਰੀਣ", "etymon": "चतुर्धुरीण" }
+      ],
+      "notes": "All 36 distinct tokens checked against their etymon; 35 follow the rule, ਅਪੂ\uf02cਣ is an override.",
+      "pdf_check": ["ਕਪੂਰ", "ਊਰਾ"]
+    },
+    "U+F02B": {
+      "kind": "char", "to": "ੋ", "means": "hora vowel sign",
+      "status": "verified_gurbani", "rows": 2, "occurrences": 2,
+      "evidence": [
+        { "headword": "ਉਮਰ", "raw": "ਡੀਹੜਾ ਸ\uf02b ਉਮਰ", "gurbani": "ਜੋ ਵੰਞੈ ਡੀਹੜਾ ਸੋ ਉਮਰ ਹਥ ਪਵਨਿ" },
+        { "headword": "ਖੋਜਿ", "raw": "ਸੇਵੇ ਸਿਖੁ ਸ\uf02b ਖੋਜਿ ਲਹੈ", "gurbani": "ਸੇਵੇ ਸਿਖੁ ਸੋ ਖੋਜਿ ਲਹੈ" }
+      ],
+      "pdf_check": []
+    },
+    "U+F03F": {
+      "kind": "char", "to": "।", "means": "laghu (light syllable) in a meter's pattern",
+      "status": "verified_definition", "rows": 74, "occurrences": 735,
+      "evidence": [
+        { "headword": "ਅਸਤਰ", "raw": "ਚਾਰ ਯਗਣ. \uf03f\uf03e\uf03e, …", "definition": "ਯਗਣ = laghu guru guru" },
+        { "headword": "ਤੋਟਕ", "raw": "ਸਗਣ \uf03f\uf03f\uf03e, …", "definition": "ਸਗਣ = laghu laghu guru" }
+      ],
+      "pdf_check": ["ਅਸਤਰ"]
+    },
+    "U+F03E": {
+      "kind": "char", "to": "ऽ", "means": "guru (heavy syllable) in a meter's pattern",
+      "status": "verified_definition", "rows": 77, "occurrences": 626,
+      "evidence": [
+        { "headword": "ਅਸਤਰ", "raw": "ਚਾਰ ਯਗਣ. \uf03f\uf03e\uf03e, …", "definition": "ਯਗਣ = laghu guru guru" }
+      ],
+      "pdf_check": ["ਅਸਤਰ"]
+    },
+    "U+F030": {
+      "kind": "unresolved", "means": "unknown",
+      "status": "unresolved", "rows": 1, "occurrences": 1,
+      "evidence": [
+        { "headword": "ਕੋਸ", "raw": "ਫ਼ਾ. ਜ\uf030ਦ੍ਕ ਕੋਸ਼." }
+      ],
+      "pdf_check": ["ਕੋਸ (sense 12)"]
+    }
+  },
+  "overrides": [
+    {
+      "from": "ਅਪੂ\uf02cਣ", "to": "ਅਪੂਰ੍ਣ",
+      "why": "अपूर्ण (headword ਊਰਾ): the source typed the reph glyph before ਣ instead of after it, so the positional rule would give ਅਰ੍ਪੂਣ."
+    },
+    {
+      "from": "ਧਸ\uf02f\uf02c", "to": "ਧਰ੍ਸ\u0a3c",
+      "why": "दुर्धर्ष (headword ਦੁੱਧਰ): the ص glyph stands in for the ष-dot, which the ص rule would drop (ਦੁਰ੍\u200dਧਰ੍ਸ)."
+    }
+  ]
+}
