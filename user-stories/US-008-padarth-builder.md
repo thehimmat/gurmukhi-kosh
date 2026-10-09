@@ -42,4 +42,9 @@ fetch and admin UI follow in PR 2.
 
 Base-form links: `word_forms`/`lexemes` are empty since migration 037 archived
 the stem-inferred grouping (#30), so the assembler takes base-form links as
-input with an explicit basis; which links to use is decided in PR 2.
+input with an explicit basis. Decided 2026-10-09: until source-backed links
+exist, PR 2 also offers spelling-variant matches (shared `search_fold` key),
+labelled "spelling match, unverified" — admin-only, computed at read time,
+never stored. Planned replacement: Shackle inflection links from #18, written
+to `word_forms` with `source_code='shackle'`; once they land, spelling matches
+should drop to a fallback or go away.
