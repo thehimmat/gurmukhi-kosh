@@ -53,6 +53,39 @@ class DropsCopiedSenses(unittest.TestCase):
         self.assertEqual(out[2]["definition_text"], "ਵਿਧਵਾ ਇਸਤ੍ਰੀ ਦਾ ਦੂਜਾ ਪਤਿ")
 
 
+class KeepsTheFullerOfTwoPrintings(unittest.TestCase):
+    def test_short_printing_then_full_printing(self):
+        # ਕਲੇਸ: the source prints the entry twice. The first printing stops
+        # after ੫'s opening sentence and restarts the entry ('#ਸੰ. ਕ੍ਲੇਸ਼…');
+        # the second carries ੫ in full.
+        out, notes = repair_numbering("ਕਲੇਸ", [
+            sense(1, "ਸੰ. ਕ੍ਲੇਸ਼. ਸੰਗ੍ਯਾ- ਦੁੱਖ"),
+            sense(4, "ਕ੍ਰੋਧ"),
+            sense(5, "ਵਿਦ੍ਵਾਨਾਂ ਨੇ ਪੰਜ ਕ੍ਲੇਸ਼ ਸੰਸਕ੍ਰਿਤਗ੍ਰੰਥਾਂ ਵਿੱਚ ਲਿਖੇ ਹਨ.#ਸੰ. ਕ੍ਲੇਸ਼. ਸੰਗ੍ਯਾ- ਦੁੱਖ"),
+            sense(5, "ਵਿਦ੍ਵਾਨਾਂ ਨੇ ਪੰਜ ਕ੍ਲੇਸ਼ ਸੰਸਕ੍ਰਿਤਗ੍ਰੰਥਾਂ ਵਿੱਚ ਲਿਖੇ ਹਨ.#ੳ- ਅਵਿਦ੍ਯਾ.#ਅ- ਅਸ੍ਮਿਤਾ."),
+        ])
+        self.assertEqual(numbers(out), [1, 4, 5])
+        self.assertTrue(out[2]["definition_text"].endswith("ਅ- ਅਸ੍ਮਿਤਾ."))
+        self.assertNotIn("printed_number", out[2])
+        self.assertEqual(kinds(notes), ["fuller_printing_kept"])
+
+    def test_full_printing_first_drops_the_short_one(self):
+        out, _ = repair_numbering("ਕਲੇਸ", [
+            sense(5, "ਵਿਦ੍ਵਾਨਾਂ ਨੇ ਪੰਜ ਕ੍ਲੇਸ਼ ਲਿਖੇ ਹਨ.#ੳ- ਅਵਿਦ੍ਯਾ.#ਅ- ਅਸ੍ਮਿਤਾ."),
+            sense(5, "ਵਿਦ੍ਵਾਨਾਂ ਨੇ ਪੰਜ ਕ੍ਲੇਸ਼ ਲਿਖੇ ਹਨ."),
+        ])
+        self.assertEqual(numbers(out), [5])
+        self.assertTrue(out[0]["definition_text"].endswith("ਅ- ਅਸ੍ਮਿਤਾ."))
+
+    def test_shared_opening_word_is_not_a_printing(self):
+        # ਵੇਕਾਰ's two 2s share only 'ਸੰ. ਵ…': different senses, renumber.
+        out, _ = repair_numbering("ਵੇਕਾਰ", [
+            sense(2, "ਸੰ. ਵਿਕਾਰ ਸੰਗ੍ਯਾ-"),
+            sense(2, "ਸੰ. ਵੈਕਾਰ੍ਰ ਵਿ- ਜਿਸ ਤੋਂ ਵੇਕਾਰ ਹੋ ਸਕਦਾ ਹੈ"),
+        ])
+        self.assertEqual(numbers(out), [2, 3])
+
+
 class RenumbersByPosition(unittest.TestCase):
     def test_repeated_number_takes_the_free_next_one(self):
         out, notes = repair_numbering("ਵੇਕਾਰ", [
