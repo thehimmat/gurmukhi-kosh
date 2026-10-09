@@ -24,7 +24,7 @@ describe("US-008: pad-arth builder", () => {
     const db = anonDb();
     const ids = Array.from({ length: 10 }, (_, i) => i + 1);
     const [l, o, p] = await Promise.all([
-      db.from("lines").select("id, ang, line_no, gurmukhi").in("id", ids).order("verse_id"),
+      db.from("lines").select("id, ang, line_no, gurmukhi").in("id", ids).order("id"),
       db.from("word_occurrences").select("line_id, position, word_id, words(gurmukhi)").in("line_id", ids),
       db.from("line_translations").select("line_id, source_code, body_unicode").in("line_id", ids).eq("source_code", "ss_padarth"),
     ]);

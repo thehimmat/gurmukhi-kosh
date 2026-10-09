@@ -126,6 +126,14 @@ describe("parsePadarth", () => {
     expect(entries[1].gloss).toBe("(ਆਪੋ ਆਪਣੇ) ਕਰਮ ਕਰ ਕੇ, ਜਿਹੋ ਜਿਹੇ ਕਰਮ ਕਰੋਗੇ");
   });
 
+  it("splits entries separated by ; but keeps ; between senses (verses 185, 110 in #165)", () => {
+    const body =
+      "ਅੰਤਰਗਤਿ = ਅੰਦਰਲਾ; ਤੀਰਥਿ = ਤੀਰਥ ਉੱਤੇ; ਅੰਤਰਗਤਿ ਤੀਰਥਿ = ਅੰਦਰਲੇ ਤੀਰਥ ਉੱਤੇ; ਮਲਿ = ਮਲ ਮਲ ਕੇ, ਚੰਗੀ ਤਰ੍ਹਾਂ; ਨਾਉ = ਇਸ਼ਨਾਨ (ਕੀਤਾ ਹੈ)";
+    expect(terms(body)).toEqual(["ਅੰਤਰਗਤਿ", "ਤੀਰਥਿ", "ਅੰਤਰਗਤਿ ਤੀਰਥਿ", "ਮਲਿ", "ਨਾਉ"]);
+    expect(entry(body, "ਤੀਰਥਿ").gloss).toBe("ਤੀਰਥ ਉੱਤੇ");
+    expect(entry("ਮਾਨੁ = ਆਦਰ; ਵਡਿਆਈ।", "ਮਾਨੁ").gloss).toBe("ਆਦਰ; ਵਡਿਆਈ");
+  });
+
   it("returns nothing for an empty body", () => {
     expect(parsePadarth("")).toEqual({ entries: [], leading: [] });
     expect(parsePadarth("  ।  ")).toEqual({ entries: [], leading: [] });
