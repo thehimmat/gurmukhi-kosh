@@ -2,6 +2,9 @@
 // takedown procedure (#39). Kept out of ingest.ts so it can be tested.
 
 import type { supabaseAdmin } from "../shared/db";
+import { wipeFormLinks } from "../shared/wipe-form-links";
+
+export { wipeFormLinks };
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -10,9 +13,12 @@ type DB = ReturnType<typeof supabaseAdmin>;
  * lemmas are deleted only while still off-corpus: once a corpus attests one
  * (the Sarbloh ingest attached occurrences to 364 of Shackle's), it belongs
  * to the corpus, a FK from word_occurrences protects it, and the re-ingest
- * attaches to it by its Gurmukhi like any other corpus word.
+ * attaches to it by its Gurmukhi like any other corpus word. Form links go
+ * first, since a hub may be rooted on one of those lemmas; re-run
+ * `npm run ingest:shackle:forms` after a re-ingest to restore them.
  */
 export async function wipeSource(db: DB, sourceId: number, sourceCode: string): Promise<void> {
+  await wipeFormLinks(db, sourceCode);
   const steps: [string, () => PromiseLike<{ error: { message: string } | null }>][] = [
     ["dict_examples", () => db.from("dict_examples").delete().eq("dict_source_id", sourceId)],
     ["word_grammar", () => db.from("word_grammar").delete().eq("source_code", sourceCode)],
