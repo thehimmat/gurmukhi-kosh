@@ -14,7 +14,8 @@
  * link sits beside any direct entry for the same word.
  *
  * Idempotent: wipes this source's form links (pipeline/shared/wipe-form-links.ts)
- * and reloads. Run after `npm run ingest:shackle`, which clears them too.
+ * and reloads. `npm run ingest:shackle` clears them with the rest of the source
+ * and then runs this script, so the two never drift apart.
  *
  * Usage: npm run ingest:shackle:forms [-- --dry-run]
  */
