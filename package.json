@@ -22,6 +22,7 @@
     "ingest:sikhri": "tsx pipeline/sikhri/ingest.ts",
     "ingest:shackle:lookups": "tsx pipeline/shackle/load-lookups.ts",
     "ingest:shackle": "tsx pipeline/shackle/ingest.ts",
+    "ingest:shackle:forms": "tsx pipeline/shackle/ingest-form-links.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
     "ingest:numbers": "tsx pipeline/numbers/populate.ts",
     "scans:check": "tsx pipeline/scans/check.ts",
