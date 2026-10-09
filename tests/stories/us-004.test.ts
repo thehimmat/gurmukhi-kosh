@@ -68,6 +68,29 @@ describe("US-004: grammar grouped by attribute with citations", () => {
     expect(count).toBe(0);
   });
 
+  // #18: Shackle's inflections notes populate the lexeme/form model, so an
+  // inflected form with no entry of its own reaches its headword in one join.
+  it("US-004: inflected forms are grouped under a lexeme by Shackle's own memberships (#18)", async () => {
+    const { count, error } = await db
+      .from("word_forms")
+      .select("id", { count: "exact", head: true })
+      .eq("source_code", "shackle");
+    expect(error).toBeNull();
+    expect(count).toBeGreaterThan(2500);
+
+    // ਹੋਵੈ (no definition of its own) is Shackle's pres. 3s. of ਹੋਇ.
+    const { data: rows, error: e2 } = await db
+      .from("word_forms")
+      .select("label_raw, tense_mood, person, number, words!inner(gurmukhi), lexemes!inner(lemma_gurmukhi)")
+      .eq("source_code", "shackle")
+      .eq("words.gurmukhi", "ਹੋਵੈ");
+    expect(e2).toBeNull();
+    const reading = (rows ?? []).find(
+      (r) => (r.lexemes as unknown as { lemma_gurmukhi: string }).lemma_gurmukhi === "ਹੋਇ"
+    );
+    expect(reading).toMatchObject({ label_raw: "pres. 3s.", tense_mood: "present", person: "third", number: "singular" });
+  });
+
   // #29: an unmapped label compares as a raw string and fakes a cross-source
   // conflict. A re-ingest that introduces a new Shackle label must fail here.
   it("US-004: every stored Shackle POS label normalizes to a controlled part of speech (#29)", async () => {

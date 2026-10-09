@@ -3,7 +3,7 @@ id: US-004
 title: See grammar with scholarly citations grouped by attribute
 status: active
 created: 2026-07-22
-updated: 2026-10-04
+updated: 2026-10-09
 linked_issues: []
 linked_tests: ["tests/stories/us-004.test.ts"]
 supersedes: null
@@ -64,3 +64,18 @@ grammar value into tables the app cannot read:
 
 Status stays partial: criteria 1 and 3 hold for every value shown; criterion 2
 waits on #18.
+
+## Assessment (2026-10-09)
+
+Criterion 2 is now met for the forms Shackle lists. The #18 ingest parsed the
+1,426 `inflections:` notes into 2,243 forms and linked the 1,959 the corpus
+attests: 3,140 word_forms rows over 1,154 lexeme hubs, 1,901 distinct corpus
+words, each with Shackle's verbatim label and the 023 feature columns. ਹੋਵੈ
+now reaches ਹੋਇ (pres. 3s.).
+
+Coverage is bounded by what Shackle enumerates: his notes list irregular and
+notable forms, not whole regular paradigms. Only 24 of the 133 Japji gaps
+verified on #158 are linked; the rest (ਕਹੈ, ਜਾਣੈ, ਮਿਲੈ) are regular forms no
+source here states. Status stays partial until a second source (#2 manual
+closed classes, #24 Viakaran) or the word page's "form of X" display lands.
+
