@@ -145,11 +145,28 @@ describe("planFormLinks", () => {
     ]);
   });
 
-  it("never treats an unwritten nasal as the same word (lossless spellings only)", () => {
-    // sāṁ may be printed ਸਾੰ or ਸਾਂ, but ਸਾ is a different word.
-    const lex = new Map([["ਸਾਂਈ", 1], ["ਸਾ", 2]]);
-    const plan = planFormLinks([entry({ definitionId: 5, wordId: 1, headword: "ਸਾਂਈ", notes: "inflections: (sāṁ)" })], lex);
-    expect(plan.forms).toEqual([]);
-    expect(plan.stats.lossyOnly).toBe(1);
+  it("prefers a spelling that writes Shackle's nasal, and links an unmarked one only failing that", () => {
+    // Shackle transcribes nasalization the script often leaves unwritten (§6):
+    // karaṁhi is SGGS ਕਰਹਿ. Where the marked spelling is attested, only it links.
+    const lex = new Map([["ਕਰਿ", 1], ["ਕਰਹਿ", 2], ["ਕਰੀ", 3], ["ਕਰੀਂ", 4]]);
+    const plan = planFormLinks(
+      [entry({ definitionId: 5, wordId: 1, headword: "ਕਰਿ", notes: "inflections: (pres. 3p. karaṁhi; 1s. karīṁ)" })],
+      lex
+    );
+    expect(plan.forms.map((f) => [f.wordId, f.features.unmarked_in_script ?? false])).toEqual([
+      [1, false],
+      [2, true],
+      [4, false],
+    ]);
+    expect(plan.stats.unmarkedSpelling).toBe(1);
+  });
+
+  it("does not link an unmarked spelling that is another Shackle headword", () => {
+    // kālhu with its ੍ਹ unwritten is ਕਾਲੁ, Shackle's separate entry "time, death".
+    const lex = new Map([["ਕਾਲਿ", 1], ["ਕਾਲੁ", 2], ["ਕਾਲਹਿ", 3]]);
+    const e = entry({ definitionId: 6, wordId: 1, headword: "ਕਾਲਿ", notes: "inflections: (kālhu, kālhi)" });
+    const plan = planFormLinks([e], lex, new Set([1, 2]));
+    expect(plan.forms.map((f) => f.wordId)).toEqual([1, 3]);
+    expect(plan.stats.headwordCollisions).toBe(1);
   });
 });

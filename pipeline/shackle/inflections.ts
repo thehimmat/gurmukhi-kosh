@@ -90,7 +90,10 @@ function tagRank(tag: string): number | null {
 }
 
 // Words that carry no form or grammar: skipped where they stand.
-const PROSE = new Set(["also", "or", "and", "as", "with", "throughout", "before", "usu.", "freq.", "etc.", "cf.", "s.v.", "uninfl.", "ppn."]);
+const PROSE = new Set([
+  "also", "or", "and", "as", "with", "throughout", "before", "only", "rarely", "the", "genitive", "etc",
+  "usu.", "freq.", "etc.", "cf.", "s.v.", "uninfl.", "ppn.",
+]);
 
 type Tag = { tag: string; rank: number };
 type State = Tag[];
@@ -173,7 +176,11 @@ function readFormToken(raw: string): FormTok | null {
     t = t.slice(0, -1);
     context.push(last);
   }
-  if (!ROMAN_RE.test(t.replace(/^-|-$/g, ""))) return null;
+  const body = t.replace(/^-|-$/g, "");
+  if (!ROMAN_RE.test(body)) return null;
+  // Shackle writes the inherent -a, so a token ending in a consonant is an OCR
+  // fragment (`miragal`, `-k`), not a form; it must not become a stem either.
+  if (!t.endsWith("-") && !VOWEL_CHARS.includes(body.at(-1)!)) return null;
   if (context.length) features.context = [...new Set(context)];
   if (sup.homograph !== undefined) features.homograph = sup.homograph;
   return { roman: t, hypothetical, features };
@@ -283,7 +290,10 @@ export function parseInflections(raw: string, headwordRoman: string): ParseResul
         if (toks[1] === "as" && toks[2] && /^[A-ZĀĪŪ]/.test(toks[2])) inflectsAs = toks[2];
         continue;
       }
-      if (toks.includes("of") || toks[0] === "int." || toks.some((t) => t.startsWith("'"))) continue;
+      // A usage note (`int. + le, lai`, `+ kari`) runs to the end of the group:
+      // the words after it are collocates, not forms.
+      if (toks[0] === "int." || (toks[0] === "+" && toks[1] && tagRank(toks[1]) === null)) break;
+      if (toks.includes("of") || toks.some((t) => t.startsWith("'"))) continue;
 
       const run: string[] = [];
       const suffixTags: string[] = [];

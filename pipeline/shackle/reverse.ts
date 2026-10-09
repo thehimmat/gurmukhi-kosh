@@ -370,12 +370,12 @@ export function gurmukhiToShackle(gurmukhi: string): string {
     }
     const v = F_VOWEL[ch];
     if (v) {
-      // ਉ / ਇ straight after an inherent -a are hiatus vowels: ü / ï keep
-      // "karaü" from reading as the diphthong au.
+      // ਉ / ਇ straight after an a (inherent, or ਅ itself) are hiatus vowels:
+      // ü / ï keep "karaü" and "aühaṭhi" from reading as the diphthongs au / ai.
       if (afterInherentA && v === "u") out += "ü";
       else if (afterInherentA && v === "i") out += "ï";
       else out += v;
-      afterInherentA = false;
+      afterInherentA = v === "a";
       continue;
     }
     out += ch;

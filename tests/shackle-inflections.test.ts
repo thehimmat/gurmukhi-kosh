@@ -234,6 +234,20 @@ describe("parseInflections: edge shapes", () => {
     });
   });
 
+  it("skips English prose words and consonant-final OCR fragments", () => {
+    expect(parseInflections("(sl. also -a, rarely -i)", "daragaha").forms.map((f) => [f.form_roman, f.label_raw])).toEqual([
+      ["daragaha", "sl."],
+      ["daragahi", "sl."],
+    ]);
+    expect(parseInflections("(s. genitive -asya SlS2ˢ)", "saṁsāru").forms.map((f) => f.form_roman)).toEqual(["saṁsārasya"]);
+    expect(parseInflections("(miragal)", "miragu").forms).toEqual([]);
+  });
+
+  it("ends the group at a usage note, so its words are never read as forms", () => {
+    expect(parseInflections("(int. + le, lai)", "kāḍhi").forms).toEqual([]);
+    expect(parseInflections("(+ kari, karai; pp. matā)", "matā").forms.map((f) => f.form_roman)).toEqual(["matā"]);
+  });
+
   it("reads a bare variant spelling after 'or'", () => {
     expect(parseInflections("(or ārhaṇu)", "āraṇu").forms.map((f) => f.form_roman)).toEqual(["ārhaṇu"]);
   });

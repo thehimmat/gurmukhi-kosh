@@ -6,8 +6,11 @@
 //
 // The corpus is closed (#30): a form links only when one of its Gurmukhi
 // spellings is an existing in-corpus words row, which also filters out bad
-// transliterations and bad suffix expansions. Spellings are lossless only: ṁ
-// may be ੰ or ਂ, but an omitted nasal or bare sonorant spells a different word.
+// transliterations and bad suffix expansions. Shackle's transcription is
+// phonemic: it writes nasalization (ṁ) and aspirated sonorants (nh) the script
+// often leaves unmarked, so karaṁhi is SGGS ਕਰਹਿ. A fully marked spelling wins
+// when attested (ਜੀਆਂ, not ਜੀਆ, for jīāṁ); otherwise the unmarked one links,
+// flagged features.unmarked_in_script.
 //
 // One hub per headword word (#30 decision 2). Homograph entries share it
 // (three ਪਾਇ entries -> one hub); each form row records its definition_id, so
@@ -47,17 +50,28 @@ export type PlanStats = {
   entries: number;
   parsedForms: number;
   linkedForms: number;
-  /** Forms with no attested lossless spelling. */
+  /** Forms with no attested spelling at all. */
   unresolved: number;
-  /** Of those, how many an omitted nasal / bare sonorant would have matched (not linked). */
-  lossyOnly: number;
+  /** Linked forms whose only attested spelling leaves Shackle's nasal or ੍ਹ unwritten. */
+  unmarkedSpelling: number;
+  /** Unmarked spellings not linked because they are another Shackle entry's headword. */
+  headwordCollisions: number;
 };
 
 export type FormLinkPlan = { lexemes: PlannedLexeme[]; forms: PlannedForm[]; stats: PlanStats };
 
-/** `corpus` maps each in-corpus words.gurmukhi (NFC) to its id. */
-export function planFormLinks(entries: ShackleEntry[], corpus: Map<string, number>): FormLinkPlan {
-  const stats: PlanStats = { entries: 0, parsedForms: 0, linkedForms: 0, unresolved: 0, lossyOnly: 0 };
+/**
+ * `corpus` maps each in-corpus words.gurmukhi (NFC) to its id. `headwordIds`
+ * holds the word ids of every Shackle entry: an unmarked spelling that lands
+ * on another entry's headword is not linked (kālhu read as ਕਾਲੁ "time"), since
+ * the script cannot tell the two apart there.
+ */
+export function planFormLinks(
+  entries: ShackleEntry[],
+  corpus: Map<string, number>,
+  headwordIds: Set<number> = new Set()
+): FormLinkPlan {
+  const stats: PlanStats = { entries: 0, parsedForms: 0, linkedForms: 0, unresolved: 0, unmarkedSpelling: 0, headwordCollisions: 0 };
   const hubs = new Map<number, { lexeme: PlannedLexeme; forms: Omit<PlannedForm, "reading_number">[]; seen: Set<string> }>();
   const order: number[] = [];
 
@@ -71,13 +85,24 @@ export function planFormLinks(entries: ShackleEntry[], corpus: Map<string, numbe
     for (const f of forms) {
       stats.parsedForms++;
       const rev = reverseTransliterate(f.form_roman);
-      const wordIds = [...new Set(candidateSpellings(rev, { lossless: true }).flatMap((g) => corpus.get(g) ?? []))];
+      const attested = (opts: { lossless?: boolean }) => [
+        ...new Set(candidateSpellings(rev, opts).flatMap((g) => corpus.get(g.normalize("NFC")) ?? [])),
+      ];
+      // Prefer a spelling that writes every mark Shackle transcribes; only when
+      // none is attested, accept one that leaves the nasal or ੍ਹ unwritten (§3b, §6).
+      let wordIds = attested({ lossless: true });
+      const unmarked = !wordIds.length;
+      if (unmarked) {
+        const all = attested({});
+        wordIds = all.filter((id) => id === e.wordId || !headwordIds.has(id));
+        stats.headwordCollisions += all.length - wordIds.length;
+      }
       if (!wordIds.length) {
         stats.unresolved++;
-        if (candidateSpellings(rev).some((g) => corpus.has(g))) stats.lossyOnly++;
         continue;
       }
       stats.linkedForms++;
+      if (unmarked) stats.unmarkedSpelling++;
       const { extra, ...cols } = featureColumns(f.grammar_tags);
       for (const wordId of wordIds) {
         linked.push({
@@ -93,6 +118,7 @@ export function planFormLinks(entries: ShackleEntry[], corpus: Map<string, numbe
             shackle_tags: f.grammar_tags,
             definition_id: e.definitionId,
             sense_number: e.senseNumber,
+            ...(unmarked ? { unmarked_in_script: true } : {}),
           },
         });
       }

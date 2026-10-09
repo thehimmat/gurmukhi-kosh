@@ -59,12 +59,13 @@ describe("gurmukhiToShackle", () => {
     ["ਨ੍ਹਾਵਣੁ", "nhāvaṇu"],
     ["ਸੱਚ", "sacca"],
     ["ਪ੍ਰਭੁ", "prabhu"],
+    ["ਅਉਹਠਿ", "aühaṭhi"],
   ])("%s -> %s", (g, roman) => {
     expect(gurmukhiToShackle(g)).toBe(roman);
   });
 
   it("round-trips through the reverse engine", () => {
-    for (const g of ["ਹੋਇ", "ਰਾਜਾ", "ਜੀਉ", "ਸਭੁ", "ਪਾਇ", "ਕਰਉ", "ਪ੍ਰਭੁ"]) {
+    for (const g of ["ਹੋਇ", "ਰਾਜਾ", "ਜੀਉ", "ਸਭੁ", "ਪਾਇ", "ਕਰਉ", "ਪ੍ਰਭੁ", "ਅਉਹਠਿ"]) {
       expect(reverseTransliterate(gurmukhiToShackle(g)).gurmukhi).toBe(g);
     }
   });
