@@ -111,6 +111,12 @@ rebuild ran through the MCP. The rest of it ran from the dashboard SQL editor, b
 destructive statements for a confirmation: the delete of the emptied avatar source row and the description
 update. The file is idempotent.
 
+| 53 | 20261009223201 | 040_word_forms_readings | kosh `040_word_forms_readings.sql` |
+
+Migration 040 drops 002's `(lexeme_id, word_id)` unique index so a membership can carry several
+readings and sources (#30 decision 4), ahead of the Shackle form links (#18). `word_forms` was empty
+when it ran.
+
 Migration 036 is the remove half of 034's add-then-remove: search_number_lines no longer
 returns the scalar `char_start`/`char_end`. Verified gurmukhi-search production (f6ec668,
 live since 2026-09-23) reads the arrays first; results for value 1 over author/ghar were
