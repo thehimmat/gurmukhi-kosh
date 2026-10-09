@@ -69,17 +69,21 @@ function sentences(body: string): string[] {
   }
   out.push(current);
   return out
-    .flatMap(splitAfterExclamation)
+    .flatMap(splitBeforeEntries)
     .map((s) => s.replace(/\s+/g, " ").trim())
     .filter((s) => !NOISE.test(s));
 }
 
-// A vocative gloss ends in ! with no danda before the next entry:
-// "ਨਾਨਕ = ਹੇ ਨਾਨਕ! ਹੋਸੀ = ਹੋਵੇਗਾ". Split there only when an entry follows.
-const ENTRY_AFTER_MARK = /[!?]\s+(?=[਀-੣ੰ-੿]+(?: [਀-੣ੰ-੿]+){0,5}\s*=)/g;
+// Some entries are not closed by a danda: a vocative gloss ends in !
+// ("ਨਾਨਕ = ਹੇ ਨਾਨਕ! ਹੋਸੀ = ਹੋਵੇਗਾ") and some rows chain entries with ;
+// ("ਅੰਤਰਗਤਿ = ਅੰਦਰਲਾ; ਤੀਰਥਿ = ਤੀਰਥ ਉੱਤੇ"). Split there only when an entry
+// follows, so a ; between senses ("ਮਾਨੁ = ਆਦਰ; ਵਡਿਆਈ") stays in the gloss.
+const ENTRY_AFTER_MARK = /[!?;]\s+(?=[਀-੣ੰ-੿]+(?: [਀-੣ੰ-੿]+){0,5}\s*=)/g;
 
-function splitAfterExclamation(sentence: string): string[] {
-  return sentence.replace(ENTRY_AFTER_MARK, (m) => m[0] + BOUNDARY).split(BOUNDARY);
+function splitBeforeEntries(sentence: string): string[] {
+  return sentence
+    .replace(ENTRY_AFTER_MARK, (m) => (m[0] === ";" ? BOUNDARY : m[0] + BOUNDARY))
+    .split(BOUNDARY);
 }
 
 /**
