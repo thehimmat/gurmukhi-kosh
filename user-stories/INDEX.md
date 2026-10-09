@@ -15,4 +15,3 @@ every non-superseded story must be referenced by at least one test.
 | US-005 | See per-line commentary and etymology alongside occurrences | active | #33, #66 | yes |
 | US-006 | Flag errors and monitor data quality (curation + admin) | active | #2 | yes |
 | US-007 | Full entries across all ingested corpora | active | #96, #66, #26, #40 | yes |
-| US-008 | Build a word-by-word pad-arth for a selected passage | active | #158 | yes |
