@@ -104,13 +104,14 @@ export type Ambiguity = {
 
 export type ReverseResult = { gurmukhi: string; ambiguities: Ambiguity[] };
 
-type Tok =
+export type Tok =
   | { kind: "C"; roman: string; cons: Cons }
   | { kind: "V"; roman: string; vowel: Vowel }
   | { kind: "N"; roman: string }
   | { kind: "?"; roman: string };
 
-function tokenize(text: string): Tok[] {
+/** Greedy longest-match tokenizer over Shackle graphemes (C consonant, V vowel, N nasalization). */
+export function tokenize(text: string): Tok[] {
   const toks: Tok[] = [];
   let i = 0;
   outer: while (i < text.length) {
