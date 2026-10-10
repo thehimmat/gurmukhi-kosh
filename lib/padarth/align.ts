@@ -18,7 +18,8 @@ export type TermMatch = {
 const PAIRIN_HAHA = /(?:੍ਹ)+|ੑ/g;
 const JOINERS = /[‌‍]/g;
 
-function normalise(word: string): string {
+/** The spelling key used for matching: NFC, no joiners, one pairin haha. */
+export function normalise(word: string): string {
   return word.normalize("NFC").replace(JOINERS, "").replace(PAIRIN_HAHA, "ੑ");
 }
 
