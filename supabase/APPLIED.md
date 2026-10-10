@@ -117,6 +117,13 @@ Migration 040 drops 002's `(lexeme_id, word_id)` unique index so a membership ca
 readings and sources (#30 decision 4), ahead of the Shackle form links (#18). `word_forms` was empty
 when it ran.
 
+| 54 | 20261010033406 | 041_padarth_glosses | kosh `041_padarth_glosses.sql` |
+
+Migration 041 adds `padarth_glosses`, `padarth_gloss_occurrences` and `padarth_case_evidence` for
+Sahib Singh's pad-arth split into terms (#165). Applied 2026-10-10 through the MCP; verified after: all
+three tables have RLS on and a public read policy, and are empty until
+`npm run ingest:padarth:glosses` runs.
+
 Migration 036 is the remove half of 034's add-then-remove: search_number_lines no longer
 returns the scalar `char_start`/`char_end`. Verified gurmukhi-search production (f6ec668,
 live since 2026-09-23) reads the arrays first; results for value 1 over author/ghar were
