@@ -21,8 +21,14 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
+import { lineIdByVerseId, type LineQuery } from "../shared/lines";
 import { fetchAng } from "../../lib/banidb";
 import { getArg, sleep, progress } from "../shared/utils";
+
+// Everything here comes from BaniDB's SGGS text, so every lookup is scoped to
+// that corpus: lines.verse_id is unique only per source, and Sri Sarbloh's
+// 1-36,000 overlaps SGGS exactly (#162).
+const SOURCE_CODE = "sggs_banidb_v2";
 
 // BaniDB translation field → our translation_sources.code + language.
 const FIELD_MAP: Array<{ group: "pu" | "en"; key: string; source: string; lang: string }> = [
@@ -46,6 +52,18 @@ async function main() {
   const end = parseInt(getArg("end") || "8", 10);
   console.log(`Ingesting line translations for angs ${start}-${end} (BaniDB)...`);
 
+  const { data: src, error: srcErr } = await db
+    .from("sources")
+    .select("id, name")
+    .eq("code", SOURCE_CODE)
+    .single();
+  if (srcErr || !src) {
+    console.error(`Source '${SOURCE_CODE}' not found in the sources table.`);
+    process.exit(1);
+  }
+  const sourceFk = src.id as number;
+  console.log(`Source: [${sourceFk}] ${src.name} (${SOURCE_CODE})`);
+
   const t0 = Date.now();
   let totalRows = 0;
   let missingLines = 0;
@@ -55,16 +73,16 @@ async function main() {
 
     // Map this ang's BaniDB verseIds → our lines.id.
     const verseIds = page.map((v) => v.verseId);
-    const { data: lineRows, error } = await db
-      .from("lines")
-      .select("id, verse_id")
-      .in("verse_id", verseIds);
-    if (error) {
-      console.error(`\nlines lookup failed (ang ${ang}):`, error.message);
+    const lineIdByVerse = await lineIdByVerseId(
+      // Cast: PostgREST's builder satisfies LineQuery structurally, but letting
+      // tsc prove it against the generated types hits TS2589.
+      () => db.from("lines").select("id, verse_id") as unknown as LineQuery,
+      sourceFk,
+      verseIds
+    ).catch((e: Error) => {
+      console.error(`\nlines lookup failed (ang ${ang}):`, e.message);
       process.exit(1);
-    }
-    const lineIdByVerse = new Map<number, number>();
-    for (const r of lineRows ?? []) lineIdByVerse.set(r.verse_id, r.id);
+    });
 
     const rows: Row[] = [];
     for (const verse of page) {
