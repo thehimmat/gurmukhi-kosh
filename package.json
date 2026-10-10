@@ -16,6 +16,7 @@
     "ingest:manual": "tsx pipeline/manual/ingest.ts",
     "ingest:grammar": "tsx pipeline/grammar/ingest.ts",
     "ingest:grammar:padarth": "tsx pipeline/grammar/ingest-padarth.ts",
+    "ingest:padarth:glosses": "tsx pipeline/padarth/ingest-glosses.ts",
     "ingest:grammar:autoflag": "tsx pipeline/grammar/auto-flag.ts",
     "ingest:etymology": "tsx pipeline/etymology/ingest.ts",
     "scrape:sikhri": "tsx pipeline/sikhri/scrape.ts",
