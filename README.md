@@ -10,8 +10,9 @@ word-by-word reference that makes Gurbani readable for learners, not just search
 
 - **Every word**: unique Gurmukhi word forms across all 1430 angs, with occurrence counts.
 - **Definitions**: multiple senses per word, drawn from classical Gurmukhi lexicography.
-- **Grammar**: part of speech, gender, number, and case, with inflected forms grouped under a
-  canonical lexeme.
+- **Grammar**: part of speech, gender, number, and case where a source states them. Inflected
+  forms are grouped under their headword where Shackle's glossary lists them (about 1,900 words);
+  nothing is inferred from spelling.
 - **Etymology**: origin chains for each word.
 - **Concordance**: every line a word appears in, with its position.
 

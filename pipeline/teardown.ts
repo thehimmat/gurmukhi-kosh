@@ -16,6 +16,9 @@
  * column. Lookup tables (sigla, mappings) are scoped by source_code too and are
  * removed as well, since a takedown means everything derived from the source.
  *
+ * Lexeme hubs carry no source_code: the ones this source cited and nothing
+ * else uses are deleted with its word_forms (pipeline/shared/wipe-form-links.ts).
+ *
  * NOT deleted: rows in `words`. Off-corpus lemmas a source contributed carry
  * words.origin_source, but `words` is referenced by occurrences, flags, audio
  * and more, so those are reported for a human decision instead of cascaded.
@@ -26,6 +29,7 @@ config({ path: ".env.local" });
 
 import { supabaseAdmin } from "./shared/db";
 import { getArg } from "./shared/utils";
+import { wipeFormLinks } from "./shared/wipe-form-links";
 
 // Tables keyed by the numeric dict_sources.id.
 const BY_DICT_SOURCE_ID = ["definitions", "dict_examples"] as const;
@@ -119,6 +123,8 @@ async function main() {
   }
 
   console.log("\nDeleting...");
+  // Form links first: it also removes the lexeme hubs only this source used.
+  await wipeFormLinks(db, sourceCode);
   for (const table of BY_DICT_SOURCE_ID) {
     const { error } = await db.from(table).delete().eq("dict_source_id", src.id);
     if (error) throw new Error(`${table} delete failed: ${error.message}`);
