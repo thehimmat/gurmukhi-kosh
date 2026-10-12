@@ -98,7 +98,11 @@ export function planGlosses(input: PlanInput): { glosses: PlannedGloss[]; stats:
   const glosses: PlannedGloss[] = [];
   for (const row of input.padarth) {
     const tokens = tokensByLine.get(row.lineId) ?? [];
-    const { entries, leading } = parsePadarth(row.body);
+    // Line words let the parser split an entry swallowed after a comma or a
+    // closing bracket, which text alone cannot decide (#181).
+    const { entries, leading } = parsePadarth(row.body, {
+      lineTokens: tokens.map((t) => t.gurmukhi),
+    });
     const aligned = alignTerms(
       tokens.map((t) => t.gurmukhi),
       entries.map((e) => e.term)
