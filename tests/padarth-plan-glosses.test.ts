@@ -78,6 +78,36 @@ describe("planGlosses", () => {
     expect(plan.glosses[1].links.map((k) => k.match)).toEqual(["exact", "exact"]);
   });
 
+  it("does not base-link a form Sahib Singh glosses to contrast with the line's word (lines 2402, 2888)", () => {
+    // ਪਾਰਿ is glossed directly; ਪਾਰੁ is his note on the *other* form, so it must not land on ਪਾਰਿ.
+    const l2402 = line(2402, "ਸਤਿਗੁਰੁ ਭੈ ਕਾ ਬੋਹਿਥਾ ਨਦਰੀ ਪਾਰਿ ਉਤਾਰੁ");
+    wid("ਪਾਰੁ");
+    const plan = planGlosses(
+      input([{ line: l2402, body: "ਪਾਰੁ = ਪਾਰਲਾ ਪਾਸਾ (ਨਾਂਵ) । ਪਾਰਿ = ਪਾਰਲੇ ਪਾਸੇ (ਕ੍ਰਿਆ ਵਿਸ਼ੇਸ਼ਣ) }। 4।" }], {
+        lexemesByWord: new Map([
+          [wid("ਪਾਰੁ"), [88]],
+          [wid("ਪਾਰਿ"), [88]],
+        ]),
+      })
+    );
+    expect(plan.glosses.map((g) => [g.term, g.links.map((l) => l.match)])).toEqual([
+      ["ਪਾਰੁ", []],
+      ["ਪਾਰਿ", ["exact"]],
+    ]);
+    // The same row's contrast comes after the direct gloss too (ਸਭੁ … ਸਭ).
+    const l2888 = line(2888, "ਸਭੁ ਨਾਵੈ ਨੋ ਪਰਤਾਪਦਾ");
+    wid("ਸਭ");
+    const after = planGlosses(
+      input([{ line: l2888, body: "ਸਭੁ = ਹਰੇਕ ਜੀਵ। ਸਭ = ਸਾਰੀ ਸ੍ਰਿਸ਼ਟੀ।" }], {
+        lexemesByWord: new Map([
+          [wid("ਸਭੁ"), [99]],
+          [wid("ਸਭ"), [99]],
+        ]),
+      })
+    );
+    expect(after.glosses[1].links).toEqual([]);
+  });
+
   it("leaves a term unlinked when nothing ties it to the line, rather than guessing", () => {
     const l7 = line(7, "ਭੁਖਿਆ ਭੁਖ ਨ ਉਤਰੀ ਜੇ ਬੰਨਾ ਪੁਰੀਆ ਭਾਰ");
     const plan = planGlosses(input([{ line: l7, body: "ਪੁਰੀ = ਲੋਕ, ਭਵਣ।" }]));

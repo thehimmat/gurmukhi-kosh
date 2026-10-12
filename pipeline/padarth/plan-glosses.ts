@@ -14,7 +14,10 @@
 //   exact / gapped  the term's words are in the line (lib/padarth/align.ts)
 //   via_base        one word, not in the line, but Shackle lists it and a
 //                   word of the line in the same paradigm (word_forms, #18):
-//                   ਪੁਰੀ beside ਪੁਰੀਆ. The shared lexeme is recorded.
+//                   ਪੁਰੀ beside ਪੁਰੀਆ. The shared lexeme is recorded. Never onto
+//                   a word the same row glosses directly: there the other form
+//                   is Sahib Singh's contrast ("ਪਾਰੁ = ਪਾਰਲਾ ਪਾਸਾ … ਪਾਰਿ = ਪਾਰਲੇ
+//                   ਪਾਸੇ"), and linking it would say the opposite of his note.
 // Nothing looser: no spelling-similarity tier. An unlinked term is kept.
 
 import { alignTerms, normalise } from "../../lib/padarth/align";
@@ -71,13 +74,15 @@ export type GlossPlanStats = {
 function baseLink(
   term: string,
   tokens: PlanToken[],
+  glossedDirectly: Set<number>,
   wordIdByKey: Map<string, number>,
   lexemesByWord: Map<number, number[]>
 ): PlannedLink | null {
   const termWord = wordIdByKey.get(normalise(term));
   const termLexemes = termWord === undefined ? [] : (lexemesByWord.get(termWord) ?? []);
   if (termLexemes.length === 0) return null;
-  for (const t of tokens) {
+  for (const [at, t] of tokens.entries()) {
+    if (glossedDirectly.has(at)) continue;
     const shared = (lexemesByWord.get(t.wordId) ?? []).find((l) => termLexemes.includes(l));
     if (shared !== undefined) return { occurrenceId: t.occurrenceId, match: "via_base", lexemeId: shared };
   }
@@ -97,6 +102,11 @@ export function planGlosses(input: PlanInput): { glosses: PlannedGloss[]; stats:
     const aligned = alignTerms(
       tokens.map((t) => t.gurmukhi),
       entries.map((e) => e.term)
+    );
+
+    // Words this row glosses on their own, by exact single-word entries.
+    const glossedDirectly = new Set(
+      aligned.flatMap((m, k) => (m && m.match === "exact" && !entries[k].term.includes(" ") ? m.positions : []))
     );
 
     let ordinal = 0;
@@ -121,7 +131,7 @@ export function planGlosses(input: PlanInput): { glosses: PlannedGloss[]; stats:
       if (m) {
         links = m.positions.map((p) => ({ occurrenceId: tokens[p].occurrenceId, match: m.match, lexemeId: null }));
       } else if (!isPhrase) {
-        const viaBase = baseLink(entry.term, tokens, wordIdByKey, input.lexemesByWord);
+        const viaBase = baseLink(entry.term, tokens, glossedDirectly, wordIdByKey, input.lexemesByWord);
         if (viaBase) links = [viaBase];
       }
       glosses.push({
