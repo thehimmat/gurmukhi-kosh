@@ -121,6 +121,15 @@ when it ran.
 
 | 55 | 20261013162934 | 042_aunkar_rule_syncretism | kosh `042_aunkar_rule_syncretism.sql` |
 
+| 56 | 20261013171500 | 043_aunkar_not_a_word_level_rule | kosh `043_aunkar_not_a_word_level_rule.sql` |
+
+Migration 043 follows 042 within the same review (#187). Re-verifying the rest of the Viakaran
+findings against the new text layer turned up two more roles for a final aunkar: invariant
+adjectives agreeing with feminine and plural nouns (p.356, ਖੁਆਰੁ and ਥਿਰੁ) and ਹੁਕਮੀ ਭਵਿੱਖਤ third
+person plural verbs (p.270, -ਨੁ against present -ਨਿ). So 042's remaining "masculine, singular"
+claim was still too strong, and the rule is retired as a word-level predictor rather than narrowed
+a third time. Registry row only.
+
 Migration 042 corrects AUNKAR_NOM_SG in `grammar_rules` (#187). Sahib Singh states at Gurbani
 Viakaran pp.77-78 that final aunkar marks the accusative singular as well as the nominative, and
 explains the syncretism historically; the p.62 kaarak table shows the same. The rule had stood
