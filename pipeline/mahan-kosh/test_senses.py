@@ -211,6 +211,47 @@ class NumberedListsStayInline(unittest.TestCase):
         self.assertEqual(out[1]["definition_text"], "ਸੰਗ੍ਯਾ- ਨਾਮ. ਸੰਗ੍ਯਾ.")
 
 
+class UnblocksATypoedNextRow(unittest.TestCase):
+    """#159: the source repeats a numeral, so the row after an inline sense
+    carries the inline sense's number (ਕੋਲੀ: '੨. ਕੋਲ…। ੨. ਸੰਗ੍ਯਾ-…। ੪.').
+    The inline numeral is the real one; the next row moves up one when that
+    number is free."""
+
+    def test_koli(self):
+        out, report = split(
+            "ਕੋਲੀ",
+            sense(1, 'ਵਿ- ਕੋਲ ਰਹਿਣ ਵਾਲਾ. ਸਮੀਪੀ. "ਹਰਿ ਨਿਕਟ ਵਸੈ ਹਰਿਕੋਲੀ." (ਗਉ ਮਃ ੪) ੨. ਕੋਲ (ਸੂਰ) ਪਾਲਣ ਵਾਲਾ'),
+            sense(2, "ਸੰਗ੍ਯਾ- ਖੇਤੀਪੇਸ਼ਾ ਇੱਕ ਜਾਤਿ."),
+            sense(4, "ਪੰਜਾਬ ਦੇ ਜੁਲਾਹੇ ਭੀ ਕੋਲੀ ਕਹੀਦੇ ਹਨ."),
+        )
+        self.assertEqual(numbers(out), [1, 2, 3, 4])
+        self.assertEqual(out[1]["definition_text"], "ਕੋਲ (ਸੂਰ) ਪਾਲਣ ਵਾਲਾ")
+        self.assertEqual(out[2]["definition_text"], "ਸੰਗ੍ਯਾ- ਖੇਤੀਪੇਸ਼ਾ ਇੱਕ ਜਾਤਿ.")
+        self.assertEqual(out[2]["printed_number"], 2)
+        self.assertIn("renumbered_to_unblock", [r["kind"] for r in report])
+
+    def test_sumitr_last_row(self):
+        out, _ = split(
+            "ਸੁਮਿਤ੍ਰ",
+            sense(1, "ਉੱਤਮ ਮਿਤ੍ਰ"),
+            sense(2, 'ਸੰ. ਸੌਮਿਤ੍ਰਿ. ਸੰਗ੍ਯਾ- ਲਛਮਣ. "ਤਿਹ ਓਰ ਸੁਮਿਤ੍ਰ ਪਠਾਯੋ." (ਰਾਮਾਵ) ੩. ਸ਼ਤ੍ਰੁਘਨ, ਲਛਮਣ ਦਾ ਛੋਟਾ ਭਾਈ'),
+            sense(3, "ਸੰ. ਸੁਮੰਤ੍ਰ. ਰਾਜਾ ਦਸ਼ਰਥ ਦਾ ਮੰਤ੍ਰੀ."),
+        )
+        self.assertEqual(numbers(out), [1, 2, 3, 4])
+        self.assertEqual(out[3]["definition_text"], "ਸੰ. ਸੁਮੰਤ੍ਰ. ਰਾਜਾ ਦਸ਼ਰਥ ਦਾ ਮੰਤ੍ਰੀ.")
+
+    def test_no_room_stays_blocked(self):
+        # Rows 2 and 3 both exist, so row 2 cannot move up.
+        out, report = split(
+            "ਥੋਰੀ",
+            sense(1, 'ਵਿ- ਥੋੜੀ. "ਕਹਾਂ ਨਰ ਗਰਬਸਿ ਥੋਰੀ ਬਾਤ?" (ਸਾਰ ਕਬੀਰ) ੨. ਸੰਗ੍ਯਾ- ਇੱਕ ਜਾਤਿ'),
+            sense(2, "ਸੰ. ਸ੍ਥੂਰ. ਵਿ- ਵਡਾ."),
+            sense(3, "ਹੋਰ."),
+        )
+        self.assertEqual(numbers(out), [1, 2, 3])
+        self.assertIn("blocked_by_existing_row", [r["kind"] for r in report])
+
+
 class Overrides(unittest.TestCase):
     def test_broken_numeral_split_by_override(self):
         # ਧਰਮ: "੧. ਧਨੁਸ" is sense ੧੦ with a dropped digit (rows 9 and 11 exist).

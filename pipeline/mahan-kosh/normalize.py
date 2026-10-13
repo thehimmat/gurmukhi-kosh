@@ -11,6 +11,8 @@ and every clean-up is re-runnable:
 
 Steps:
   - Private Use Area glyphs from the source font -> Unicode (#150, pua.py)
+  - repeated sense numbers repaired, copied senses dropped (#159,
+    numbering.py)
   - rows holding several printed senses split at their numerals (#140,
     senses.py); numerals left inline for review go to
     output/sense_split_report.jsonl
@@ -24,6 +26,7 @@ import json
 import os
 from collections import Counter, defaultdict
 
+from numbering import repair_numbering
 from pua import clean_pua, find_pua
 from senses import load_overrides, split_entry_senses
 
@@ -46,9 +49,10 @@ def normalize_entry(entry: dict, report: list | None = None, overrides: list | N
     out = copy.deepcopy(entry)
     for s in out.get("senses") or []:
         s["definition_text"] = clean_pua(s.get("definition_text") or "")
-    out["senses"], notes = split_entry_senses(out["gurmukhi"], out.get("senses") or [], overrides)
+    out["senses"], repairs = repair_numbering(out["gurmukhi"], out.get("senses") or [])
+    out["senses"], notes = split_entry_senses(out["gurmukhi"], out["senses"], overrides)
     if report is not None:
-        report.extend(notes)
+        report.extend(repairs + notes)
     return out
 
 
