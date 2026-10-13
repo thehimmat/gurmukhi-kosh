@@ -119,6 +119,16 @@ when it ran.
 
 | 54 | 20261010033406 | 041_padarth_glosses | kosh `041_padarth_glosses.sql` |
 
+| 55 | 20261013162934 | 042_aunkar_rule_syncretism | kosh `042_aunkar_rule_syncretism.sql` |
+
+Migration 042 corrects AUNKAR_NOM_SG in `grammar_rules` (#187). Sahib Singh states at Gurbani
+Viakaran pp.77-78 that final aunkar marks the accusative singular as well as the nominative, and
+explains the syncretism historically; the p.62 kaarak table shows the same. The rule had stood
+`verified = true` asserting nominative "applied uniformly", because 025 left that call to #27 and
+#27 was closed without it. Registry row only: `word_grammar` has held 0 rows for every rule code
+since 037. MUKTA_OBL_SG and SIHARI_OBL_SG were re-checked against the same new text layer and are
+correct as 025 left them, so they are untouched.
+
 Migration 041 adds `padarth_glosses`, `padarth_gloss_occurrences` and `padarth_case_evidence` for
 Sahib Singh's pad-arth split into terms (#165). Applied 2026-10-10 through the MCP; verified after: all
 three tables have RLS on and a public read policy, and are empty until
