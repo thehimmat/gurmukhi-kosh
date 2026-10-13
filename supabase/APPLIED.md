@@ -130,6 +130,19 @@ person plural verbs (p.270, -ਨੁ against present -ਨਿ). So 042's remaining
 claim was still too strong, and the rule is retired as a word-level predictor rather than narrowed
 a third time. Registry row only.
 
+| 57 | 20261013232302 | 044_lines_first_letters | kosh `044_lines_first_letters.sql` |
+
+Migration 044 makes first-letter search answer within the anon role's 3s statement timeout: every
+query of two or more letters used to time out. It adds `lines.first_letters`, the first code point of
+each word in position order, with a `text_pattern_ops` index, and `refresh_line_first_letters()`
+(service role only), which the ingest now calls. It also replaces the body of
+`search_first_letters(text[], text[], text[], bigint[], int, int, int, int)` with an indexed prefix
+match; the signature is unchanged.
+- Before applying, ran it in a rolled-back transaction and timed the RPC as anon: 39–721 ms, with line
+  counts identical to the old function (ਸਨਕਪ 8, ਸ_ਕ 2,292, ਹ 7,654, ਮਨਮ 30).
+- Verified live after applying: 171,880 lines keyed (the 2 lines with no words stay null).
+  `search.atthebunga.com/api/search?mode=first_letter` answers in 0.3–0.7 s warm.
+
 Migration 042 corrects AUNKAR_NOM_SG in `grammar_rules` (#187). Sahib Singh states at Gurbani
 Viakaran pp.77-78 that final aunkar marks the accusative singular as well as the nominative, and
 explains the syncretism historically; the p.62 kaarak table shows the same. The rule had stood
