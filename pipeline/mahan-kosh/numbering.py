@@ -15,10 +15,9 @@ Senses are renumbered by position, keeping the printed numeral in
   - two senses with the same number where one is a fuller printing of the
     other (same opening sentence; ਕਲੇਸ prints its entry twice) become one,
     keeping the fuller text;
-  - a number that does not increase becomes the previous number + 1 when no
-    later sense holds that number;
-  - when no number is free (1, 2, 2, 3) the sense is merged into the one
-    before it, so no text is lost.
+  - a number that does not increase becomes the previous number + 1; when a
+    later sense was printed with that number (ਜੰਤੀ 1, 2, 2, 3) it moves up
+    in turn, so the shift runs on until a gap in the numbering absorbs it.
 
 Gaps are left alone: the #140 splitter fills them from inline numerals.
 """
@@ -66,7 +65,7 @@ def _fuller(a, b, first_sense):
 
 def repair_numbering(headword, senses):
     """Returns (senses, notes): a repaired copy of `senses` (in order) and
-    one note per sense dropped, renumbered or merged."""
+    one note per sense dropped, combined or renumbered."""
     notes = []
     out = []
 
@@ -74,7 +73,7 @@ def repair_numbering(headword, senses):
         notes.append({"kind": kind, "headword": headword,
                       "sense_number": s["sense_number"], **extra})
 
-    for i, s in enumerate(senses):
+    for s in senses:
         if any(_same_text(s.get("definition_text"), o.get("definition_text")) for o in out):
             note("duplicate_text_dropped", s)
             continue
@@ -88,14 +87,10 @@ def repair_numbering(headword, senses):
         if n > prev:
             out.append(s)
             continue
+        # Renumber by position. If prev + 1 is printed on a later sense, that
+        # sense is <= its new predecessor when its turn comes and moves up too,
+        # so the shift carries on until a gap in the numbering absorbs it.
         wanted = prev + 1
-        taken = any(t["sense_number"] == wanted for t in senses[i + 1:])
-        if not taken:
-            out.append(dict(s, sense_number=wanted, printed_number=s.get("printed_number", n)))
-            note("renumbered", s, renumbered_to=wanted)
-            continue
-        merged = out[-1]
-        out[-1] = dict(merged, definition_text=(
-            f'{(merged.get("definition_text") or "").rstrip()} {(s.get("definition_text") or "").strip()}'))
-        note("merged_no_room", s, merged_into=merged["sense_number"])
+        out.append(dict(s, sense_number=wanted, printed_number=s.get("printed_number", n)))
+        note("renumbered", s, renumbered_to=wanted)
     return out, notes

@@ -118,17 +118,33 @@ class RenumbersByPosition(unittest.TestCase):
         self.assertEqual(numbers(out), [4, 5, 6, 10])
 
 
-class MergesWhenNoNumberIsFree(unittest.TestCase):
-    def test_merges_into_the_previous_sense(self):
-        out, notes = repair_numbering("ਨਮੂਨਾ", [
-            sense(1, "ਪਹਿਲਾ."),
-            sense(2, "ਦੂਜਾ."),
-            sense(2, "ਦੂਜੇ ਦਾ ਵਾਧਾ."),
-            sense(3, "ਤੀਜਾ."),
+class ShiftsLaterSensesWhenNoNumberIsFree(unittest.TestCase):
+    """A repeated number whose next number is taken (1, 2, 2, 3): the source
+    misnumbered from there on, so that sense and every later one move up."""
+
+    def test_jantee(self):
+        out, notes = repair_numbering("ਜੰਤੀ", [
+            sense(1, "ਯੰਤ੍ਰੀ ਵਿ- ਮਸ਼ੀਨ ਚਲਾਉਣ ਵਾਲਾ"),
+            sense(2, 'ਵਾਜਾ ਵਜਾਉਣ ਵਾਲਾ. "ਜਸ ਜੰਤੀ ਮਹਿ ਜੀਉ ਸਮਾਨਾ." (ਗਉ ਕਬੀਰ)'),
+            sense(2, 'ਯੰਤ੍ਰ ਮੇਂ. ਕਲ ਵਿੱਚ. "ਜੈਸੇ ਬਿਰਖ ਜੰਤੀ ਜੋਤ." (ਕੇਦਾ ਮਃ ੫)'),
+            sense(3, "ਸੰਗ੍ਯਾ- ਤਾਰ ਖਿੱਚਣ ਦਾ ਵੱਡੇ ਛੋਟੇ ਛੇਕਾਂ ਵਾਲਾ ਜੰਤਾ."),
         ])
-        self.assertEqual(numbers(out), [1, 2, 3])
-        self.assertEqual(out[1]["definition_text"], "ਦੂਜਾ. ਦੂਜੇ ਦਾ ਵਾਧਾ.")
-        self.assertEqual(kinds(notes), ["merged_no_room"])
+        self.assertEqual(numbers(out), [1, 2, 3, 4])
+        self.assertTrue(out[2]["definition_text"].startswith("ਯੰਤ੍ਰ ਮੇਂ"))
+        self.assertEqual([s.get("printed_number") for s in out], [None, None, 2, 3])
+        self.assertEqual(kinds(notes), ["renumbered", "renumbered"])
+
+    def test_shift_stops_at_a_gap(self):
+        # ਤੁਟਿ-shaped, with a later gap that absorbs the shift.
+        out, _ = repair_numbering("ਤੁਟਿ", [
+            sense(1, "ਸੰ. ਸੰਗ੍ਯਾ- ਛੋਟੀ ਇਲਾਯਚੀ"),
+            sense(2, "ਸੰ. ਤ੍ਰੁਟਿ. ਸੰਗ੍ਯਾ- ਕਮੀ. ਘਾਟਾ. ਨ੍ਯੂਨਤਾ"),
+            sense(2, "ਭੁੱਲ. ਖ਼ੋਤਾ"),
+            sense(3, "ਸ਼ੱਕ. ਸੰਸਾ"),
+            sense(5, "ਹੋਰ ਅਰਥ"),
+        ])
+        self.assertEqual(numbers(out), [1, 2, 3, 4, 5])
+        self.assertNotIn("printed_number", out[4])
 
 
 class LeavesCleanEntriesAlone(unittest.TestCase):
