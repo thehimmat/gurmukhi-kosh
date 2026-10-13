@@ -194,8 +194,10 @@ async function main() {
   // must abort loudly: these full-table rebuilds can hit the PostgREST
   // statement timeout, and an unchecked rpc() once left the stats empty
   // while the run reported success.
-  console.log("Refreshing word frequencies (total + per-corpus)...");
-  for (const fn of ["refresh_word_frequencies", "refresh_word_corpus_stats"] as const) {
+  // lines.first_letters (044) is the first-letter search key, rebuilt from the
+  // occurrences just written; a stale key silently drops lines from that mode.
+  console.log("Refreshing word frequencies (total + per-corpus) and first-letter keys...");
+  for (const fn of ["refresh_word_frequencies", "refresh_word_corpus_stats", "refresh_line_first_letters"] as const) {
     const { error } = await db.rpc(fn);
     if (error) {
       console.error(`${fn} FAILED: ${error.message}`);
