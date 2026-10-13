@@ -7,6 +7,14 @@
 // ਹੈ– ਭਾਵ). Between entries sit notes, quotations and numbered asides — those
 // are kept as notes on the entry they follow, so nothing in the source is lost.
 //
+// The `=` is not Sahib Singh's. The typed Darpan (Dhami/Thind, the Gurbani-CD
+// text) writes one hyphen for both jobs, entry separator and compound joiner:
+// "ਨਦਰਿ-ਕਿਰਪਾ-ਦ੍ਰਿਸ਼ਟੀ ਵਿਚ". The BaniDB `pss` text we ingest turned many of
+// those hyphens into " = ", inconsistently and in both directions: some
+// compounds became `=` (ਨਦਰਿ = ਕਿਰਪਾ = ਦ੍ਰਿਸ਼ਟੀ ਵਿਚ, ਸਦਾ = ਥਿਰ beside ਸਦਾ-ਥਿਰ),
+// some separators stayed `-` (ਮਨਿ-ਮਨ), and some rows were never converted
+// (Japji pauris 17–19). So neither character alone says which job it is doing.
+//
 // This module is pure (text → entries); matching terms to words of the line is
 // lib/padarth/align.ts.
 
@@ -27,8 +35,9 @@ export type ParseOptions = {
    * line. Without them the parser behaves exactly as before, so no existing
    * caller changes behaviour.
    *
-   * The gate is necessary because the two cases are identical as text. Sahib
-   * Singh writes `=` for a hyphen in compounds, so "ਮਸ਼ੱਕਤਿ, ਮਿਹਨਤ, ਘਾਲ = ਕਮਾਈ"
+   * The gate is necessary because the two cases are identical as text. The
+   * `pss` digitisation turned some compound hyphens into `=` (see the header),
+   * so "ਮਸ਼ੱਕਤਿ, ਮਿਹਨਤ, ਘਾਲ = ਕਮਾਈ"
    * is one gloss (ghāl-kamāī), while "ਮੈਂ ਵਰਣਨ ਕਰਾਂ, ਸਭੁ ਕੋ = ਹਰੇਕ ਜੀਵ" hides a
    * second entry. Both are `, <term> =`. What separates them is that a real
    * entry glosses a word of the line and a compound does not (#181).
