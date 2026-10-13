@@ -10,12 +10,30 @@
 // This module is pure (text → entries); matching terms to words of the line is
 // lib/padarth/align.ts.
 
+import { normalise } from "./align";
+
 export type PadarthEntry = {
   /** The glossed Gurmukhi word or phrase, whitespace-normalised. */
   term: string;
   gloss: string;
   /** Sentences after this entry that are not entries themselves. */
   notes: string[];
+};
+
+export type ParseOptions = {
+  /**
+   * The line's word forms. Supplying them lets a comma or a closing bracket
+   * also open a new entry, but ONLY where the candidate term is a word of this
+   * line. Without them the parser behaves exactly as before, so no existing
+   * caller changes behaviour.
+   *
+   * The gate is necessary because the two cases are identical as text. Sahib
+   * Singh writes `=` for a hyphen in compounds, so "ਮਸ਼ੱਕਤਿ, ਮਿਹਨਤ, ਘਾਲ = ਕਮਾਈ"
+   * is one gloss (ghāl-kamāī), while "ਮੈਂ ਵਰਣਨ ਕਰਾਂ, ਸਭੁ ਕੋ = ਹਰੇਕ ਜੀਵ" hides a
+   * second entry. Both are `, <term> =`. What separates them is that a real
+   * entry glosses a word of the line and a compound does not (#181).
+   */
+  lineTokens?: string[];
 };
 
 export type ParsedPadarth = {
@@ -50,7 +68,7 @@ function matchedParens(text: string): Set<number> {
 }
 
 /** Split at dandas outside (matched) parentheses and at aside markers. */
-function sentences(body: string): string[] {
+function sentences(body: string, lineTokens: Set<string>): string[] {
   const text = body.replace(ASIDE_MARKER, BOUNDARY);
   const matched = matchedParens(text);
   const out: string[] = [];
@@ -69,7 +87,7 @@ function sentences(body: string): string[] {
   }
   out.push(current);
   return out
-    .flatMap(splitBeforeEntries)
+    .flatMap((s) => splitBeforeEntries(lineTokens.size > 0 ? splitAtLineTerms(s, lineTokens) : s))
     .map((s) => s.replace(/\s+/g, " ").trim())
     .filter((s) => !NOISE.test(s));
 }
@@ -79,6 +97,47 @@ function sentences(body: string): string[] {
 // ("ਅੰਤਰਗਤਿ = ਅੰਦਰਲਾ; ਤੀਰਥਿ = ਤੀਰਥ ਉੱਤੇ"). Split there only when an entry
 // follows, so a ; between senses ("ਮਾਨੁ = ਆਦਰ; ਵਡਿਆਈ") stays in the gloss.
 const ENTRY_AFTER_MARK = /[!?;]\s+(?=[਀-੣ੰ-੿]+(?: [਀-੣ੰ-੿]+){0,5}\s*=)/g;
+
+// A comma or closing bracket can also precede a swallowed entry, but only the
+// line's own words tell us whether it does (see ParseOptions.lineTokens). Two
+// guards keep the false positives out, both found in the written rows (#181):
+// a term repeating the entry's own term after an etymology aside
+// ("ਅਨਾਹਤਿ = (ਅਨ-ਆਹਤਿ) … ਅਨਾਹਤਿ = ਨਾਸ ਰਹਿਤ"), and metalanguage inside an
+// unclosed brace ("{ਨੋਟ: ਜਿਨ, ਤਿਨ, ਇਨ, ਕਿਨ = ਇਹ ਲਫ਼ਜ਼ ਬਹੁ-ਵਚਨ ਹਨ").
+const ENTRY_AFTER_BOUNDARY =
+  /[,)}]\s+(?=([਀-੣ੰ-੿]+(?: [਀-੣ੰ-੿]+){0,5})\s*=)/g;
+
+/** Is every word of the candidate term a word of this line? */
+function isLineTerm(term: string, lineTokens: Set<string>): boolean {
+  const words = term.split(" ").filter(Boolean);
+  return words.length > 0 && words.every((w) => lineTokens.has(normalise(w)));
+}
+
+/**
+ * Are we inside an unclosed brace once the boundary character is consumed?
+ * The boundary itself is counted, so a `}` that closes the brace leaves depth
+ * at 0 and the candidate after it is eligible.
+ */
+function insideBrace(sentence: string, at: number): boolean {
+  let depth = 0;
+  for (let i = 0; i <= at; i++) {
+    if (sentence[i] === "{") depth++;
+    else if (sentence[i] === "}" && depth > 0) depth--;
+  }
+  return depth > 0;
+}
+
+function splitAtLineTerms(sentence: string, lineTokens: Set<string>): string {
+  const ownTerm = sentence.slice(0, Math.max(separatorIndex(sentence), 0)).trim();
+  const ownKey = ownTerm.split(/\s+/).filter(Boolean).map(normalise).join(" ");
+  return sentence.replace(ENTRY_AFTER_BOUNDARY, (m, term: string, at: number) => {
+    const key = term.split(" ").filter(Boolean).map(normalise).join(" ");
+    if (key === ownKey) return m;
+    if (insideBrace(sentence, at)) return m;
+    if (!isLineTerm(term, lineTokens)) return m;
+    return m[0] === "," ? BOUNDARY : m[0] + BOUNDARY;
+  });
+}
 
 function splitBeforeEntries(sentence: string): string[] {
   return sentence
@@ -104,10 +163,11 @@ function cleanGloss(gloss: string): string {
   return gloss.replace(/\s*\}\s*$/, "").trim();
 }
 
-export function parsePadarth(body: string): ParsedPadarth {
+export function parsePadarth(body: string, opts: ParseOptions = {}): ParsedPadarth {
   const entries: PadarthEntry[] = [];
   const leading: string[] = [];
-  for (const sentence of sentences(body)) {
+  const lineTokens = new Set((opts.lineTokens ?? []).map(normalise));
+  for (const sentence of sentences(body, lineTokens)) {
     const sep = separatorIndex(sentence);
     const term = sep >= 0 ? sentence.slice(0, sep).trim() : "";
     if (sep >= 0 && TERM.test(term)) {
