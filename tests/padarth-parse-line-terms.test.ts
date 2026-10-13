@@ -4,8 +4,8 @@ import { tokenize } from "../lib/tokenizer";
 
 // Bodies and lines are verbatim from the written rows (padarth_glosses, #175),
 // with lines.id noted. These cover the one case a text-only rule cannot decide
-// (#181): Sahib Singh writes `=` both as a compound hyphen and as an entry
-// separator, so "ਮਿਹਨਤ, ਘਾਲ = ਕਮਾਈ" and "ਗਲ ਵਿਚ, ਲਾਇ = ਲਾ ਕੇ" are the same
+// (#181): the BaniDB `pss` text writes `=` both as a compound hyphen and as an
+// entry separator (its digitisation, not Sahib Singh's print; see parse.ts), so "ਮਿਹਨਤ, ਘਾਲ = ਕਮਾਈ" and "ਗਲ ਵਿਚ, ਲਾਇ = ਲਾ ਕੇ" are the same
 // shape. Only the line's own words separate them, so the split is gated on
 // lineTokens and does nothing without them.
 
