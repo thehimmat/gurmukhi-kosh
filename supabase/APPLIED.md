@@ -183,3 +183,18 @@ schema if ever required.
 2. Apply via MCP `apply_migration` with name `NNN_name`.
 3. Append the row above; commit file + ledger row together.
 4. If it creates a table: RLS + policies in the same file (CI enforces).
+
+| 58 | 20261014190134 | 045_first_letters_covering_index | kosh `045_first_letters_covering_index.sql` |
+
+Migration 045 is a follow-up to 044, which CI caught (PR #193). For a broad query, 044's RPC still
+read every matching wide `lines` row from the heap: `ਸ_ਕ` took 5.8 s on a cold cache. 045 adds
+`lines_first_letters_cover`, which covers the filter, count and sort columns, and fetches full rows
+for the returned page only. The plan is now an index-only scan with 0 heap fetches: `ਹ` (7,654
+matches) takes 154 ms cold.
+- The first two applies hung, because the MCP holds DROP for a confirmation, as with 037. So the
+  file adds the new index and leaves the old one. **Pending manual cleanup** from the dashboard SQL
+  editor (the planner already ignores the old index):
+
+  ```sql
+  drop index if exists lines_first_letters;
+  ```
