@@ -14,11 +14,11 @@
 -- ਸਨ + writer 73, last page of ਹ 14 rows), 4-126 ms each as anon; the
 -- ਸ_ਕ plan is an index-only scan with 0 heap fetches.
 --
--- The 044 index (lines_first_letters) is superseded but not dropped here: the
--- Supabase MCP holds DROP statements for a confirmation a cloud session can't
--- answer (see APPLIED.md, 037). With both present the planner picks the
--- covering index (checked in the dry run). Drop it from the dashboard:
---   drop index if exists lines_first_letters;
+-- The 044 index (lines_first_letters) is superseded but kept here: the
+-- Supabase MCP holds destructive statements for a confirmation a cloud session
+-- can't answer (see APPLIED.md, 037). With both present the planner picks the
+-- covering index (checked in the dry run). APPLIED.md has the one-line cleanup
+-- to run from the dashboard SQL editor.
 
 create index if not exists lines_first_letters_cover
   on lines (first_letters text_pattern_ops)
