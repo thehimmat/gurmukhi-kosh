@@ -187,6 +187,7 @@ schema if ever required.
 | 58 | 20261014190134 | 045_first_letters_covering_index | kosh `045_first_letters_covering_index.sql` |
 | 59 | 20261014201756 | 046_search_order_and_indexes | kosh `046_search_order_and_indexes.sql` |
 | 60 | 20261015144521 | 047_fuzzy_search | kosh `047_fuzzy_search.sql` |
+| 61 | 20261015145811 | 048_fuzzy_high_letters_only | kosh `048_fuzzy_high_letters_only.sql` |
 
 Migration 045 is a follow-up to 044, which CI caught (PR #193). For a broad query, 044's RPC still
 read every matching wide `lines` row from the heap: `ਸ_ਕ` took 5.8 s on a cold cache. 045 adds
@@ -212,3 +213,8 @@ the folded `lines.gurmukhi`, `lines.first_letters` and `words.gurmukhi`, and 3 R
 `search_first_letters_fuzzy`, `search_words_fuzzy`). It is additive only. It was dry-run against live data in an
 aborted `DO` block (~20 s to apply), with fold assertions and timings as anon: Low/Medium Contains 8-190 ms,
 High Contains 9-246 ms, First Letter 2-76 ms (Low/Medium) and ~800 ms (High), Dictionary 5-272 ms.
+
+Migration 048 fixes 047's High level, whose one-letter wildcard (LIKE `_`) also matched a space or a vowel sign:
+ਵਾਹਗੁਰੂ found "ਪਾਵ ਗੁਰੂ" on the live preview. The wildcard is now letter-only (a regex recheck on top of 047's
+LIKE candidates). After applying, ਵਾਹਗੁਰੂ at High returns 14 lines with 0 cross-word matches. Timings as anon:
+High Contains 0.25-1.2 s, High Dictionary 11-256 ms.
