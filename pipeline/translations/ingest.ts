@@ -13,6 +13,8 @@
  * Usage (from gurmukhi-kosh project root):
  *   npm run ingest:translations                 # angs 1-8 (Japji)
  *   npm run ingest:translations -- --start=1 --end=8
+ *   npm run ingest:translations -- --start=1 --end=1430 --sources=ssk_en
+ *                                               # one source, all of SGGS
  *
  * Requires in .env.local: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
@@ -37,6 +39,9 @@ const FIELD_MAP: Array<{ group: "pu" | "en"; key: string; source: string; lang: 
   { group: "pu", key: "ft",  source: "faridkot",    lang: "pa" },
   { group: "pu", key: "ms",  source: "manmohan_pa", lang: "pa" },
   { group: "en", key: "ms",  source: "manmohan_en", lang: "en" },
+  // Dr Sant Singh Khalsa verbatim (#146's Translation view). lines.translation_en
+  // is BaniDB's `bdb`, its revision of this text, which differs on ~13% of lines.
+  { group: "en", key: "ssk", source: "ssk_en",      lang: "en" },
 ];
 
 type Row = {
@@ -50,6 +55,13 @@ async function main() {
   const db = supabaseAdmin();
   const start = parseInt(getArg("start") || "1", 10);
   const end = parseInt(getArg("end") || "8", 10);
+  // --sources=a,b limits the run to those translation_sources codes.
+  const only = (getArg("sources") || "").split(",").map((x) => x.trim()).filter(Boolean);
+  const fields = only.length ? FIELD_MAP.filter((f) => only.includes(f.source)) : FIELD_MAP;
+  if (only.length && fields.length !== only.length) {
+    console.error(`Unknown source in --sources=${only.join(",")}; known: ${FIELD_MAP.map((f) => f.source).join(", ")}`);
+    process.exit(1);
+  }
   console.log(`Ingesting line translations for angs ${start}-${end} (BaniDB)...`);
 
   const { data: src, error: srcErr } = await db
@@ -91,7 +103,7 @@ async function main() {
         missingLines++;
         continue;
       }
-      for (const f of FIELD_MAP) {
+      for (const f of fields) {
         const slot = verse.translation?.[f.group] as
           | Record<string, unknown>
           | undefined;

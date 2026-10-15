@@ -251,3 +251,17 @@ indexes. The migration edits the deployed definitions in place, touching `order 
 matched a select list, and the dry run caught it. Dry-run in an aborted `DO` block, then applied: First Letter ਹ, number
 ੧ (verse markers) and fuzzy ਹਰਿ each return the same 200 lines paged by 20 as in one read, in verse order. Counts unchanged
 as anon (ੲ 4,870; ੧ author 624).
+
+Migration 057 adds the `ssk_en` translation source: Dr Sant Singh Khalsa's English, verbatim from BaniDB's
+`translation.en.ssk`. `lines.translation_en` is BaniDB's `bdb` revision of it, which differs on ~13% of lines. Applied;
+the rows themselves come from `npm run ingest:translations -- --start=1 --end=1430 --sources=ssk_en`, which needs the
+service-role key. **Pending** until that runs: the viewer shows "BaniDB English" in its place.
+
+**Pending manual cleanup** (from the dashboard SQL editor; the MCP still holds DROP for a confirmation that times out).
+The planner uses the covering replacements (checked with EXPLAIN on 2026-10-15):
+
+```sql
+drop index if exists lines_first_letters;        -- 044, superseded by lines_first_letters_cover (045)
+drop index if exists lines_first_letters_fold1;  -- 047, superseded by lines_first_letters_fold1_cover (051)
+drop index if exists lines_first_letters_fold2;  -- 047, superseded by lines_first_letters_fold2_cover (051)
+```
