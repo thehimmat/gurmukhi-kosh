@@ -3,7 +3,15 @@ import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// The page depends only on its path and the corpus changes only on an
+// ingest, so each ang is rendered once and refreshed daily (#200).
+export const revalidate = 86400;
+
+// None at build time: each ang is rendered on its first request, then cached.
+// Declaring the (empty) list is what makes the route ISR rather than dynamic.
+export function generateStaticParams() {
+  return [];
+}
 
 type Props = { params: Promise<{ ang: string }> };
 
@@ -24,7 +32,7 @@ export default async function AngPage({ params }: Props) {
   // browsing routes for the other texts are a follow-up.
   const { data: lines } = await supabase
     .from("lines")
-    .select("*, shabads(raag_english, writer_english), sources!inner(code)")
+    .select("id, gurmukhi, translation_en, transliteration_en, shabads(raag_english, writer_english), sources!inner(code)")
     .eq("ang", ang)
     .eq("sources.code", "sggs_banidb_v2")
     .order("line_no", { ascending: true });

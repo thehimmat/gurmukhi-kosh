@@ -19,7 +19,24 @@ export const DEFINITION_COLUMNS =
 // pos_mappings (#29): every surface that builds a grammar view must compare POS
 // through the same map, or the word page, /health and the autoflag pass drift.
 // The table is tiny (one row per distinct raw label), so no paging is needed.
+// It changes only with a migration, so the shared client's read is kept per
+// server instance for an hour instead of re-read on every word page (#200).
+// A caller passing its own client (the autoflag pass) always reads fresh.
+const POS_MAP_TTL_MS = 60 * 60 * 1000;
+let posMapCache: { at: number; map: Promise<PosMap> } | null = null;
+
 export async function fetchPosMap(db: SupabaseClient = supabase): Promise<PosMap> {
+  if (db !== supabase) return readPosMap(db);
+  if (!posMapCache || Date.now() - posMapCache.at > POS_MAP_TTL_MS) {
+    const map = readPosMap(db);
+    posMapCache = { at: Date.now(), map };
+    // A failed read must not be served for the next hour.
+    map.catch(() => { if (posMapCache?.map === map) posMapCache = null; });
+  }
+  return posMapCache.map;
+}
+
+async function readPosMap(db: SupabaseClient): Promise<PosMap> {
   const { data, error } = await db.from("pos_mappings").select("source_code, pos_raw, pos_norm");
   if (error) throw new Error(`fetchPosMap: ${error.message}`);
   return posMappingsFrom((data ?? []) as PosMapping[]);

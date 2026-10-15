@@ -22,6 +22,11 @@ import { DEFINITION_COLUMNS, fetchMorphVariants, fetchUsage, fetchWriterStats } 
 
 type Params = { params: Promise<{ gurmukhi: string }> };
 
+// Entries change only when an ingest runs: cache at the CDN for a day, serve
+// stale for a week while one refreshes (as gurmukhi-search's lib/cache.ts).
+// The 404 is left uncached so a newly ingested word appears at once.
+const CDN_CACHE = "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
+
 type GrammarRow = {
   provenance: string | null;
   rule_code: string | null;
@@ -76,7 +81,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   // Parallel: definitions, etymology, usage, writer stats.
   // The morphological-variant and usage derivations are shared with the word
   // page via lib/word-data.ts so the two surfaces cannot drift.
-  const [defsResult, etymResult, usage, writerRows] = await Promise.all([
+  const [defsResult, etymResult, usage, writerRows, variants] = await Promise.all([
     supabase
       .from("definitions")
       .select(DEFINITION_COLUMNS)
@@ -92,12 +97,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     fetchUsage(wordId),
     fetchWriterStats(wordId, 10),
+    fetchMorphVariants(wordId, word),
   ]);
 
   // inflection_desc keeps its key for backward compatibility and now carries
   // the source's own label. rule_code / rule_verified are kept for existing
   // consumers but are always null: no variant label is rule-derived any more.
-  const morphological_variants = (await fetchMorphVariants(wordId, word)).map((v) => ({
+  const morphological_variants = variants.map((v) => ({
     gurmukhi: v.gurmukhi,
     inflection_desc: v.label,
     source_code: v.sourceCode,
@@ -129,5 +135,5 @@ export async function GET(_req: NextRequest, { params }: Params) {
     morphological_variants,
     usage: { phrases, collocations },
     stats: { writers },
-  });
+  }, { headers: { "Cache-Control": CDN_CACHE } });
 }

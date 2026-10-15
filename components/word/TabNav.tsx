@@ -38,6 +38,11 @@ export function TabNav({ gurmukhi, currentTab = 'overview', curatorKey = null }:
           <Link
             key={tab.id}
             href={href}
+            // The word page is dynamic, so a prefetch fetches nothing reusable,
+            // and under search.atthebunga.com Next's segment prefetch doesn't
+            // survive the shell's multi-zone rewrite: every tab's prefetch came
+            // back a (CDN-cached) 404 (#202). Navigation still uses RSC.
+            prefetch={false}
             style={{
               padding: '0.75rem 1.25rem',
               borderBottom: isActive ? '2px solid var(--text-primary)' : 'none',

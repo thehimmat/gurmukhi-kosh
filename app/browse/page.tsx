@@ -28,6 +28,9 @@ export default async function BrowsePage({
     .select("id, gurmukhi, frequency", { count: "exact" })
     .eq("in_corpus", true)
     .order("frequency", { ascending: false })
+    // Many words share a frequency; without a tiebreak a page boundary can
+    // repeat or skip them (#203). Matches 046's (frequency desc, id) index.
+    .order("id", { ascending: true })
     .range(from, to);
 
   const totalPages = count ? Math.ceil(count / pageSize) : 1;
