@@ -160,7 +160,9 @@ export default async function WordPage({ params, searchParams }: Props) {
   const needsForms = tab === "overview";
   const EMPTY = Promise.resolve({ data: null });
 
-  const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult] = await Promise.all([
+  // Sibling inflected forms (overview) and the Usage tab's data need only the
+  // word id, so they join this batch rather than waiting for it (#201).
+  const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult, morphForms, usageData] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     needsDefs
       ? supabase
@@ -217,6 +219,15 @@ export default async function WordPage({ params, searchParams }: Props) {
       .select("frequency, sources(name)")
       .eq("word_id", wordId)
       .order("frequency", { ascending: false }),
+
+    // Sibling inflected forms, across every lexeme this word belongs to, from
+    // source-asserted memberships only (lib/word-data.ts — shared with the JSON
+    // API). Each label is the source's own wording.
+    needsForms ? fetchMorphVariants(wordId, word) : Promise.resolve([]),
+
+    // Usage tab: common phrases (bigrams) + statistical collocations + writer
+    // breakdown (lib/word-data.ts — shared with the JSON API).
+    tab === "usage" ? Promise.all([fetchUsage(wordId), fetchWriterStats(wordId, 8)]) : Promise.resolve(null),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
@@ -228,35 +239,30 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Structured Mahan Kosh layer (#34): which ਦੇਖੋ targets are real head-words?
   // Checked against `words` so only existing entries become links. Both
   // normalization forms are queried — the corpus and the scrape may differ.
+  // The citation sigla (siglum → work title) for this word's examples are
+  // looked up alongside, not after: neither depends on the other (#201).
   const parsedSenses = definitions.map((d) => asParsedSense(d.parsed ?? null));
   const xrefTargets = collectXrefTargets(parsedSenses);
-  const linkableXrefs = new Set<string>();
-  if (xrefTargets.length > 0) {
-    const variants = [...new Set(xrefTargets.flatMap((t) => [t, t.normalize("NFC")]))];
-    const { data: xrefRows } = await supabase.from("words").select("gurmukhi").in("gurmukhi", variants);
-    for (const r of (xrefRows ?? []) as { gurmukhi: string }[]) {
-      linkableXrefs.add(nfdNormalize(r.gurmukhi));
-    }
-  }
-
-  // Resolve citation sigla (siglum → work title) for this word's examples.
-  const siglaTitle = new Map<string, string>();
+  const xrefVariants = [...new Set(xrefTargets.flatMap((t) => [t, t.normalize("NFC")]))];
   const siglaCodes = [...new Set(examples.map((x) => x.citation_siglum).filter((s): s is string => !!s))];
-  if (siglaCodes.length > 0) {
-    const { data: siglaRows } = await supabase
-      .from("citation_sigla")
-      .select("siglum, title")
-      .eq("source_code", "shackle")
-      .in("siglum", siglaCodes);
-    for (const r of (siglaRows ?? []) as { siglum: string; title: string | null }[]) {
-      if (r.title) siglaTitle.set(r.siglum, r.title);
-    }
+  const [{ data: xrefRows }, { data: siglaRows }] = await Promise.all([
+    xrefVariants.length > 0 ? supabase.from("words").select("gurmukhi").in("gurmukhi", xrefVariants) : EMPTY,
+    siglaCodes.length > 0
+      ? supabase
+          .from("citation_sigla")
+          .select("siglum, title")
+          .eq("source_code", "shackle")
+          .in("siglum", siglaCodes)
+      : EMPTY,
+  ]);
+  const linkableXrefs = new Set<string>();
+  for (const r of (xrefRows ?? []) as { gurmukhi: string }[]) {
+    linkableXrefs.add(nfdNormalize(r.gurmukhi));
   }
-
-  // Step 3: sibling inflected forms, across every lexeme this word belongs to,
-  // from source-asserted memberships only (lib/word-data.ts — shared with the
-  // JSON API). Each label is the source's own wording.
-  const morphForms = needsForms ? await fetchMorphVariants(wordId, word) : [];
+  const siglaTitle = new Map<string, string>();
+  for (const r of (siglaRows ?? []) as { siglum: string; title: string | null }[]) {
+    if (r.title) siglaTitle.set(r.siglum, r.title);
+  }
 
   // Group definitions by source
   const defsBySource = new Map<string, { sourceName: string; sourceUrl: string | null; language: string | null; provenance: string | null; reviewStatus: string | null; defs: DefinitionWithSource[] }>();
@@ -345,16 +351,12 @@ export default async function WordPage({ params, searchParams }: Props) {
   // Map a source kind to the existing provenance pill.
   const KIND_PROVENANCE: Record<string, string> = { scholar: "imported", dictionary: "scraped" };
 
-  // Usage tab: common phrases (bigrams) + statistical collocations + writer
-  // breakdown (lib/word-data.ts — shared with the JSON API).
+  // Usage tab (fetched in the step 2 batch).
   let phrases: Array<{ w1: string; w2: string; count: number }> = [];
   let collocates: Array<{ partner: string; count: number; pmi: number | null }> = [];
   let writerStats: Array<{ writer: string; count: number }> = [];
-  if (tab === "usage") {
-    const [usage, writerRows] = await Promise.all([
-      fetchUsage(wordId),
-      fetchWriterStats(wordId, 8),
-    ]);
+  if (usageData) {
+    const [usage, writerRows] = usageData;
     phrases = usage.phrases.map((p) => ({ w1: p.w1 ?? "?", w2: p.w2 ?? "?", count: p.count }));
     collocates = usage.collocates.map((c) => ({ partner: c.partner ?? "?", count: c.count, pmi: c.pmi }));
     writerStats = writerRows
