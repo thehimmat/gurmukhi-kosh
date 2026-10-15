@@ -196,8 +196,14 @@ async function main() {
   // while the run reported success.
   // lines.first_letters (044) is the first-letter search key, rebuilt from the
   // occurrences just written; a stale key silently drops lines from that mode.
-  console.log("Refreshing word frequencies (total + per-corpus) and first-letter keys...");
-  for (const fn of ["refresh_word_frequencies", "refresh_word_corpus_stats", "refresh_line_first_letters"] as const) {
+  // word_corpus_writer_stats (052) backs the Dictionary's Scripture/Writer filters.
+  console.log("Refreshing word frequencies (total + per-corpus + per-writer) and first-letter keys...");
+  for (const fn of [
+    "refresh_word_frequencies",
+    "refresh_word_corpus_stats",
+    "refresh_word_corpus_writer_stats",
+    "refresh_line_first_letters",
+  ] as const) {
     const { error } = await db.rpc(fn);
     if (error) {
       console.error(`${fn} FAILED: ${error.message}`);
