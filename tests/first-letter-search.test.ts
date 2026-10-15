@@ -106,3 +106,22 @@ describe.skipIf(!live)("search_first_letters_fuzzy (anon)", () => {
     for (const r of rows) expect(tokenize(r.gurmukhi)[0]).toMatch(/^[ਇਈਏੲ]/);
   });
 });
+
+// gurmukhi-search#46 / 055: one printed line holds several verses, so
+// (ang, line_no) ties; the sort must still be total, or offset pages repeat
+// or skip lines.
+describe.skipIf(!live)("search paging is stable across tied printed lines", () => {
+  it("returns the same lines paged as in one read, in verse order", async () => {
+    const db = anonDb();
+    const page = async (offset: number, limit: number) => {
+      const { data, error } = await db.rpc("search_first_letters", { p_letters: ["ਹ"], p_limit: limit, p_offset: offset });
+      expect(error).toBeNull();
+      return (data as Row[]).map((r) => r.id);
+    };
+    const paged = (await Promise.all([0, 1, 2, 3, 4].map((i) => page(i * 20, 20)))).flat();
+    const whole = await page(0, 100);
+    expect(paged).toEqual(whole);
+    // SGGS and Bhai Gurdas ids follow verse order, so ids must ascend.
+    expect(whole).toEqual([...whole].sort((a, b) => a - b));
+  });
+});

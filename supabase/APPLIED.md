@@ -243,3 +243,11 @@ lookups 10-103 ms. Checked as anon after applying.
 Migration 053 rewrites 052's `count_number_roles` so the facet filters are a per-numeral EXISTS (skipped when no filter
 is set) instead of a join the planner served by hashing all of `lines`: unfiltered ੧ went from 2.1 s as anon (a CI
 timeout under load, PR #210) to 47 ms, with identical counts. Dry-run in an aborted `DO` block, then applied.
+
+Migration 055 appends `id` to the reading-order sort of the six line-search RPCs (gurmukhi-search#46). `line_no` is the
+printed line, so `(corpus_rank, ang, line_no)` tied and offset pages could repeat or skip lines. `(ang, line_no, id)`
+matches `verse_id` order for every line of every scripture (0 out of place), and `id` is already in the covering
+indexes. The migration edits the deployed definitions in place, touching `order by` clauses only; a first draft also
+matched a select list, and the dry run caught it. Dry-run in an aborted `DO` block, then applied: First Letter ਹ, number
+੧ (verse markers) and fuzzy ਹਰਿ each return the same 200 lines paged by 20 as in one read, in verse order. Counts unchanged
+as anon (ੲ 4,870; ੧ author 624).
