@@ -33,7 +33,8 @@ describe("Mahan Kosh Private Use Area glyphs (#150)", () => {
     }
   });
 
-  it("no definition row contains a mapped PUA code point", async () => {
+  // Live DB: skipped without credentials, like tests/api.test.ts.
+  it.skipIf(!process.env.NEXT_PUBLIC_SUPABASE_URL)("no definition row contains a mapped PUA code point", async () => {
     const db = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

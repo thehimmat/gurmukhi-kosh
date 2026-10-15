@@ -21,7 +21,9 @@ async function firstLetters(letters: string, extra: Record<string, unknown> = {}
   return { rows: (data ?? []) as Row[], error };
 }
 
-describe("search_first_letters (anon)", () => {
+const live = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+describe.skipIf(!live)("search_first_letters (anon)", () => {
   it("answers multi-letter queries within the anon timeout", async () => {
     const t0 = Date.now();
     const { rows, error } = await firstLetters("ਸਨਕਪ");
@@ -65,5 +67,42 @@ describe("search_first_letters (anon)", () => {
     const { rows, error } = await firstLetters("ਜਸਹਪਨ");
     expect(error).toBeNull();
     expect(rows).toEqual([]);
+  });
+
+  // 051: a vowel carrier stands for every independent vowel it carries, as ਸ
+  // stands for ਸਿ ਸੀ ਸੇ. Counts are whole-corpus line counts taken live.
+  it.each([
+    ["ੲ", 4870],
+    ["ਇ", 4870],
+    ["ਏ", 4870],
+    ["ੳ", 2085],
+    ["ਅ", 13644],
+    ["ਆ", 13644],
+    ["ੲਕ", 339],
+  ])("folds the vowel carrier for %s", async (letters, total) => {
+    const { rows, error } = await firstLetters(letters);
+    expect(error).toBeNull();
+    expect(rows[0].total_count).toBe(total);
+  });
+
+  it("returns lines whose first word starts with any vowel ੲ carries", async () => {
+    const { rows, error } = await firstLetters("ੲ");
+    expect(error).toBeNull();
+    for (const r of rows) expect(tokenize(r.gurmukhi)[0]).toMatch(/^[ਇਈਏੲ]/);
+  });
+});
+
+describe.skipIf(!live)("search_first_letters_fuzzy (anon)", () => {
+  it("folds vowel carriers too", async () => {
+    const { data, error } = await anonDb().rpc("search_first_letters_fuzzy", {
+      p_letters: ["ੲ", "ਕ"],
+      p_level: 1,
+      p_limit: 20,
+      p_offset: 0,
+    });
+    expect(error).toBeNull();
+    const rows = (data ?? []) as Row[];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) expect(tokenize(r.gurmukhi)[0]).toMatch(/^[ਇਈਏੲ]/);
   });
 });
