@@ -1,0 +1,11 @@
+-- 054: an index in true reading order, (corpus_rank, verse_id).
+--
+-- (corpus_rank, ang, line_no) is not unique: line_no is the printed line, and
+-- one printed line holds several verses (SGGS: 60,403 lines on 26,563
+-- (ang, line_no) pairs). gurmukhi-search's shabad feed paged on it with
+-- `line_no > cursor` and could skip the opening verses of a shabad that shares
+-- a printed line with the one before (gurmukhi-search#46). verse_id is unique
+-- per scripture and in reading order in every one (checked live: 0 rows out of
+-- order against (ang, line_no)), and corpus_rank is one value per scripture,
+-- so (corpus_rank, verse_id) is a total reading order the feed can page on.
+create index if not exists lines_corpus_rank_verse on lines (corpus_rank, verse_id);

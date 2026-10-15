@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { lineHref, placeLabel } from "@/lib/line-context";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
@@ -321,13 +322,6 @@ export default async function WordPage({ params, searchParams }: Props) {
       </>
     );
   }
-
-  // Each corpus pages in its own unit; the label prefixes the page number on
-  // non-SGGS occurrence cards ("Vaar 3", "Ang 212 · Dasam Bani").
-  const PAGE_UNIT: Record<string, string> = {
-    bhai_gurdas_banidb_v2: "Vaar",
-    dasam_banidb_v2: "Ang",
-  };
 
   // Grammar display helpers
   const GRAMMAR_LABELS: Record<string, string> = {
@@ -956,20 +950,13 @@ export default async function WordPage({ params, searchParams }: Props) {
               return (
                 <div key={occ.id} style={{ ...CARD, marginBottom: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
-                    {/* /ang/N is SGGS browsing; other corpora page in their
-                        own unit (Bhai Gurdas: the vaar; Dasam Bani: its own
-                        angs) and get no link until per-source browse routes
-                        exist (#68). */}
-                    {line.sources == null || line.sources.code === "sggs_banidb_v2" ? (
-                      <a href={`/ang/${line.ang}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
-                        Ang {line.ang}
-                      </a>
-                    ) : (
-                      <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                        {(PAGE_UNIT[line.sources.code] ?? "p.") + ` ${line.ang}`}
-                        {" · "}{line.sources.name}
-                      </span>
-                    )}
+                    {/* Opens the line in its shabad (the viewer, #146), for
+                        every corpus; each pages in its own unit (Bhai Gurdas:
+                        the vaar; Dasam Bani: its own angs). */}
+                    <a href={lineHref(line.id)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
+                      {placeLabel(line.sources?.code, line.ang)}
+                      {line.sources && line.sources.code !== "sggs_banidb_v2" && <>{" · "}{line.sources.name}</>}
+                    </a>
                     {line.shabads?.writer_english && (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>
                         {line.shabads.writer_english}
