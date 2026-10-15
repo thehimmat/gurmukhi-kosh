@@ -239,3 +239,7 @@ filters), `count_lines_fuzzy` (capped fuzzy Contains total), and `word_corpus_wr
 column. Dry-run in an aborted `DO` block, then applied: 149,302 stats rows summing to all 1,108,716 occurrences;
 number ੧ in Dasam only reads author 0, ghar 0, other 2, verse 563 (84 ms); fuzzy counts 75-282 ms; filtered word
 lookups 10-103 ms. Checked as anon after applying.
+
+Migration 053 rewrites 052's `count_number_roles` so the facet filters are a per-numeral EXISTS (skipped when no filter
+is set) instead of a join the planner served by hashing all of `lines`: unfiltered ੧ went from 2.1 s as anon (a CI
+timeout under load, PR #210) to 47 ms, with identical counts. Dry-run in an aborted `DO` block, then applied.
