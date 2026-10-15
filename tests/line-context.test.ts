@@ -52,10 +52,45 @@ describe.skipIf(!process.env.NEXT_PUBLIC_SUPABASE_URL)("fetchLineContext (live)"
     expect(ctx!.prevId).toBe(30);
     expect(ctx!.nextId).toBe(ids.at(-1)! + 1);
     expect(ctx!.source?.code).toBe("sggs_banidb_v2");
+    // Commentaries come with the shabad, Sahib Singh first.
+    expect(ctx!.commentaries.get(32)?.[0]?.source_code).toBe("ss_darpan");
+    expect(ctx!.commentarySources[0]?.code).toBe("ss_darpan");
   });
 
   it("returns null for a line that doesn't exist", async () => {
     const { fetchLineContext } = await import("../lib/line-context");
     expect(await fetchLineContext(999999999)).toBeNull();
+  });
+});
+
+describe("commentariesByLine", () => {
+  it("groups each line's commentaries in reading order: Sahib Singh first, Faridkot last", async () => {
+    const { commentariesByLine } = await import("../lib/line-context");
+    const row = (line_id: number, source_code: string) => ({
+      line_id, source_code, language: "pa", body_unicode: `${source_code} ${line_id}`, caveat: null,
+    });
+    const byLine = commentariesByLine([
+      row(1, "faridkot"), row(1, "ss_darpan"), row(2, "manmohan_en"), row(1, "manmohan_pa"), row(1, "unknown_src"),
+    ]);
+    expect(byLine.get(1)!.map((c) => c.source_code)).toEqual(["ss_darpan", "manmohan_pa", "faridkot", "unknown_src"]);
+    expect(byLine.get(2)!.map((c) => c.source_code)).toEqual(["manmohan_en"]);
+  });
+});
+
+describe("CommentaryPicker", () => {
+  it("offers Off plus each source present, with Off chosen by default", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { CommentaryPicker } = await import("../components/line/CommentaryPicker");
+    const html = renderToStaticMarkup(createElement(CommentaryPicker, {
+      sources: [
+        { code: "ss_darpan", name: "Sri Guru Granth Sahib Darpan", author: "Prof. Sahib Singh" },
+        { code: "faridkot", name: "Faridkot Teeka", author: "Sant Giani Badan Singh Ji and others (1928)" },
+      ],
+    }));
+    expect(html).toContain('role="radiogroup"');
+    expect(html.match(/role="radio"/g)).toHaveLength(3);
+    expect(html).toMatch(/aria-checked="true"[^>]*>Off</);
+    expect(html).toContain("Faridkot Teeka");
   });
 });

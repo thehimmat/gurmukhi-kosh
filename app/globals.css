@@ -99,3 +99,20 @@ a:hover {
   background: var(--accent-light);
   text-decoration: none;
 }
+
+/* Viewer commentaries: hidden until the picker chooses a source (the rules
+   that show one are rendered per page from the sources it has). */
+.viewer-cm {
+  display: none;
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid var(--border);
+  background: var(--bg-alt);
+  border-radius: 0 4px 4px 0;
+}
+.viewer-cm-source {
+  font-family: "Inter", sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
