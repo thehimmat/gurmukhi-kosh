@@ -13,8 +13,7 @@
 -- so typing ਇ, ਈ, ਏ or ੲ all find the same lines. A folded column, not an
 -- expression index: the covering index (045) and the fuzzy indexes (047) stay
 -- on the plain column, and fuzzy_fold leaves ੲ ੳ ਅ alone at every level.
---
--- Search-side mirror (highlighting): gurmukhi-search lib/first-letters.ts.
+-- gurmukhi-search doesn't highlight First Letter matches, so it holds no copy.
 
 create or replace function first_letter_fold(t text) returns text
 language sql immutable parallel safe
