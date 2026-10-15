@@ -39,8 +39,8 @@ describe("Mahan Kosh Private Use Area glyphs (#150)", () => {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     // A plain regex filter scanned every definition row and, on a cold cache,
-    // ran past the anon role's 3 s statement timeout. Migration 049's
-    // function reads only the rows its partial index holds.
+    // ran past the anon role's 3 s statement timeout. definitions_with_pua()
+    // (migrations 049–050) reads only the rows its partial index holds.
     const { data, error } = await db.rpc("definitions_with_pua", {
       p_source_code: "mahan_kosh",
       p_limit: 200,

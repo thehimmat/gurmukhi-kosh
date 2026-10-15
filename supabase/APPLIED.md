@@ -189,6 +189,7 @@ schema if ever required.
 | 60 | 20261015144521 | 047_fuzzy_search | kosh `047_fuzzy_search.sql` |
 | 61 | 20261015145811 | 048_fuzzy_high_letters_only | kosh `048_fuzzy_high_letters_only.sql` |
 | 62 | 20261015174022 | 049_definitions_pua_index | kosh `049_definitions_pua_index.sql` |
+| 63 | 20261015174347 | 050_definitions_with_pua_definer | kosh `050_definitions_with_pua_definer.sql` |
 
 Migration 045 is a follow-up to 044, which CI caught (PR #193). For a broad query, 044's RPC still
 read every matching wide `lines` row from the heap: `ਸ_ਕ` took 5.8 s on a cold cache. 045 adds
