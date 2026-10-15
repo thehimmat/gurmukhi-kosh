@@ -65,9 +65,45 @@ export type ContextLine = {
   source_fk: number;
 };
 
+// ─── Commentaries ────────────────────────────────────────────────────────────
+
+// Per-line commentaries and translations already in line_translations, in the
+// order the word page shows them: Sahib Singh first, Faridkot (archaic) last.
+export const COMMENTARY_ORDER = ["ss_darpan", "ss_padarth", "manmohan_pa", "manmohan_en", "faridkot"];
+
+export type Commentary = {
+  line_id: number;
+  source_code: string;
+  language: string;
+  body_unicode: string;
+  caveat: string | null;
+};
+
+export type CommentarySource = { code: string; name: string; author: string | null };
+
+const rank = (code: string) => {
+  const i = COMMENTARY_ORDER.indexOf(code);
+  return i === -1 ? COMMENTARY_ORDER.length : i;
+};
+
+/** Each line's commentaries, in COMMENTARY_ORDER (unknown sources last). */
+export function commentariesByLine(rows: Commentary[]): Map<number, Commentary[]> {
+  const byLine = new Map<number, Commentary[]>();
+  for (const r of rows) {
+    const list = byLine.get(r.line_id) ?? [];
+    list.push(r);
+    byLine.set(r.line_id, list);
+  }
+  for (const list of byLine.values()) list.sort((a, b) => rank(a.source_code) - rank(b.source_code));
+  return byLine;
+}
+
 export type LineContext = {
   lineId: number;
   lines: ContextLine[];
+  commentaries: Map<number, Commentary[]>;
+  // The commentary sources this shabad has, in COMMENTARY_ORDER.
+  commentarySources: CommentarySource[];
   source: { code: string; name: string } | null;
   shabad: { raag_english: string | null; raag_gurmukhi: string | null; writer_english: string | null } | null;
   // First line of the previous / next shabad (or ang) in the same scripture.
@@ -98,17 +134,31 @@ export async function fetchLineContext(id: number): Promise<LineContext | null> 
   const first = lines[0] ?? l;
   const last = lines.at(-1) ?? l;
 
-  // Neighbours along (source_fk, verse_id), the unique index's order.
-  const [prev, next] = await Promise.all([
+  // Neighbours along (source_fk, verse_id), the unique index's order, and
+  // the shabad's commentaries, all at once.
+  const ids = lines.map((x) => x.id);
+  const [prev, next, comm, sources] = await Promise.all([
     supabase.from("lines").select("id, shabad_id, ang").eq("source_fk", l.source_fk)
       .lt("verse_id", first.verse_id).order("verse_id", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("lines").select("id").eq("source_fk", l.source_fk)
       .gt("verse_id", last.verse_id).order("verse_id", { ascending: true }).limit(1).maybeSingle(),
+    ids.length
+      ? supabase.from("line_translations").select("line_id, source_code, language, body_unicode, caveat").in("line_id", ids)
+      : Promise.resolve({ data: [], error: null }),
+    supabase.from("translation_sources").select("code, name, author"),
   ]);
+  if (comm.error) throw new Error(`fetchLineContext: ${comm.error.message}`);
+  const commentaries = commentariesByLine((comm.data ?? []) as Commentary[]);
+  const present = new Set([...commentaries.values()].flat().map((c) => c.source_code));
+  const commentarySources = ((sources.data ?? []) as CommentarySource[])
+    .filter((src) => present.has(src.code))
+    .sort((a, b) => rank(a.code) - rank(b.code));
 
   return {
     lineId: l.id,
     lines,
+    commentaries,
+    commentarySources,
     source: l.sources,
     shabad: l.shabads,
     // The previous group opens at its own first line; the line just before

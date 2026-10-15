@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
 import { fetchLineContext, lineParts, placeLabel } from "@/lib/line-context";
+import { CommentaryPicker, LINES_ID } from "@/components/line/CommentaryPicker";
 
 // One line in its shabad (#146). A line's context changes only on an ingest,
 // so each page is rendered on its first request and refreshed daily.
@@ -38,6 +39,13 @@ export default async function LinePage({ params }: Props) {
     ? `${placeLabel(code, angs[0])}–${angs.at(-1)}`
     : placeLabel(code, first?.ang ?? 0);
 
+  // Every commentary is rendered, hidden; the picker sets data-commentary on
+  // the line list and these rules show the chosen source under each line.
+  const sourceName = new Map(ctx.commentarySources.map((src) => [src.code, src]));
+  const commentaryCss = ctx.commentarySources
+    .map((src) => `#${LINES_ID}[data-commentary="${src.code}"] .viewer-cm[data-src="${src.code}"]{display:block}`)
+    .join("");
+
   const nav = (
     <nav style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
       {ctx.prevId != null && <a href={`/line/${ctx.prevId}`} style={NAV}>← Previous</a>}
@@ -64,7 +72,12 @@ export default async function LinePage({ params }: Props) {
         {ctx.shabad?.writer_english && <span style={META}>{ctx.shabad.writer_english}</span>}
       </header>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+      <div style={{ marginBottom: "1.25rem" }}>
+        <CommentaryPicker sources={ctx.commentarySources} />
+      </div>
+      <style>{commentaryCss}</style>
+
+      <div id={LINES_ID} data-commentary="off" style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
         {ctx.lines.map((line) => (
           <div key={line.id} id={`line-${line.id}`} className="viewer-line">
             <p className="gurmukhi-lg" style={{ marginBottom: "0.2rem" }}>
@@ -82,6 +95,20 @@ export default async function LinePage({ params }: Props) {
             {line.translation_en && (
               <p style={{ color: "var(--text-secondary)", fontSize: "1rem" }}>{line.translation_en}</p>
             )}
+            {(ctx.commentaries.get(line.id) ?? []).map((c) => {
+              const src = sourceName.get(c.source_code);
+              return (
+                <div key={c.source_code} className="viewer-cm" data-src={c.source_code}>
+                  <p className={c.language === "pa" ? "gurmukhi" : undefined} style={{ fontSize: c.language === "pa" ? "1.05rem" : "1rem" }}>
+                    {c.body_unicode}
+                  </p>
+                  <p className="viewer-cm-source">
+                    {src ? `${src.name}${src.author ? ` · ${src.author}` : ""}` : c.source_code}
+                    {c.caveat && <> · <em>{c.caveat}</em></>}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
