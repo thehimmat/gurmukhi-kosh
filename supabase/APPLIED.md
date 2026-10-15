@@ -232,3 +232,10 @@ block before being applied: ੲ, ਇ and ਏ each 4,870 lines, ੳ 2,085, ਅ/�
   drop index if exists lines_first_letters_fold1;
   drop index if exists lines_first_letters_fold2;
   ```
+
+Migration 052 adds gurmukhi-search's count and Dictionary-filter RPCs: `count_number_roles` (role counts scoped to the
+filters), `count_lines_fuzzy` (capped fuzzy Contains total), and `word_corpus_writer_stats` +
+`search_words_filtered` (#204). The table is named apart from 008's `word_writer_stats` matview, which has no scripture
+column. Dry-run in an aborted `DO` block, then applied: 149,302 stats rows summing to all 1,108,716 occurrences;
+number ੧ in Dasam only reads author 0, ghar 0, other 2, verse 563 (84 ms); fuzzy counts 75-282 ms; filtered word
+lookups 10-103 ms. Checked as anon after applying.
