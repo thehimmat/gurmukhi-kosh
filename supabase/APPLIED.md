@@ -185,6 +185,7 @@ schema if ever required.
 4. If it creates a table: RLS + policies in the same file (CI enforces).
 
 | 58 | 20261014190134 | 045_first_letters_covering_index | kosh `045_first_letters_covering_index.sql` |
+| 59 | 20261014201756 | 046_search_order_and_indexes | kosh `046_search_order_and_indexes.sql` |
 
 Migration 045 is a follow-up to 044, which CI caught (PR #193). For a broad query, 044's RPC still
 read every matching wide `lines` row from the heap: `ਸ_ਕ` took 5.8 s on a cold cache. 045 adds
@@ -198,3 +199,9 @@ matches) takes 154 ms cold.
   ```sql
   drop index if exists lines_first_letters;
   ```
+
+Migration 046 reorders the corpora to SGGS, Dasam, Sarbloh, Bhai Gurdas, and adds `lines_gurmukhi_trgm`
+(for gurmukhi-search's Contains search) and `words_frequency_rank` (for the Dictionary feed) (PR #195). It
+was dry-run against live data in an aborted `DO` block (~12 s to apply) before being applied. After the
+apply: ranks are sggs=0, dasam=10, sarbloh=20, bhai_gurdas=30, and as anon, `ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ`
+(SGGS + Dasam, first 21) takes 5 ms through the trigram index. It used to be a 0.7-4 s full scan.
