@@ -220,3 +220,15 @@ Migration 048 fixes 047's High level, whose one-letter wildcard (LIKE `_`) also 
 ਵਾਹਗੁਰੂ found "ਪਾਵ ਗੁਰੂ" on the live preview. The wildcard is now letter-only (a regex recheck on top of 047's
 LIKE candidates). After applying, ਵਾਹਗੁਰੂ at High returns 14 lines with 0 cross-word matches. Timings as anon:
 High Contains 0.25-1.2 s, High Dictionary 11-256 ms.
+
+Migration 051 folds vowel carriers in First Letter search (#198): `lines.first_letters` stores ੲ for ਇ ਈ ਏ, ੳ for ਉ ਊ ਓ
+and ਅ for ਆ ਐ ਔ, and both RPCs fold the query the same way. It also adds covering versions of 047's fuzzy first-letter
+indexes and drops the unreachable multi-code-point branch (#199). It was dry-run against live data in an aborted `DO`
+block before being applied: ੲ, ਇ and ਏ each 4,870 lines, ੳ 2,085, ਅ/ਆ 13,644; unchanged ਸਨਕਪ 8, ਸ_ਕ 2,292, ਹ 7,654,
+ੴਸਨਕਪ 31; 0 unfolded rows left. Timings as postgres: 7-220 ms exact, 8-25 ms Low/Medium, ~870 ms High.
+- **Pending manual cleanup** from the dashboard SQL editor (superseded indexes the planner no longer needs):
+
+  ```sql
+  drop index if exists lines_first_letters_fold1;
+  drop index if exists lines_first_letters_fold2;
+  ```
