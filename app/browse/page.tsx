@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 import type { Metadata } from "next";
@@ -23,7 +24,7 @@ export default async function BrowsePage({
   // Frequency-ranked list of the SGGS corpus; off-corpus dictionary lemmas
   // (e.g. Shackle headwords not attested in the corpus, frequency 0) are
   // excluded here but remain reachable via search and their word pages.
-  const { data: words, count } = await supabase
+  const { data: words, count, error } = await supabase
     .from("words")
     .select("id, gurmukhi, frequency", { count: "exact" })
     .eq("in_corpus", true)
@@ -32,6 +33,10 @@ export default async function BrowsePage({
     // repeat or skip them (#203). Matches 046's (frequency desc, id) index.
     .order("id", { ascending: true })
     .range(from, to);
+  // Past the last page PostgREST rejects the range (PGRST103): there is no
+  // such page. Any other failure goes to the error page and its retry (#225).
+  if (error?.code === "PGRST103") notFound();
+  if (error) throw new Error(`browse: ${error.message}`);
 
   const totalPages = count ? Math.ceil(count / pageSize) : 1;
 

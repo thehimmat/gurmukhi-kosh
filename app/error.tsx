@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useTransition } from "react";
 
 // Shown when a page fails to render (#126), e.g. a database timeout. Keeps
 // the site's layout and offers a retry instead of Next's default error page.
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const router = useRouter();
+  const [retrying, startTransition] = useTransition();
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -18,10 +21,13 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <div style={{ display: "flex", gap: "1rem", alignItems: "center", fontFamily: '"Inter", sans-serif' }}>
         <button
           type="button"
-          onClick={reset}
+          // reset() alone only re-renders client components; a server
+          // component's failed query needs a refetch too (#225).
+          onClick={() => startTransition(() => { router.refresh(); reset(); })}
+          disabled={retrying}
           style={{ padding: "0.5rem 1.1rem", background: "var(--accent)", color: "white", border: "none", borderRadius: "6px", fontSize: "0.9rem", fontWeight: 600, cursor: "pointer" }}
         >
-          Try again
+          {retrying ? "Trying…" : "Try again"}
         </button>
         <a href="/" style={{ fontSize: "0.9rem" }}>Back to search</a>
       </div>
