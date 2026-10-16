@@ -1,23 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { VIEWS, type ResourceSource, type ViewId } from "../../lib/line-context";
+import { GRID_ID, VIEWS, gridAttributes, sourceLabel, type PickerState, type ResourceSource, type ViewId } from "../../lib/line-context";
 
 // The right-hand pane's controls (#146): which view (Translation, Punjabi
 // commentary, …) and, within it, which sources. Every resource is already in
 // the page; this only sets attributes on the line grid that CSS reads, so
 // switching is instant and the page stays cacheable. Remembered per browser.
+// Only the component is exported: a server component can render it but can't
+// call a function from this "use client" module (the grid helpers it shares
+// with LineView live in lib/line-context.ts).
 const KEY = "viewer.resources";
-export const GRID_ID = "viewer-lines";
-
-export type PickerState = { view: ViewId; on: Partial<Record<ViewId, string[]>> };
-
-/** The grid attributes for a state: data-view, and data-on-<code> per shown source. */
-export function gridAttributes(state: PickerState): Record<string, string> {
-  const attrs: Record<string, string> = { "data-view": state.view };
-  for (const code of state.on[state.view] ?? []) attrs[`data-on-${code}`] = "1";
-  return attrs;
-}
 
 function apply(state: PickerState) {
   const el = document.getElementById(GRID_ID);
@@ -102,10 +95,4 @@ export function ResourcePicker({ sources, initial }: { sources: ResourceSource[]
       </div>
     </div>
   );
-}
-
-/** A chip's label: the author when the source is named for its form. */
-export function sourceLabel(src: ResourceSource): string {
-  const who = src.author?.replace(/\s*\(.*\)$/, "").replace(/,.*$/, "");
-  return who ? `${src.name} · ${who}` : src.name;
 }
