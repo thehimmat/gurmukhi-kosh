@@ -5,7 +5,20 @@
 // and text, in reading order. A paragraph becomes one passage per contiguous
 // run of our lines; the viewer opens a line in the smallest one holding it.
 
+import type { BaniDBBani } from "./banidb";
+
 export type BaniVerse = { paragraph: number; page: number; text: string };
+
+/**
+ * A bani's verses to match: those with a page and a paragraph. A bani's own
+ * titles ("ਰਹਰਾਸਿ ਸਾਹਿਬ", "ਸ੍ਰੀ ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫਤਹ ॥") aren't in any scripture
+ * and come with no page.
+ */
+export function baniVerses(bani: BaniDBBani): BaniVerse[] {
+  return bani.verses
+    .filter((v) => v.verse?.verse?.unicode && v.verse.pageNo != null && v.paragraph != null)
+    .map((v) => ({ paragraph: v.paragraph!, page: v.verse.pageNo, text: v.verse.verse!.unicode }));
+}
 export type CorpusLine = { id: number; verse_id: number; source_fk: number; ang: number; gurmukhi: string };
 export type PassageRun = {
   ordinal: number; // the paragraph's place in the bani, from 1
