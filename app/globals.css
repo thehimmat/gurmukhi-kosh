@@ -115,7 +115,7 @@ a:hover {
 }
 /* A resource shows when the grid carries data-on-<its source> (rules are
    rendered per page from the sources it has; the picker sets the flags). */
-/* Vishraam (#217): the last letter of a word read with a pause, coloured by
+/* Vishraam (#217): a word read with a pause, coloured by
    the set the grid's data-vishraam names, as iGurbani does: the main pause
    (v) in one colour, the light yamki (y) in another. */
 #viewer-lines[data-vishraam="igurbani"] .vishraam[data-igurbani="v"],

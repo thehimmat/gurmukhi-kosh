@@ -2,8 +2,8 @@
 // publishes them. Each mark names a word by its index among the line's
 // space-separated tokens, and a kind: "v" the main pause, "y" (yamki) the
 // lighter one. BaniDB carries three sets that sometimes disagree, so all three
-// are kept and the reader picks one; the viewer colours the last letter of
-// each marked word, as iGurbani does.
+// are kept and the reader picks one; the viewer colours each marked word, as
+// iGurbani does.
 
 export type VishraamKind = "v" | "y";
 export type VishraamSet = "igurbani" | "sttm" | "sttm2";
@@ -36,28 +36,6 @@ export function normalizeVishraam(raw: unknown, words: number): LineVishraam | n
     if (Object.keys(m).length) out[set as VishraamSet] = m;
   }
   return Object.keys(out).length ? out : null;
-}
-
-// Signs that belong to the letter before them: bindi, nukta, vowel signs,
-// virama, tippi, addak, udaat, yakash.
-const MARK = /[ਁ-ਃ਼ਾ-੍ੑੰੱੵ]/;
-const VIRAMA = "੍";
-
-/**
- * A word split before its last letter, the letter keeping its vowel signs and
- * any letter subjoined to it (ਨ੍ਹ), so colouring it never breaks a cluster.
- */
-export function splitLastLetter(word: string): [string, string] {
-  const chars = [...word];
-  let i = chars.length;
-  while (i > 0) {
-    i--;
-    if (MARK.test(chars[i])) continue;
-    // A base letter: stop, unless it hangs from the letter before (virama).
-    if (i > 0 && chars[i - 1] === VIRAMA) continue;
-    break;
-  }
-  return [chars.slice(0, i).join(""), chars.slice(i).join("")];
 }
 
 /** Each set's mark on word `i` of a line, or null if none marks it. */
