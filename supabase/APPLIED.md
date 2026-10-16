@@ -266,3 +266,8 @@ Applied. Japji (bani 2, 43 passages) is seeded. The rest come from `npm run inge
 service-role key; `-- --dry-run` reports matches without writing. Ran 2026-10-16: 6,664 passages across 104 banis,
 4 bani verses unmatched (BaniDB spelling variants).
 
+
+Migration 060 gives every Sri Sarbloh Granth line a `shabad_id`, one per chhand run or titled section (#233), from
+`sarbloh_section_indexes`, the SQL twin of `pipeline/sarbloh/lines.ts` `sectionIndexes`. Applied 2026-10-16: 1,564
+sections, ids 900001-901564, each with a `shabads` row (`ang_start` only). `id`, `verse_id`, `line_no` and `ang` are
+unchanged (checksum of the 36,000 rows the same before and after); no Sarbloh line has a null `shabad_id`.
