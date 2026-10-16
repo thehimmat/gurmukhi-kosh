@@ -160,3 +160,23 @@ describe("viewer client boundary", () => {
     }
   });
 });
+
+describe("lineContextJson", () => {
+  it("serializes the viewer's context for /api/line, resources keyed by line id", async () => {
+    const { lineContextJson } = await import("../lib/line-context");
+    const line = {
+      id: 7, verse_id: 70, shabad_id: 3, ang: 1, line_no: 2, gurmukhi: "ਨਮੋ ਨਮੋ", translation_en: "Salutation",
+      transliteration_en: null, source_fk: 3, vishraam: null, shabads: null,
+    };
+    const res = { line_id: 7, source_code: "ssk_en", language: "en", body_unicode: "Hail", caveat: null };
+    const out = lineContextJson({
+      lineId: 7, scope: "passage", lines: [line], resources: new Map([[7, [res]]]),
+      sources: [{ code: "ssk_en", name: "SSK", author: null }], source: { code: "dasam", name: "Sri Dasam Granth" },
+      shabad: null, passage: null, prevId: 6, nextId: null,
+    });
+    expect(out.resources).toEqual({ "7": [res] });
+    expect(out.lines[0]).toEqual(line);
+    expect(out).toMatchObject({ lineId: 7, scope: "passage", prevId: 6, nextId: null, source: { name: "Sri Dasam Granth" } });
+    expect(JSON.parse(JSON.stringify(out))).toEqual(out); // plain JSON, no Map left
+  });
+});
