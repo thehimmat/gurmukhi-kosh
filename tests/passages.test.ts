@@ -4,7 +4,8 @@
  * a line in its pauri rather than the shabad BaniDB files it under.
  */
 import { describe, it, expect } from "vitest";
-import { alignBani, pickPassage, normalizeText, narrowerThanShabad, type CorpusLine } from "../lib/passages";
+import { alignBani, baniVerses, pickPassage, normalizeText, narrowerThanShabad, type CorpusLine } from "../lib/passages";
+import type { BaniDBBani } from "../lib/banidb";
 
 const line = (id: number, text: string, ang = 1, source_fk = 1): CorpusLine =>
   ({ id, verse_id: id, source_fk, ang, gurmukhi: text });
@@ -98,5 +99,16 @@ describe("narrowerThanShabad", () => {
 
   it("takes the passage for a line with no shabad", () => {
     expect(narrowerThanShabad(p(5, 14), [])).toBe(true);
+  });
+});
+
+describe("baniVerses", () => {
+  it("skips a bani's own titles, which have no page (ਰਹਰਾਸਿ ਸਾਹਿਬ), and verses with no paragraph", () => {
+    const bani = { baniInfo: null, verses: [
+      { paragraph: 1, verse: { verseId: 1, pageNo: null, lineNo: null, verse: { gurmukhi: "", unicode: "ਰਹਰਾਸਿ ਸਾਹਿਬ" } } },
+      { paragraph: 2, verse: { verseId: 2, pageNo: 8, lineNo: 1, verse: { gurmukhi: "", unicode: "ਸੋ ਦਰੁ ॥" } } },
+      { verse: { verseId: 3, pageNo: 8, lineNo: 2, verse: { gurmukhi: "", unicode: "ਸੋ ਘਰੁ ॥" } } },
+    ] } as unknown as BaniDBBani;
+    expect(baniVerses(bani)).toEqual([{ paragraph: 2, page: 8, text: "ਸੋ ਦਰੁ ॥" }]);
   });
 });

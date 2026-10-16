@@ -16,7 +16,7 @@ config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
 import { fetchBani, fetchBanis } from "../../lib/banidb";
-import { alignBani, type BaniVerse, type CorpusLine } from "../../lib/passages";
+import { alignBani, baniVerses, type CorpusLine } from "../../lib/passages";
 import { getArg, sleep } from "../shared/utils";
 
 // Our scriptures a bani can draw on, by BaniDB SourceID. A bani verse names
@@ -55,9 +55,7 @@ async function main() {
   for (const b of listing) {
     const bani = await fetchBani(b.ID);
     const own = sourceFk.get(bani.baniInfo?.source?.sourceId ?? "G");
-    const verses: BaniVerse[] = bani.verses
-      .filter((v) => v.verse?.verse?.unicode && v.paragraph != null)
-      .map((v) => ({ paragraph: v.paragraph!, page: v.verse.pageNo, text: v.verse.verse!.unicode }));
+    const verses = baniVerses(bani);
     for (const page of new Set(verses.map((v) => v.page))) await linesOn(page);
     const { runs, unmatched } = alignBani(verses, (page) => {
       const lines = pageCache.get(page) ?? [];
