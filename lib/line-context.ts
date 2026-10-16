@@ -6,6 +6,7 @@
 // since one printed line holds several verses (gurmukhi-search#46).
 
 import { supabase } from "./supabase";
+import type { LineVishraam } from "./vishraam";
 
 /** The viewer link for a line: its context page, scrolled to and marking it. */
 export function lineHref(id: number): string {
@@ -21,7 +22,9 @@ export function placeLabel(sourceCode: string | null | undefined, ang: number): 
   return `${PAGE_UNIT[sourceCode ?? ""] ?? "Ang"} ${ang}`;
 }
 
-export type LinePart = { text: string; word?: string };
+// `i` is a word's index among the line's space-separated tokens, the index
+// BaniDB's vishraam marks use.
+export type LinePart = { text: string; word?: string; i?: number };
 
 const LETTER = /[ਅ-ਹਾ-ੌੲੳੴ]/;
 const PUNCT = /[।॥|~]+/;
@@ -33,18 +36,20 @@ const PUNCT = /[।॥|~]+/;
  */
 export function lineParts(gurmukhi: string): LinePart[] {
   const parts: LinePart[] = [];
-  const push = (text: string, word?: string) => {
+  const push = (text: string, word?: string, i?: number) => {
     if (!text) return;
     const last = parts.at(-1);
     if (!word && last && !last.word) last.text += text;
-    else parts.push(word ? { text, word } : { text });
+    else parts.push(word ? { text, word, i } : { text });
   };
+  let index = -1;
   for (const token of gurmukhi.split(/(\s+)/)) {
     if (!token || /^\s+$/.test(token)) { push(token); continue; }
+    index++;
     const m = token.match(/^([।॥|~]*)(.*?)([।॥|~]*[੦-੯]*[।॥|~]*)$/);
     const [lead, core, tail] = m ? [m[1], m[2], m[3]] : ["", token, ""];
     push(lead);
-    if (core && LETTER.test(core) && !PUNCT.test(core)) push(core, core);
+    if (core && LETTER.test(core) && !PUNCT.test(core)) push(core, core, index);
     else push(core);
     push(tail);
   }
@@ -63,6 +68,7 @@ export type ContextLine = {
   translation_en: string | null;
   transliteration_en: string | null;
   source_fk: number;
+  vishraam?: LineVishraam | null;
   shabads?: { raag_english: string | null; raag_gurmukhi: string | null; writer_english: string | null } | null;
 };
 
@@ -155,8 +161,9 @@ export type LineContext = {
 };
 
 const LINE_COLUMNS = "id, verse_id, shabad_id, ang, line_no, gurmukhi, translation_en, transliteration_en, source_fk";
-// Each line carries its shabad, so an ang view can head each shabad it holds.
-const GROUP_COLUMNS = `${LINE_COLUMNS}, shabads(raag_english, raag_gurmukhi, writer_english)`;
+// Each line carries its shabad, so an ang view can head each shabad it holds,
+// and its vishraam marks (#217) for the Gurmukhi pane.
+const GROUP_COLUMNS = `${LINE_COLUMNS}, vishraam, shabads(raag_english, raag_gurmukhi, writer_english)`;
 
 /**
  * A line with the passage around it: its shabad (scope "shabad"; Sri Sarbloh

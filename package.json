@@ -25,6 +25,7 @@
     "ingest:shackle": "tsx pipeline/shackle/ingest.ts && tsx pipeline/shackle/ingest-form-links.ts",
     "ingest:shackle:forms": "tsx pipeline/shackle/ingest-form-links.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
+    "ingest:vishraam": "tsx pipeline/vishraam/ingest.ts",
     "ingest:numbers": "tsx pipeline/numbers/populate.ts",
     "scans:check": "tsx pipeline/scans/check.ts",
     "build:sarbloh": "tsx pipeline/sarbloh/build.ts",
