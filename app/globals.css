@@ -77,13 +77,26 @@ a:hover {
   letter-spacing: 0.03em;
 }
 
-/* Line viewer (/line/[id]): the line a search result opened, marked via the
-   URL fragment (#line-<id>) so prev/next shabad links land unmarked. */
+/* Line viewer (/line/[id], #146): a split view, one grid row per line so
+   each Gurbani line (left) sits level with its resources (right). A row
+   stacks on narrow screens. The line opened from a link (#line-<id>) is
+   marked; prev/next links land unmarked. */
+.viewer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 2.5rem;
+}
+@media (max-width: 760px) {
+  .viewer-row { grid-template-columns: minmax(0, 1fr); }
+  .viewer-controls > :first-child { display: none; }
+}
+.viewer-controls { margin-bottom: 0.75rem; }
 .viewer-line {
   scroll-margin-top: 30vh;
   border-radius: 6px;
   padding: 0.6rem 0.9rem;
   margin: 0 -0.9rem;
+  border-bottom: 1px solid var(--bg-alt);
   transition: background-color 0.3s;
 }
 .viewer-line:target {
@@ -99,20 +112,22 @@ a:hover {
   background: var(--accent-light);
   text-decoration: none;
 }
-
-/* Viewer commentaries: hidden until the picker chooses a source (the rules
-   that show one are rendered per page from the sources it has). */
-.viewer-cm {
+/* A resource shows when the grid carries data-on-<its source> (rules are
+   rendered per page from the sources it has; the picker sets the flags). */
+.viewer-res {
   display: none;
-  margin-top: 0.4rem;
-  padding: 0.5rem 0.75rem;
-  border-left: 2px solid var(--border);
-  background: var(--bg-alt);
-  border-radius: 0 4px 4px 0;
+  margin-bottom: 0.45rem;
 }
-.viewer-cm-source {
+.viewer-res-source {
   font-family: "Inter", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  margin-top: 0.2rem;
+}
+.viewer-shabad-head {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 1.5rem 0 0.4rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
 }
