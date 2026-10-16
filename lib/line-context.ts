@@ -224,17 +224,23 @@ const LINE_COLUMNS = "id, verse_id, shabad_id, ang, line_no, gurmukhi, translati
 // and its vishraam marks (#217) for the Gurmukhi pane.
 const GROUP_COLUMNS = `${LINE_COLUMNS}, vishraam, shabads(raag_english, raag_gurmukhi, writer_english)`;
 
+/** A query's data, or its error thrown so the page's error boundary (and its retry) shows (#225). */
+function must<T>(r: { data: T; error: { message: string } | null }, what: string): T {
+  if (r.error) throw new Error(`fetchLineContext ${what}: ${r.error.message}`);
+  return r.data;
+}
+
 /**
  * A line with the passage around it ("passage": its shabad, or the smaller
  * bani passage holding it; Sri Sarbloh Granth, which has neither, reads by
  * ang) or its whole ang ("ang").
  */
 export async function fetchLineContext(id: number, scope: Scope = "passage"): Promise<LineContext | null> {
-  const { data: line } = await supabase
+  const line = must(await supabase
     .from("lines")
     .select(`${LINE_COLUMNS}, sources(code, name), shabads(raag_english, raag_gurmukhi, writer_english)`)
     .eq("id", id)
-    .maybeSingle();
+    .maybeSingle(), "line");
   if (!line) return null;
   const l = line as unknown as ContextLine & {
     sources: LineContext["source"];
@@ -243,9 +249,7 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
 
   const linesWhere = () => supabase.from("lines").select(GROUP_COLUMNS).eq("source_fk", l.source_fk);
   const read = async (q: ReturnType<typeof linesWhere>) => {
-    const { data, error } = await q.order("verse_id", { ascending: true });
-    if (error) throw new Error(`fetchLineContext: ${error.message}`);
-    return (data ?? []) as unknown as ContextLine[];
+    return (must(await q.order("verse_id", { ascending: true }), "lines") ?? []) as unknown as ContextLine[];
   };
 
   let lines: ContextLine[];
@@ -263,7 +267,7 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
     ]);
     type Held = { bani_id: number; ordinal: number; first_verse_id: number; last_verse_id: number;
       banis: { name_gurmukhi: string; name_english: string | null; paragraphs: number } | null };
-    const p = pickPassage((held.data ?? []) as unknown as Held[]);
+    const p = pickPassage((must(held, "passages") ?? []) as unknown as Held[]);
     if (p && narrowerThanShabad(p, shabadLines)) {
       lines = shabadLines.length
         ? shabadLines.filter((x) => x.verse_id >= p.first_verse_id && x.verse_id <= p.last_verse_id)
@@ -291,9 +295,9 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
       : Promise.resolve({ data: [], error: null }),
     supabase.from("translation_sources").select("code, name, author"),
   ]);
-  if (res.error) throw new Error(`fetchLineContext: ${res.error.message}`);
-
-  const rowsOut = (res.data ?? []) as Resource[];
+  const prevRow = must(prev, "previous") as { id: number } | null;
+  const nextRow = must(next, "next") as { id: number } | null;
+  const rowsOut = (must(res, "resources") ?? []) as Resource[];
   for (const x of lines) {
     if (x.translation_en) {
       rowsOut.push({ line_id: x.id, source_code: BANIDB_EN, language: "en", body_unicode: x.translation_en, caveat: null });
@@ -301,8 +305,15 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
   }
   const resources = resourcesByLine(rowsOut);
   const present = new Set(rowsOut.map((r) => r.source_code));
+  // The names are only labels: if they fail to load, every source the lines
+  // have still shows, under its code, rather than none at all.
+  const listed = (sources.data ?? []) as ResourceSource[];
+  const unnamed = sources.error
+    ? [...present].filter((c) => c !== BANIDB_EN && !listed.some((s) => s.code === c)).map((code) => ({ code, name: code, author: null }))
+    : [];
   const named = [
-    ...((sources.data ?? []) as ResourceSource[]),
+    ...listed,
+    ...unnamed,
     { code: BANIDB_EN, name: "BaniDB English", author: "BaniDB (Khalis Foundation), revised from Dr Sant Singh Khalsa" },
   ];
 
@@ -315,8 +326,8 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
     source: l.sources,
     shabad: l.shabads,
     passage,
-    prevId: (prev.data as { id: number } | null)?.id ?? null,
-    nextId: (next.data as { id: number } | null)?.id ?? null,
+    prevId: prevRow?.id ?? null,
+    nextId: nextRow?.id ?? null,
   };
 }
 

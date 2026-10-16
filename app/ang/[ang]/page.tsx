@@ -30,12 +30,14 @@ export default async function AngPage({ params }: Props) {
   // ingested (#65), "ang N" exists per source (Bhai Gurdas vaar 1 is also
   // ang 1 of its source), so the query must pin the corpus. Per-source
   // browsing routes for the other texts are a follow-up.
-  const { data: lines } = await supabase
+  const { data: lines, error } = await supabase
     .from("lines")
     .select("id, gurmukhi, translation_en, transliteration_en, shabads(raag_english, writer_english), sources!inner(code)")
     .eq("ang", ang)
     .eq("sources.code", "sggs_banidb_v2")
     .order("line_no", { ascending: true });
+  // A failed query goes to the error page and its retry (#225), not "not indexed".
+  if (error) throw new Error(`ang ${ang}: ${error.message}`);
 
   if (!lines || lines.length === 0) {
     return (
