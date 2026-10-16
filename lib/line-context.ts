@@ -319,3 +319,8 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
     nextId: (next.data as { id: number } | null)?.id ?? null,
   };
 }
+
+/** The context as plain JSON for /api/line/[id]: resources keyed by line id. */
+export function lineContextJson(ctx: LineContext) {
+  return { ...ctx, resources: Object.fromEntries([...ctx.resources].map(([id, list]) => [String(id), list])) };
+}

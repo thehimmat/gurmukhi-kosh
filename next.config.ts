@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 
   // Multi-zone: this app serves the dictionary paths under search.atthebunga.com
   // (the gurmukhi-search shell rewrites /word/*, /browse, /ang/*, /about, /health,
-  // /admin/*, /api/word|flags|health here). The asset prefix keeps this zone's
+  // /admin/*, /api/word|line|flags|health here). The asset prefix keeps this zone's
   // JS/CSS/fonts from colliding with the shell's /_next/* on the shared domain.
   assetPrefix: process.env.NODE_ENV === "production" ? "/kosh-static" : undefined,
 
