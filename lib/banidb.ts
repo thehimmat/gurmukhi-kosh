@@ -64,7 +64,7 @@ export async function fetchShabad(shabadId: number) {
 // verse under a `verse` key. Its `verseId` is NOT our `lines.verse_id`: the
 // banis endpoint numbers verses its own way (Japji's Mul Mantar is 12 here,
 // 1 from /angs), so match by page and text (lib/passages.ts). `paragraph`
-// numbers the units the bani is read in (#219).
+// numbers the units the bani is read in (#220).
 export type BaniDBBaniVerse = {
   paragraph?: number;
   header?: number;

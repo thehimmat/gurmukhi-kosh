@@ -1,4 +1,4 @@
-// Passages (#219): the units a bani is read in, from BaniDB's banis. Each
+// Passages (#220): the units a bani is read in, from BaniDB's banis. Each
 // bani verse carries a `paragraph` number (Japji: Mul Mantar, ॥ਜਪੁ॥, the
 // salok, each pauri, the closing salok), but its own verse ids, not the ang
 // endpoint's ones our lines carry, so verses are matched to our lines by page
@@ -67,4 +67,21 @@ type Span = { first_verse_id: number; last_verse_id: number; bani_id: number };
 export function pickPassage<P extends Span>(candidates: P[]): P | null {
   const size = (p: Span) => p.last_verse_id - p.first_verse_id;
   return [...candidates].sort((a, b) => size(a) - size(b) || a.bani_id - b.bani_id)[0] ?? null;
+}
+
+/**
+ * Whether a passage is a smaller unit than the line's shabad, so the viewer
+ * opens the passage: inside the shabad and not all of it (Japji's first
+ * shabad holds four passages). A passage the same as its shabad, or running
+ * past it, leaves the shabad. A line with no shabad takes the passage.
+ */
+export function narrowerThanShabad(
+  p: { first_verse_id: number; last_verse_id: number },
+  shabad: { verse_id: number }[],
+): boolean {
+  if (!shabad.length) return true;
+  const first = shabad[0].verse_id;
+  const last = shabad.at(-1)!.verse_id;
+  const inside = p.first_verse_id >= first && p.last_verse_id <= last;
+  return inside && (p.first_verse_id > first || p.last_verse_id < last);
 }

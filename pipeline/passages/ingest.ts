@@ -1,5 +1,5 @@
 /**
- * Passages ingestion (#219): every BaniDB bani's paragraphs, matched to our
+ * Passages ingestion (#220): every BaniDB bani's paragraphs, matched to our
  * lines by page and text (lib/passages.ts), into `banis` and `passages`
  * (migration 059). Re-running replaces each bani's passages.
  *

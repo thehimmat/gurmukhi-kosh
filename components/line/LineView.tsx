@@ -71,19 +71,25 @@ export function LineView({ ctx }: { ctx: LineContext }) {
 
       <header style={{ margin: "1.5rem 0 1rem", display: "flex", flexWrap: "wrap", gap: "0.25rem 1.25rem", alignItems: "baseline" }}>
         <span style={{ ...META, fontWeight: 600, color: "var(--text-primary)" }}>{ctx.source?.name ?? "Gurbani"}</span>
-        {sggs && angs.length === 1 && ctx.scope === "shabad"
+        {sggs && angs.length === 1 && ctx.scope === "passage"
           ? <a href={`/line/${ctx.lineId}/ang${target}`} style={META}>{place}</a>
           : <span style={META}>{place}</span>}
-        {ctx.scope === "shabad" && ctx.shabad?.raag_gurmukhi && (
+        {ctx.passage && (
+          <span style={META}>
+            <span className="gurmukhi">{ctx.passage.name_gurmukhi}</span>
+            {ctx.passage.paragraphs > 1 ? ` · ${ctx.passage.ordinal} of ${ctx.passage.paragraphs}` : ""}
+          </span>
+        )}
+        {ctx.scope === "passage" && ctx.shabad?.raag_gurmukhi && (
           <span style={META}>
             <span className="gurmukhi">{ctx.shabad.raag_gurmukhi}</span>
             {ctx.shabad.raag_english ? ` (${ctx.shabad.raag_english})` : ""}
           </span>
         )}
-        {ctx.scope === "shabad" && ctx.shabad?.writer_english && <span style={META}>{ctx.shabad.writer_english}</span>}
+        {ctx.scope === "passage" && ctx.shabad?.writer_english && <span style={META}>{ctx.shabad.writer_english}</span>}
 
         <span role="group" aria-label="Scope" style={{ marginLeft: "auto", display: "inline-flex", border: "1px solid var(--border)", borderRadius: "6px", overflow: "hidden", fontFamily: '"Inter", sans-serif', fontSize: "0.8rem" }}>
-          {(["shabad", "ang"] as const).map((s) => (
+          {(["passage", "ang"] as const).map((s) => (
             <a
               key={s}
               href={`${scopePath(ctx.lineId, s)}${target}`}
@@ -93,7 +99,7 @@ export function LineView({ ctx }: { ctx: LineContext }) {
                 background: ctx.scope === s ? "var(--accent)" : "white",
                 color: ctx.scope === s ? "white" : "var(--text-secondary)",
               }}
-            >{s === "shabad" ? "Shabad" : "Ang"}</a>
+            >{s === "passage" ? "Passage" : "Ang"}</a>
           ))}
         </span>
       </header>

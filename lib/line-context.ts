@@ -7,6 +7,7 @@
 
 import { supabase } from "./supabase";
 import type { LineVishraam } from "./vishraam";
+import { narrowerThanShabad, pickPassage } from "./passages";
 
 /** The viewer link for a line: its context page, scrolled to and marking it. */
 export function lineHref(id: number): string {
@@ -144,7 +145,12 @@ export function resourcesByLine(rows: Resource[]): Map<number, Resource[]> {
   return byLine;
 }
 
-export type Scope = "shabad" | "ang";
+// "passage": the unit a line is read in, its shabad or, inside a bani, the
+// smaller passage BaniDB marks (#220); "ang": its whole ang.
+export type Scope = "passage" | "ang";
+
+/** A bani passage the view shows, for its heading ("Japji Sahib · 1 of 43"). */
+export type ContextPassage = { bani_id: number; name_gurmukhi: string; name_english: string | null; ordinal: number; paragraphs: number };
 
 export type LineContext = {
   lineId: number;
@@ -155,7 +161,9 @@ export type LineContext = {
   sources: ResourceSource[];
   source: { code: string; name: string } | null;
   shabad: { raag_english: string | null; raag_gurmukhi: string | null; writer_english: string | null } | null;
-  // A line of the previous / next shabad (or ang) in the same scripture.
+  // Set when the passage scope shows a bani passage rather than the shabad.
+  passage: ContextPassage | null;
+  // A line of the previous / next passage (or ang) in the same scripture.
   prevId: number | null;
   nextId: number | null;
 };
@@ -166,10 +174,11 @@ const LINE_COLUMNS = "id, verse_id, shabad_id, ang, line_no, gurmukhi, translati
 const GROUP_COLUMNS = `${LINE_COLUMNS}, vishraam, shabads(raag_english, raag_gurmukhi, writer_english)`;
 
 /**
- * A line with the passage around it: its shabad (scope "shabad"; Sri Sarbloh
- * Granth, which has no shabad ids, reads by ang) or its whole ang ("ang").
+ * A line with the passage around it ("passage": its shabad, or the smaller
+ * bani passage holding it; Sri Sarbloh Granth, which has neither, reads by
+ * ang) or its whole ang ("ang").
  */
-export async function fetchLineContext(id: number, scope: Scope = "shabad"): Promise<LineContext | null> {
+export async function fetchLineContext(id: number, scope: Scope = "passage"): Promise<LineContext | null> {
   const { data: line } = await supabase
     .from("lines")
     .select(`${LINE_COLUMNS}, sources(code, name), shabads(raag_english, raag_gurmukhi, writer_english)`)
@@ -181,13 +190,39 @@ export async function fetchLineContext(id: number, scope: Scope = "shabad"): Pro
     shabads: LineContext["shabad"];
   };
 
-  let group = supabase.from("lines").select(GROUP_COLUMNS).eq("source_fk", l.source_fk);
-  group = scope === "shabad" && l.shabad_id != null
-    ? group.eq("shabad_id", l.shabad_id)
-    : group.eq("ang", l.ang);
-  const { data: rows, error } = await group.order("verse_id", { ascending: true });
-  if (error) throw new Error(`fetchLineContext: ${error.message}`);
-  const lines = (rows ?? []) as unknown as ContextLine[];
+  const linesWhere = () => supabase.from("lines").select(GROUP_COLUMNS).eq("source_fk", l.source_fk);
+  const read = async (q: ReturnType<typeof linesWhere>) => {
+    const { data, error } = await q.order("verse_id", { ascending: true });
+    if (error) throw new Error(`fetchLineContext: ${error.message}`);
+    return (data ?? []) as unknown as ContextLine[];
+  };
+
+  let lines: ContextLine[];
+  let passage: ContextPassage | null = null;
+  if (scope === "ang") {
+    lines = await read(linesWhere().eq("ang", l.ang));
+  } else {
+    // The shabad and the bani passages holding the line, together; the
+    // passage wins only where it's the smaller unit (Japji's first shabad).
+    const [shabadLines, held] = await Promise.all([
+      l.shabad_id != null ? read(linesWhere().eq("shabad_id", l.shabad_id)) : Promise.resolve([]),
+      supabase.from("passages")
+        .select("bani_id, ordinal, first_verse_id, last_verse_id, banis(name_gurmukhi, name_english, paragraphs)")
+        .eq("source_fk", l.source_fk).lte("first_verse_id", l.verse_id).gte("last_verse_id", l.verse_id),
+    ]);
+    type Held = { bani_id: number; ordinal: number; first_verse_id: number; last_verse_id: number;
+      banis: { name_gurmukhi: string; name_english: string | null; paragraphs: number } | null };
+    const p = pickPassage((held.data ?? []) as unknown as Held[]);
+    if (p && narrowerThanShabad(p, shabadLines)) {
+      lines = shabadLines.length
+        ? shabadLines.filter((x) => x.verse_id >= p.first_verse_id && x.verse_id <= p.last_verse_id)
+        : await read(linesWhere().gte("verse_id", p.first_verse_id).lte("verse_id", p.last_verse_id));
+      passage = { bani_id: p.bani_id, ordinal: p.ordinal, name_gurmukhi: p.banis?.name_gurmukhi ?? "",
+        name_english: p.banis?.name_english ?? null, paragraphs: p.banis?.paragraphs ?? 0 };
+    } else {
+      lines = shabadLines.length ? shabadLines : await read(linesWhere().eq("ang", l.ang));
+    }
+  }
   const first = lines[0] ?? l;
   const last = lines.at(-1) ?? l;
 
@@ -228,6 +263,7 @@ export async function fetchLineContext(id: number, scope: Scope = "shabad"): Pro
     sources: named.filter((src) => present.has(src.code)).sort((a, b) => rank(a.code) - rank(b.code)),
     source: l.sources,
     shabad: l.shabads,
+    passage,
     prevId: (prev.data as { id: number } | null)?.id ?? null,
     nextId: (next.data as { id: number } | null)?.id ?? null,
   };

@@ -1,10 +1,10 @@
 /**
- * Passages from BaniDB's banis (#219): a bani's paragraphs (Japji's pauris,
+ * Passages from BaniDB's banis (#220): a bani's paragraphs (Japji's pauris,
  * its Mul Mantar and saloks, …) matched to our lines, so the viewer can open
  * a line in its pauri rather than the shabad BaniDB files it under.
  */
 import { describe, it, expect } from "vitest";
-import { alignBani, pickPassage, normalizeText, type CorpusLine } from "../lib/passages";
+import { alignBani, pickPassage, normalizeText, narrowerThanShabad, type CorpusLine } from "../lib/passages";
 
 const line = (id: number, text: string, ang = 1, source_fk = 1): CorpusLine =>
   ({ id, verse_id: id, source_fk, ang, gurmukhi: text });
@@ -76,5 +76,27 @@ describe("pickPassage", () => {
 
   it("is null when no passage holds the line", () => {
     expect(pickPassage([])).toBeNull();
+  });
+});
+
+describe("narrowerThanShabad", () => {
+  const shabad = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((verse_id) => ({ verse_id }));
+  const p = (first: number, last: number) => ({ first_verse_id: first, last_verse_id: last });
+
+  it("opens a pauri inside a bigger shabad as the pauri (Japji's first shabad)", () => {
+    expect(narrowerThanShabad(p(5, 10), shabad)).toBe(true);
+    expect(narrowerThanShabad(p(1, 1), shabad)).toBe(true);
+  });
+
+  it("keeps the shabad when the passage is the whole shabad", () => {
+    expect(narrowerThanShabad(p(1, 10), shabad)).toBe(false);
+  });
+
+  it("keeps the shabad when the passage runs past it", () => {
+    expect(narrowerThanShabad(p(5, 14), shabad)).toBe(false);
+  });
+
+  it("takes the passage for a line with no shabad", () => {
+    expect(narrowerThanShabad(p(5, 14), [])).toBe(true);
   });
 });

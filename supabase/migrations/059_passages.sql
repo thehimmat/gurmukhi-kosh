@@ -1,4 +1,4 @@
--- 059: passages, the units a bani is read in (#219), from BaniDB's banis.
+-- 059: passages, the units a bani is read in (#220), from BaniDB's banis.
 --
 -- A shabad is how BaniDB files the text; a passage is how a bani is read:
 -- Japji's first shabad holds the Mul Mantar, ॥ਜਪੁ॥, the salok and Pauri 1,
