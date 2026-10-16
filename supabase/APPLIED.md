@@ -197,12 +197,8 @@ read every matching wide `lines` row from the heap: `ਸ_ਕ` took 5.8 s on a co
 for the returned page only. The plan is now an index-only scan with 0 heap fetches: `ਹ` (7,654
 matches) takes 154 ms cold.
 - The first two applies hung, because the MCP holds DROP for a confirmation, as with 037. So the
-  file adds the new index and leaves the old one. **Pending manual cleanup** from the dashboard SQL
-  editor (the planner already ignores the old index):
-
-  ```sql
-  drop index if exists lines_first_letters;
-  ```
+  file adds the new index and leaves the old one. The old index was dropped from the dashboard SQL
+  editor on 2026-10-16 (see below).
 
 Migration 046 reorders the corpora to SGGS, Dasam, Sarbloh, Bhai Gurdas, and adds `lines_gurmukhi_trgm`
 (for gurmukhi-search's Contains search) and `words_frequency_rank` (for the Dictionary feed) (PR #195). It
@@ -226,12 +222,7 @@ and ਅ for ਆ ਐ ਔ, and both RPCs fold the query the same way. It also adds
 indexes and drops the unreachable multi-code-point branch (#199). It was dry-run against live data in an aborted `DO`
 block before being applied: ੲ, ਇ and ਏ each 4,870 lines, ੳ 2,085, ਅ/ਆ 13,644; unchanged ਸਨਕਪ 8, ਸ_ਕ 2,292, ਹ 7,654,
 ੴਸਨਕਪ 31; 0 unfolded rows left. Timings as postgres: 7-220 ms exact, 8-25 ms Low/Medium, ~870 ms High.
-- **Pending manual cleanup** from the dashboard SQL editor (superseded indexes the planner no longer needs):
-
-  ```sql
-  drop index if exists lines_first_letters_fold1;
-  drop index if exists lines_first_letters_fold2;
-  ```
+- The superseded `lines_first_letters_fold1`/`_fold2` were dropped from the dashboard SQL editor on 2026-10-16.
 
 Migration 052 adds gurmukhi-search's count and Dictionary-filter RPCs: `count_number_roles` (role counts scoped to the
 filters), `count_lines_fuzzy` (capped fuzzy Contains total), and `word_corpus_writer_stats` +
@@ -255,10 +246,10 @@ as anon (ੲ 4,870; ੧ author 624).
 Migration 057 adds the `ssk_en` translation source: Dr Sant Singh Khalsa's English, verbatim from BaniDB's
 `translation.en.ssk`. `lines.translation_en` is BaniDB's `bdb` revision of it, which differs on ~13% of lines. Applied;
 the rows themselves come from `npm run ingest:translations -- --start=1 --end=1430 --sources=ssk_en`, which needs the
-service-role key. **Pending** until that runs: the viewer shows "BaniDB English" in its place.
+service-role key. Ran 2026-10-16: 60,173 rows.
 
-**Pending manual cleanup** (from the dashboard SQL editor; the MCP still holds DROP for a confirmation that times out).
-The planner uses the covering replacements (checked with EXPLAIN on 2026-10-15):
+**Done 2026-10-16** from the dashboard SQL editor (the MCP still holds DROP for a confirmation that times out). The
+planner uses the covering replacements (checked with EXPLAIN before and after):
 
 ```sql
 drop index if exists lines_first_letters;        -- 044, superseded by lines_first_letters_cover (045)
@@ -267,11 +258,11 @@ drop index if exists lines_first_letters_fold2;  -- 047, superseded by lines_fir
 ```
 Migration 058 adds `lines.vishraam` (jsonb: per set, word index → `v`/`y`) and `set_lines_vishraam(jsonb)`, the
 service-role writer the ingest uses (#217). Applied. The marks come from `npm run ingest:vishraam` (all of SGGS) and
-`npm run ingest:vishraam -- --source=dasam_banidb_v2`, which need the service-role key. **Pending** until that runs:
-the viewer shows no Vishraam control for a passage without marks.
+`npm run ingest:vishraam -- --source=dasam_banidb_v2`, which need the service-role key. Ran 2026-10-16: 57,816 SGGS
+lines and 215 Dasam lines carry marks (BaniDB has few for Dasam, none for Bhai Gurdas).
 
 Migration 059 adds `banis` and `passages`: each BaniDB bani's paragraphs matched to our lines by page and text (#220).
 Applied. Japji (bani 2, 43 passages) is seeded. The rest come from `npm run ingest:passages`, which needs the
-service-role key; `-- --dry-run` reports matches without writing. **Pending** until that runs: lines outside Japji open in
-their shabad, as before.
+service-role key; `-- --dry-run` reports matches without writing. Ran 2026-10-16: 6,664 passages across 104 banis,
+4 bani verses unmatched (BaniDB spelling variants).
 
