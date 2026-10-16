@@ -1,5 +1,8 @@
-import { VIEWS, defaultSources, lineParts, placeLabel, type LineContext, type ViewId } from "@/lib/line-context";
-import { GRID_ID, ResourcePicker, gridAttributes, sourceLabel, type PickerState } from "./ResourcePicker";
+import {
+  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, placeLabel, sourceLabel,
+  type LineContext, type PickerState, type ViewId,
+} from "@/lib/line-context";
+import { ResourcePicker } from "./ResourcePicker";
 
 // The Gurbani viewer (#146): a split view, Gurbani on the left and the chosen
 // resources on the right, one row per line so each line sits level with its

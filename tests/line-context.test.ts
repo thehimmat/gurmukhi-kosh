@@ -127,8 +127,24 @@ describe("ResourcePicker", () => {
   });
 
   it("marks the grid with the view and each shown source", async () => {
-    const { gridAttributes } = await import("../components/line/ResourcePicker");
+    const { gridAttributes } = await import("../lib/line-context");
     expect(gridAttributes({ view: "commentary", on: { translation: ["banidb_en"], commentary: ["ss_darpan", "faridkot"] } }))
       .toEqual({ "data-view": "commentary", "data-on-ss_darpan": "1", "data-on-faridkot": "1" });
+  });
+});
+
+// A server component can render a client component but not call its
+// functions: LineView calling gridAttributes() from the "use client" picker
+// 500'd every /line page in production. Client modules export components only.
+describe("viewer client boundary", () => {
+  it("'use client' modules under components/line export only components", async () => {
+    const { readdirSync, readFileSync } = await import("node:fs");
+    const dir = "components/line";
+    for (const f of readdirSync(dir)) {
+      const src = readFileSync(`${dir}/${f}`, "utf8");
+      if (!/^["']use client["']/.test(src.trimStart())) continue;
+      const exported = [...src.matchAll(/export\s+(?:async\s+)?(?:function|const|let)\s+(\w+)/g)].map((m) => m[1]);
+      for (const name of exported) expect(name, `${f} exports ${name}`).toMatch(/^[A-Z]/);
+    }
   });
 });

@@ -92,6 +92,25 @@ export function defaultSources(view: ViewId, present: Set<string>): string[] {
   return present.has("ssk_en") ? own.filter((s) => s !== BANIDB_EN) : own;
 }
 
+// ─── Picker state, shared by the server view and the client picker ───────────
+
+export const GRID_ID = "viewer-lines";
+
+export type PickerState = { view: ViewId; on: Partial<Record<ViewId, string[]>> };
+
+/** The grid attributes for a state: data-view, and data-on-<code> per shown source. */
+export function gridAttributes(state: PickerState): Record<string, string> {
+  const attrs: Record<string, string> = { "data-view": state.view };
+  for (const code of state.on[state.view] ?? []) attrs[`data-on-${code}`] = "1";
+  return attrs;
+}
+
+/** A source's label: its name and, shortened, its author. */
+export function sourceLabel(src: ResourceSource): string {
+  const who = src.author?.replace(/\s*\(.*\)$/, "").replace(/,.*$/, "");
+  return who ? `${src.name} · ${who}` : src.name;
+}
+
 export type Resource = {
   line_id: number;
   source_code: string;
