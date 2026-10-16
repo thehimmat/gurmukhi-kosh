@@ -1,5 +1,5 @@
 import {
-  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, placeLabel, sourceLabel,
+  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, placeLabel, sourceLabel, viewerCss,
   type LineContext, type PickerState, type ViewId,
 } from "@/lib/line-context";
 import { vishraamSets, wordMarks } from "@/lib/vishraam";
@@ -30,9 +30,8 @@ export function LineView({ ctx }: { ctx: LineContext }) {
     on: Object.fromEntries(VIEWS.map((v) => [v.id, defaultSources(v.id, present)])) as Record<ViewId, string[]>,
   };
   // A source shows when the grid carries data-on-<code>; the picker sets them.
-  const css = ctx.sources
-    .map((s) => `#${GRID_ID}[data-on-${s.code}="1"] .viewer-res[data-src="${s.code}"]{display:block}`)
-    .join("");
+  const css = viewerCss(ctx.sources.map((s) => s.code));
+  const hasResources = ctx.sources.length > 0;
   const sourceByCode = new Map(ctx.sources.map((s) => [s.code, s]));
   // Vishraam (#217): each marked word carries every set's kind
   // (data-igurbani="v", …); the grid's data-vishraam picks the set CSS colours.
@@ -106,7 +105,9 @@ export function LineView({ ctx }: { ctx: LineContext }) {
 
       <div className="viewer-row viewer-controls">
         <div><VishraamPicker sets={sets} initial={vishraamInitial} /></div>
-        <ResourcePicker sources={ctx.sources} initial={initial} />
+        {hasResources
+          ? <ResourcePicker sources={ctx.sources} initial={initial} />
+          : <p className="viewer-none">No translations or commentaries for this passage yet.</p>}
       </div>
       <style>{css}</style>
 
@@ -132,7 +133,7 @@ export function LineView({ ctx }: { ctx: LineContext }) {
                   <p style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem" }}>{line.transliteration_en}</p>
                 )}
               </div>
-              <div>
+              <div className="viewer-cell">
                 {(ctx.resources.get(line.id) ?? []).map((r) => {
                   const src = sourceByCode.get(r.source_code);
                   return (
@@ -147,6 +148,7 @@ export function LineView({ ctx }: { ctx: LineContext }) {
                     </div>
                   );
                 })}
+                {hasResources && <p className="viewer-empty">Not in the selected sources for this line.</p>}
               </div>
             </div>
           </div>

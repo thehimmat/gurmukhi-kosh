@@ -112,6 +112,56 @@ export function gridAttributes(state: PickerState): Record<string, string> {
   return attrs;
 }
 
+// What the reader changed (#224), remembered per browser: the last view, and
+// each source they switched on or off by hand. Untouched sources follow each
+// page's default, so a source a later page has (or a new one) still shows.
+export type ViewerPrefs = { view?: ViewId; choices: Record<string, boolean> };
+
+/** Stored prefs, keeping only a known view and boolean choices for known sources. */
+export function parseViewerPrefs(raw: unknown): ViewerPrefs {
+  const prefs: ViewerPrefs = { choices: {} };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return prefs;
+  const { view, choices } = raw as { view?: unknown; choices?: unknown };
+  if (VIEWS.some((v) => v.id === view)) prefs.view = view as ViewId;
+  if (choices && typeof choices === "object" && !Array.isArray(choices)) {
+    for (const [code, on] of Object.entries(choices)) {
+      if (ORDER.includes(code) && typeof on === "boolean") prefs.choices[code] = on;
+    }
+  }
+  return prefs;
+}
+
+/** Prefs with one more hand-made choice. */
+export function withChoice(prefs: ViewerPrefs, code: string, on: boolean): ViewerPrefs {
+  return { ...prefs, choices: { ...prefs.choices, [code]: on } };
+}
+
+/** A page's default state with the reader's choices laid over it. */
+export function applyViewerPrefs(initial: PickerState, prefs: ViewerPrefs, present: Set<string>): PickerState {
+  const has = (id: ViewId) => VIEWS.find((v) => v.id === id)!.sources.some((s) => present.has(s));
+  const on: PickerState["on"] = {};
+  for (const v of VIEWS) {
+    const dflt = new Set(initial.on[v.id] ?? []);
+    on[v.id] = v.sources.filter((s) => present.has(s) && (prefs.choices[s] ?? dflt.has(s)));
+  }
+  return { view: prefs.view && has(prefs.view) ? prefs.view : initial.view, on };
+}
+
+/**
+ * The grid's CSS: a source shows when the grid carries data-on-<code>, and a
+ * line's "nothing here" note shows while some source is on but none of the
+ * shown ones has this line.
+ */
+export function viewerCss(codes: string[]): string {
+  const g = `#${GRID_ID}`;
+  return codes.map((c) => {
+    const on = `${g}[data-on-${c}="1"]`;
+    return `${on} .viewer-res[data-src="${c}"]{display:block}`
+      + `${on} .viewer-empty{display:block}`
+      + `${on} .viewer-cell:has(> .viewer-res[data-src="${c}"]) > .viewer-empty{display:none}`;
+  }).join("");
+}
+
 /** A source's label: its name and, shortened, its author. */
 export function sourceLabel(src: ResourceSource): string {
   const who = src.author?.replace(/\s*\(.*\)$/, "").replace(/,.*$/, "");
@@ -138,6 +188,7 @@ export function resourcesByLine(rows: Resource[]): Map<number, Resource[]> {
   const byLine = new Map<number, Resource[]>();
   for (const r of rows) {
     const list = byLine.get(r.line_id) ?? [];
+    if (list.some((x) => x.source_code === r.source_code)) continue;
     list.push(r);
     byLine.set(r.line_id, list);
   }

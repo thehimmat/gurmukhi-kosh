@@ -143,3 +143,17 @@ a:hover {
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
 }
+/* Empty states (#224): a line none of the shown sources has, and a passage
+   or view with nothing to show. viewerCss() reveals .viewer-empty per line. */
+.viewer-empty {
+  display: none;
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.viewer-none {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GRID_ID, VIEWS, gridAttributes, sourceLabel, type PickerState, type ResourceSource, type ViewId } from "../../lib/line-context";
+import {
+  GRID_ID, VIEWS, applyViewerPrefs, gridAttributes, parseViewerPrefs, sourceLabel, withChoice,
+  type PickerState, type ResourceSource, type ViewId, type ViewerPrefs,
+} from "../../lib/line-context";
 
 // The right-hand pane's controls (#146): which view (Translation, Punjabi
 // commentary, …) and, within it, which sources. Every resource is already in
 // the page; this only sets attributes on the line grid that CSS reads, so
-// switching is instant and the page stays cacheable. Remembered per browser.
+// switching is instant and the page stays cacheable. Only what the reader
+// changes is remembered (#224), so each page keeps its own defaults otherwise.
 // Only the component is exported: a server component can render it but can't
 // call a function from this "use client" module (the grid helpers it shares
 // with LineView live in lib/line-context.ts).
-const KEY = "viewer.resources";
+const KEY = "viewer.prefs";
+// The pre-#224 snapshot of every on-list; it can't tell choices from defaults.
+const OLD_KEY = "viewer.resources";
 
 function apply(state: PickerState) {
   const el = document.getElementById(GRID_ID);
@@ -19,34 +25,41 @@ function apply(state: PickerState) {
   for (const [k, v] of Object.entries(gridAttributes(state))) el.setAttribute(k, v);
 }
 
+function load(): ViewerPrefs {
+  try {
+    localStorage.removeItem(OLD_KEY);
+    return parseViewerPrefs(JSON.parse(localStorage.getItem(KEY) ?? "null"));
+  } catch {
+    return { choices: {} };
+  }
+}
+
 export function ResourcePicker({ sources, initial }: { sources: ResourceSource[]; initial: PickerState }) {
   const [state, setState] = useState<PickerState>(initial);
+  const [prefs, setPrefs] = useState<ViewerPrefs>({ choices: {} });
   const present = new Set(sources.map((s) => s.code));
   const views = VIEWS.filter((v) => v.sources.some((s) => present.has(s)));
 
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY) ?? "null") as PickerState | null;
-      if (saved?.view && saved.on && views.some((v) => v.id === saved.view)) {
-        const merged: PickerState = { view: saved.view, on: { ...initial.on, ...saved.on } };
-        setState(merged);
-        apply(merged);
-      }
-    } catch {}
-    // Once, on load: a saved choice replaces the server's default.
+    const saved = load();
+    const merged = applyViewerPrefs(initial, saved, present);
+    setPrefs(saved);
+    setState(merged);
+    apply(merged);
+    // Once, on load: the reader's choices over this page's defaults.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function update(next: PickerState) {
+  function update(nextPrefs: ViewerPrefs) {
+    const next = applyViewerPrefs(initial, nextPrefs, present);
+    setPrefs(nextPrefs);
     setState(next);
     apply(next);
-    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+    try { localStorage.setItem(KEY, JSON.stringify(nextPrefs)); } catch {}
   }
 
   function toggle(view: ViewId, code: string) {
-    const cur = state.on[view] ?? [];
-    const on = cur.includes(code) ? cur.filter((c) => c !== code) : [...cur, code];
-    update({ ...state, on: { ...state.on, [view]: on } });
+    update(withChoice(prefs, code, !(state.on[view] ?? []).includes(code)));
   }
 
   if (views.length === 0) return null;
@@ -63,7 +76,7 @@ export function ResourcePicker({ sources, initial }: { sources: ResourceSource[]
               type="button"
               role="tab"
               aria-selected={on}
-              onClick={() => update({ ...state, view: v.id })}
+              onClick={() => update({ ...prefs, view: v.id })}
               style={{
                 border: "none", background: "none", padding: "0.4rem 0", cursor: "pointer",
                 fontWeight: on ? 600 : 400,
@@ -93,6 +106,9 @@ export function ResourcePicker({ sources, initial }: { sources: ResourceSource[]
           );
         })}
       </div>
+      {(state.on[current.id] ?? []).length === 0 && (
+        <p className="viewer-none">All sources are hidden. Choose one above to show it.</p>
+      )}
     </div>
   );
 }
