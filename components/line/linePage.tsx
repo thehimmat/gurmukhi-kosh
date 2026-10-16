@@ -4,7 +4,7 @@ import { pageTitle } from "@/lib/site";
 import { fetchLineContext, type Scope } from "@/lib/line-context";
 import { LineView } from "./LineView";
 
-// Shared by /line/<id> (scope: shabad) and /line/<id>/ang (scope: ang).
+// Shared by /line/<id> (scope: passage) and /line/<id>/ang (scope: ang).
 const parseLineId = (s: string) => (/^\d+$/.test(s) ? Number(s) : null);
 
 export async function lineMetadata(idParam: string, scope: Scope): Promise<Metadata> {

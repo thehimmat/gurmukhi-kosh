@@ -270,3 +270,8 @@ service-role writer the ingest uses (#217). Applied. The marks come from `npm ru
 `npm run ingest:vishraam -- --source=dasam_banidb_v2`, which need the service-role key. **Pending** until that runs:
 the viewer shows no Vishraam control for a passage without marks.
 
+Migration 059 adds `banis` and `passages`: each BaniDB bani's paragraphs matched to our lines by page and text (#220).
+Applied. Japji (bani 2, 43 passages) is seeded. The rest come from `npm run ingest:passages`, which needs the
+service-role key; `-- --dry-run` reports matches without writing. **Pending** until that runs: lines outside Japji open in
+their shabad, as before.
+

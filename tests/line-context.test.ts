@@ -58,7 +58,19 @@ describe.skipIf(!process.env.NEXT_PUBLIC_SUPABASE_URL)("fetchLineContext (live)"
     expect(codes).toContain("banidb_en");
     expect(codes).toContain("ss_darpan");
     expect(codes.indexOf("manmohan_en")).toBeLessThan(codes.indexOf("ss_darpan"));
-    expect(ctx!.scope).toBe("shabad");
+    expect(ctx!.scope).toBe("passage");
+    // Japji's paragraph here is the whole shabad, so the shabad stands.
+    expect(ctx!.passage).toBeNull();
+  });
+
+  it("opens a line in Japji's first shabad in its own passage (#220)", async () => {
+    const { fetchLineContext } = await import("../lib/line-context");
+    // Shabad 1 holds the Mul Mantar, ॥ਜਪੁ॥, the salok and Pauri 1 (verses 5-10).
+    const ctx = await fetchLineContext(7);
+    expect(ctx!.lines.map((l) => l.id)).toEqual([5, 6, 7, 8, 9, 10]);
+    expect(ctx!.passage).toMatchObject({ bani_id: 2, ordinal: 4 });
+    expect(ctx!.prevId).toBe(4);
+    expect(ctx!.nextId).toBe(11);
   });
 
   it("reads the whole ang in the ang scope", async () => {

@@ -61,19 +61,38 @@ export async function fetchShabad(shabadId: number) {
 }
 
 // A bani (e.g. Japji Sahib) groups verses across angs. Each entry nests the
-// verse under a `verse` key; `verseId` matches our `lines.verse_id`.
+// verse under a `verse` key. Its `verseId` is NOT our `lines.verse_id`: the
+// banis endpoint numbers verses its own way (Japji's Mul Mantar is 12 here,
+// 1 from /angs), so match by page and text (lib/passages.ts). `paragraph`
+// numbers the units the bani is read in (#220).
 export type BaniDBBaniVerse = {
+  paragraph?: number;
+  header?: number;
   verse: {
     verseId: number;
     pageNo: number;
     lineNo: number;
+    verse?: { gurmukhi: string; unicode: string };
   };
 };
 
 export type BaniDBBani = {
-  baniInfo: unknown;
+  baniInfo: {
+    baniID?: number;
+    unicode?: string;
+    english?: string;
+    source?: { sourceId?: BaniDBSourceId | "A" };
+  } | null;
   verses: BaniDBBaniVerse[];
 };
+
+export type BaniDBBaniListing = { ID: number; token: string; gurmukhiUni: string; transliteration?: string };
+
+export async function fetchBanis(): Promise<BaniDBBaniListing[]> {
+  const res = await fetch(`${BASE_URL}/banis`, { headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error(`BaniDB fetch failed for the bani list: ${res.status}`);
+  return res.json();
+}
 
 export async function fetchBani(baniId: number): Promise<BaniDBBani> {
   const res = await fetch(`${BASE_URL}/banis/${baniId}`, {
