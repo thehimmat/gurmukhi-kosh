@@ -17,6 +17,9 @@ export type BaniDBVerse = {
   transliteration: {
     english: string;
   };
+  // Pause marks per set; p is the word index (sometimes a string), t "v"
+  // (main) or "y" (yamki). Normalised by lib/vishraam.ts.
+  visraam?: Record<string, { p: number | string; t: string }[]>;
   pageNo: number;
   lineNo: number;
   writer: {

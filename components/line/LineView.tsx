@@ -2,7 +2,9 @@ import {
   GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, placeLabel, sourceLabel,
   type LineContext, type PickerState, type ViewId,
 } from "@/lib/line-context";
+import { splitLastLetter, vishraamSets, wordMarks } from "@/lib/vishraam";
 import { ResourcePicker } from "./ResourcePicker";
+import { VishraamPicker } from "./VishraamPicker";
 
 // The Gurbani viewer (#146): a split view, Gurbani on the left and the chosen
 // resources on the right, one row per line so each line sits level with its
@@ -32,6 +34,10 @@ export function LineView({ ctx }: { ctx: LineContext }) {
     .map((s) => `#${GRID_ID}[data-on-${s.code}="1"] .viewer-res[data-src="${s.code}"]{display:block}`)
     .join("");
   const sourceByCode = new Map(ctx.sources.map((s) => [s.code, s]));
+  // Vishraam (#217): each marked word's last letter carries every set's kind
+  // (data-igurbani="v", …); the grid's data-vishraam picks the set CSS colours.
+  const sets = vishraamSets(ctx.lines.map((l) => l.vishraam));
+  const vishraamInitial = sets[0] ?? "off";
 
   // In an ang view, each shabad the ang holds gets its own small heading.
   const headingFor = (i: number) => {
@@ -93,23 +99,29 @@ export function LineView({ ctx }: { ctx: LineContext }) {
       </header>
 
       <div className="viewer-row viewer-controls">
-        <div />
+        <div><VishraamPicker sets={sets} initial={vishraamInitial} /></div>
         <ResourcePicker sources={ctx.sources} initial={initial} />
       </div>
       <style>{css}</style>
 
-      <div id={GRID_ID} {...gridAttributes(initial)}>
+      <div id={GRID_ID} {...gridAttributes(initial)} data-vishraam={vishraamInitial}>
         {ctx.lines.map((line, i) => (
           <div key={line.id}>
             {headingFor(i)}
             <div id={`line-${line.id}`} className="viewer-row viewer-line">
               <div>
                 <p className="gurmukhi-lg" style={{ marginBottom: "0.15rem" }}>
-                  {lineParts(line.gurmukhi).map((part, j) =>
-                    part.word
-                      ? <a key={j} className="viewer-word" href={`/word/${encodeURIComponent(part.word)}`}>{part.text}</a>
-                      : <span key={j}>{part.text}</span>,
-                  )}
+                  {lineParts(line.gurmukhi).map((part, j) => {
+                    if (!part.word) return <span key={j}>{part.text}</span>;
+                    const marks = wordMarks(line.vishraam, part.i ?? -1);
+                    const [head, tail] = marks ? splitLastLetter(part.text) : [part.text, ""];
+                    const data = marks ? Object.fromEntries(Object.entries(marks).map(([k, v]) => [`data-${k}`, v])) : {};
+                    return (
+                      <a key={j} className="viewer-word" href={`/word/${encodeURIComponent(part.word)}`}>
+                        {head}{tail && <span className="vishraam" {...data}>{tail}</span>}
+                      </a>
+                    );
+                  })}
                 </p>
                 {line.transliteration_en && (
                   <p style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.9rem" }}>{line.transliteration_en}</p>

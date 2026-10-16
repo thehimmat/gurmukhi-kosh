@@ -14,11 +14,11 @@ describe("lineParts", () => {
 
   it("links the word, not a danda stuck to it", () => {
     const parts = lineParts("ਮਹਤੁ॥");
-    expect(parts).toEqual([{ text: "ਮਹਤੁ", word: "ਮਹਤੁ" }, { text: "॥" }]);
+    expect(parts).toEqual([{ text: "ਮਹਤੁ", word: "ਮਹਤੁ", i: 0 }, { text: "॥" }]);
   });
 
   it("leaves ੴ and verse numbers unlinked", () => {
-    expect(lineParts("ੴ ॥੨॥").filter((p) => p.word)).toEqual([{ text: "ੴ", word: "ੴ" }]);
+    expect(lineParts("ੴ ॥੨॥").filter((p) => p.word)).toEqual([{ text: "ੴ", word: "ੴ", i: 0 }]);
   });
 });
 

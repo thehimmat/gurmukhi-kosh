@@ -265,3 +265,8 @@ drop index if exists lines_first_letters;        -- 044, superseded by lines_fir
 drop index if exists lines_first_letters_fold1;  -- 047, superseded by lines_first_letters_fold1_cover (051)
 drop index if exists lines_first_letters_fold2;  -- 047, superseded by lines_first_letters_fold2_cover (051)
 ```
+Migration 058 adds `lines.vishraam` (jsonb: per set, word index → `v`/`y`) and `set_lines_vishraam(jsonb)`, the
+service-role writer the ingest uses (#217). Applied. The marks come from `npm run ingest:vishraam` (all of SGGS) and
+`npm run ingest:vishraam -- --source=dasam_banidb_v2`, which need the service-role key. **Pending** until that runs:
+the viewer shows no Vishraam control for a passage without marks.
+
