@@ -163,6 +163,8 @@ const toAsciiNumber = (g: string) => String(toInt(g));
 /**
  * Sarbloh shabad ids are SARBLOH_SHABAD_BASE + 1, + 2, ... in reading order. The shared shabads table
  * holds SGGS (1-5540), Dasam Bani (7402+), Bhai Gurdas (40001+) and a few BaniDB ids up to 555569.
+ * These ids are ours, assigned internally (no source publishes Sarbloh shabad ids), and nothing
+ * reserves the range: a source loaded later could use ids here and clash (see migration 061).
  */
 export const SARBLOH_SHABAD_BASE = 900000;
 
