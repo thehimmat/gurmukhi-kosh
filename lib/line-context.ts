@@ -1,6 +1,6 @@
 // The line viewer (/line/[id], #146): one line of Gurbani read in its context,
-// the whole shabad around it (or, for Sri Sarbloh Granth, which has no shabad
-// ids, the whole ang), with the previous and next shabad a click away.
+// the whole shabad around it (for Sri Sarbloh Granth, its chhand run or titled
+// section, migration 060), with the previous and next shabad a click away.
 //
 // Reading order within a scripture is verse_id: (ang, line_no) is not unique,
 // since one printed line holds several verses (gurmukhi-search#46).
@@ -232,8 +232,8 @@ function must<T>(r: { data: T; error: { message: string } | null }, what: string
 
 /**
  * A line with the passage around it ("passage": its shabad, or the smaller
- * bani passage holding it; Sri Sarbloh Granth, which has neither, reads by
- * ang) or its whole ang ("ang").
+ * bani passage holding it; a line with neither reads by ang) or its whole ang
+ * ("ang").
  */
 export async function fetchLineContext(id: number, scope: Scope = "passage"): Promise<LineContext | null> {
   const line = must(await supabase

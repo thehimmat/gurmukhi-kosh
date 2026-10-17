@@ -96,6 +96,8 @@ export function refDigits(ref: string): string {
 export interface CorpusLine {
   gurmukhi: string;
   ang: number;
+  /** SARBLOH_SHABAD_BASE + the line's section number (sectionIndexes), counting from 1. */
+  shabad_id: number;
   /** Characters cleanText dropped, for the ingest report. */
   dropped?: string[];
 }
@@ -142,11 +144,145 @@ export function toLines(padas: PagedPada[]): CorpusLine[] {
       items.push({ words, refs, ang: p.page, dropped: k === 0 ? dropped : [] });
     });
   }
-  return items.map((it) => ({
+  const lines = items.map((it) => ({
     gurmukhi: `${it.words.join(" ")} ${it.refs.length ? refDigits(it.refs.join(".")) : "॥"}`,
     ang: it.ang,
     ...(it.dropped.length ? { dropped: it.dropped } : {}),
   }));
+  const sections = sectionIndexes(lines);
+  return lines.map((l, k) => ({ ...l, shabad_id: SARBLOH_SHABAD_BASE + 1 + sections[k] }));
 }
 
 const toAsciiNumber = (g: string) => String(toInt(g));
+
+// ---------------------------------------------------------------------------------------------
+// Sections (shabad_id): one per run of one chhand, or per titled section, as Dasam Bani has them
+// from BaniDB. Migration 060 applies the same rules in SQL to the rows already loaded; keep the
+// word lists below and its arrays the same (tests/sarbloh-sections.test.ts checks).
+
+/**
+ * Sarbloh shabad ids are SARBLOH_SHABAD_BASE + 1, + 2, ... in reading order. The shared shabads table
+ * holds SGGS (1-5540), Dasam Bani (7402+), Bhai Gurdas (40001+) and a few BaniDB ids up to 555569.
+ */
+export const SARBLOH_SHABAD_BASE = 900000;
+
+/** Chhand names (as typed, with variants) → the chhand they name, so a run survives spelling changes. */
+export const CHHANDS: Record<string, string> = {
+  ਚੌਪਈ: "ਚੌਪਈ", ਚੁਪਈ: "ਚੌਪਈ", ਚਉਪਈ: "ਚੌਪਈ", ਚਰਪਈ: "ਚੌਪਈ", ਚੌਪਾਈ: "ਚੌਪਈ",
+  ਦੋਹਰਾ: "ਦੋਹਰਾ", ਦੋਹਿਰਾ: "ਦੋਹਰਾ", ਦੋਹਾ: "ਦੋਹਰਾ",
+  ਸੋਰਠਾ: "ਸੋਰਠਾ",
+  ਛਪਯ: "ਛਪਯ", ਛਪੈ: "ਛਪਯ",
+  ਕਬਿੱਤ: "ਕਬਿੱਤ", ਕਬਿਤ: "ਕਬਿੱਤ", ਕਵਿਤ: "ਕਬਿੱਤ", ਕਬਿਤੁ: "ਕਬਿੱਤ",
+  ਸ੍ਵੈਯਾ: "ਸ੍ਵੈਯਾ", ਸਵੈਯਾ: "ਸ੍ਵੈਯਾ", ਸਵੱਯਾ: "ਸ੍ਵੈਯਾ",
+  ਨਰਾਜ: "ਨਰਾਜ", ਨਰਾਚ: "ਨਰਾਜ",
+  ਭੁਜੰਗ: "ਭੁਜੰਗ",
+  ਅੜਿਲ: "ਅੜਿਲ", ਅੜਿੱਲ: "ਅੜਿਲ",
+  ਤ੍ਰਿਭੰਗੀ: "ਤ੍ਰਿਭੰਗੀ", ਤਿਭੰਗੀ: "ਤ੍ਰਿਭੰਗੀ",
+  ਰਸਾਵਲ: "ਰਸਾਵਲ", ਤੋਮਰ: "ਤੋਮਰ", ਪਾਧੜੀ: "ਪਾਧੜੀ", ਝੂਲਨਾ: "ਝੂਲਨਾ", ਰੇਖਤਾ: "ਰੇਖਤਾ",
+  ਸਲੋਕ: "ਸਲੋਕ", ਪਉੜੀ: "ਪਉੜੀ", ਕਲਸ: "ਕਲਸ",
+  ਚਰਪਦ: "ਚਰਪਦ", ਚਰਪਦਾ: "ਚਰਪਦ", ਚਤੁਰਪਦ: "ਚਰਪਦ", ਚਉਪਦਾ: "ਚਰਪਦ",
+  // A chhand the header names after these; the whole header stands for it.
+  ਛੰਦ: "", ਛੰਤ: "",
+};
+/** Chhand names the typist sometimes cut short; a header only when they are the whole line. */
+export const CHHAND_LINES: Record<string, string> = { ਪਈ: "ਚੌਪਈ" };
+/** Lines that open or label a stretch without naming a chhand: never a split, never the end of one. */
+export const LABEL_LINES = ["ਸਾਨੀ", "ਮਲਾਰ", "ਮਲ੍ਹਾਰ", "ਸਮ"];
+/** Lines that finish the verse before them (॥੧॥ ਰਹਾਉ ॥), so stay in its section. */
+export const TRAILER_LINES = ["ਰਹਾਉ"];
+/** Words that mark a speaker (… ਬਾਚ) or an invocation (… ਜੀ ਸਹਾਇ, … ਕੀ ਫਤਿਹ). */
+export const LABEL_ENDINGS = ["ਬਾਚ", "ਵਾਚ", "ਸਹਾਇ", "ਫਤਿਹ", "ਫ਼ਤਿਹ"];
+/** First words of a colophon (ਇਤਿ ਸ੍ਰੀ … ਸਮਾਪਤਿ), which closes the section it ends. */
+export const COLOPHON_WORDS = ["ਇਤਿ", "ਇਤੀ", "ਇਤ"];
+
+/** Most words a chhand header or a label carries ("ਦੋਹਾ ਪਰਸ ਰਾਮ ਬਾਚ"); verse half-lines run longer. */
+const HEADER_WORDS = 6;
+/** Most words of a numbered label closing a piece (ਦਸਕ ॥੧॥, ਰਹਾਉ ਦੂਜਾ ॥੮॥); a verse's last half-line runs longer. */
+const LABEL_NUMBERED_WORDS = 2;
+const VERSE_NUMBER = /॥([੦-੯]+)(?:॥[੦-੯]+)*॥$/;
+
+type Kind = { kind: "verse" } | { kind: "numbered"; count: number; short: boolean } | { kind: "colophon" } | { kind: "title"; chhand: string }
+  | { kind: "header"; chhand: string } | { kind: "label" } | { kind: "trailer" };
+
+/** The chhand a header names: its first chhand word, or for "ਛੰਦ X" / "X ਛੰਦ", the whole header. */
+function chhandOf(words: string[], text: string): string | null {
+  const known = words.find((w) => CHHANDS[w]);
+  if (known) return CHHANDS[known];
+  return words.some((w) => w in CHHANDS) ? text : null;
+}
+
+function classify(gurmukhi: string): Kind {
+  const words = gurmukhi.replace(/[।॥੦-੯]+/g, " ").trim().split(/\s+/).filter(Boolean);
+  const text = words.join(" ");
+  if (COLOPHON_WORDS.includes(words[0])) return { kind: "colophon" };
+  const n = VERSE_NUMBER.exec(gurmukhi);
+  if (n) return { kind: "numbered", count: toInt(n[1]), short: words.length <= LABEL_NUMBERED_WORDS };
+  if (words.includes("ਅਥ") || words[0]?.startsWith("ਬਿਸਨ")) return { kind: "title", chhand: chhandOf(words, text) ?? text };
+  if (TRAILER_LINES.includes(text)) return { kind: "trailer" };
+  if (CHHAND_LINES[text]) return { kind: "header", chhand: CHHAND_LINES[text] };
+  if (words.length <= HEADER_WORDS) {
+    const chhand = chhandOf(words, text);
+    if (chhand) return { kind: "header", chhand };
+  }
+  if (LABEL_LINES.includes(text) || words.includes("ੴ") || (words.length <= HEADER_WORDS && LABEL_ENDINGS.some((e) => words.some((w) => w.endsWith(e))))) {
+    return { kind: "label" };
+  }
+  return { kind: "verse" };
+}
+
+/**
+ * The section (0, 1, 2, ...) each line belongs to. Headers count only between verses (after a
+ * numbered line, a colophon, or another header or label), and a section starts at the first of the
+ * header and label lines before its first verse:
+ *   - a title (ਅਥ …, ਬਿਸਨੁਪਦ …) always starts one;
+ *   - a chhand header starts one when it names another chhand than the run it follows, so the
+ *     "ਦੋਹਾ ॥" repeated before each couplet of a run stays in it;
+ *   - a colophon ends one, so whatever header follows starts the next;
+ *   - with no header, a verse count back at ੧ starts one at that verse;
+ *   - ਰਹਾਉ, or a short numbered label (ਦਸਕ ॥੧॥) right after a verse, stays with that verse.
+ * A section takes no split before its first verse, so a title block (ੴ …, ਅਥ …, ਦੋਹਰਾ) is one start.
+ */
+export function sectionIndexes(lines: Array<{ gurmukhi: string }>): number[] {
+  const starts = new Set<number>([0]);
+  let run: string | null = null; // chhand of the current run
+  let versed = false; // the current section has a numbered line
+  let between = true; // the line before ended a verse, or was a header, label or colophon
+  let blockStart = 0; // first line after the last verse: where a split here would start
+  let blockSplit = false; // a section already starts at blockStart
+  const split = () => {
+    starts.add(blockStart);
+    versed = false;
+    blockSplit = true;
+  };
+  lines.forEach(({ gurmukhi }, i) => {
+    const k = classify(gurmukhi);
+    // A short numbered line right after a verse labels the piece it closes, like ਰਹਾਉ.
+    if (k.kind === "numbered" && k.short && between) {
+      if (!blockSplit) blockStart = i + 1;
+      return;
+    }
+    if (k.kind === "colophon" || k.kind === "numbered") {
+      if (k.kind === "numbered" && k.count === 1 && versed && !blockSplit) split();
+      if (k.kind === "numbered") versed = true;
+      else run = null;
+      between = true;
+      blockStart = i + 1;
+      blockSplit = false;
+      return;
+    }
+    if (!between || k.kind === "verse") {
+      between = false;
+      return;
+    }
+    if (k.kind === "trailer") {
+      if (!blockSplit) blockStart = i + 1;
+      return;
+    }
+    if (k.kind === "title" || k.kind === "header") {
+      if (versed && !blockSplit && (k.kind === "title" || k.chhand !== run)) split();
+      if (!versed) run = k.chhand;
+    }
+  });
+  let section = -1;
+  return lines.map((_, i) => (starts.has(i) ? ++section : section));
+}
