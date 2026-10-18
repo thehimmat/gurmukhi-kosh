@@ -56,6 +56,11 @@ transliteration, one row per misra.
    loads them (`pipeline/shared/load-sql.ts`). It prints the line, ghazal, sher and token counts.
 3. Apply migration 063, run `<load.sql>`, then `refresh_word_frequencies`,
    `refresh_word_corpus_stats`, `refresh_word_corpus_writer_stats` and `refresh_line_first_letters`.
+4. Fill the new words' `ipa_display` and `search_fold` (`npm run pronounce`, `npm run searchfold`):
+   `tests/stories/us-001` fails once 100 words lack IPA.
+5. `vacuum (analyze) lines`. 063's `corpus_rank` change rewrites `lines`, and until the vacuum, first-letter search
+   is slow enough to time out.
+6. Retake the whole-corpus counts pinned in `tests/first-letter-search.test.ts`.
 
 **Loaded 2026-10-18** (`source_fk` 6): 722 lines, 63 shabads, 5,099 occurrences of 1,802 words (1,169 of them
 new to `words`).
