@@ -277,3 +277,18 @@ This is an internal decision (maintainer, 2026-10-17), not a sourced attribution
 (900001+, 060) are assigned internally and could clash with a source loaded later; check the range first. Applied
 2026-10-17: 1,564 shabads; `word_writer_stats` refreshed (16,365 → 137,468 rows: it had not been refreshed since the
 Dasam and Bhai Gurdas loads) and `word_corpus_writer_stats` rebuilt (no Sarbloh rows left without a writer).
+
+Migration 062 fixes two Sarbloh section rules (#236): a numbered ਬਿਸਨੁਪਦ / ਅਥ heading (ਬਿਸਨੁਪਦ ਛੰਦ ਕਾਲੰਕਾ ਘਰ ॥੧॥)
+is a title, and a ਬਿਸਨੁਪਦ heading is matched by its spellings, not by any word starting ਬਿਸਨ (ਬਿਸਨੁ, Vishnu). 1,564
+sections became 1,559, renumbered 900001-901559 (maintainer decision: contiguous, as build:sarbloh assigns; cached
+Sarbloh shabad_ids are stale). Applied 2026-10-18. The 35,723 moved lines were updated in four batches by line_no
+first (one statement over all of them outran the MCP's 60 s), then the migration ran with nothing left to move.
+`id`, `verse_id`, `line_no`, `ang` unchanged (same checksum); the rows match the new function exactly.
+
+**Done 2026-10-18** from the dashboard SQL editor (the MCP holds DELETE for a confirmation that times out): removed
+the five retired shabads rows, 901560-901564, which no line used. 1,559 Sarbloh shabads remain, one per section:
+
+```sql
+delete from shabads sh where sh.id >= 900001
+   and not exists (select 1 from lines l where l.shabad_id = sh.id);
+```

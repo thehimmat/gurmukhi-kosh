@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import {
   sectionIndexes, toLines, SARBLOH_SHABAD_BASE,
-  CHHANDS, CHHAND_LINES, LABEL_LINES, TRAILER_LINES, LABEL_ENDINGS, COLOPHON_WORDS,
+  CHHANDS, CHHAND_LINES, LABEL_LINES, TRAILER_LINES, LABEL_ENDINGS, COLOPHON_WORDS, BISANPAD,
 } from "../pipeline/sarbloh/lines";
 import { PAGES_1_2, AYODHYA_KAND } from "./fixtures/sarbloh-sections";
 
@@ -61,6 +61,31 @@ describe("sectionIndexes", () => {
     ])).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1]);
   });
 
+  it("reads a numbered ਬਿਸਨੁਪਦ heading (its part number, ਘਰ ॥੧॥) as the title of the section it opens", () => {
+    // Budha Dal page 392, lines 11986-11994 (shabads 900592-900594 as first loaded).
+    expect(sectionIndexes([
+      { gurmukhi: "ਸੁ ਚਿੱਤ ਏਕ ਨਿਮਖੰ ਜਯੋ ਜਾਪ ਵਯਾਨੰ ॥" },
+      { gurmukhi: "ਜਪੜੋ ਜਾਪ ਮੰਤ੍ਰ ਅਕਾਲੀ ਅਕਾਲੰ ॥੨॥੯॥੩੪੧॥੨੬੬੦॥" },
+      { gurmukhi: "ਬਿਸਨੁਪਦ ਛੰਦ ਕਾਲੰਕਾ ਘਰ ॥੧॥" },
+      { gurmukhi: "ਕਰਰੋ ਹੈ ਨਿਬੇਰੋ ਸੁਰਾ ਸੁਰ ਸੰਗ੍ਰਾਮੰ ॥" },
+      { gurmukhi: "ਧਰਯੋ ਰੂਪ ਪਰਬਲ ਸਰਬਲੋਹ ਨਾਮੰ ॥" },
+      { gurmukhi: "ਲੜਾ ਕਰ ਸੁਰਾ ਸੁਰ ਬਹੁਰ ਆਪ ਮਚਯੋ ॥" },
+      { gurmukhi: "ਰਖਯੋ ਲਾਜ ਦੇਵਨ ਅਸੁਰ ਦੁਸ਼ ਅਚਯੋ ॥੧॥" },
+      { gurmukhi: "ਸਾਨੀ ॥" },
+      { gurmukhi: "ਪ੍ਰਿਥੀ ਭਾਰ ਮੇਟਰੋ ਕਰੀ ਦੇਵ ਰੱਛ ॥" },
+    ])).toEqual([0, 0, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it("does not read a verse that opens with ਬਿਸਨੁ (Vishnu) as a ਬਿਸਨੁਪਦ title", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਚੌਪਈ ॥" },
+      { gurmukhi: "ਪਹਿਲੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਦੂਜੀ ਤੁਕ ਇਹ ਹੈ ॥੧॥" },
+      { gurmukhi: "ਬਿਸਨੁ ਸਭਿ ਬਿਧਿ ਭਲੋ ਕਰਿ ਹੈਂ ॥" },
+      { gurmukhi: "ਠਠੋਂ ਰਨ ਪੁੰਨ ਛੇਤ ਹੀ ॥੨॥" },
+    ])).toEqual([0, 0, 0, 0, 0]);
+  });
+
   it("does not split at a header met mid-verse", () => {
     expect(sectionIndexes([
       { gurmukhi: "ਦੋਹਰਾ ॥" },
@@ -71,9 +96,9 @@ describe("sectionIndexes", () => {
   });
 });
 
-describe("migration 060", () => {
-  // The backfill applies the same rules in SQL; its word lists must match these.
-  const sql = readFileSync("supabase/migrations/060_sarbloh_shabads.sql", "utf8");
+describe("migration 062", () => {
+  // The latest SQL twin of sectionIndexes (060, replaced by 062); its word lists must match these.
+  const sql = readFileSync("supabase/migrations/062_sarbloh_sections_renumber.sql", "utf8");
   const json = (name: string) => JSON.parse(new RegExp(`${name} constant jsonb := '([^']*)'`).exec(sql)![1]);
   const list = (name: string) => [...new RegExp(`${name} constant text\\[\\] := array\\[([^\\]]*)\\]`).exec(sql)![1].matchAll(/'([^']*)'/g)].map((m) => m[1]);
 
@@ -84,6 +109,7 @@ describe("migration 060", () => {
     expect(list("trailer_lines")).toEqual(TRAILER_LINES);
     expect(list("label_endings")).toEqual(LABEL_ENDINGS);
     expect(list("colophon_words")).toEqual(COLOPHON_WORDS);
+    expect(/bisanpad constant text := '([^']*)'/.exec(sql)![1]).toBe(BISANPAD.source);
     expect(sql).toContain("header_words constant int := 6;");
     expect(sql).toContain("label_numbered_words constant int := 2;");
     expect(sql).toContain(`${SARBLOH_SHABAD_BASE + 1} + u.section`);

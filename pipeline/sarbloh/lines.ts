@@ -157,7 +157,7 @@ const toAsciiNumber = (g: string) => String(toInt(g));
 
 // ---------------------------------------------------------------------------------------------
 // Sections (shabad_id): one per run of one chhand, or per titled section, as Dasam Bani has them
-// from BaniDB. Migration 060 applies the same rules in SQL to the rows already loaded; keep the
+// from BaniDB. Migrations 060 and 062 apply the same rules in SQL to the rows already loaded; keep the
 // word lists below and its arrays the same (tests/sarbloh-sections.test.ts checks).
 
 /**
@@ -194,6 +194,12 @@ export const LABEL_LINES = ["ਸਾਨੀ", "ਮਲਾਰ", "ਮਲ੍ਹਾਰ"
 export const TRAILER_LINES = ["ਰਹਾਉ"];
 /** Words that mark a speaker (… ਬਾਚ) or an invocation (… ਜੀ ਸਹਾਇ, … ਕੀ ਫਤਿਹ). */
 export const LABEL_ENDINGS = ["ਬਾਚ", "ਵਾਚ", "ਸਹਾਇ", "ਫਤਿਹ", "ਫ਼ਤਿਹ"];
+/**
+ * The first word of a ਬਿਸਨੁਪਦ heading in the spellings the typist used (ਬਿਸਨੁਪਦ, ਬਿਸਨਪਦ, ਬਿਸਨਪੁਦ,
+ * ਬਿਸ਼ਨੁਪਦ, ਬਿਸਨ੍ਪਦ), but not ਬਿਸਨੁ (Vishnu) or ਬਿਸਨਾਥ opening a verse. Written in escapes so the SQL
+ * twin (migration 062) carries the same pattern.
+ */
+export const BISANPAD = /^\u0A2C\u0A3F(?:\u0A36|\u0A38\u0A3C|\u0A38)\u0A28[\u0A41\u0A4D]?\u0A2A/;
 /** First words of a colophon (ਇਤਿ ਸ੍ਰੀ … ਸਮਾਪਤਿ), which closes the section it ends. */
 export const COLOPHON_WORDS = ["ਇਤਿ", "ਇਤੀ", "ਇਤ"];
 
@@ -203,7 +209,9 @@ const HEADER_WORDS = 6;
 const LABEL_NUMBERED_WORDS = 2;
 const VERSE_NUMBER = /॥([੦-੯]+)(?:॥[੦-੯]+)*॥$/;
 
-type Kind = { kind: "verse" } | { kind: "numbered"; count: number; short: boolean } | { kind: "colophon" } | { kind: "title"; chhand: string }
+type Kind = { kind: "verse" } | { kind: "numbered"; count: number; short: boolean } | { kind: "colophon" }
+  /** count: the number a title carries (ਬਿਸਨੁਪਦ … ਘਰ ॥੧॥), its part rather than a verse. */
+  | { kind: "title"; chhand: string; count?: number }
   | { kind: "header"; chhand: string } | { kind: "label" } | { kind: "trailer" };
 
 /** The chhand a header names: its first chhand word, or for "ਛੰਦ X" / "X ਛੰਦ", the whole header. */
@@ -217,9 +225,12 @@ function classify(gurmukhi: string): Kind {
   const words = gurmukhi.replace(/[।॥੦-੯]+/g, " ").trim().split(/\s+/).filter(Boolean);
   const text = words.join(" ");
   if (COLOPHON_WORDS.includes(words[0])) return { kind: "colophon" };
+  const lead = words[0] === "ੴ" ? words[1] ?? "" : words[0] ?? "";
+  const titled = lead === "ਅਥ" || BISANPAD.test(lead);
   const n = VERSE_NUMBER.exec(gurmukhi);
+  if (n && titled) return { kind: "title", chhand: chhandOf(words, text) ?? text, count: toInt(n[1]) };
   if (n) return { kind: "numbered", count: toInt(n[1]), short: words.length <= LABEL_NUMBERED_WORDS };
-  if (words.includes("ਅਥ") || words[0]?.startsWith("ਬਿਸਨ")) return { kind: "title", chhand: chhandOf(words, text) ?? text };
+  if (titled || words.includes("ਅਥ")) return { kind: "title", chhand: chhandOf(words, text) ?? text };
   if (TRAILER_LINES.includes(text)) return { kind: "trailer" };
   if (CHHAND_LINES[text]) return { kind: "header", chhand: CHHAND_LINES[text] };
   if (words.length <= HEADER_WORDS) {
@@ -236,7 +247,7 @@ function classify(gurmukhi: string): Kind {
  * The section (0, 1, 2, ...) each line belongs to. Headers count only between verses (after a
  * numbered line, a colophon, or another header or label), and a section starts at the first of the
  * header and label lines before its first verse:
- *   - a title (ਅਥ …, ਬਿਸਨੁਪਦ …) always starts one;
+ *   - a title (ਅਥ …, ਬਿਸਨੁਪਦ …, even one carrying its part number) always starts one;
  *   - a chhand header starts one when it names another chhand than the run it follows, so the
  *     "ਦੋਹਾ ॥" repeated before each couplet of a run stays in it;
  *   - a colophon ends one, so whatever header follows starts the next;
@@ -257,7 +268,9 @@ export function sectionIndexes(lines: Array<{ gurmukhi: string }>): number[] {
     blockSplit = true;
   };
   lines.forEach(({ gurmukhi }, i) => {
-    const k = classify(gurmukhi);
+    let k = classify(gurmukhi);
+    // A numbered title is a title only between verses; met mid-verse, its number ends the verse.
+    if (k.kind === "title" && k.count !== undefined && !between) k = { kind: "numbered", count: k.count, short: false };
     // A short numbered line right after a verse labels the piece it closes, like ਰਹਾਉ.
     if (k.kind === "numbered" && k.short && between) {
       if (!blockSplit) blockStart = i + 1;
