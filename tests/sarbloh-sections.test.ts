@@ -86,6 +86,71 @@ describe("sectionIndexes", () => {
     ])).toEqual([0, 0, 0, 0, 0]);
   });
 
+  it("keeps a ਰਹਾਉ refrain with the ਛੰਤ it closes (page 460, lines 15084-15096)", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਛੰਤ ॥" },
+      { gurmukhi: "ਤਾਂ ਤੇ ਰੇ ਮਨ ਢੀਲ ਨ ਕੀਜੈ ॥" },
+      { gurmukhi: "ਹਰਿ ਕਰ ਜਿਹ ਬਿਧ ਮੀਚ ਮਰੀਜੈ ॥" },
+      { gurmukhi: "ਭਲ ਦਾਵ ਅਉਸਰ ਬਨਯੋ ਨੀਕੋ ਬਿਲੰਬ ਸੰਕ ਨ ਕੀਜਿਯੇ ॥" },
+      { gurmukhi: "ਕਰ ਸਮਰ ਸਨਮੁਖ ਜੁੱਧ ਹਰਿ ਸੰਗ ਨ ਹਰਿ ਕਰ ਦੀਜਿਥੈ ॥" },
+      { gurmukhi: "ਹੋਇ ਮੁਕਤਿ ਯਾ ਬਪੁ ਆਸੁਰੀ ਹਰਿ ਪ੍ਰਾਨ ਮ੍ਰਿਤ ਜੈ ਪਾਈਐ ॥" },
+      { gurmukhi: "ਬੇਗ ਉਧਰਨ ਹੋਇ ਯਾ ਤਨ ਹਰਿ ਸਰਨ ਸੀਘਰ ਸਿਧਾਈਐ ॥੧॥" },
+      { gurmukhi: "ਸਭਿ ਮਿਟਹਿ ਕ੍ਰਿਤ ਅਪਕਰਮ ਸਗਰੇ ਪਰਾ ਪੂਰਬਲੇ ਪਾਪ ਹੇ ॥" },
+      { gurmukhi: "ਅਬਿਬੇਕ ਮਾਨੇ ਦੋਖ ਨਸਿਹੈਂ ਮਿਟੇ ਤ੍ਰਿਬਿਧਿ ਤਾਪ ਹੇ ॥੧॥" },
+      { gurmukhi: "ਰਹਾਉ ॥" },
+      { gurmukhi: "ਸਲੋਕ ॥" },
+      { gurmukhi: "ਯਾ ਬਪੁ ਮਲਿਨ ਨਿਸਾਚਰੀ ਅਉਗਨ ਭਯੋ ਮੂਲ ॥" },
+      { gurmukhi: "ਨੀਚ ਕਰਮ ਜੇਤਿਕ ਬਿਦਿਤ ਸੋ ਯਾ ਕੇ ਅਨੁਕੂਲ ॥੧॥" },
+    ])).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]);
+  });
+
+  it("keeps a refrain of several ॥੧॥ lines before a numbered ਰਹਾਉ with its stanza (page 791)", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਚੌਪਈ ॥" },
+      { gurmukhi: "ਪਹਿਲੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਦੂਜੀ ਤੁਕ ਇਹ ਹੈ ॥੨॥੧੭੩॥" },
+      { gurmukhi: "ਸਮੇ ਸਮੇ ਤੋ ਫਲ ਸਭਿ ਪ੍ਰਾਪਤ ਕਾਮ ਕਾਰਿ ਹਰਿ ਪ੍ਰਜਾ ਤੁਮਾਰੋ ॥" },
+      { gurmukhi: "ਐਸੇ ਜੋ ਆਪ ਕਰਮ ਕਰਤਾ ਪੁਰਖੁ ਸ਼ਰਨ ਤੁਮਾਰੀ ਆਦਿ ਨਿਰੰਜਨ ॥੧॥" },
+      { gurmukhi: "ਹੋਹੁ ਪ੍ਰਸੰਨ ਅਖਿਲ ਜਗ ਨਾਯਕ ॥੧॥" },
+      { gurmukhi: "ਰਹਾਉ ॥੩॥੧੭੪॥੧੮੭੩॥੪੧੯੨॥" },
+    ])).toEqual([0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it("still starts a piece that opens SGGS-style, ॥੧॥ then ਰਹਾਉ then ॥੨॥ (page 6, lines 164-170)", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਦੋਹਰਾ ॥" },
+      { gurmukhi: "ਚਾਰ ਬੇਦ ਖਟ ਅਸਟਦਸ ਬਿਧਨਾ ਰਚਿ ਬਿਸਥਾਰ ॥" },
+      { gurmukhi: "ਤੀਨ ਲੋਕ ਰਚਨਾ ਭਈ ਕਰਤਾ ਸਿਰਜਨਹਾਰ ॥੫੨॥" },
+      { gurmukhi: "ਤੁਮ ਬਿਨ ਸਰੇ ਨ ਏਕ ਛਿਨ ਤੁਮ ਸਭ ਜੀਅਨ ਪ੍ਰਾਨ ॥" },
+      { gurmukhi: "ਤੁਮ ਕਰਤਾ ਸਭਿ ਜਗਤ ਕੀ ਤੁਮ ਹੀ ਤੇ ਸਭਿ ਮਾਨ ॥੧॥" },
+      { gurmukhi: "ਰਹਾਉ ॥" },
+      { gurmukhi: "ਦੂਜੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਤੀਜੀ ਤੁਕ ਇਹ ਹੈ ॥੨॥" },
+    ])).toEqual([0, 0, 0, 1, 1, 1, 1, 1]);
+  });
+
+  it("does not start a section at a numbered ਰਹਾਉ line itself", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਚੌਪਈ ॥" },
+      { gurmukhi: "ਪਹਿਲੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਦੂਜੀ ਤੁਕ ਇਹ ਹੈ ॥੨॥੧੨੯॥" },
+      { gurmukhi: "ਹੋਹੁ ਪ੍ਰਸੰਨ ਹੇ ਪੁਰਖ ਸੁਜਾਨ ॥" },
+      { gurmukhi: "ਰਹਾਉ ॥੧॥੩॥੧੩੦॥੧੮੨੯॥੪੧੪੮॥" },
+    ])).toEqual([0, 0, 0, 0, 0]);
+  });
+
+  it("keeps a one-line ॥੧॥ label or colophon with the section it closes", () => {
+    expect(sectionIndexes([
+      { gurmukhi: "ਚੌਪਈ ॥" },
+      { gurmukhi: "ਪਹਿਲੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਦੂਜੀ ਤੁਕ ਇਹ ਹੈ ॥੨੧॥੫੩॥" },
+      { gurmukhi: "ਦਸਕ ਪਦ ਪੁਨਯਾਕੀ ਕੇ ॥੧॥੨੧॥੫੩॥੫੮੫॥੨੯੦੪॥" },
+      { gurmukhi: "ਤੀਜੀ ਤੁਕ ਇਹ ਹੈ ॥" },
+      { gurmukhi: "ਚਉਥੀ ਤੁਕ ਇਹ ਹੈ ॥੨੨॥" },
+      { gurmukhi: "ਅੰਗਦ ਸੰਬਾਦ ਸਮਾਪਤਿ ॥੧॥" },
+    ])).toEqual([0, 0, 0, 0, 0, 0, 0]);
+  });
+
   it("does not split at a header met mid-verse", () => {
     expect(sectionIndexes([
       { gurmukhi: "ਦੋਹਰਾ ॥" },
@@ -96,9 +161,9 @@ describe("sectionIndexes", () => {
   });
 });
 
-describe("migration 062", () => {
-  // The latest SQL twin of sectionIndexes (060, replaced by 062); its word lists must match these.
-  const sql = readFileSync("supabase/migrations/062_sarbloh_sections_renumber.sql", "utf8");
+describe("migration 063", () => {
+  // The latest SQL twin of sectionIndexes (060, replaced by 062, then 063); its word lists must match these.
+  const sql = readFileSync("supabase/migrations/063_sarbloh_refrains.sql", "utf8");
   const json = (name: string) => JSON.parse(new RegExp(`${name} constant jsonb := '([^']*)'`).exec(sql)![1]);
   const list = (name: string) => [...new RegExp(`${name} constant text\\[\\] := array\\[([^\\]]*)\\]`).exec(sql)![1].matchAll(/'([^']*)'/g)].map((m) => m[1]);
 

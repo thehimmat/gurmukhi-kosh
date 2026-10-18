@@ -292,3 +292,21 @@ the five retired shabads rows, 901560-901564, which no line used. 1,559 Sarbloh 
 delete from shabads sh where sh.id >= 900001
    and not exists (select 1 from lines l where l.shabad_id = sh.id);
 ```
+
+Migration 063 keeps Sarbloh refrains and closing labels with their piece (#236): ॥੧॥ refrain lines closed by a ਰਹਾਉ no
+longer start a section (unless the piece opens SGGS-style, ॥੧॥, ਰਹਾਉ, ॥੨॥), and a lone ॥੧॥ label or colophon stays with
+the piece it closes. 1,559 sections became 1,425 (36 of the short ones listed for #236, and 98 longer ones a mid-run
+refrain had split off), renumbered 900001-901425. Applied 2026-10-18, lines moved in four batches first as for 062; `id`,
+`verse_id`, `line_no`, `ang` unchanged (same checksum); the rows match the new function exactly.
+
+Decisions (maintainer, 2026-10-18), on best judgment and open to revision; either way the effect on readers is small:
+fix the refrain and closing-label splits; keep the ਬਿਸਨੁਪਦ ਛੰਤ ਰਾਮਾ pieces of pages 460-470 split at each ਸਲੋਕ and ਛੰਤ, with
+each ਰਹਾਉ refrain joined to the ਛੰਤ it closes.
+
+**To do from the dashboard SQL editor** (the MCP holds DELETE for a confirmation that times out): remove the 134 retired
+shabads rows, 901426-901559, which no line uses:
+
+```sql
+delete from shabads sh where sh.id >= 900001
+   and not exists (select 1 from lines l where l.shabad_id = sh.id);
+```
