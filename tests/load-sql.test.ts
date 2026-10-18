@@ -28,4 +28,12 @@ describe("linesLoadSql", () => {
     const { sql: q } = linesLoadSql("x", [{ ...lines[0], gurmukhi: "ਅ'ਬ" }]);
     expect(q).toContain("'ਅ''ਬ'");
   });
+
+  it("counts words from a source's own word text when given one, keeping the stored line as is", () => {
+    const strip = (t: string) => t.replace(/,/g, " ");
+    const { sql: q, tokens } = linesLoadSql("x", [{ ...lines[0], gurmukhi: "ਹਵਾਏ, ਬੰਦਗੀ ।" }], strip);
+    expect(tokens).toBe(2);
+    expect(q).toContain("'ਹਵਾਏ, ਬੰਦਗੀ ।'");
+    expect(q).toContain("(1, 0, 'ਹਵਾਏ')");
+  });
 });

@@ -1,18 +1,35 @@
 /**
  * Bhai Nand Lal's Ghazals (Diwan-e-Goya) in Gurmukhi, from "Ghazals Bhai Nand Laal Goyaa Complete.pdf"
- * (canonical by decision, 2026-10-18; BaniDB source N is a variant). See supabase/migrations/061.
+ * (canonical by decision, 2026-10-18; BaniDB source N is a variant). See supabase/migrations/061 and README.md.
  *
  * Input is the PDF's text layer converted from GurbaniAkhar to Unicode: a "ਗ਼ਜ਼ਲ N" heading per ghazal,
  * then shers whose two misras end in "।" and "॥N॥". The PDF wraps long misras, sometimes mistypes the
  * marks (।੧॥, or the mark on a line of its own), and five shers lack the mark between their misras.
  * The rubaiyan and baints after ghazal 63 start at a "ੴ" line, where parsing stops.
  *
- * One row per misra, as for Dasam Bani and Sarbloh: ang = ghazal, shabad_id = GHAZAL_SHABAD_BASE + ghazal,
- * verse_id = line_no = the running misra number. A row's sher is sherPosition(its position in the ghazal).
+ * The text is kept as printed (user decision, 2026-10-18): punctuation, quote marks and every nukta.
+ * wordText gives the same line without the punctuation, for counting words.
+ *
+ * One row per misra, as for Dasam Bani and Sarbloh: ang = ghazal, shabad_id = BaniDB's ShabadID for the
+ * ghazal (banidbShabadId), verse_id = line_no = the running misra number. A row's sher is
+ * sherPosition(its position in the ghazal).
  */
 
-/** 910001-910063. Shabad ids in use: SGGS 1-5540, Dasam 7402+, Bhai Gurdas 40001+, Sarbloh 900001-901564. */
+/** For a ghazal BaniDB lacks (61). Shabad ids in use: SGGS 1-5540, Dasam 7402+, Bhai Gurdas 40001+,
+ * Sarbloh 900001-901564; BaniDB's source N sits at 30000-30062 (ghazals) and above. */
 export const GHAZAL_SHABAD_BASE = 910000;
+
+/**
+ * BaniDB's ShabadID (source N) for each ghazal of this edition. BaniDB numbers its ghazals 30000-30062
+ * in its own order: its 30006-30008 are this edition's 9, 7, 8; it lacks ghazal 61; and its 30060 is a
+ * second copy of ghazal 63 (30062), so 30060 is left unused.
+ */
+export function banidbShabadId(ghazal: number): number {
+  if (ghazal < 1 || ghazal > 63) throw new Error(`no ghazal ${ghazal}`);
+  if (ghazal === 61) return GHAZAL_SHABAD_BASE + 61;
+  const moved: Record<number, number> = { 7: 30007, 8: 30008, 9: 30006, 62: 30061, 63: 30062 };
+  return moved[ghazal] ?? 29999 + ghazal;
+}
 
 export type Misra = { ghazal: number; sher: number; misra: 1 | 2; text: string };
 export type GhazalLine = { verse_id: number; ang: number; line_no: number; shabad_id: number; gurmukhi: string };
@@ -41,17 +58,23 @@ export function composeNukta(s: string): string {
 }
 
 /**
- * One misra as the corpus stores it, without its closing mark. Drops the edition's commas, quote marks,
- * "?", "--", "!" and brackets; keeps "ਕਿ:" and hyphenated compounds. Nukta letters are written as in the
- * BaniDB corpora: precomposed (ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਲ਼ ਸ਼), and other letters (ਕ਼ for qaf, ਅ਼ for ain) without the nukta.
+ * One misra as printed, without the mark that closes it: lines the PDF wrapped are rejoined and spacing
+ * is tidied. Nukta letters are precomposed where Unicode has them (ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਲ਼ ਸ਼, as in the BaniDB
+ * corpora); the others keep letter + nukta (ਕ਼ qaf, ਅ਼ ain), with a nukta the converter put after the
+ * vowel sign (ਕਿ਼) moved back onto its letter.
  */
 export function cleanMisra(raw: string): string {
-  return composeNukta(raw)
+  return composeNukta(raw.replace(new RegExp(`([\u0a3e-\u0a4c])${NUKTA}`, "g"), `${NUKTA}$1`))
     .replace(/-\s*\n\s*/g, "-")
-    .replaceAll(NUKTA, "")
-    .replace(/ਅਾ/g, "ਆ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** A stored line without the edition's punctuation, for lib/tokenizer: keeps ਕਿ:, hyphens and dandas. */
+export function wordText(line: string): string {
+  return line
     .replace(/--/g, " ")
-    .replace(/[,'"?!.()।॥]/g, " ")
+    .replace(/[,'"?!.()]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -116,8 +139,13 @@ export function toLines(misras: Misra[]): GhazalLine[] {
     verse_id: i + 1,
     ang: m.ghazal,
     line_no: i + 1,
-    shabad_id: GHAZAL_SHABAD_BASE + m.ghazal,
-    gurmukhi: m.misra === 1 ? `${m.text} ।` : `${m.text} ॥${toGurmukhiDigits(m.sher)}॥`,
+    shabad_id: banidbShabadId(m.ghazal),
+    gurmukhi:
+      m.misra === 2
+        ? `${m.text} ॥${toGurmukhiDigits(m.sher)}॥`
+        : /(\?|--)$/.test(m.text)
+          ? m.text
+          : `${m.text} ।`,
   }));
 }
 

@@ -9,13 +9,14 @@
  * Writes { "nand_lal_ghazals": Line[] } with Line = { verse_id, ang, line_no, shabad_id, gurmukhi },
  * ready to load into `lines` once 061 has added the source and the shabads rows.
  * With <load.sql>, also writes the SQL that loads them (pipeline/shared/load-sql.ts).
- * Also prints the token counts lib/tokenizer gives, to check the load against.
+ * Also prints the token counts lib/tokenizer gives on wordText (the lines without punctuation), to check
+ * the load against.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { tokenize } from "../../lib/tokenizer";
 import { linesLoadSql } from "../shared/load-sql";
-import { parseGhazals, toLines } from "./ghazals";
+import { parseGhazals, toLines, wordText } from "./ghazals";
 
 const [input, out, sqlOut] = process.argv.slice(2);
 if (!input || !out) {
@@ -26,9 +27,9 @@ if (!input || !out) {
 const misras = parseGhazals(readFileSync(input, "utf8"));
 const lines = toLines(misras);
 writeFileSync(out, JSON.stringify({ nand_lal_ghazals: lines }));
-if (sqlOut) writeFileSync(sqlOut, linesLoadSql("nand_lal_ghazals", lines).sql);
+if (sqlOut) writeFileSync(sqlOut, linesLoadSql("nand_lal_ghazals", lines, wordText).sql);
 
-const tokens = lines.flatMap((l) => tokenize(l.gurmukhi));
+const tokens = lines.flatMap((l) => tokenize(wordText(l.gurmukhi)));
 const shers = new Map<number, number>();
 for (const m of misras) if (m.misra === 2) shers.set(m.ghazal, m.sher);
 console.log(

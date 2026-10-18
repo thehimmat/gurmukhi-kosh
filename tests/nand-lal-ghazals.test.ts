@@ -1,8 +1,17 @@
 import { readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
-import { parseGhazals, cleanMisra, composeNukta, toLines, sherPosition, GHAZAL_SHABAD_BASE } from "../pipeline/nand-lal/ghazals";
+import {
+  parseGhazals,
+  cleanMisra,
+  composeNukta,
+  wordText,
+  banidbShabadId,
+  toLines,
+  sherPosition,
+  GHAZAL_SHABAD_BASE,
+} from "../pipeline/nand-lal/ghazals";
 
-// Gurmukhi literals here are saved decomposed (ਖ + nukta); the parser writes ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਸ਼ precomposed.
+// Gurmukhi literals here are saved decomposed (ਖ + nukta); the parser writes ਖ਼ ਗ਼ ਜ਼ ਫ਼ ਲ਼ ਸ਼ precomposed.
 const g = composeNukta;
 
 // Ghazals 1-3 of "Ghazals Bhai Nand Laal Goyaa Complete.pdf" as converted from GurbaniAkhar, then
@@ -10,24 +19,34 @@ const g = composeNukta;
 const fixture = readFileSync("tests/fixtures/nand-lal-ghazals.txt", "utf8");
 
 describe("cleanMisra", () => {
-  it("drops the edition's punctuation but keeps ਕਿ: and hyphens inside words", () => {
-    expect(cleanMisra("ਬਗੋ 'ਗੋਇਆ', ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ, ਈਂ ਦੁਨੀਆ ਓ")).toBe(g("ਬਗੋ ਗੋਇਆ ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ ਈਂ ਦੁਨੀਆ ਓ"));
-    expect(cleanMisra("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ, ਵਰਨਾ --")).toBe(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ ਵਰਨਾ"));
-    expect(cleanMisra("ਯਕ ਲਹਜ਼ਾ, ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ, ਚਿ: ਸ਼ਵੱਦ ?")).toBe(g("ਯਕ ਲਹਜ਼ਾ ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ ਚਿ: ਸ਼ਵੱਦ"));
-    expect(cleanMisra("ਜਰਸ ਬੇਹੂਦਾ ਮੇ-ਨਾਲਦ, ਕੁਜਾ ਬੰਦੇਮ ਮਹਮਿਲ-ਹਾ")).toBe(g("ਜਰਸ ਬੇਹੂਦਾ ਮੇ-ਨਾਲਦ ਕੁਜਾ ਬੰਦੇਮ ਮਹਮਿਲ-ਹਾ"));
+  it("keeps the edition's text as printed: punctuation, quote marks, ਕਿ: and hyphens", () => {
+    expect(cleanMisra("ਬਗੋ 'ਗੋਇਆ', ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ, ਈਂ ਦੁਨੀਆ ਓ")).toBe(g("ਬਗੋ 'ਗੋਇਆ', ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ, ਈਂ ਦੁਨੀਆ ਓ"));
+    expect(cleanMisra("ਯਕ ਲਹਜ਼ਾ,  ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ, ਚਿ: ਸ਼ਵੱਦ ? ")).toBe(g("ਯਕ ਲਹਜ਼ਾ, ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ, ਚਿ: ਸ਼ਵੱਦ ?"));
   });
 
-  it("writes nukta letters as the corpus does: precomposed where Unicode has them, else without the nukta", () => {
-    expect(cleanMisra("ਖ਼ੁਦਾ")).toBe(g("ਖ਼ੁਦਾ")); // decomposed ਖ਼ → precomposed
-    expect(cleanMisra("ਸਾਕ਼ੀ")).toBe(g("ਸਾਕੀ")); // ਕ਼ (qaf) has no precomposed form
-    expect(cleanMisra("ਅ਼ਾਲਮ")).toBe(g("ਆਲਮ")); // ain: ਅ + ਾ is written ਆ
-    expect(cleanMisra("ਜ਼ੂਕਿ਼")).toBe(g("ਜ਼ੂਕਿ")); // the converter puts the nukta after the vowel sign
-    expect(cleanMisra("ਜ਼ੂਕਿ਼")).not.toMatch(/਼/);
+  it("keeps every nukta: precomposed where Unicode has the letter, else letter + nukta", () => {
+    expect(cleanMisra("ਖ਼ੁਦਾ")).toBe("\u0a59ੁਦਾ"); // decomposed ਖ਼ → precomposed, as in the BaniDB corpora
+    expect(cleanMisra("ਸਾਕ਼ੀ")).toBe("ਸਾਕ\u0a3cੀ"); // ਕ਼ (qaf) has no precomposed form
+    expect(cleanMisra("ਅ਼ਾਲਮ")).toBe("ਅ\u0a3cਾਲਮ"); // ain
+  });
+
+  it("moves a nukta the converter put after the vowel sign back onto its letter", () => {
+    expect(cleanMisra("ਜ਼ੂਕਿ\u0a3c")).toBe(g("ਜ਼ੂਕ\u0a3cਿ"));
+    expect(cleanMisra("ਤਬਕਿ\u0a3c ਚਰਖ਼")).toBe(g("ਤਬਕ\u0a3cਿ ਚਰਖ਼"));
   });
 
   it("joins a word broken across lines by a trailing hyphen", () => {
     expect(cleanMisra("ਦਰ ਖ਼ਾਨਾ-\nਇ ਦਿਲ")).toBe(g("ਦਰ ਖ਼ਾਨਾ-ਇ ਦਿਲ"));
     expect(cleanMisra("ਈਂ ਜੁਮਲਾ\nਮੁਸ਼ਕਿਲ-ਹਾ")).toBe(g("ਈਂ ਜੁਮਲਾ ਮੁਸ਼ਕਿਲ-ਹਾ"));
+  });
+});
+
+describe("wordText", () => {
+  it("drops the punctuation for counting words, keeping ਕਿ: and hyphenated compounds", () => {
+    expect(wordText(g("ਬਗੋ 'ਗੋਇਆ', ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ, ਈਂ ਦੁਨੀਆ ਓ ॥੫॥"))).toBe(g("ਬਗੋ ਗੋਇਆ ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ ਈਂ ਦੁਨੀਆ ਓ ॥੫॥"));
+    expect(wordText(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ, ਵਰਨਾ --"))).toBe(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ ਵਰਨਾ"));
+    expect(wordText(g("ਜਰਸ ਬੇਹੂਦਾ ਮੇ-ਨਾਲਦ, ਚਿ: ਸ਼ਵੱਦ ? ।"))).toBe(g("ਜਰਸ ਬੇਹੂਦਾ ਮੇ-ਨਾਲਦ ਚਿ: ਸ਼ਵੱਦ ।"));
+    expect(wordText("ਸ਼ੁਦ ਆਮਦਨਸ਼ (ਓ) ਰਫ਼ਤਨ!")).toBe("ਸ਼ੁਦ ਆਮਦਨਸ਼ ਓ ਰਫ਼ਤਨ");
   });
 });
 
@@ -49,17 +68,17 @@ describe("parseGhazals", () => {
 
   it("splits a sher at its danda, or at a closing '--'", () => {
     const g1 = misras.filter((m) => m.ghazal === 1);
-    expect(g1[0].text).toBe(g("ਹਵਾਏ ਬੰਦਗੀ ਆਵੁਰਦ ਦਰ ਵਜੂਦ ਮਰਾ"));
-    expect(g1[1].text).toBe(g("ਵਗਰਨਹ ਜ਼ੂਕਿ ਚੁਨੀਂ ਆਮਦਨ ਨਬੂਦ ਮਰਾ"));
-    expect(g1[2].text).toBe(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ ਵਰਨਾ"));
-    expect(g1[3].text).toBe(g("ਚਿ ਹਾਸਿਲ ਅਸ੍ਤ ਅਜ਼ੀਂ ਗੁੰਬਦਿ ਕਬੂਦ ਮਰਾ"));
+    expect(g1[0].text).toBe(g("ਹਵਾਏ ਬੰਦਗੀ ਆਵੁਰਦ, ਦਰ ਵਜੂਦ ਮਰਾ"));
+    expect(g1[1].text).toBe(g("ਵਗਰਨਹ, ਜ਼ੂਕ\u0a3cਿ ਚੁਨੀਂ ਆਮਦਨ, ਨਬੂਦ ਮਰਾ"));
+    expect(g1[2].text).toBe(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ, ਵਰਨਾ --"));
+    expect(g1[3].text).toBe(g("ਚਿ ਹਾਸਿਲ ਅਸ੍ਤ, ਅਜ਼ੀਂ ਗੁੰਬਦਿ ਕਬੂਦ ਮਰਾ"));
   });
 
   it("rejoins misras that the PDF wrapped onto a second line", () => {
     const g3 = misras.filter((m) => m.ghazal === 3);
-    expect(g3[1].text).toBe(g("ਬ-ਚਸ਼ਮਿ ਪਾਕ ਬੀਂ ਆਸਾਂਅ ਕੁਨਮ ਈਂ ਜੁਮਲਾ ਮੁਸ਼ਕਿਲ-ਹਾ"));
-    expect(g3[8].text).toBe(g("ਚੂੰ ਗ਼ੈਰ ਅਜ਼ ਜ਼ਾਤਿ ਪਾਕਸ਼ ਨੇਸ੍ਤ ਦਰ ਹਰ ਜਾ ਕਿ: ਮੇ ਬੀਨਮ"));
-    expect(g3[9].text).toBe(g("ਬਗੋ ਗੋਇਆ ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ ਈਂ ਦੁਨੀਆ ਓ ਅਹਲਿਲ-ਹਾ"));
+    expect(g3[1].text).toBe(g("ਬ-ਚਸ਼ਮਿ ਪਾਕ ਬੀਂ, ਆਸਾਂਅ ਕੁਨਮ, ਈਂ ਜੁਮਲਾ ਮੁਸ਼ਕਿਲ-ਹਾ"));
+    expect(g3[8].text).toBe(g("ਚੂੰ ਗ਼ੈਰ ਅਜ਼ ਜ਼ਾਤਿ ਪਾਕਸ਼ ਨੇਸ੍ਤ, ਦਰ ਹਰ ਜਾ ਕਿ: ਮੇ ਬੀਨਮ"));
+    expect(g3[9].text).toBe(g("ਬਗੋ 'ਗੋਇਆ', ਕੁਜਾ ਬੁਗੁਜ਼ਾਰਮ, ਈਂ ਦੁਨੀਆ ਓ ਅਹਲਿਲ-ਹਾ"));
   });
 
   it("accepts mistyped sher marks (।੧॥) and a mark on a line of its own", () => {
@@ -74,10 +93,10 @@ describe("parseGhazals", () => {
       ].join("\n"),
     );
     expect(m.map((x) => x.text)).toEqual([
-      "ਚੂੰ ਮਾਹਿ ਦੋ ਹਫ਼ਤਾ ਰੂ-ਨੁਮਾਈ ਚਿ: ਸ਼ਵੱਦ",
-      "ਇਮ-ਸ਼ਬ ਮਹਿ ਮਨ ਅਗਰ ਬਿਆਈ ਚਿ: ਸ਼ਵੱਦ",
-      "ਈਂ ਜੁਮਲਹ ਜਹਾਂ ਅਸੀਰਿ ਜ਼ੁਲਫ਼ਤ ਗ਼ਸ਼ਤਹ",
-      "ਯਕ ਲਹਜ਼ਾ ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ ਚਿ: ਸ਼ਵੱਦ",
+      "ਚੂੰ ਮਾਹਿ ਦੋ ਹਫ਼ਤਾ, ਰੂ-ਨੁਮਾਈ, ਚਿ: ਸ਼ਵੱਦ ?",
+      "ਇਮ-ਸ਼ਬ ਮਹਿ ਮਨ, ਅਗਰ ਬਿਆਈ, ਚਿ: ਸ਼ਵੱਦ ?",
+      "ਈਂ ਜੁਮਲਹ ਜਹਾਂ, ਅਸੀਰਿ ਜ਼ੁਲਫ਼ਤ ਗ਼ਸ਼ਤਹ",
+      "ਯਕ ਲਹਜ਼ਾ, ਅਗਰ ਗਿਰਾ ਕੁਸ਼ਾਈ, ਚਿ: ਸ਼ਵੱਦ ?",
     ].map(g));
   });
 
@@ -92,9 +111,9 @@ describe("parseGhazals", () => {
       ].join("\n"),
     );
     expect(m.map((x) => [x.sher, x.misra, x.text])).toEqual(([
-      [1, 1, "ਗੁਲਾਬੋ ਅੰਬਰੋ ਮੁਸ਼ਕੋ ਅਬੀਰੇ"],
-      [1, 2, "ਚੁ ਬਾਰਾਂ ਬਾਰਿਸ਼ੇ ਅਜ਼ ਸੂ ਬਸੂ ਕਰਦ"],
-      [2, 1, "ਦਰ ਹਿਜਰਿ ਤੁਸ੍ਤ ਜਾਨੋ ਦਿਲਿ ਆਸ਼ਿਕਾਂ ਚੁਨੀਂ"],
+      [1, 1, "ਗੁਲਾਬੋ, ਅੰਬਰੋ, ਮੁਸ਼ਕੋ ਅਬੀਰੇ"],
+      [1, 2, "ਚੁ ਬਾਰਾਂ, ਬਾਰਿਸ਼ੇ ਅਜ਼ ਸੂ ਬਸੂ ਕਰਦ"],
+      [2, 1, "ਦਰ ਹਿਜਰਿ ਤੁਸ੍ਤ, ਜਾਨੋ ਦਿਲਿ ਆਸ਼ਿਕਾਂ ਚੁਨੀਂ"],
       [2, 2, "ਚੂੰ ਲਾਲਹ ਦਾਗ਼ ਬਰ ਜਿਗਰੋ ਸੀਨਾ ਚਾਕ ਚਾਕ"],
     ] as const).map(([s, k, t]) => [s, k, g(t)]));
   });
@@ -103,7 +122,7 @@ describe("parseGhazals", () => {
     const m = parseGhazals(
       ["ਗ਼ਜ਼ਲ ੧", "ਐ ਜ਼ਹੇ । ਸੇਬਿ ਜ਼ਨੁਖ਼ਦਾਨਿ ਸ਼ੁਮਾ ।", "ਮੇਵਾ ਚੂੰ ਦਰ ਬੋਸਤਾਂ ਬਾਸ਼ਦ ਲਜ਼ੀਜ਼ ॥੧॥"].join("\n"),
     );
-    expect(m.map((x) => x.text)).toEqual(["ਐ ਜ਼ਹੇ ਸੇਬਿ ਜ਼ਨੁਖ਼ਦਾਨਿ ਸ਼ੁਮਾ", "ਮੇਵਾ ਚੂੰ ਦਰ ਬੋਸਤਾਂ ਬਾਸ਼ਦ ਲਜ਼ੀਜ਼"].map(g));
+    expect(m.map((x) => x.text)).toEqual(["ਐ ਜ਼ਹੇ । ਸੇਬਿ ਜ਼ਨੁਖ਼ਦਾਨਿ ਸ਼ੁਮਾ", "ਮੇਵਾ ਚੂੰ ਦਰ ਬੋਸਤਾਂ ਬਾਸ਼ਦ ਲਜ਼ੀਜ਼"].map(g));
   });
 
   it("refuses a sher or ghazal out of sequence, and a sher it cannot split in two", () => {
@@ -114,20 +133,35 @@ describe("parseGhazals", () => {
   });
 });
 
+describe("banidbShabadId", () => {
+  it("uses BaniDB's ShabadID for the same ghazal (source N, 30000-30062)", () => {
+    expect([1, 6, 10, 60, 62, 63].map(banidbShabadId)).toEqual([30000, 30005, 30009, 30059, 30061, 30062]);
+  });
+
+  it("follows BaniDB's order of ghazals 7-9 (its 30006 is our 9)", () => {
+    expect([7, 8, 9].map(banidbShabadId)).toEqual([30007, 30008, 30006]);
+  });
+
+  it("gives ghazal 61, which BaniDB lacks, an id of our own (30060 is BaniDB's second copy of 63)", () => {
+    expect(banidbShabadId(61)).toBe(GHAZAL_SHABAD_BASE + 61);
+  });
+});
+
 describe("toLines", () => {
   const lines = toLines(parseGhazals(fixture));
 
-  it("numbers misras through the whole source; ang is the ghazal; one shabad per ghazal", () => {
+  it("numbers misras through the whole source; ang is the ghazal; its shabad is BaniDB's", () => {
     expect(lines.map((l) => l.line_no)).toEqual(lines.map((_, i) => i + 1));
     expect(lines.map((l) => l.verse_id)).toEqual(lines.map((l) => l.line_no));
-    expect(lines[12]).toMatchObject({ line_no: 13, ang: 2, shabad_id: GHAZAL_SHABAD_BASE + 2 });
-    expect(new Set(lines.map((l) => l.shabad_id))).toEqual(new Set([910001, 910002, 910003]));
+    expect(lines[12]).toMatchObject({ line_no: 13, ang: 2, shabad_id: 30001 });
+    expect(new Set(lines.map((l) => l.shabad_id))).toEqual(new Set([30000, 30001, 30002]));
   });
 
-  it("ends the first misra with । and the second with its sher number", () => {
-    expect(lines[0].gurmukhi).toBe(g("ਹਵਾਏ ਬੰਦਗੀ ਆਵੁਰਦ ਦਰ ਵਜੂਦ ਮਰਾ ।"));
-    expect(lines[1].gurmukhi).toBe(g("ਵਗਰਨਹ ਜ਼ੂਕਿ ਚੁਨੀਂ ਆਮਦਨ ਨਬੂਦ ਮਰਾ ॥੧॥"));
-    expect(lines[11].gurmukhi).toBe(g("ਬਸੂਏ ਦੋਸਤ ਰਿਹਾਈ ਦਿਹੰਦ ਜ਼ੂਦ ਮਰਾ ॥੬॥"));
+  it("ends the first misra with । (unless it closes with ? or --) and the second with its sher number", () => {
+    expect(lines[0].gurmukhi).toBe(g("ਹਵਾਏ ਬੰਦਗੀ ਆਵੁਰਦ, ਦਰ ਵਜੂਦ ਮਰਾ ।"));
+    expect(lines[1].gurmukhi).toBe(g("ਵਗਰਨਹ, ਜ਼ੂਕ\u0a3cਿ ਚੁਨੀਂ ਆਮਦਨ, ਨਬੂਦ ਮਰਾ ॥੧॥"));
+    expect(lines[2].gurmukhi).toBe(g("ਖ਼ੁਸ਼ ਅਸ੍ਤ ਉਮਰ ਕਿ: ਦਰ ਯਾਦ ਬਿਗੁਜ਼ਰਦ, ਵਰਨਾ --"));
+    expect(lines[11].gurmukhi).toBe(g("ਬਸੂਏ ਦੋਸਤ, ਰਿਹਾਈ ਦਿਹੰਦ, ਜ਼ੂਦ ਮਰਾ ॥੬॥"));
   });
 });
 
