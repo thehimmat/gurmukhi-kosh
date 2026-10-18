@@ -285,8 +285,8 @@ Sarbloh shabad_ids are stale). Applied 2026-10-18. The 35,723 moved lines were u
 first (one statement over all of them outran the MCP's 60 s), then the migration ran with nothing left to move.
 `id`, `verse_id`, `line_no`, `ang` unchanged (same checksum); the rows match the new function exactly.
 
-**To do from the dashboard SQL editor** (the MCP holds DELETE for a confirmation that times out): remove the five
-retired shabads rows, 901560-901564, which no line uses:
+**Done 2026-10-18** from the dashboard SQL editor (the MCP holds DELETE for a confirmation that times out): removed
+the five retired shabads rows, 901560-901564, which no line used. 1,559 Sarbloh shabads remain, one per section:
 
 ```sql
 delete from shabads sh where sh.id >= 900001
