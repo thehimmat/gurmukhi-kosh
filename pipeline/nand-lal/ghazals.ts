@@ -1,6 +1,6 @@
 /**
  * Bhai Nand Lal's Ghazals (Diwan-e-Goya) in Gurmukhi, from "Ghazals Bhai Nand Laal Goyaa Complete.pdf"
- * (canonical by decision, 2026-10-18; BaniDB source N is a variant). See supabase/migrations/061 and README.md.
+ * (canonical by decision, 2026-10-18; BaniDB source N is a variant). See supabase/migrations/063 and README.md.
  *
  * Input is the PDF's text layer converted from GurbaniAkhar to Unicode: a "ਗ਼ਜ਼ਲ N" heading per ghazal,
  * then shers whose two misras end in "।" and "॥N॥". The PDF wraps long misras, sometimes mistypes the
@@ -16,7 +16,7 @@
  */
 
 /** For a ghazal BaniDB lacks (61). Shabad ids in use: SGGS 1-5540, Dasam 7402+, Bhai Gurdas 40001+,
- * Sarbloh 900001-901564; BaniDB's source N sits at 30000-30062 (ghazals) and above. */
+ * Sarbloh 900001-901559; BaniDB's source N sits at 30000-30062 (ghazals) and above. */
 export const GHAZAL_SHABAD_BASE = 910000;
 
 /**

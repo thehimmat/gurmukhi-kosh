@@ -1,5 +1,5 @@
 /**
- * Build the Bhai Nand Lal Ghazals corpus lines (see ghazals.ts and supabase/migrations/061).
+ * Build the Bhai Nand Lal Ghazals corpus lines (see ghazals.ts and supabase/migrations/063).
  *
  *   npm run build:nand-lal -- <ghazals.txt> <out.json> [<load.sql>]
  *
@@ -7,7 +7,7 @@
  * 1E0Ev6lOwuvTRz41vqw_uC8RzJjMslVSW), from `pdftotext -layout`, converted from GurbaniAkhar to Unicode
  * line by line (Shabad OS gurmukhi-utils toUnicode, run outside this repo as for the scans triage).
  * Writes { "nand_lal_ghazals": Line[] } with Line = { verse_id, ang, line_no, shabad_id, gurmukhi },
- * ready to load into `lines` once 061 has added the source and the shabads rows.
+ * ready to load into `lines` once 063 has added the source and the shabads rows.
  * With <load.sql>, also writes the SQL that loads them (pipeline/shared/load-sql.ts).
  * Also prints the token counts lib/tokenizer gives on wordText (the lines without punctuation), to check
  * the load against.

@@ -1,4 +1,4 @@
--- 061: Bhai Nand Lal's Ghazals (Diwan-e-Goya) in Gurmukhi (pipeline/nand-lal/README.md).
+-- 063: Bhai Nand Lal's Ghazals (Diwan-e-Goya) in Gurmukhi (pipeline/nand-lal/README.md).
 --
 -- Canonical text (user decision, 2026-10-18): "Ghazals Bhai Nand Laal Goyaa Complete.pdf", 63 ghazals,
 -- 361 shers, kept as printed (punctuation and every nukta). BaniDB's Bhai Nand Lal source (N, shabads
@@ -9,7 +9,7 @@
 -- misra number (1-722); a row's sher is ceil(k/2) for its k-th row in the ghazal, and the second misra
 -- ends in ॥N॥. shabad_id is BaniDB's ShabadID for the same ghazal (pipeline/nand-lal/ghazals.ts
 -- banidbShabadId), so a ghazal can be looked up in BaniDB directly. Ghazal 61, which BaniDB lacks, gets
--- 910061: shabad ids in use are SGGS 1-5540, Dasam 7402+, Bhai Gurdas 40001+, Sarbloh 900001-901564,
+-- 910061: shabad ids in use are SGGS 1-5540, Dasam 7402+, Bhai Gurdas 40001+, Sarbloh 900001-901559 (062),
 -- and BaniDB's N continues above 30062 (rubaiyan etc.), so neither range can collide. BaniDB's 30060 is
 -- left unused. One shabads row per ghazal; writer_id 48 is BaniDB's id for Bhai Nand Lal Ji.
 --

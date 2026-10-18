@@ -292,3 +292,10 @@ the five retired shabads rows, 901560-901564, which no line used. 1,559 Sarbloh 
 delete from shabads sh where sh.id >= 900001
    and not exists (select 1 from lines l where l.shabad_id = sh.id);
 ```
+
+Migration 063 adds the `nand_lal_ghazals` source (Bhai Nand Lal's Ghazals, `source_fk` 6), 63 `shabads` rows on
+BaniDB's ShabadIDs (30000-30062, minus BaniDB's duplicate 30060, plus 910061 for ghazal 61), and reading order 40
+(`pipeline/nand-lal/README.md`). Applied 2026-10-18. **Ledger name `061_nand_lal_ghazals_source`**: it was applied
+from its branch before main's 061/062 (Sarbloh) were merged in, then renumbered 063 in the repo; the SQL is the
+same. The lines were loaded and refreshed the same day: 722 lines, 5,099 occurrences, 1,802 words, checksums
+matching the build.

@@ -1,6 +1,6 @@
 # Bhai Nand Lal: Diwan-e-Goya (Ghazals)
 
-Corpus `nand_lal_ghazals` (migration 061): Bhai Nand Lal's 63 Persian ghazals in Gurmukhi
+Corpus `nand_lal_ghazals` (migration 063, `source_fk` 6): Bhai Nand Lal's 63 Persian ghazals in Gurmukhi
 transliteration, one row per misra.
 
 ## Decisions (agreed 2026-10-18)
@@ -54,7 +54,18 @@ transliteration, one row per misra.
    Shabad OS `gurmukhi-utils` `toUnicode` outside this repo, because it is GPL-3.0.
 2. `npm run build:nand-lal -- <ghazals.txt> <out.json> <load.sql>` writes the rows and the SQL that
    loads them (`pipeline/shared/load-sql.ts`). It prints the line, ghazal, sher and token counts.
-3. Apply migration 061, run `<load.sql>`, then `refresh_word_frequencies`,
+3. Apply migration 063, run `<load.sql>`, then `refresh_word_frequencies`,
    `refresh_word_corpus_stats`, `refresh_word_corpus_writer_stats` and `refresh_line_first_letters`.
+
+**Loaded 2026-10-18** (`source_fk` 6): 722 lines, 63 shabads, 5,099 occurrences of 1,802 words (1,169 of them
+new to `words`).
+- This container could not reach Supabase with a service key, so the lines went in through the MCP
+  `execute_sql` in four chunks. Precomposed nukta letters were written as `U&'\0A59'` escapes, so that no step
+  could decompose them.
+- The md5 of every line, in order, matches the built JSON (`f6d61d30…`).
+- Words and occurrences were then built in SQL with `wordText` + `lib/tokenizer`'s rules. The token stream's md5
+  matches the TypeScript one (`aeaaf114…`).
+- Run the occurrence insert as its own statement, after the words insert. In a single statement, a CTE cannot see
+  words that another CTE of the same statement inserted.
 
 Tests: `tests/nand-lal-ghazals.test.ts` (fixture: ghazals 1–3) and `tests/load-sql.test.ts`.
