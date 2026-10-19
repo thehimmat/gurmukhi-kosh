@@ -157,7 +157,7 @@ const toAsciiNumber = (g: string) => String(toInt(g));
 
 // ---------------------------------------------------------------------------------------------
 // Sections (shabad_id): one per run of one chhand, or per titled section, as Dasam Bani has them
-// from BaniDB. Migrations 060 and 062 apply the same rules in SQL to the rows already loaded; keep the
+// from BaniDB. Migrations 060, 062 and 064 apply the same rules in SQL to the rows already loaded; keep the
 // word lists below and its arrays the same (tests/sarbloh-sections.test.ts checks).
 
 /**
@@ -251,7 +251,9 @@ function classify(gurmukhi: string): Kind {
  *   - a chhand header starts one when it names another chhand than the run it follows, so the
  *     "ਦੋਹਾ ॥" repeated before each couplet of a run stays in it;
  *   - a colophon ends one, so whatever header follows starts the next;
- *   - with no header, a verse count back at ੧ starts one at that verse;
+ *   - with no header, a verse count back at ੧ starts one at that verse, unless that verse is a lone
+ *     ॥੧॥ line (a closing label or colophon), or the ॥੧॥ lines are a refrain: a ਰਹਾਉ follows that
+ *     carries a stanza count (॥੨॥ or more), or is followed by anything but a verse counted ॥੨॥;
  *   - ਰਹਾਉ, or a short numbered label (ਦਸਕ ॥੧॥) right after a verse, stays with that verse.
  * A section takes no split before its first verse, so a title block (ੴ …, ਅਥ …, ਦੋਹਰਾ) is one start.
  */
@@ -262,22 +264,62 @@ export function sectionIndexes(lines: Array<{ gurmukhi: string }>): number[] {
   let between = true; // the line before ended a verse, or was a header, label or colophon
   let blockStart = 0; // first line after the last verse: where a split here would start
   let blockSplit = false; // a section already starts at blockStart
+  // Starts made by a count back at ੧ since the last verse counted past ੧. A ਰਹਾਉ carrying a stanza
+  // count (॥੨॥ or more) shows those ॥੧॥ lines were the refrain closing the stanza, and undoes them.
+  let resets: number[] = [];
+  // Resets a ਰਹਾਉ without a stanza count left open: a piece opening SGGS-style (॥੧॥, ਰਹਾਉ, ॥੨॥)
+  // keeps them; anything else after the ਰਹਾਉ (a header, a colophon, another count) undoes them.
+  let deferred: number[] = [];
+  const undo = (rs: number[]) => rs.forEach((r) => starts.delete(r));
   const split = () => {
     starts.add(blockStart);
     versed = false;
     blockSplit = true;
+    undo(deferred);
+    deferred = [];
+    resets = [];
+  };
+  /** A ਰਹਾਉ line's stanza count (0 when it has none), or null for any other line. */
+  const refrainCount = (gurmukhi: string) => {
+    if (!TRAILER_LINES.includes(gurmukhi.trim().split(/[\s।॥੦-੯]+/)[0])) return null;
+    const n = VERSE_NUMBER.exec(gurmukhi);
+    return n ? toInt(n[1]) : 0;
   };
   lines.forEach(({ gurmukhi }, i) => {
     let k = classify(gurmukhi);
     // A numbered title is a title only between verses; met mid-verse, its number ends the verse.
     if (k.kind === "title" && k.count !== undefined && !between) k = { kind: "numbered", count: k.count, short: false };
-    // A short numbered line right after a verse labels the piece it closes, like ਰਹਾਉ.
+    // A ਰਹਾਉ line closes the verse or refrain before it and never starts a section itself.
+    const rc = refrainCount(gurmukhi);
+    if (rc !== null && (k.kind === "numbered" || (k.kind === "trailer" && between))) {
+      if (rc >= 2) undo(resets);
+      else deferred = resets;
+      resets = [];
+      if (k.kind === "numbered" && !between) {
+        versed = true;
+        between = true;
+        blockStart = i + 1;
+        blockSplit = false;
+      } else if (!blockSplit) blockStart = i + 1;
+      return;
+    }
+    // A short numbered line right after a verse labels the piece it closes.
     if (k.kind === "numbered" && k.short && between) {
       if (!blockSplit) blockStart = i + 1;
       return;
     }
     if (k.kind === "colophon" || k.kind === "numbered") {
-      if (k.kind === "numbered" && k.count === 1 && versed && !blockSplit) split();
+      if (k.kind === "numbered" && k.count === 2) deferred = [];
+      else {
+        undo(deferred);
+        deferred = [];
+      }
+      // A reset needs a verse of more than its one numbered line: a lone ॥੧॥ line is a label or
+      // colophon closing the piece (ਦਸਕ ਪਦ ਪੁਨਯਾਕੀ ਕੇ ॥੧॥, ਅੰਗਦ ਸੰਬਾਦ ਸਮਾਪਤਿ ॥੧॥).
+      if (k.kind === "numbered" && k.count === 1 && versed && !blockSplit && i > blockStart) {
+        split();
+        resets.push(blockStart);
+      } else if (k.kind === "colophon" || k.count !== 1) resets = [];
       if (k.kind === "numbered") versed = true;
       else run = null;
       between = true;
@@ -298,6 +340,7 @@ export function sectionIndexes(lines: Array<{ gurmukhi: string }>): number[] {
       if (!versed) run = k.chhand;
     }
   });
+  undo(deferred);
   let section = -1;
   return lines.map((_, i) => (starts.has(i) ? ++section : section));
 }
