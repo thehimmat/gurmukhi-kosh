@@ -27,7 +27,7 @@ export function linesLoadSql(
   const distinct = [...new Set(lines.flatMap(words))];
 
   const sql = `insert into lines (source_fk, verse_id, shabad_id, ang, line_no, gurmukhi)
-select ${source}, v.verse_id, v.shabad_id, v.ang, v.line_no, v.gurmukhi
+select ${source}, v.verse_id, v.shabad_id::int, v.ang, v.line_no, v.gurmukhi
 from (values
 ${lines.map((l) => `(${l.verse_id}, ${l.shabad_id ?? "null"}, ${l.ang}, ${l.line_no}, ${q(l.gurmukhi)})`).join(",\n")}
 ) v(verse_id, shabad_id, ang, line_no, gurmukhi)

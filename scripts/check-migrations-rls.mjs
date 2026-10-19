@@ -21,6 +21,8 @@ const dirs =
         "supabase/migrations",
         "supabase/migrations-imported/gurmukhi-search",
         "supabase/migrations-imported/gurmukhi-voice-search",
+        "supabase/migrations-imported/unfiled",
+        "supabase/migrations-imported/dashboard",
       ];
 
 const stripName = (raw) =>

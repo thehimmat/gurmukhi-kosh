@@ -29,6 +29,9 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
+`npm test` runs the suite. Schema tests (`tests/db/`) need no credentials: they replay every
+migration into an in-process Postgres (PGlite). See `tests/db/README.md`.
+
 ---
 
 One of a suite of Gurmukhi and Gurbani tools. More at [thehimmat.com](https://thehimmat.com).

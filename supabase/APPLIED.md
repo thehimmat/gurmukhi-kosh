@@ -20,7 +20,14 @@ that (#101).
    file-to-ledger reconciliation.
 4. Sibling repos' historical migrations are vendored read-only under
    `supabase/migrations-imported/<repo>/` so CI's RLS gate lints everything that shaped
-   this database. They are records of what ran, not scripts to re-run.
+   this database. They are records of what ran, not scripts to re-run. The UNFILED entries'
+   SQL, copied from the server ledger, is under `supabase/migrations-imported/unfiled/`, and
+   statements run by hand in the dashboard SQL editor are under
+   `supabase/migrations-imported/dashboard/`.
+6. **Migrations are tested locally first** (`tests/db/`, #242): `npm test` replays everything
+   above into an in-process Postgres in ledger order. Anything applied outside a repo migration
+   file (a dashboard statement) is also added to `supabase/migrations-imported/dashboard/` and
+   to the replay order in `tests/db/replay.ts`, so the replay keeps matching production.
 5. RPC signatures shared with deployed clients change **add-then-remove**, never in
    place (two apps deploy against this schema independently).
 
