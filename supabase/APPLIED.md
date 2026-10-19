@@ -303,8 +303,8 @@ Decisions (maintainer, 2026-10-18), on best judgment and open to revision; eithe
 fix the refrain and closing-label splits; keep the ਬਿਸਨੁਪਦ ਛੰਤ ਰਾਮਾ pieces of pages 460-470 split at each ਸਲੋਕ and ਛੰਤ, with
 each ਰਹਾਉ refrain joined to the ਛੰਤ it closes.
 
-**To do from the dashboard SQL editor** (the MCP holds DELETE for a confirmation that times out): remove the 134 retired
-shabads rows, 901426-901559, which no line uses:
+**Done 2026-10-19** from the dashboard SQL editor (the MCP holds DELETE for a confirmation that times out): removed
+the 134 retired shabads rows, 901426-901559, which no line used. 1,425 Sarbloh shabads remain, one per section:
 
 ```sql
 delete from shabads sh where sh.id >= 900001
