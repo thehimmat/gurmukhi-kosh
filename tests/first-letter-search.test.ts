@@ -53,7 +53,7 @@ describe.skipIf(!live)("search_first_letters (anon)", () => {
   it("treats _ as any letter", async () => {
     const { rows, error } = await firstLetters("ਸ_ਕ");
     expect(error).toBeNull();
-    expect(rows[0].total_count).toBe(2292);
+    expect(rows[0].total_count).toBe(2293);
   });
 
   it("still applies the writer filter", async () => {
@@ -70,15 +70,16 @@ describe.skipIf(!live)("search_first_letters (anon)", () => {
   });
 
   // 051: a vowel carrier stands for every independent vowel it carries, as ਸ
-  // stands for ਸਿ ਸੀ ਸੇ. Counts are whole-corpus line counts taken live.
+  // stands for ਸਿ ਸੀ ਸੇ. Counts are whole-corpus line counts taken live
+  // (last retaken 2026-10-18, after the Bhai Nand Lal Ghazals load, 063).
   it.each([
-    ["ੲ", 4870],
-    ["ਇ", 4870],
-    ["ਏ", 4870],
-    ["ੳ", 2085],
-    ["ਅ", 13644],
-    ["ਆ", 13644],
-    ["ੲਕ", 339],
+    ["ੲ", 4895],
+    ["ਇ", 4895],
+    ["ਏ", 4895],
+    ["ੳ", 2086],
+    ["ਅ", 13719],
+    ["ਆ", 13719],
+    ["ੲਕ", 340],
   ])("folds the vowel carrier for %s", async (letters, total) => {
     const { rows, error } = await firstLetters(letters);
     expect(error).toBeNull();
