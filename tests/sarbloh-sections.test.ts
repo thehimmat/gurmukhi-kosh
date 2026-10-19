@@ -161,9 +161,9 @@ describe("sectionIndexes", () => {
   });
 });
 
-describe("migration 063", () => {
-  // The latest SQL twin of sectionIndexes (060, replaced by 062, then 063); its word lists must match these.
-  const sql = readFileSync("supabase/migrations/063_sarbloh_refrains.sql", "utf8");
+describe("migration 064", () => {
+  // The latest SQL twin of sectionIndexes (060, replaced by 062, then 064); its word lists must match these.
+  const sql = readFileSync("supabase/migrations/064_sarbloh_refrains.sql", "utf8");
   const json = (name: string) => JSON.parse(new RegExp(`${name} constant jsonb := '([^']*)'`).exec(sql)![1]);
   const list = (name: string) => [...new RegExp(`${name} constant text\\[\\] := array\\[([^\\]]*)\\]`).exec(sql)![1].matchAll(/'([^']*)'/g)].map((m) => m[1]);
 

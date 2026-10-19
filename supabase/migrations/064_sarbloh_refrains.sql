@@ -1,4 +1,6 @@
--- 063: Sarbloh refrains and closing labels stay with their piece; ids renumbered (#236).
+-- 064: Sarbloh refrains and closing labels stay with their piece; ids renumbered (#236).
+-- Applied to the shared database as 063_sarbloh_refrains, before main's 063 (Bhai Nand Lal ghazals) was
+-- merged; renumbered 064 here, same SQL.
 --
 -- sarbloh_section_indexes (062) changes in step with pipeline/sarbloh/lines.ts sectionIndexes:
 --   - a refrain (॥੧॥ lines closed by ਰਹਾਉ) no longer starts a section. The ਰਹਾਉ line never starts one

@@ -157,7 +157,7 @@ const toAsciiNumber = (g: string) => String(toInt(g));
 
 // ---------------------------------------------------------------------------------------------
 // Sections (shabad_id): one per run of one chhand, or per titled section, as Dasam Bani has them
-// from BaniDB. Migrations 060, 062 and 063 apply the same rules in SQL to the rows already loaded; keep the
+// from BaniDB. Migrations 060, 062 and 064 apply the same rules in SQL to the rows already loaded; keep the
 // word lists below and its arrays the same (tests/sarbloh-sections.test.ts checks).
 
 /**

@@ -293,11 +293,24 @@ delete from shabads sh where sh.id >= 900001
    and not exists (select 1 from lines l where l.shabad_id = sh.id);
 ```
 
-Migration 063 keeps Sarbloh refrains and closing labels with their piece (#236): ॥੧॥ refrain lines closed by a ਰਹਾਉ no
+Migration 063 adds the `nand_lal_ghazals` source (Bhai Nand Lal's Ghazals, `source_fk` 6), 63 `shabads` rows on
+BaniDB's ShabadIDs (30000-30062, minus BaniDB's duplicate 30060, plus 910061 for ghazal 61), and reading order 40
+(`pipeline/nand-lal/README.md`). Applied 2026-10-18. **Ledger name `061_nand_lal_ghazals_source`**: it was applied
+from its branch before main's 061/062 (Sarbloh) were merged in, then renumbered 063 in the repo; the SQL is the
+same. The lines were loaded and refreshed the same day: 722 lines, 5,099 occurrences, 1,802 words, checksums
+matching the build. The new words' `ipa_display` and `search_fold` were filled from `lib/pronounce` and
+`lib/gurmukhi-fold` (what `npm run pronounce` / `npm run searchfold` write), checksum-matched.
+**After any `corpus_rank` SET EXPRESSION, run `vacuum (analyze) lines`.** The rewrite resets the visibility map,
+so `search_first_letters` falls back from the covering index (045) to heap reads and `ਸ_ਕ` outran the anon 3 s
+timeout until the vacuum (run 2026-10-18).
+
+Migration 064 keeps Sarbloh refrains and closing labels with their piece (#236): ॥੧॥ refrain lines closed by a ਰਹਾਉ no
 longer start a section (unless the piece opens SGGS-style, ॥੧॥, ਰਹਾਉ, ॥੨॥), and a lone ॥੧॥ label or colophon stays with
 the piece it closes. 1,559 sections became 1,425 (36 of the short ones listed for #236, and 98 longer ones a mid-run
 refrain had split off), renumbered 900001-901425. Applied 2026-10-18, lines moved in four batches first as for 062; `id`,
-`verse_id`, `line_no`, `ang` unchanged (same checksum); the rows match the new function exactly.
+`verse_id`, `line_no`, `ang` unchanged (same checksum); the rows match the new function exactly. **Ledger name
+`063_sarbloh_refrains`**: it was applied before main's 063 (ghazals, above) was merged in, then renumbered 064 in the
+repo; the SQL is the same.
 
 Decisions (maintainer, 2026-10-18), on best judgment and open to revision; either way the effect on readers is small:
 fix the refrain and closing-label splits; keep the ਬਿਸਨੁਪਦ ਛੰਤ ਰਾਮਾ pieces of pages 460-470 split at each ਸਲੋਕ and ਛੰਤ, with
