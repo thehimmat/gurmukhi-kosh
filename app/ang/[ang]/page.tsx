@@ -32,9 +32,9 @@ export default async function AngPage({ params }: Props) {
   // browsing routes for the other texts are a follow-up.
   const { data: lines, error } = await supabase
     .from("lines")
-    .select("id, gurmukhi, translation_en, transliteration_en, shabads(raag_english, writer_english), sources!inner(code)")
+    .select("id, gurmukhi, translation_en, transliteration_en, shabads(raag_english, writer_english), sources!inner(slug)")
     .eq("ang", ang)
-    .eq("sources.code", "sggs_banidb_v2")
+    .eq("sources.slug", "sggs")
     .order("line_no", { ascending: true });
   // A failed query goes to the error page and its retry (#225), not "not indexed".
   if (error) throw new Error(`ang ${ang}: ${error.message}`);

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { lineHref, placeLabel } from "@/lib/line-context";
+import { lineHref } from "@/lib/line-context";
+import { SOURCE_COLUMNS, isSggs, placeLabel, type SourceMeta } from "@/lib/sources";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
@@ -191,7 +192,7 @@ export default async function WordPage({ params, searchParams }: Props) {
             id, position,
             lines (
               id, ang, line_no, gurmukhi, translation_en, transliteration_en, shabad_id,
-              sources ( code, name ),
+              sources ( ${SOURCE_COLUMNS} ),
               shabads ( id, raag_english, writer_english, ang_start ),
               line_translations (
                 body_unicode, language, caveat,
@@ -296,7 +297,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       id: number; ang: number; line_no: number; gurmukhi: string;
       translation_en: string | null; transliteration_en: string | null;
       shabad_id: number;
-      sources: { code: string; name: string } | null;
+      sources: SourceMeta | null;
       shabads: { id: number; raag_english: string | null; writer_english: string | null } | null;
       line_translations: LineCommentary[] | null;
     } | null;
@@ -954,8 +955,8 @@ export default async function WordPage({ params, searchParams }: Props) {
                         every corpus; each pages in its own unit (Bhai Gurdas:
                         the vaar; Dasam Bani: its own angs). */}
                     <a href={lineHref(line.id)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
-                      {placeLabel(line.sources?.code, line.ang)}
-                      {line.sources && line.sources.code !== "sggs_banidb_v2" && <>{" · "}{line.sources.name}</>}
+                      {placeLabel(line.sources, line.ang)}
+                      {line.sources && !isSggs(line.sources) && <>{" · "}{line.sources.name}</>}
                     </a>
                     {line.shabads?.writer_english && (
                       <span style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)" }}>

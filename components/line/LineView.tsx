@@ -1,7 +1,8 @@
 import {
-  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, placeLabel, sourceLabel, viewerCss,
+  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, sourceLabel, viewerCss,
   type LineContext, type PickerState, type ViewId,
 } from "@/lib/line-context";
+import { isSggs, placeLabel } from "@/lib/sources";
 import { vishraamSets, wordMarks } from "@/lib/vishraam";
 import { ResourcePicker } from "./ResourcePicker";
 import { VishraamPicker } from "./VishraamPicker";
@@ -19,10 +20,9 @@ const scopePath = (id: number, scope: LineContext["scope"]) => (scope === "ang" 
 
 export function LineView({ ctx }: { ctx: LineContext }) {
   const first = ctx.lines[0];
-  const code = ctx.source?.code ?? null;
-  const sggs = code === "sggs_banidb_v2";
+  const sggs = isSggs(ctx.source);
   const angs = [...new Set(ctx.lines.map((l) => l.ang))];
-  const place = angs.length > 1 ? `${placeLabel(code, angs[0])}–${angs.at(-1)}` : placeLabel(code, first?.ang ?? 0);
+  const place = angs.length > 1 ? `${placeLabel(ctx.source, angs[0])}–${angs.at(-1)}` : placeLabel(ctx.source, first?.ang ?? 0);
 
   const present = new Set(ctx.sources.map((s) => s.code));
   const initial: PickerState = {

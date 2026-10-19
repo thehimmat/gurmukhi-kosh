@@ -3,7 +3,8 @@
  * words, how its place is labelled per corpus, and the link into it.
  */
 import { describe, it, expect } from "vitest";
-import { lineHref, lineParts, placeLabel } from "../lib/line-context";
+import { lineHref, lineParts } from "../lib/line-context";
+import { isSggs, placeLabel } from "../lib/sources";
 
 describe("lineParts", () => {
   it("links each word to its entry and keeps the spacing and dandas as text", () => {
@@ -23,10 +24,22 @@ describe("lineParts", () => {
 });
 
 describe("placeLabel", () => {
-  it("names the ang for SGGS and the vaar for Bhai Gurdas Ji", () => {
-    expect(placeLabel("sggs_banidb_v2", 12)).toBe("Ang 12");
-    expect(placeLabel("bhai_gurdas_banidb_v2", 3)).toBe("Vaar 3");
-    expect(placeLabel("dasam_banidb_v2", 40)).toBe("Ang 40");
+  it("names the place in the source's own page unit (sources.page_unit, 065)", () => {
+    expect(placeLabel({ page_unit: "Ang" }, 12)).toBe("Ang 12");
+    expect(placeLabel({ page_unit: "Vaar" }, 3)).toBe("Vaar 3");
+    expect(placeLabel({ page_unit: "Ghazal" }, 61)).toBe("Ghazal 61");
+  });
+
+  it("falls back to Ang without a source", () => {
+    expect(placeLabel(null, 40)).toBe("Ang 40");
+  });
+});
+
+describe("isSggs", () => {
+  it("goes by the source's slug", () => {
+    expect(isSggs({ slug: "sggs" })).toBe(true);
+    expect(isSggs({ slug: "dasam" })).toBe(false);
+    expect(isSggs(null)).toBe(false);
   });
 });
 
@@ -171,7 +184,7 @@ describe("lineContextJson", () => {
     const res = { line_id: 7, source_code: "ssk_en", language: "en", body_unicode: "Hail", caveat: null };
     const out = lineContextJson({
       lineId: 7, scope: "passage", lines: [line], resources: new Map([[7, [res]]]),
-      sources: [{ code: "ssk_en", name: "SSK", author: null }], source: { code: "dasam", name: "Sri Dasam Granth" },
+      sources: [{ code: "ssk_en", name: "SSK", author: null }], source: { code: "dasam_banidb_v2", name: "Sri Dasam Granth", slug: "dasam", page_unit: "Ang" },
       shabad: null, passage: null, prevId: 6, nextId: null,
     });
     expect(out.resources).toEqual({ "7": [res] });
