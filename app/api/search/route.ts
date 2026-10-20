@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { foldGurmukhi } from "@/lib/gurmukhi-fold";
+import { SOURCE_COLUMNS, type SourceMeta } from "@/lib/sources";
 import {
   DEFAULT_NUMERAL_ROLES,
   NUMERAL_ROLES,
@@ -20,7 +21,7 @@ type LineRow = {
   line_no: number;
   gurmukhi: string;
   corpus_rank: number | null;
-  sources: { code: string; name: string } | null;
+  sources: SourceMeta | null;
   shabads: { raag_english: string | null; writer_english: string | null } | null;
 };
 
@@ -82,7 +83,7 @@ async function searchNumbers(req: NextRequest, q: string) {
     .from("number_occurrences")
     .select(
       "value, role, keyword, char_start, char_end, " +
-        "lines!inner(id, ang, line_no, gurmukhi, corpus_rank, sources(code, name), shabads(raag_english, writer_english))"
+        `lines!inner(id, ang, line_no, gurmukhi, corpus_rank, sources(${SOURCE_COLUMNS}), shabads(raag_english, writer_english))`
     )
     .eq("value", value)
     .in("role", roles)
@@ -101,6 +102,7 @@ async function searchNumbers(req: NextRequest, q: string) {
       corpusRank: r.lines!.corpus_rank ?? 100,
       sourceCode: r.lines!.sources?.code ?? null,
       sourceName: r.lines!.sources?.name ?? null,
+      sourceSlug: r.lines!.sources?.slug ?? null,
       raag: r.lines!.shabads?.raag_english ?? null,
       writer: r.lines!.shabads?.writer_english ?? null,
       role: r.role,

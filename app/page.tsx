@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Word } from "@/lib/supabase";
 import { useGurmukhiInput } from "@atthebunga/gurmukhi-input";
 import { SITE_NAME_PA } from "@/lib/site";
+import { isSggs } from "@/lib/sources";
 import {
   DEFAULT_NUMERAL_ROLES,
   NUMERAL_ROLES,
@@ -29,6 +30,7 @@ type NumberLine = {
   gurmukhi: string;
   sourceCode: string | null;
   sourceName: string | null;
+  sourceSlug: string | null;
   raag: string | null;
   writer: string | null;
   role: NumeralRole;
@@ -305,7 +307,7 @@ export default function HomePage() {
                 >
                   {NUMERAL_ROLE_LABELS[line.role]}
                 </span>
-                {line.sourceCode === "sggs_banidb_v2" ? (
+                {isSggs({ slug: line.sourceSlug }) ? (
                   <a href={`/ang/${line.ang}`} style={{ color: "var(--text-secondary)" }}>
                     Ang {line.ang}
                   </a>

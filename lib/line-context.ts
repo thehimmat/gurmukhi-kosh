@@ -6,21 +6,13 @@
 // since one printed line holds several verses (gurmukhi-search#46).
 
 import { supabase } from "./supabase";
+import { SOURCE_COLUMNS, type SourceMeta } from "./sources";
 import type { LineVishraam } from "./vishraam";
 import { narrowerThanShabad, pickPassage } from "./passages";
 
 /** The viewer link for a line: its context page, scrolled to and marking it. */
 export function lineHref(id: number): string {
   return `/line/${id}#line-${id}`;
-}
-
-// Each corpus pages in its own unit (as the word page's occurrence cards).
-const PAGE_UNIT: Record<string, string> = {
-  bhai_gurdas_banidb_v2: "Vaar",
-};
-
-export function placeLabel(sourceCode: string | null | undefined, ang: number): string {
-  return `${PAGE_UNIT[sourceCode ?? ""] ?? "Ang"} ${ang}`;
 }
 
 // `i` is a word's index among the line's space-separated tokens, the index
@@ -210,7 +202,7 @@ export type LineContext = {
   resources: Map<number, Resource[]>;
   // The view sources these lines have, in view order.
   sources: ResourceSource[];
-  source: { code: string; name: string } | null;
+  source: SourceMeta | null;
   shabad: { raag_english: string | null; raag_gurmukhi: string | null; writer_english: string | null } | null;
   // Set when the passage scope shows a bani passage rather than the shabad.
   passage: ContextPassage | null;
@@ -238,7 +230,7 @@ function must<T>(r: { data: T; error: { message: string } | null }, what: string
 export async function fetchLineContext(id: number, scope: Scope = "passage"): Promise<LineContext | null> {
   const line = must(await supabase
     .from("lines")
-    .select(`${LINE_COLUMNS}, sources(code, name), shabads(raag_english, raag_gurmukhi, writer_english)`)
+    .select(`${LINE_COLUMNS}, sources(${SOURCE_COLUMNS}), shabads(raag_english, raag_gurmukhi, writer_english)`)
     .eq("id", id)
     .maybeSingle(), "line");
   if (!line) return null;

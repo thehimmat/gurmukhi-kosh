@@ -40,7 +40,7 @@ describe("the replayed schema", () => {
   let db: PGlite;
   beforeAll(async () => {
     db = await freshDb();
-  });
+  }, 60_000); // the first call builds the migrated template
 
   it("gives the sources the ids they have in production", async () => {
     const { rows } = await db.query<{ id: number; code: string }>("select id::int, code from sources order by id");

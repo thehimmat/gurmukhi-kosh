@@ -330,3 +330,16 @@ the 134 retired shabads rows, 901426-901559, which no line used. 1,425 Sarbloh s
 delete from shabads sh where sh.id >= 900001
    and not exists (select 1 from lines l where l.shabad_id = sh.id);
 ```
+
+| 66 | 20261019220132 | 065_data_driven_sources | kosh `065_data_driven_sources.sql` |
+
+Migration 065 makes sources describe themselves (#243): `sources` gains `slug`, `kind`, `tier`, `rank`, `page_unit`,
+`searched_by_default`, `author` and `external_refs` (BaniDB SourceID, ShabadOS code); `lines.corpus_rank` drops its
+generated CASE and is set from `sources.rank` by trigger (a new source is one insert; changing a rank re-ranks its
+lines); `shabads.source_fk` references `sources` instead of `dict_sources`, backfilled from lines (SGGS 5,542,
+Bhai Gurdas 911, Dasam 5,422, Sarbloh 1,425, Nand Lal 63). Tested first on the PGlite replay (`tests/db/sources.test.ts`),
+dry-run in an aborted `DO` block, then applied 2026-10-19. DROP EXPRESSION rewrote nothing: per-source ranks and
+counts unchanged, and 15 ordered-result fingerprints of the search RPCs, counts and feed order (taken before and after)
+are identical. Timings as postgres, warm: First Letter ਸ_ਕ 18 ms, Contains 13 ms, fuzzy High ~660 ms, word-ids ਹਰਿ
+at offset 2000 50 ms. The triggers were checked live in an aborted `DO` block (a probe source at rank 35 sorted after
+Bhai Gurdas, and re-ranked to 5 it sorted after SGGS).

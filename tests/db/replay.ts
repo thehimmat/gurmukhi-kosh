@@ -50,9 +50,17 @@ const BOOTSTRAP = "tests/db/supabase-bootstrap.sql";
 // Seeded right after 001, where production's add_sources_table seeded it.
 const AFTER_001 = "tests/db/sggs-source.sql";
 
-async function migrate(): Promise<PGlite> {
-  const db = await PGlite.create({ extensions: { pg_trgm } });
-  const files = [BOOTSTRAP, ...replayOrder().flatMap((f) => (f.endsWith("/001_schema.sql") ? [f, AFTER_001] : [f]))];
+const allFiles = () =>
+  [BOOTSTRAP, ...replayOrder().flatMap((f) => (f.endsWith("/001_schema.sql") ? [f, AFTER_001] : [f]))];
+
+// The index of the file named `migration` (e.g. "065_data_driven_sources.sql").
+function indexOf(migration: string): number {
+  const i = allFiles().findIndex((f) => f.endsWith(`/${migration}`));
+  if (i < 0) throw new Error(`no migration ${migration}`);
+  return i;
+}
+
+async function run(db: PGlite, files: string[]): Promise<void> {
   for (const file of files) {
     try {
       await db.exec(readFileSync(file, "utf8"));
@@ -60,13 +68,28 @@ async function migrate(): Promise<PGlite> {
       throw new Error(`replaying ${file}: ${(e as Error).message}`);
     }
   }
+}
+
+async function migrate(before?: string): Promise<PGlite> {
+  const db = await PGlite.create({ extensions: { pg_trgm } });
+  const files = allFiles();
+  await run(db, before ? files.slice(0, indexOf(before)) : files);
   return db;
 }
 
-let template: Promise<PGlite> | undefined;
+const templates = new Map<string, Promise<PGlite>>();
 
-/** A migrated database of its own, with no corpus rows beyond what migrations seed. */
-export async function freshDb(): Promise<PGlite> {
-  template ??= migrate();
-  return (await template).clone() as Promise<PGlite>;
+/**
+ * A migrated database of its own, with no corpus rows beyond what migrations seed. With `before`, it
+ * stops just before that migration, so a test can load rows and then run it with applyFrom().
+ */
+export async function freshDb(opts: { before?: string } = {}): Promise<PGlite> {
+  const key = opts.before ?? "";
+  if (!templates.has(key)) templates.set(key, migrate(opts.before));
+  return (await templates.get(key)!).clone() as Promise<PGlite>;
+}
+
+/** Runs `migration` and every one after it, on a database from freshDb({ before: migration }). */
+export async function applyFrom(db: PGlite, migration: string): Promise<void> {
+  await run(db, allFiles().slice(indexOf(migration)));
 }
