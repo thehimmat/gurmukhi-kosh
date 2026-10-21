@@ -343,3 +343,13 @@ counts unchanged, and 15 ordered-result fingerprints of the search RPCs, counts 
 are identical. Timings as postgres, warm: First Letter ਸ_ਕ 18 ms, Contains 13 ms, fuzzy High ~660 ms, word-ids ਹਰਿ
 at offset 2000 50 ms. The triggers were checked live in an aborted `DO` block (a probe source at rank 35 sorted after
 Bhai Gurdas, and re-ranked to 5 it sorted after SGGS).
+
+| 67 | 20261021030235 | 066_contains_search | kosh `066_contains_search.sql` |
+
+Migration 066 adds `search_lines_contains` / `count_lines_contains` for gurmukhi-search's exact Contains, matching the
+line and the query after `normalize(…, NFD)` (expression trigram index `lines_gurmukhi_nfd_trgm`), so a nukta letter
+matches whether stored ready-made or as letter + ਼, and a query with no trigram (਼, ੍, "੍ ") uses strpos instead of a
+full trigram index scan that ran past the anon 3 s timeout. Tested first on the PGlite replay
+(`tests/db/contains-search.test.ts`), applied 2026-10-21. Checked live as anon: ਼ 7,644 lines, ੍ 45,032, "੍ " 1
+(ਜਨਿੰਦ਼੍), ਸ਼ in either form 5,301; plain words unchanged (ਸਤਿ 3,607, ਸਬਦ 3,364, same as the old `like`). Timings, warm:
+਼ ~1.0 s rows / 0.9 s count (the slowest), ੍ 0.6 s / 0.4 s, "੍ " 0.3 s, ਸਤਿ 50 ms, ਹਰਿ 130 ms.
