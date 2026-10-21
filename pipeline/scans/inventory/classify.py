@@ -43,6 +43,7 @@ UNICODE_FONT_PREFIXES = (
     "noto", "raavi", "gurmukhisangam", "mukta", "anmoluni", "saab", "lohit", "akaash",
     "mangal", "glyphless", "minion", "myriad", "palatino", "bookman", "book", "century",
     "trebuchet", "wingdings", "cour", "nirmala", "kokila", "aparajita", "arialunicode",
+    "papyrus", "gabriola", "monotypecorsiva", "elatin", "comicsans", "impact", "franklin",
 )
 
 _SCRIPTS = {
@@ -140,7 +141,7 @@ def strip_stamps(text: str, pages: int) -> str:
                      if not WATERMARKS.search(l) and counts.get(l.strip(), 0) < repeated)
 
 
-def _is_unicode_font(name: str) -> bool:
+def is_unicode_font(name: str) -> bool:
     bare = re.sub(r"^[A-Z]{6}\+", "", name).lower().replace("-", "").replace(" ", "")
     return bare.startswith(UNICODE_FONT_PREFIXES) or bare in ("[none]", "")
 
@@ -177,7 +178,7 @@ def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
         if enc:
             if enc not in font_encodings:
                 font_encodings.append(enc)
-        elif not f.uni and not _is_unicode_font(f.name):
+        elif not f.uni and not is_unicode_font(f.name):
             bare = re.sub(r"^[A-Z]{6}\+", "", f.name)
             if bare not in unknown:
                 unknown.append(bare)

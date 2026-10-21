@@ -16,6 +16,9 @@ import sys
 from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+from classify import is_unicode_font  # noqa: E402
 
 # First match wins, so the more specific kinds come first.
 KIND_PATTERNS = [
@@ -61,7 +64,8 @@ def build_rows(tree: dict, probes: dict, manifest: dict) -> list[dict]:
             "kind": guess_kind(node["title"], path),
             "text_layer": probe.get("text_layer", "unprobed"),
             "encodings": probe.get("encodings", []),
-            "unknown_fonts": probe.get("unknown_fonts", []),
+            # re-filtered so fonts added to the Latin list since the probe drop out
+            "unknown_fonts": [f for f in probe.get("unknown_fonts", []) if not is_unicode_font(f)],
             "scripts": {k: round(v, 2) for k, v in probe.get("scripts", {}).items() if v >= 0.05},
             "probe": probe.get("probe"),
         }
