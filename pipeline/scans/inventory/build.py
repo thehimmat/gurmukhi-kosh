@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Assemble the Drive inventory from the folder walk, the probes and the triage.
 
-  python3 pipeline/scans/inventory/build.py tree.json probes.jsonl
+  python3 pipeline/scans/inventory/build.py [tree.json probes.jsonl]
 
-tree.json is the walk of the Drive folders ({"nodes": {id: {id, parentId, kind
+The inputs default to data/tree.json and data/probes.jsonl. tree.json is the walk of the Drive folders ({"nodes": {id: {id, parentId, kind
 F|P|O, size, title}}}), probes.jsonl one probe.py result per line with its
-"drive_id". Writes inventory.json and INVENTORY.md beside this file, joining
+"drive_id" (the latest line for an id wins). Writes inventory.json and INVENTORY.md beside this file, joining
 manifest.yaml's triage by Drive id.
 """
 
@@ -85,7 +85,7 @@ def load_manifest() -> dict:
             for f in m["files"] if f.get("drive_id")}
 
 
-LAYER_ORDER = ["unicode", "mixed", "legacy", "garbled", "latin", "none", "unprobed"]
+LAYER_ORDER = ["unicode", "mixed", "legacy", "garbled", "latin", "none", "unindexed", "unprobed"]
 
 
 def render_markdown(rows: list[dict], images: dict[str, int]) -> str:
@@ -98,7 +98,9 @@ def render_markdown(rows: list[dict], images: dict[str, int]) -> str:
         "",
         "Text layer: **unicode** Unicode Gurmukhi (or Devanagari/Perso-Arabic) · **mixed** Unicode and a",
         "legacy font · **legacy** a legacy Gurmukhi font (encoding named) · **garbled** bad OCR · **latin**",
-        "English or romanised only · **none** page images only · **unprobed** not checked yet.",
+        "English or romanised only · **none** page images only · **unindexed** too large for Drive's",
+        "text extraction and the download limit: probe a synced copy with `probe_local.py` ·",
+        "**unprobed** not checked yet.",
         "Kind is guessed from the title, as a first sort.",
         "",
         "| text layer | files |",
@@ -143,4 +145,6 @@ def main(tree_path: str, probes_path: str) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    data = os.path.join(HERE, "data")
+    args = sys.argv[1:] or [os.path.join(data, "tree.json"), os.path.join(data, "probes.jsonl")]
+    main(*args)
