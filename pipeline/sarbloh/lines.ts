@@ -66,10 +66,15 @@ export function splitPagedPadas(pages: string[]): PagedPada[] {
 
 const DANDA_LIKE = /[ñ!{}#·_→]+/g;
 
-/** Repair legacy-font leftovers: ੴ, symbols standing for dandas, visarga; drop other stray characters. */
+/**
+ * Repair legacy-font leftovers: ੴ, symbols standing for dandas, visarga, doubled halants; drop other
+ * stray characters.
+ */
 export function cleanText(text: string): { text: string; dropped: string[] } {
   let t = text
     .replace(/</g, "ੴ")
+    // A halant typed twice (ਛਤ੍੍ਰ, 4 lines in the typed text) is one; migration 068 fixed the loaded copy.
+    .replace(/੍{2,}/g, "੍")
     .replace(DANDA_LIKE, "॥")
     .replace(/([ਁ-੥ੰ-ੵ]):(?=\s|$)/g, "$1ਃ")
     .replace(/:/g, "॥");
