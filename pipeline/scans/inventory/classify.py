@@ -52,6 +52,14 @@ _SCRIPTS = {
 }
 _ARABIC_EXTRA = ((0x0750, 0x077F), (0xFB50, 0xFDFF), (0xFE70, 0xFEFF))
 
+STAMP_MIN_PAGES = 6
+# Scanner and library stamps: text a page-image PDF carries without a text layer.
+WATERMARKS = re.compile(
+    r"egangotri|camscanner|digiti[sz]ed by|google|dharmartha trust|raghunath temple|"
+    r"namdhari e-?library|panjab digital library|archive\.org|internet archive|"
+    r"scanned (by|with)|cc-0\.|public domain|sikh ?heritage|ocr by|adobe",
+    re.I)
+
 _VOWEL_SIGNS = set("ਾਿੀੁੂੇੈੋੌ")
 _NASALS = set("ਂੰ")
 _CONSONANT = re.compile(r"[ਕ-ਹਖ਼-ੜਫ਼ੲੳਅ-ਔ]")
@@ -121,6 +129,17 @@ def _garbled_share(text: str) -> float:
     return bad / len(words)
 
 
+def strip_stamps(text: str, pages: int) -> str:
+    """Drop watermark lines, and any line printed on most pages (a stamp or running
+    head), so a page-image PDF with a stamp in its text layer reads as having none."""
+    lines = text.splitlines()
+    counts = Counter(l.strip() for l in lines if l.strip())
+    # Only a sample of several pages can show a line recurring page after page.
+    repeated = pages // 2 if pages >= STAMP_MIN_PAGES else float("inf")
+    return "\n".join(l for l in lines
+                     if not WATERMARKS.search(l) and counts.get(l.strip(), 0) < repeated)
+
+
 def _is_unicode_font(name: str) -> bool:
     bare = re.sub(r"^[A-Z]{6}\+", "", name).lower().replace("-", "").replace(" ", "")
     return bare.startswith(UNICODE_FONT_PREFIXES) or bare in ("[none]", "")
@@ -130,7 +149,9 @@ def _encodings_from_text(text: str) -> list[str]:
     """Legacy layouts found in Latin-looking text, most lines first. A steek or a
     translation may hold only a little verse among its prose, so a small share of
     confidently legacy lines is enough."""
-    lines = [l for l in text.splitlines() if len(l.strip()) >= 8]
+    # A line with no lower case is a heading in capitals, which reads as valid
+    # AnmolLipi; legacy Gurmukhi always mixes cases.
+    lines = [l for l in text.splitlines() if len(l.strip()) >= 8 and re.search(r"[a-z]", l)]
     if len(lines) > MAX_DETECT_LINES:
         step = len(lines) / MAX_DETECT_LINES
         lines = [lines[int(i * step)] for i in range(MAX_DETECT_LINES)]
@@ -146,6 +167,7 @@ def _encodings_from_text(text: str) -> list[str]:
 def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
     """Classify a text layer from its fonts (None when unknown) and a text sample
     covering *pages* pages."""
+    text = strip_stamps(text, pages)
     chars = len(re.sub(r"\s", "", text))
     scripts = _script_shares(text)
     font_encodings: list[str] = []

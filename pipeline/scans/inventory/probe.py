@@ -47,13 +47,20 @@ def probe_pdf(pdf: str) -> dict:
     return {"pages": pages, "fonts": sorted({f.name for f in fonts}), "probe": "pdf", **asdict(c)}
 
 
-def probe_drive_text(path: str) -> dict:
-    content = json.load(open(path))["fileContent"]
-    pages = len(re.findall(r"\*\*Page \d+\*\*", content)) or 1
+def classify_drive_content(content: str) -> dict:
+    """Classify Drive's text extraction. Drive returns nothing at all, not even
+    page markers, for a file it hasn't indexed: that says nothing about its text."""
+    pages = len(re.findall(r"\*\*Page \d+\*\*", content))
     text = re.sub(r"\|\s*:?-+:?\s*\||\[\*\*Page \d+\*\*\]\(\)|^-----$|\|", " ", content, flags=re.M)
     text = text.replace("Untitled", "", 1)
-    c = classify(None, text, pages=pages)
-    return {"pages": pages, "fonts": [], "probe": "drive-text", **asdict(c)}
+    if not pages and not text.strip():
+        return {"pages": None, "fonts": [], "probe": "drive-text", "text_layer": "unindexed"}
+    c = classify(None, text, pages=pages or 1)
+    return {"pages": pages or None, "fonts": [], "probe": "drive-text", **asdict(c)}
+
+
+def probe_drive_text(path: str) -> dict:
+    return classify_drive_content(json.load(open(path))["fileContent"])
 
 
 if __name__ == "__main__":

@@ -21,6 +21,11 @@ JAPJI_AKHAR = "Awid scu jugwid scu ]\nhY BI scu nwnk hosI BI scu ]1]\n" * 5
 ENGLISH = "The Guru's word is the light of the world and all who read it.\n" * 5
 
 
+def numbered(line: str, n: int) -> str:
+    """n distinct copies of a line, as real pages would have (repeats look like stamps)."""
+    return "".join(f"{line.rstrip()} {i}\n" for i in range(n))
+
+
 class TextLayer(unittest.TestCase):
     def test_no_text_is_none(self):
         c = classify(None, "\n\n  \f\f", pages=3)
@@ -59,9 +64,27 @@ class TextLayer(unittest.TestCase):
         # Sri Gur Sobha (Asees) with Kulwant Singh's translation: most lines are English
         asees = ("b? poSh eo w? sp jh, wB' d/y e[ozr e' f;zx i' Xk:'.\n"
                  "ykb;/ e/ f;yB eh fBzde[ i' fBzd eo?,\n")
-        c = classify(None, ENGLISH * 40 + asees * 5, pages=10)
+        c = classify(None, numbered(ENGLISH.splitlines()[0], 200) + "".join(numbered(l, 5) for l in asees.splitlines()), pages=10)
         self.assertEqual(c.text_layer, "legacy")
         self.assertEqual(c.encodings[0], "asees")
+
+    def test_english_headings_in_capitals_are_not_legacy(self):
+        # 'TRANSLATED BY' is valid AnmolLipi keystrokes; real legacy text mixes cases
+        heads = "LELAND STANFORD\nTRANSLATED BY\nBERNARD QUARITCH\nPERSIAN BALUCHISTAN\nTHE GOSHAWKS\nCONTENTS\n"
+        c = classify(None, numbered(ENGLISH.splitlines()[0], 100) + "".join(numbered(h, 3) for h in heads.splitlines()), pages=10)
+        self.assertEqual(c.text_layer, "latin")
+
+    def test_scanner_watermarks_are_not_a_text_layer(self):
+        stamps = ("CC-0. Panjab University Library, Chandigarh. Digitized by eGangotri\n"
+                  "Scanned with CamScanner\n"
+                  "Digitized by Google\n")
+        c = classify(None, "\f".join([stamps] * 30), pages=30)
+        self.assertEqual(c.text_layer, "none")
+
+    def test_a_stamp_repeated_on_every_page_is_ignored(self):
+        stamp = "Dharmartha Trust J&K Collection, Jammu. Shri Raghunath Temple Library\n"
+        c = classify(None, "\f".join([stamp] * 40), pages=40)
+        self.assertEqual(c.text_layer, "none")
 
     def test_english(self):
         c = classify([Font("TimesNewRomanPSMT", uni=True)], ENGLISH, pages=1)
@@ -82,6 +105,19 @@ class TextLayer(unittest.TestCase):
         fonts = [Font("ABCDEF+Calibri", uni=True), Font("Arial-BoldMT", uni=True)]
         c = classify(fonts, ENGLISH, pages=1)
         self.assertEqual(c.unknown_fonts, [])
+
+
+class Unindexed(unittest.TestCase):
+    def test_drive_text_with_no_page_markers_is_unindexed(self):
+        # Drive returns nothing at all, not even page markers, for files it hasn't indexed
+        from probe import classify_drive_content
+        self.assertEqual(classify_drive_content("")["text_layer"], "unindexed")
+
+    def test_drive_text_with_empty_pages_is_none(self):
+        from probe import classify_drive_content
+        content = "Untitled \n\n|  |\n| :-: |\n| [**Page 1**]() |\n\n-----\n\n|  |\n| :-: |\n| [**Page 2**]() |"
+        r = classify_drive_content(content)
+        self.assertEqual((r["text_layer"], r["pages"]), ("none", 2))
 
 
 class Garbled(unittest.TestCase):
