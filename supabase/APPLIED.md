@@ -353,3 +353,11 @@ full trigram index scan that ran past the anon 3 s timeout. Tested first on the 
 (`tests/db/contains-search.test.ts`), applied 2026-10-21. Checked live as anon: ਼ 7,644 lines, ੍ 45,032, "੍ " 1
 (ਜਨਿੰਦ਼੍), ਸ਼ in either form 5,301; plain words unchanged (ਸਤਿ 3,607, ਸਬਦ 3,364, same as the old `like`). Timings, warm:
 ਼ ~1.0 s rows / 0.9 s count (the slowest), ੍ 0.6 s / 0.4 s, "੍ " 0.3 s, ਸਤਿ 50 ms, ਹਰਿ 130 ms.
+
+**068_sarbloh_doubled_halant** — run 2026-10-21 from the dashboard SQL editor, so there is no ledger row: the MCP's
+`apply_migration` holds the DELETE for a confirmation that never reached the maintainer and timed out (three tries,
+each rolled back). Kosh `068_sarbloh_doubled_halant.sql`, as in the repo. Four Sarbloh half-lines had a halant typed
+twice (lines 169421, 169439, 171115, 173273). Checked after: no line or word holds a doubled halant; ਛਤ੍ਰ (72052)
+211 → 212 occurrences (Sarbloh 77 → 78 in both stats tables) and ਸਸਤ੍ਨ (898002) 2 → 3, their misspellings 908120
+and 921408 deleted; 925959 renamed ਨ੍ਪਬਰ and 891466 ਪ੍ਸਾਦਿ (fold ਪ੍ਸਾਦ); each line's words read back in order.
+`pipeline/sarbloh/lines.ts` cleanText now collapses doubled halants, so a rebuild keeps them fixed.
