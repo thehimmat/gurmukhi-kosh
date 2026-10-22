@@ -20,10 +20,12 @@ insert into source_rights (code, visibility, rights_status, notes) values
    'Institute of Sikh Studies, Chandigarh (2014): the verse is public domain, the typed text and its readings are the edition''s')
 on conflict (code) do nothing;
 
-insert into sources (code, name, version, description, slug, kind, tier, rank, page_unit,
+-- id 7 pinned: production's sequence has already handed out 7, so it would give 8,
+-- while a fresh replay gives 7.
+insert into sources (id, code, name, version, description, slug, kind, tier, rank, page_unit,
                      searched_by_default, author, external_refs)
 values (
-  'gur_sobha_iss',
+  7, 'gur_sobha_iss',
   'Sri Gur Sobha (Kavi Sainapati)',
   'iss-2014',
   'Sainapati''s Sri Gur Sobha (1701), 20 chapters, 935 verses, one row per tuk, as printed by the Institute of Sikh Studies, Chandigarh (2014, tr. Kulwant Singh), from its Asees text layer. Typing slips corrected; the edition''s verse numbers kept as printed. Curator-only until permission to publish is settled.',
@@ -31,6 +33,7 @@ values (
   false, 'Kavi Sainapati', '{}'::jsonb
 )
 on conflict (code) do nothing;
+select setval('sources_id_seq', (select max(id) from sources));
 
 insert into shabads (id, writer_english, writer_id, ang_start, source_fk)
 select v.id, 'Kavi Sainapati', 9001, v.ang, (select id from sources where code = 'gur_sobha_iss')
