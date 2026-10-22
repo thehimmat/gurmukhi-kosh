@@ -379,3 +379,13 @@ and 921408 deleted; 925959 renamed ਨ੍ਪਬਰ and 891466 ਪ੍ਸਾਦਿ
 in the repo. Checked after: all 172,604 lines `is_public`; the five corpora have public `source_rights` rows; 10 of the
 13 line-search functions are now security definer (the other three don't read `lines` themselves); anon can no longer
 execute `refresh_computed_stats`.
+
+**072_health_stats_fast** — applied 2026-10-22 with the MCP's `apply_migration`, twice (ledger rows `072_health_stats_fast`
+and `072b_health_stats_fast`); the repo file is the second version. After 070, `/api/health` returned 500: 070's
+`health_stats` filtered on `lines.is_public`, which no index answers, and ran ~29 s (`count(distinct ang)` alone 5.8 s,
+an index-only scan on `lines_ang` before). 072 counts over all lines and subtracts the private ones (partial index
+`lines_private`). The first version reached the private occurrences and translations through `line_id in (…)`, which
+scanned every row; the second starts from `lines`. `analyze lines` was then run by hand: `is_public` had no statistics,
+so the planner expected many private lines and merge-joined over all of `lines` (9 s). After: `/api/health` 200, same
+totals (172,604 lines, 1,430 angs, 1,113,815 occurrences). The function still takes ~14 s on its other, older parts
+(definitions and line_translations scans), inside its 20 s limit.
