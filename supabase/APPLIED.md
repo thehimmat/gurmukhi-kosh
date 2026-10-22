@@ -384,6 +384,7 @@ execute `refresh_computed_stats`.
 `071_gur_sobha_source.sql`, as in the repo. Checked after: `gur_sobha_iss` is source 7 (pinned; the sequence would have
 given 8), curator-only and absent from `public_source_codes`, with its 483 shabads (920001-920483). Its lines are not
 loaded yet.
+
 **072_health_stats_fast** — applied 2026-10-22 with the MCP's `apply_migration`, twice (ledger rows `072_health_stats_fast`
 and `072b_health_stats_fast`); the repo file is the second version. After 070, `/api/health` returned 500: 070's
 `health_stats` filtered on `lines.is_public`, which no index answers, and ran ~29 s (`count(distinct ang)` alone 5.8 s,
