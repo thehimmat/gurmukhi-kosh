@@ -13,6 +13,9 @@ import { linesLoadSql } from "../../pipeline/shared/load-sql";
 
 let db: PGlite;
 
+// A private-use character, for definitions_with_pua. Built from its code point so the source stays ASCII.
+const PUA = String.fromCodePoint(0xe001);
+
 const dictId = (code: string) => `(select id from dict_sources where code = '${code}')`;
 
 async function seed(d: PGlite) {
@@ -33,7 +36,7 @@ async function seed(d: PGlite) {
 
     insert into definitions (word_id, dict_source_id, definition_text) values
       (9001, ${dictId("mahan_kosh")}, 'mk sense'),
-      (9001, ${dictId("shackle")}, 'shackle sense '),
+      (9001, ${dictId("shackle")}, 'shackle sense ${PUA}'),
       (9001, ${dictId("sikhri")}, 'sikhri sense'),
       (9001, ${dictId("mahan_kosh_en_pu")}, 'english mk sense');
 
@@ -204,7 +207,7 @@ describe("069: curator and release", () => {
     const defs = (await fresh.query<{ t: string }>("select definition_text as t from definitions where word_id = 9001")).rows;
     const lex = (await fresh.query("select id from lexemes")).rows;
     await fresh.exec("reset role");
-    expect(texts(defs)).toEqual(["mk sense", "shackle sense "]);
+    expect(texts(defs)).toEqual(["mk sense", `shackle sense ${PUA}`]);
     expect(lex).toEqual([{ id: 77 }]); // the uncited lexeme stays hidden: a lexeme is public through a public citation
   }, 60_000);
 });
