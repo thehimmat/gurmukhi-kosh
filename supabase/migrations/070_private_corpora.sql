@@ -219,7 +219,7 @@ where s.writer_id is not null
 group by w.id, s.writer_id;
 create unique index if not exists word_writer_stats_idx
   on word_writer_stats (word_id, writer_id);
-grant select on word_writer_stats to anon;
+grant select on word_writer_stats to anon, authenticated, service_role;
 
 create or replace function health_stats()
 returns jsonb
@@ -375,7 +375,7 @@ begin
       '\m(from|join)\s+(public\.)?number_occurrences\s+(as\s+)?([a-z_][a-z0-9_]*)',
       '\1 (select * from @@public_numbers@@ where line_id in (select id from @@public_lines@@ where is_public)) \4', 'gi');
     if def ~* '\m(from|join)\s+(public\.)?(lines|number_occurrences)\M' then
-      raise exception '069: % still reads lines or number_occurrences directly', f.sig;
+      raise exception '070: % still reads lines or number_occurrences directly', f.sig;
     end if;
     def := replace(replace(def, '@@public_lines@@', 'public.lines'), '@@public_numbers@@', 'public.number_occurrences');
     if def !~* 'SECURITY DEFINER' then
