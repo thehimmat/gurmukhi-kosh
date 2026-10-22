@@ -10,9 +10,9 @@ Corpus `gur_sobha_iss`: Sainapati's Sri Gur Sobha (completed Bhadon Sudi 15, Sam
   Malwa Press print (ed. Akali Kaur Singh Nihang) has only garbled OCR.
   - Other editions are to be ingested later, to compare readings and find errors and editorial
     differences.
-- **Private first.** The verse is public domain, but this typed text and its readings belong to the
-  edition. The source is loaded with `visibility = 'private'` until permission is settled, so only
-  an admin sees it.
+- **Curator-only first.** The verse is public domain, but this typed text and its readings belong to
+  the edition. Its `source_rights` row (069) is `curator` until permission is settled, so only the
+  curator sees it (corpora are gated by 070).
   - The extracted text is not committed. The build reads it from a path.
 - **Rows as Dasam Bani and Sarbloh have them.**
   - One tuk per row, ending in ` ॥` or in its verse numbers in Gurmukhi digits. The edition counts
@@ -83,7 +83,8 @@ Run the build to see the full list.
 2. `npm run build:gur-sobha -- <extract.jsonl> <out.json> <load.sql>` writes the rows and the SQL
    that loads them. It prints 3,708 lines, 483 shabads, 20 chapters, 23,736 words (4,789 distinct)
    and the numbering breaks.
-3. Apply the source migration, then run `<load.sql>`. Then run `refresh_word_frequencies`,
+3. Apply migrations 070 (curator-only corpora) and 071 (this source and its 483 shabads), then run
+   `<load.sql>`. Then run `refresh_word_frequencies`,
    `refresh_word_corpus_stats`, `refresh_word_corpus_writer_stats` and `refresh_line_first_letters`.
 4. Fill the new words' `ipa_display` and `search_fold` (`npm run pronounce`, `npm run searchfold`).
 
