@@ -379,3 +379,8 @@ and 921408 deleted; 925959 renamed ਨ੍ਪਬਰ and 891466 ਪ੍ਸਾਦਿ
 in the repo. Checked after: all 172,604 lines `is_public`; the five corpora have public `source_rights` rows; 10 of the
 13 line-search functions are now security definer (the other three don't read `lines` themselves); anon can no longer
 execute `refresh_computed_stats`.
+
+**071_gur_sobha_source** — applied 2026-10-22 with the MCP's `apply_migration` (ledger row `071_gur_sobha_source`). Kosh
+`071_gur_sobha_source.sql`, as in the repo. Checked after: `gur_sobha_iss` is source 7 (pinned; the sequence would have
+given 8), curator-only and absent from `public_source_codes`, with its 483 shabads (920001-920483). Its lines are not
+loaded yet.
