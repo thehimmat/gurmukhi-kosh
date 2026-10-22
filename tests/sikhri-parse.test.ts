@@ -110,3 +110,101 @@ describe('decodeWn', () => {
     expect(decodeWn('MzMwNzE=')).toBe('33071');
   });
 });
+
+// Full crawl (#40, 2026-10-21): every entry is taken, not only those whose Gurmukhi is already a
+// Kosh word. The Panjabi glossary gives (gurmukhi, wn); the English glossary gives the
+// romanization the detail page is fetched by. Both are joined on wn.
+import { planCrawl, refreshGurmukhi, panjabiEntryUrl } from "../pipeline/sikhri/plan";
+
+describe("planCrawl", () => {
+  const pa = [
+    { term: "ਸਚੁ", wn: "A1" },
+    { term: "ਨਾਮੁ", wn: "B2" },
+    { term: "ਨਾਮੁ", wn: "B3" }, // a homograph: its own wn
+  ];
+  const en = [
+    { term: "sach", wn: "A1" },
+    { term: "naam", wn: "B2" },
+    { term: "naam", wn: "B3" },
+    { term: "orphan", wn: "Z9" }, // in the English glossary only
+  ];
+
+  it("takes every entry when no word list is given", () => {
+    const plan = planCrawl(pa, en, null);
+    expect(plan.entries.map((e) => e.wn)).toEqual(["A1", "B2", "B3", "Z9"]);
+    expect(plan.entries.find((e) => e.wn === "Z9")).toEqual({ wn: "Z9", gurmukhi: null, roman: "orphan" });
+  });
+
+  it("still filters to known words when a word list is given", () => {
+    const plan = planCrawl(pa, en, new Set(["ਸਚੁ"]));
+    expect(plan.entries).toEqual([{ wn: "A1", gurmukhi: "ਸਚੁ", roman: "sach" }]);
+  });
+
+  it("reports entries it cannot fetch for want of a romanization", () => {
+    const plan = planCrawl([...pa, { term: "ਅਲਖ", wn: "C4" }], en, null);
+    expect(plan.unfetchable).toEqual([{ wn: "C4", gurmukhi: "ਅਲਖ" }]);
+    expect(plan.entries.some((e) => e.wn === "C4")).toBe(false);
+  });
+
+  it("keeps the first romanization when a wn appears twice", () => {
+    const plan = planCrawl([], [{ term: "sach", wn: "A1" }, { term: "sachu", wn: "A1" }], null);
+    expect(plan.entries).toEqual([{ wn: "A1", gurmukhi: null, roman: "sach" }]);
+  });
+});
+
+describe("planCrawl: homographs missing from the Panjabi glossary", () => {
+  it("borrows the Gurmukhi of a same-romanization sibling, marked as inferred", () => {
+    const plan = planCrawl([{ term: "ਨਾਮੁ", wn: "B2" }], [{ term: "naam", wn: "B2" }, { term: "naam", wn: "B3" }], null);
+    expect(plan.entries).toEqual([
+      { wn: "B2", gurmukhi: "ਨਾਮੁ", roman: "naam" },
+      { wn: "B3", gurmukhi: "ਨਾਮੁ", roman: "naam", gurmukhi_inferred: true },
+    ]);
+  });
+
+  it("leaves it null when siblings disagree on the Gurmukhi", () => {
+    const plan = planCrawl(
+      [{ term: "ਸਰ", wn: "A" }, { term: "ਸਰੁ", wn: "B" }],
+      [{ term: "sar", wn: "A" }, { term: "sar", wn: "B" }, { term: "sar", wn: "C" }],
+      null,
+    );
+    expect(plan.entries.find((e) => e.wn === "C")).toEqual({ wn: "C", gurmukhi: null, roman: "sar" });
+  });
+});
+
+describe("refreshGurmukhi", () => {
+  it("fills in Gurmukhi for already-crawled lines that lacked it, keeping everything else", () => {
+    const plan = planCrawl([{ term: "ਇਆਣਾ", wn: "Q1" }], [{ term: "iaanaa", wn: "Q1" }], null);
+    const lines = [{ wn: "Q1", gurmukhi: null, meaning: "ignorant" }, { wn: "Z", gurmukhi: null, meaning: "x" }];
+    expect(refreshGurmukhi(lines, plan)).toEqual({
+      lines: [{ wn: "Q1", gurmukhi: "ਇਆਣਾ", meaning: "ignorant" }, { wn: "Z", gurmukhi: null, meaning: "x" }],
+      updated: 1,
+    });
+  });
+});
+
+// Panjabi detail pages (/dictionary/panjabi/ms/<gurmukhi>?wn=) carry the same layout with Panjabi
+// labels: ਵਿਆਕਰਣ (grammar), ਵਿਉਤਪਤੀ (etymology). About 3,300 entries exist only in Panjabi.
+describe("parseEntry on a Panjabi page", () => {
+  const html = `<h5><a href="#">ਸਉਣ</a></h5>
+    <p>ਸਉਣ ਦੀ, ਸਗਨ ਦੀ।</p>
+    <p><i class="dictHeading">ਵਿਆਕਰਣ:</i> ਨਾਂਵ, ਸੰਬੰਧ ਕਾਰਕ; ਪੁਲਿੰਗ, ਇਕਵਚਨ।</p>
+    <p><i class="dictHeading">ਵਿਉਤਪਤੀ:</i> ਸੰਸਕ੍ਰਿਤ - ਸ਼ਕੁਨ।</p>
+    <p><i class="dictHeading">ਉਦਾਹਰਣ:</i> some line</p>`;
+
+  it("reads the meaning, grammar and etymology under Panjabi labels", () => {
+    expect(parseEntry(html)).toEqual({
+      headwordRoman: "ਸਉਣ",
+      meaning: "ਸਉਣ ਦੀ, ਸਗਨ ਦੀ।",
+      grammar: "ਨਾਂਵ, ਸੰਬੰਧ ਕਾਰਕ; ਪੁਲਿੰਗ, ਇਕਵਚਨ।",
+      etymology: "ਸੰਸਕ੍ਰਿਤ - ਸ਼ਕੁਨ।",
+    });
+  });
+});
+
+describe("panjabiEntryUrl", () => {
+  it("fetches a Panjabi page by its Gurmukhi and wn", () => {
+    expect(panjabiEntryUrl({ term: "ਸਉਣ", wn: "MjY0NDQ=" })).toBe(
+      "https://gurugranthsahibdictionary.io/dictionary/panjabi/ms/%E0%A8%B8%E0%A8%89%E0%A8%A3?wn=MjY0NDQ%3D",
+    );
+  });
+});
