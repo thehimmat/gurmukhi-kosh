@@ -2,7 +2,7 @@
 // Criteria: user-stories/US-004-grammar-with-scholarly-citations-by-attribute.md
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb, curatorDb } from "./helpers";
+import { anonDb, viewFor, visibilityLive } from "./helpers";
 import { buildGrammarView, normalizePos } from "../../lib/grammar-view";
 import { fetchPosMap } from "../../lib/word-data";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
@@ -21,12 +21,11 @@ function grammarRow(over: Record<string, unknown>): WordGrammarWithRule {
 }
 
 describe("US-004: grammar grouped by attribute with citations", () => {
-  // Shackle and the Darpan pad-arth are curator-only until permission arrives (#39, #264), so the
-  // corpus-scale checks read the curator's view; the public view is checked at the end.
-  let db: ReturnType<typeof anonDb>;
+  // Shackle and the Darpan pad-arth are curator-only until permission arrives (#39, #264). Each
+  // corpus-scale check reads through viewFor: the curator's view when a service key is set, else
+  // anon while it can still see those sources, else it skips. The public view is checked at the end.
   let pub: ReturnType<typeof anonDb>;
   beforeAll(() => {
-    db = curatorDb();
     pub = anonDb();
   });
 
@@ -43,7 +42,9 @@ describe("US-004: grammar grouped by attribute with citations", () => {
     expect(pos.readings[0].attestations[0].sourceKind).toBe("scholar");
   });
 
-  it("US-004: sourced grammar coverage exists at corpus scale (15k+ rows)", async () => {
+  it("US-004: sourced grammar coverage exists at corpus scale (15k+ rows)", async (ctx) => {
+    const db = await viewFor(["shackle", "ss_padarth"]);
+    if (!db) return ctx.skip();
     const { count, error } = await db
       .from("word_grammar")
       .select("id", { count: "exact", head: true });
@@ -53,6 +54,7 @@ describe("US-004: grammar grouped by attribute with citations", () => {
 
   // #30 "no guessing": every stored grammar value is read from a named source.
   it("US-004: every grammar row names its source; none is inferred from spelling", async () => {
+    const db = (await viewFor([]))!;
     const [unsourced, inferred] = await Promise.all([
       db.from("word_grammar").select("id", { count: "exact", head: true }).is("source_code", null),
       db.from("word_grammar").select("id", { count: "exact", head: true }).eq("provenance", "rule_derived"),
@@ -64,6 +66,7 @@ describe("US-004: grammar grouped by attribute with citations", () => {
   });
 
   it("US-004: every related-form membership names the source that asserts it", async () => {
+    const db = (await viewFor([]))!;
     const { count, error } = await db
       .from("word_forms")
       .select("id", { count: "exact", head: true })
@@ -74,7 +77,9 @@ describe("US-004: grammar grouped by attribute with citations", () => {
 
   // #18: Shackle's inflections notes populate the lexeme/form model, so an
   // inflected form with no entry of its own reaches its headword in one join.
-  it("US-004: inflected forms are grouped under a lexeme by Shackle's own memberships (#18)", async () => {
+  it("US-004: inflected forms are grouped under a lexeme by Shackle's own memberships (#18)", async (ctx) => {
+    const db = await viewFor(["shackle"]);
+    if (!db) return ctx.skip();
     const { count, error } = await db
       .from("word_forms")
       .select("id", { count: "exact", head: true })
@@ -97,7 +102,9 @@ describe("US-004: grammar grouped by attribute with citations", () => {
 
   // #29: an unmapped label compares as a raw string and fakes a cross-source
   // conflict. A re-ingest that introduces a new Shackle label must fail here.
-  it("US-004: every stored Shackle POS label normalizes to a controlled part of speech (#29)", async () => {
+  it("US-004: every stored Shackle POS label normalizes to a controlled part of speech (#29)", async (ctx) => {
+    const db = await viewFor(["shackle"]);
+    if (!db) return ctx.skip();
     const CONTROLLED = new Set([
       "noun", "adjective", "verb", "verb_transitive", "verb_intransitive", "pronoun",
       "postposition", "preposition", "particle", "adverb", "numeral", "interjection",
@@ -117,7 +124,9 @@ describe("US-004: grammar grouped by attribute with citations", () => {
     expect([...unresolved]).toEqual([]);
   });
 
-  it("US-004: the public sees no curator-only grammar or form links (#258)", async () => {
+  // Enforced once 069 is live; until then Shackle and the pad-arth are still public.
+  it("US-004: the public sees no curator-only grammar or form links (#258)", async (ctx) => {
+    if (!(await visibilityLive())) return ctx.skip();
     const [grammar, forms] = await Promise.all([
       pub.from("word_grammar").select("id", { count: "exact", head: true }).in("source_code", ["shackle", "ss_padarth"]),
       pub.from("word_forms").select("id", { count: "exact", head: true }).eq("source_code", "shackle"),
