@@ -18,6 +18,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { isPublicOrigin } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 
 type Params = { params: Promise<{ gurmukhi: string }> };
@@ -63,11 +64,16 @@ export async function GET(_req: NextRequest, { params }: Params) {
     // with that rule's tier, citation, and whether it has been verified.
     // Kept as one string literal: Supabase parses the select at compile time to
     // infer the row type, and a concatenated expression defeats that.
-    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, word_grammar(*, grammar_rules(rule_code, title, tier, verified, citation))")
+    .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, origin_source, word_grammar(*, grammar_rules(rule_code, title, tier, verified, citation))")
     .eq("gurmukhi", word)
     .single();
 
   if (wordErr || !wordRow) {
+    return NextResponse.json({ error: "Word not found" }, { status: 404 });
+  }
+  // An off-corpus word listed only by a curator-only source (#258) isn't public.
+  const origin = wordRow as unknown as { in_corpus: boolean | null; origin_source: string | null };
+  if (origin.in_corpus === false && !(await isPublicOrigin(origin.origin_source))) {
     return NextResponse.json({ error: "Word not found" }, { status: 404 });
   }
 

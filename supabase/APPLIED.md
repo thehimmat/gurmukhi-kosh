@@ -353,3 +353,23 @@ full trigram index scan that ran past the anon 3 s timeout. Tested first on the 
 (`tests/db/contains-search.test.ts`), applied 2026-10-21. Checked live as anon: ਼ 7,644 lines, ੍ 45,032, "੍ " 1
 (ਜਨਿੰਦ਼੍), ਸ਼ in either form 5,301; plain words unchanged (ਸਤਿ 3,607, ਸਬਦ 3,364, same as the old `like`). Timings, warm:
 ਼ ~1.0 s rows / 0.9 s count (the slowest), ੍ 0.6 s / 0.4 s, "੍ " 0.3 s, ਸਤਿ 50 ms, ਹਰਿ 130 ms.
+
+| 68 | — | 067_contains_mark_prefilter | kosh `067_contains_mark_prefilter.sql`, first version (prefilter ANDed) |
+| 69 | — | 067b_contains_prefilter_case | kosh `067_contains_mark_prefilter.sql`, final version (prefilter in CASE) |
+
+Migration 067 redefines `contains_condition` (066) so a query with no trigram checks the raw text first and only
+normalizes lines that pass. It was applied twice on 2026-10-21. The first version ANDed the prefilter, which the
+planner evaluated after `normalize()` (its cost estimate rated normalize cheaper), so it saved little. The second,
+`067b`, wraps it in CASE to force the order; the repo file is that final version. Both applies returned results
+identical to 066 for 9 queries (count and md5 of every matching id: ਼, ੍, "੍ ", ਸ਼ in both forms, ਸ, ਲ਼, ਼ਾ, ਸਤਿ).
+Timings as anon, warm: ਼ 1.0 s → 0.17 s rows / 0.9 s → 0.2 s count; ਸ਼ 0.15 / 0.2 s; ੍ count ~0.4 s (45k lines
+contain a halant, so the prefilter can't skip much there); ਸਤਿ unchanged at 46 ms. Motivation: four 066 calls
+for ਼ passed the anon 3 s timeout during a busy minute after the 066 deploy (17:05 UTC).
+
+**068_sarbloh_doubled_halant** — run 2026-10-21 from the dashboard SQL editor, so there is no ledger row: the MCP's
+`apply_migration` holds the DELETE for a confirmation that never reached the maintainer and timed out (three tries,
+each rolled back). Kosh `068_sarbloh_doubled_halant.sql`, as in the repo. Four Sarbloh half-lines had a halant typed
+twice (lines 169421, 169439, 171115, 173273). Checked after: no line or word holds a doubled halant; ਛਤ੍ਰ (72052)
+211 → 212 occurrences (Sarbloh 77 → 78 in both stats tables) and ਸਸਤ੍ਨ (898002) 2 → 3, their misspellings 908120
+and 921408 deleted; 925959 renamed ਨ੍ਪਬਰ and 891466 ਪ੍ਸਾਦਿ (fold ਪ੍ਸਾਦ); each line's words read back in order.
+`pipeline/sarbloh/lines.ts` cleanText now collapses doubled halants, so a rebuild keeps them fixed.

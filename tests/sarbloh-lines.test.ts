@@ -46,6 +46,12 @@ describe("cleanText", () => {
     expect(cleanText("ਕੀ ਮਾਰਾ : ਰਾਗ ਕਉਭਾਰਾ").text).toBe("ਕੀ ਮਾਰਾ ॥ ਰਾਗ ਕਉਭਾਰਾ");
   });
 
+  it("reads a doubled halant as one (typing slips, e.g. ਛਤ੍੍ਰ)", () => {
+    const H = "੍";
+    expect(cleanText(`ਛਤ${H}${H}ਰ ਚਉਰ`).text).toBe(`ਛਤ${H}ਰ ਚਉਰ`);
+    expect(cleanText(`ਨ${H}${H}${H}ਪਬਰ`).text).toBe(`ਨ${H}ਪਬਰ`);
+  });
+
   it("drops other non-Gurmukhi characters and reports them", () => {
     const r = cleanText("ਜ਼ੇਬਾ ਅਤਲਸ ਕਲİਤ ਅੰਬਰ");
     expect(r.text).toBe("ਜ਼ੇਬਾ ਅਤਲਸ ਕਲਤ ਅੰਬਰ");

@@ -97,3 +97,38 @@ describe("066: search_lines_contains", () => {
     expect(Number(capped.rows[0].n)).toBe(2);
   });
 });
+
+// 067: a query with no trigram reads every line, so the raw text is checked
+// first (cheap) and only lines that pass are normalized (not cheap).
+describe("067: raw-text prefilter for mark-only queries", () => {
+  const condition = async (q: string) =>
+    (await db.query<{ c: string | null }>("select contains_condition($1) as c", [q])).rows[0].c ?? "";
+
+  // A CASE, because the planner orders ANDed conditions by its own cost
+  // estimate and put normalize() first, which made the prefilter useless.
+  it("checks the raw text before normalizing for a lone mark", async () => {
+    for (const q of [NUKTA, HALANT, `${HALANT} `]) {
+      const c = await condition(q);
+      expect(c).toMatch(/^case when /);
+      expect(c.indexOf("l.gurmukhi ")).toBeLessThan(c.indexOf("normalize("));
+    }
+  });
+
+  it("leaves indexed queries to the trigram index", async () => {
+    expect(await condition("ਗੁਰ")).not.toMatch(/^case when /);
+  });
+
+  it("lets ready-made letters through for the parts they split into", async () => {
+    // ਸ alone takes the prefilter path; ਸ਼ (line 1) passes it and is then
+    // excluded by the no-trailing-nukta rule, not by the prefilter.
+    expect(await hits("ਸ")).toEqual([2, 3, 4, 5, 7]);
+    expect(await hits("ਸ" + NUKTA)).toEqual([1]);
+    expect(await hits(SHA)).toEqual([1]);
+    expect(await hits(NUKTA)).toEqual([1, 3, 5, 6]);
+  });
+
+  it("ignores characters outside Gurmukhi in the prefilter", async () => {
+    expect(await hits("0%")).toEqual([7]);
+    expect(await hits("é")).toEqual([]);
+  });
+});

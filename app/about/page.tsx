@@ -7,16 +7,18 @@ export const metadata: Metadata = {
     `Where every datum in ${SITE_NAME_EN} comes from, and the scholarly sources we cite, use, and plan to use.`,
 };
 
-type Status = "in-use" | "pending-permission" | "pending-terms";
+type Status = "in-use" | "private-pending" | "pending-permission" | "pending-terms";
 
 const STATUS_LABEL: Record<Status, string> = {
   "in-use": "In use",
+  "private-pending": "Not public · pending permission",
   "pending-permission": "Planned · pending permission",
   "pending-terms": "Under consideration · pending terms",
 };
 
 const STATUS_STYLE: Record<Status, { bg: string; fg: string }> = {
   "in-use": { bg: "var(--accent-light)", fg: "var(--accent)" },
+  "private-pending": { bg: "#f3ece1", fg: "#7a5a2e" },
   "pending-permission": { bg: "#f3ece1", fg: "#7a5a2e" },
   "pending-terms": { bg: "#eee9e2", fg: "#5c534d" },
 };
@@ -58,7 +60,7 @@ const SOURCES: Source[] = [
     role: "Corpus text (Sri Guru Granth Sahib Ji, Bhai Gurdas Ji Vaaran and Dasam Bani), line metadata, and per-line commentaries.",
     status: "in-use",
     url: "https://banidb.com",
-    note: "Licensed CC BY-NC-SA 3.0 — non-commercial, share-alike. Carries the Darpan, pad-arth, Faridkot Teeka, and Manmohan Singh readings shown under each word.",
+    note: "Licensed CC BY-NC-SA 3.0 — non-commercial, share-alike. Carries the Faridkot Teeka and Manmohan Singh readings shown under each word, and the Darpan and pad-arth (see below).",
   },
   {
     name: "Mahan Kosh (Bhai Kahn Singh Nabha, 1930)",
@@ -74,9 +76,9 @@ const SOURCES: Source[] = [
   {
     name: "Sri Guru Granth Sahib Darpan & pad-arth (Prof. Sahib Singh)",
     role: "Per-line grammatical analysis; the cited basis for sourced grammar facts.",
-    status: "in-use",
+    status: "private-pending",
     url: "https://www.gurugranthdarpan.net/",
-    note: "Shown verbatim in the original Punjabi, never machine-translated. Mined only for grammar statements the scholar makes explicitly.",
+    note: "Prof. Sahib Singh's work is still in copyright. Until we have confirmed permission from the rights holder, the Darpan, its pad-arth and the grammar drawn from it are kept for our own research and not shown here.",
   },
   {
     name: "Monier-Williams Sanskrit-English Dictionary (1899)",
@@ -101,16 +103,16 @@ const SOURCES: Source[] = [
   },
   {
     name: "The Guru Granth Sahib Dictionary (SikhRI)",
-    role: "Per-word English meanings (and scholar-verified grammar), planned — not currently shown on any entry.",
-    status: "pending-permission",
+    role: "Per-word English meanings (and scholar-verified grammar) — not shown on any entry.",
+    status: "private-pending",
     url: "https://gurugranthsahibdictionary.io",
-    note: "© SikhRI, all rights reserved. We wrote to SikhRI about using per-word meanings here, and they have told us the request is under internal review. While they consider it we have paused this work and none of their material is published on this site. We will follow whatever guidance they give.",
+    note: "© SikhRI, all rights reserved. We wrote to SikhRI about using per-word meanings here, and they have told us the request is under internal review. Until they give guidance, none of their material is published on this site; we keep a copy only for our own research, and will follow whatever guidance they give.",
   },
   {
     name: "A Guru Nanak Glossary (Christopher Shackle, 2nd ed.)",
     role: "Definitions, grammar, and etymology (incl. CDIAL/Turner numbers) for words in the hymns of Guru Nanak, Guru Angad, and Shaikh Farid; our richest single source, with in-text example citations.",
-    status: "in-use",
-    note: "© Christopher Shackle / SOAS, all rights reserved. Used strictly non-commercially with attribution, and we will remove it promptly on request. Off-corpus appendix headwords are reverse-transliterated into Gurmukhi by us and clearly marked as derived, not original to the source.",
+    status: "private-pending",
+    note: "© Christopher Shackle / SOAS, all rights reserved. We have asked Prof. Shackle for permission to show it here. Until he replies it is kept for our own research and not shown on this site.",
   },
   {
     name: "Sri Granth Gurbani Dictionary (Dr. Kulbir S. Thind & Dr. Gurcharan Singh)",
