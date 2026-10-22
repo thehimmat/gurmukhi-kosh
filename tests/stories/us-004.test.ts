@@ -2,7 +2,7 @@
 // Criteria: user-stories/US-004-grammar-with-scholarly-citations-by-attribute.md
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb } from "./helpers";
+import { anonDb, curatorDb } from "./helpers";
 import { buildGrammarView, normalizePos } from "../../lib/grammar-view";
 import { fetchPosMap } from "../../lib/word-data";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
@@ -21,9 +21,13 @@ function grammarRow(over: Record<string, unknown>): WordGrammarWithRule {
 }
 
 describe("US-004: grammar grouped by attribute with citations", () => {
+  // Shackle and the Darpan pad-arth are curator-only until permission arrives (#39, #264), so the
+  // corpus-scale checks read the curator's view; the public view is checked at the end.
   let db: ReturnType<typeof anonDb>;
+  let pub: ReturnType<typeof anonDb>;
   beforeAll(() => {
-    db = anonDb();
+    db = curatorDb();
+    pub = anonDb();
   });
 
   it("US-004: different sources on one attribute surface as a conflict, not a merge", () => {
@@ -111,5 +115,16 @@ describe("US-004: grammar grouped by attribute with citations", () => {
       for (const v of normalizePos("shackle", r.pos, posMap)) if (!CONTROLLED.has(v)) unresolved.add(v);
     }
     expect([...unresolved]).toEqual([]);
+  });
+
+  it("US-004: the public sees no curator-only grammar or form links (#258)", async () => {
+    const [grammar, forms] = await Promise.all([
+      pub.from("word_grammar").select("id", { count: "exact", head: true }).in("source_code", ["shackle", "ss_padarth"]),
+      pub.from("word_forms").select("id", { count: "exact", head: true }).eq("source_code", "shackle"),
+    ]);
+    expect(grammar.error).toBeNull();
+    expect(forms.error).toBeNull();
+    expect(grammar.count).toBe(0);
+    expect(forms.count).toBe(0);
   });
 });

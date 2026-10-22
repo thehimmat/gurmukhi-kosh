@@ -2,12 +2,16 @@
 // Criteria: user-stories/US-005-per-line-commentary-and-etymology.md
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb } from "./helpers";
+import { anonDb, curatorDb } from "./helpers";
 
 describe("US-005: per-line commentary and etymology", () => {
+  // The Darpan and Shackle's etymologies are curator-only until permission arrives (#264, #39), so
+  // the corpus-scale counts read the curator's view; the public view is checked at the end.
   let db: ReturnType<typeof anonDb>;
+  let pub: ReturnType<typeof anonDb>;
   beforeAll(() => {
-    db = anonDb();
+    db = curatorDb();
+    pub = anonDb();
   });
 
   it("US-005: the named commentary sources are registered", async () => {
@@ -36,5 +40,15 @@ describe("US-005: per-line commentary and etymology", () => {
       .select("id", { count: "exact", head: true });
     expect(error).toBeNull();
     expect(count).toBeGreaterThan(14000);
+  });
+
+  it("US-005: the public sees no Darpan commentary (#264)", async () => {
+    const { data, error } = await pub
+      .from("line_translations")
+      .select("id")
+      .in("source_code", ["ss_darpan", "ss_padarth"])
+      .limit(1);
+    expect(error).toBeNull();
+    expect(data).toEqual([]);
   });
 });

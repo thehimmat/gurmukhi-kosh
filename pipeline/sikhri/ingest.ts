@@ -27,14 +27,14 @@ config({ path: ".env.local" });
 import * as fs from "fs";
 import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
-import { sleep, progress } from "../shared/utils";
+import { sleep, progress, getArg } from "../shared/utils";
 
-const JSONL_PATH = "pipeline/sikhri/output/entries.jsonl";
+const JSONL_PATH = getArg("in") ?? "pipeline/sikhri/output/entries.jsonl";
 const DICT_SOURCE_CODE = "sikhri";
 const BATCH_SIZE = 50;
 
 interface JournalEntry {
-  gurmukhi: string;
+  gurmukhi: string | null; // null: listed only in SikhRI's English glossary (full crawl, #40)
   wn: string;
   wn_id: string;
   found: boolean;
@@ -85,7 +85,7 @@ async function main() {
 
   // Resolve gurmukhi → word_id in small batches (a long `.in()` of Unicode
   // headwords blows the GET URL length limit).
-  const gurmukhiSet = [...new Set(withMeaning.map((e) => e.gurmukhi))];
+  const gurmukhiSet = [...new Set(withMeaning.map((e) => e.gurmukhi).filter((g): g is string => !!g))];
   const wordMap = new Map<string, number>();
   for (let i = 0; i < gurmukhiSet.length; i += 100) {
     const batch = gurmukhiSet.slice(i, i + 100);
@@ -101,8 +101,10 @@ async function main() {
   // Group entries by word, assign a stable sense_number per homograph (wn id order).
   const byWord = new Map<number, JournalEntry[]>();
   let skipped = 0;
+  // Entries with no Kosh word yet wait for the raw entries layer (dict_entries, plan Phase 0):
+  // definitions.word_id is NOT NULL.
   for (const e of withMeaning) {
-    const wordId = wordMap.get(e.gurmukhi);
+    const wordId = e.gurmukhi ? wordMap.get(e.gurmukhi) : undefined;
     if (!wordId) {
       skipped++;
       continue;
@@ -132,7 +134,7 @@ async function main() {
       rows.push({
         word_id: wordId,
         dict_source_id: dictSourceId,
-        entry_gurmukhi: e.gurmukhi,
+        entry_gurmukhi: e.gurmukhi!, // every entry grouped under a word has its Gurmukhi
         sense_number: sense,
         definition_text: text,
         source_url: e.source_url,
