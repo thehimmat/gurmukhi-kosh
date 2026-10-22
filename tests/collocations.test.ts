@@ -4,6 +4,7 @@ import {
   extractCollocations,
   computePMI,
   filterCollocationsByPMI,
+  publicOccurrences,
 } from '../pipeline/compute/collocations';
 
 describe('collocations', () => {
@@ -147,6 +148,22 @@ describe('collocations', () => {
       ];
       const filtered = filterCollocationsByPMI(collocations, 50, 5);
       expect(filtered).toEqual([{ word_a_id: 10, word_b_id: 30, pair_count: 10, pmi: 2 }]);
+    });
+  });
+
+  describe('publicOccurrences', () => {
+    it('reads only occurrences on public lines: a private source never feeds the public pairs', () => {
+      const calls: Array<[string, unknown[]]> = [];
+      const chain: any = new Proxy({}, {
+        get: (_t, name: string) => (...args: unknown[]) => {
+          calls.push([name, args]);
+          return chain;
+        },
+      });
+      publicOccurrences({ from: (t: string) => { calls.push(['from', [t]]); return chain; } });
+      expect(calls[0]).toEqual(['from', ['word_occurrences']]);
+      expect(calls).toContainEqual(['select', ['word_id, line_id, position, lines!inner(is_public)']]);
+      expect(calls).toContainEqual(['eq', ['lines.is_public', true]]);
     });
   });
 });
