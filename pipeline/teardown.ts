@@ -30,21 +30,7 @@ config({ path: ".env.local" });
 import { supabaseAdmin } from "./shared/db";
 import { getArg } from "./shared/utils";
 import { wipeFormLinks } from "./shared/wipe-form-links";
-
-// Tables keyed by the numeric dict_sources.id.
-const BY_DICT_SOURCE_ID = ["definitions", "dict_examples"] as const;
-
-// Tables keyed by the text source code.
-const BY_SOURCE_CODE = [
-  "word_grammar",
-  "etymology",
-  "word_forms",
-  "lexeme_citations",
-  "lexeme_relations",
-  "citation_sigla",
-  "dict_mappings",
-  "pos_mappings",
-] as const;
+import { BY_DICT_SOURCE_ID, BY_SOURCE_CODE } from "./teardown-tables";
 
 async function main() {
   const sourceCode = getArg("source");

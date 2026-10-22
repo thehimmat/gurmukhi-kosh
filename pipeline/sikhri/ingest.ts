@@ -101,8 +101,8 @@ async function main() {
   // Group entries by word, assign a stable sense_number per homograph (wn id order).
   const byWord = new Map<number, JournalEntry[]>();
   let skipped = 0;
-  // Entries with no Kosh word yet wait for the raw entries layer (dict_entries, plan Phase 0):
-  // definitions.word_id is NOT NULL.
+  // definitions.word_id is NOT NULL, so entries with no Kosh word are skipped here; every entry,
+  // word or no word, is in dict_entries (pipeline/sikhri/load-entries.ts).
   for (const e of withMeaning) {
     const wordId = e.gurmukhi ? wordMap.get(e.gurmukhi) : undefined;
     if (!wordId) {
