@@ -150,6 +150,18 @@ describe("070: private corpora are hidden from the API roles", () => {
     const stats = await anon(() => col<Record<string, number>>("select health_stats() as v"));
     expect(stats[0].total_lines).toBe(publicLines.length);
     expect(stats[0].total_occurrences).toBe(5); // ਸਤਿ ਨਾਮੁ ਕਰਤਾ, ਗੁਰ ਪ੍ਰਸਾਦਿ
+    expect(stats[0].total_angs).toBe(1); // the private line is alone on ang 2
+    expect(stats[0].lines_with_no_commentary).toBe(2);
+    expect(stats[0].lines_per_source).toEqual([]); // the one translation is on the private line
+  });
+
+  it("counts the health totals without reading every line (072)", async () => {
+    // health_stats subtracts the private lines, found through this partial index, from totals
+    // over all lines; filtering on is_public instead read the whole table (5.8 s for the angs).
+    expect(await col("select indexdef as v from pg_indexes where indexname = 'lines_private'"))
+      .toEqual([expect.stringMatching(/WHERE \(NOT is_public\)/)]);
+    const def = (await col<string>("select pg_get_functiondef('health_stats()'::regprocedure) as v"))[0];
+    expect(def).not.toMatch(/from lines where is_public/);
   });
 
   it("lets only the service role refresh the computed views", async () => {

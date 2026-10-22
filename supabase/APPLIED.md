@@ -384,3 +384,12 @@ execute `refresh_computed_stats`.
 `071_gur_sobha_source.sql`, as in the repo. Checked after: `gur_sobha_iss` is source 7 (pinned; the sequence would have
 given 8), curator-only and absent from `public_source_codes`, with its 483 shabads (920001-920483). Its lines are not
 loaded yet.
+**072_health_stats_fast** — applied 2026-10-22 with the MCP's `apply_migration`, twice (ledger rows `072_health_stats_fast`
+and `072b_health_stats_fast`); the repo file is the second version. After 070, `/api/health` returned 500: 070's
+`health_stats` filtered on `lines.is_public`, which no index answers, and ran ~29 s (`count(distinct ang)` alone 5.8 s,
+an index-only scan on `lines_ang` before). 072 counts over all lines and subtracts the private ones (partial index
+`lines_private`). The first version reached the private occurrences and translations through `line_id in (…)`, which
+scanned every row; the second starts from `lines`. `analyze lines` was then run by hand: `is_public` had no statistics,
+so the planner expected many private lines and merge-joined over all of `lines` (9 s). After: `/api/health` 200, same
+totals (172,604 lines, 1,430 angs, 1,113,815 occurrences). The function still takes ~14 s on its other, older parts
+(definitions and line_translations scans), inside its 20 s limit.
