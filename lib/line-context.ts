@@ -5,6 +5,7 @@
 // Reading order within a scripture is verse_id: (ang, line_no) is not unique,
 // since one printed line holds several verses (gurmukhi-search#46).
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 import { SOURCE_COLUMNS, type SourceMeta } from "./sources";
 import type { LineVishraam } from "./vishraam";
@@ -227,8 +228,12 @@ function must<T>(r: { data: T; error: { message: string } | null }, what: string
  * bani passage holding it; a line with neither reads by ang) or its whole ang
  * ("ang").
  */
-export async function fetchLineContext(id: number, scope: Scope = "passage"): Promise<LineContext | null> {
-  const line = must(await supabase
+export async function fetchLineContext(
+  id: number,
+  scope: Scope = "passage",
+  db: SupabaseClient = supabase,
+): Promise<LineContext | null> {
+  const line = must(await db
     .from("lines")
     .select(`${LINE_COLUMNS}, sources(${SOURCE_COLUMNS}), shabads(raag_english, raag_gurmukhi, writer_english)`)
     .eq("id", id)
@@ -239,7 +244,7 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
     shabads: LineContext["shabad"];
   };
 
-  const linesWhere = () => supabase.from("lines").select(GROUP_COLUMNS).eq("source_fk", l.source_fk);
+  const linesWhere = () => db.from("lines").select(GROUP_COLUMNS).eq("source_fk", l.source_fk);
   const read = async (q: ReturnType<typeof linesWhere>) => {
     return (must(await q.order("verse_id", { ascending: true }), "lines") ?? []) as unknown as ContextLine[];
   };
@@ -253,7 +258,7 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
     // passage wins only where it's the smaller unit (Japji's first shabad).
     const [shabadLines, held] = await Promise.all([
       l.shabad_id != null ? read(linesWhere().eq("shabad_id", l.shabad_id)) : Promise.resolve([]),
-      supabase.from("passages")
+      db.from("passages")
         .select("bani_id, ordinal, first_verse_id, last_verse_id, banis(name_gurmukhi, name_english, paragraphs)")
         .eq("source_fk", l.source_fk).lte("first_verse_id", l.verse_id).gte("last_verse_id", l.verse_id),
     ]);
@@ -277,15 +282,15 @@ export async function fetchLineContext(id: number, scope: Scope = "passage"): Pr
   // the passage's resources, all at once.
   const ids = lines.map((x) => x.id);
   const [prev, next, res, sources] = await Promise.all([
-    supabase.from("lines").select("id").eq("source_fk", l.source_fk)
+    db.from("lines").select("id").eq("source_fk", l.source_fk)
       .lt("verse_id", first.verse_id).order("verse_id", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("lines").select("id").eq("source_fk", l.source_fk)
+    db.from("lines").select("id").eq("source_fk", l.source_fk)
       .gt("verse_id", last.verse_id).order("verse_id", { ascending: true }).limit(1).maybeSingle(),
     ids.length
-      ? supabase.from("line_translations").select("line_id, source_code, language, body_unicode, caveat")
+      ? db.from("line_translations").select("line_id, source_code, language, body_unicode, caveat")
           .in("line_id", ids).in("source_code", ORDER)
       : Promise.resolve({ data: [], error: null }),
-    supabase.from("translation_sources").select("code, name, author"),
+    db.from("translation_sources").select("code, name, author"),
   ]);
   const prevRow = must(prev, "previous") as { id: number } | null;
   const nextRow = must(next, "next") as { id: number } | null;

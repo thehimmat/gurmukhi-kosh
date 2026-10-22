@@ -50,8 +50,12 @@ async function readPosMap(db: SupabaseClient): Promise<PosMap> {
  * readings, migration 023 / #30), so this unions the sibling forms of every
  * lexeme the word is a member of, deduped.
  */
-export async function fetchMorphVariants(wordId: number, word: string): Promise<MorphVariant[]> {
-  const { data: memberships } = await supabase
+export async function fetchMorphVariants(
+  wordId: number,
+  word: string,
+  db: SupabaseClient = supabase,
+): Promise<MorphVariant[]> {
+  const { data: memberships } = await db
     .from("word_forms")
     .select("lexeme_id")
     .eq("word_id", wordId)
@@ -61,7 +65,7 @@ export async function fetchMorphVariants(wordId: number, word: string): Promise<
   ];
   if (lexemeIds.length === 0) return [];
 
-  const { data: formRows } = await supabase
+  const { data: formRows } = await db
     .from("word_forms")
     .select("source_code, label_raw, words(gurmukhi)")
     .in("lexeme_id", lexemeIds)
@@ -79,16 +83,17 @@ export type UsageCollocate = { partner: string | null; count: number; pmi: numbe
  */
 export async function fetchUsage(
   wordId: number,
-  limit = 15
+  limit = 15,
+  db: SupabaseClient = supabase,
 ): Promise<{ phrases: UsagePhrase[]; collocates: UsageCollocate[] }> {
   const [bgRes, colRes] = await Promise.all([
-    supabase
+    db
       .from("bigrams")
       .select("w1_id, w2_id, pair_count")
       .or(`w1_id.eq.${wordId},w2_id.eq.${wordId}`)
       .order("pair_count", { ascending: false })
       .limit(limit),
-    supabase
+    db
       .from("collocations")
       .select("word_a_id, word_b_id, pair_count, pmi")
       .or(`word_a_id.eq.${wordId},word_b_id.eq.${wordId}`)
@@ -102,7 +107,7 @@ export async function fetchUsage(
   for (const r of bgRows) { partnerIds.add(r.w1_id); partnerIds.add(r.w2_id); }
   for (const r of colRows) { partnerIds.add(r.word_a_id); partnerIds.add(r.word_b_id); }
   const { data: partnerWords } = partnerIds.size
-    ? await supabase.from("words").select("id, gurmukhi").in("id", [...partnerIds])
+    ? await db.from("words").select("id, gurmukhi").in("id", [...partnerIds])
     : { data: [] };
   const idToGur = new Map(
     ((partnerWords ?? []) as Array<{ id: number; gurmukhi: string }>).map((w) => [w.id, w.gurmukhi])
@@ -125,9 +130,10 @@ export async function fetchUsage(
 // degrades to an empty list (only .data is read).
 export async function fetchWriterStats(
   wordId: number,
-  limit: number
+  limit: number,
+  db: SupabaseClient = supabase,
 ): Promise<Array<{ writer_english: string | null; occurrence_count: number }>> {
-  const { data } = await supabase
+  const { data } = await db
     .from("word_writer_stats")
     .select("writer_english, occurrence_count")
     .eq("word_id", wordId)

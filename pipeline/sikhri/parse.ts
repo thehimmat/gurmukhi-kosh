@@ -85,8 +85,9 @@ function headingLabel(block: string): "grammar" | "etymology" | null {
   const label = block.match(/class="dictHeading"[^>]*>\s*([^<:]+)\s*:?\s*<\/i>/);
   if (!label) return null;
   const t = label[1].trim().toLowerCase();
-  if (t.startsWith("grammar")) return "grammar";
-  if (t.startsWith("etymolog")) return "etymology";
+  // English pages, and Panjabi pages: ਵਿਆਕਰਣ (grammar), ਵਿਉਤਪਤੀ (etymology).
+  if (t.startsWith("grammar") || t.startsWith("ਵਿਆਕਰਣ")) return "grammar";
+  if (t.startsWith("etymolog") || t.startsWith("ਵਿਉਤਪਤੀ")) return "etymology";
   return null;
 }
 

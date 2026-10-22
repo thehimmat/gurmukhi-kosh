@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { lineHref } from "@/lib/line-context";
 import { SOURCE_COLUMNS, isSggs, placeLabel, type SourceMeta } from "@/lib/sources";
-import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
@@ -9,7 +8,7 @@ import { buildGrammarView, normalizePos, sourceDisplayLabel, type AttributeView,
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
 import { entryLink, secondaryGloss } from "@/lib/definition-display";
 import { homographMark, seeTargets, splitShackleGloss } from "@/lib/shackle-display";
-import { isCurator, withCuratorKey } from "@/lib/curator";
+import { curatorDb, isCurator, isPublicOrigin, withCuratorKey } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
 import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
@@ -114,24 +113,29 @@ export default async function WordPage({ params, searchParams }: Props) {
   // curator. Public visitors get one word-level "Report an error" link.
   const curator = isCurator(key);
   const curatorKey = curator ? key! : null;
+  // Curator-only sources (#258) are hidden from the anon key; a curator reads them too.
+  const db = curatorDb(curator);
   const OCC_PAGE_SIZE = 50;
   const occPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const word = decodeURIComponent(encoded);
 
   // Step 1: fetch word + grammar together (and the POS map the view compares through)
   const [{ data: wordRow }, posMap] = await Promise.all([
-    supabase
+    db
       .from("words")
-      .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, spelling_status, spelling_reviewed_at, word_grammar(*, grammar_rules(*))")
+      .select("id, gurmukhi, frequency, ipa_display, roman_iso15919, roman_practical, in_corpus, origin_source, spelling_status, spelling_reviewed_at, word_grammar(*, grammar_rules(*))")
       .eq("gurmukhi", word)
       .single(),
-    fetchPosMap(),
+    fetchPosMap(db),
   ]);
 
   if (!wordRow) notFound();
 
   const wordId = wordRow.id;
   const inCorpus = (wordRow as unknown as { in_corpus: boolean | null }).in_corpus ?? true;
+  // An off-corpus word listed only by a curator-only source (#258) isn't public.
+  const originSource = (wordRow as unknown as { origin_source: string | null }).origin_source;
+  if (!curator && !inCorpus && !(await isPublicOrigin(originSource))) notFound();
   // A human-reviewed spelling is no longer "unverified", even if its origin
   // marker (spelling_status) still records how it first entered.
   const spellingReviewed = !!(wordRow as unknown as { spelling_reviewed_at: string | null }).spelling_reviewed_at;
@@ -167,7 +171,7 @@ export default async function WordPage({ params, searchParams }: Props) {
   const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult, morphForms, usageData] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     needsDefs
-      ? supabase
+      ? db
           .from("definitions")
           .select(`${DEFINITION_COLUMNS}, parsed`)
           .eq("word_id", wordId)
@@ -177,7 +181,7 @@ export default async function WordPage({ params, searchParams }: Props) {
 
     // Etymology
     tab === "etymology"
-      ? supabase
+      ? db
           .from("etymology")
           .select("*")
           .eq("word_id", wordId)
@@ -186,7 +190,7 @@ export default async function WordPage({ params, searchParams }: Props) {
 
     // Occurrences with line + shabad + corpus (multi-source since #65)
     tab === "occurrences"
-      ? supabase
+      ? db
           .from("word_occurrences")
           .select(`
             id, position,
@@ -208,7 +212,7 @@ export default async function WordPage({ params, searchParams }: Props) {
     // Dictionary example quotations (Shackle etc.) — English translation + AG
     // citation. The romanized quote (quote_roman) is internal and not selected.
     needsExamples
-      ? supabase
+      ? db
           .from("dict_examples")
           .select("id, definition_id, order_index, translation, citation_raw, citation_siglum, citation_hymn, citation_verse, citation_author")
           .eq("word_id", wordId)
@@ -216,7 +220,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       : EMPTY,
 
     // Per-corpus frequencies (#65): every displayed count names its text.
-    supabase
+    db
       .from("word_corpus_stats")
       .select("frequency, sources(name)")
       .eq("word_id", wordId)
@@ -225,11 +229,11 @@ export default async function WordPage({ params, searchParams }: Props) {
     // Sibling inflected forms, across every lexeme this word belongs to, from
     // source-asserted memberships only (lib/word-data.ts — shared with the JSON
     // API). Each label is the source's own wording.
-    needsForms ? fetchMorphVariants(wordId, word) : Promise.resolve([]),
+    needsForms ? fetchMorphVariants(wordId, word, db) : Promise.resolve([]),
 
     // Usage tab: common phrases (bigrams) + statistical collocations + writer
     // breakdown (lib/word-data.ts — shared with the JSON API).
-    tab === "usage" ? Promise.all([fetchUsage(wordId), fetchWriterStats(wordId, 8)]) : Promise.resolve(null),
+    tab === "usage" ? Promise.all([fetchUsage(wordId, 15, db), fetchWriterStats(wordId, 8, db)]) : Promise.resolve(null),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
@@ -247,16 +251,19 @@ export default async function WordPage({ params, searchParams }: Props) {
   const xrefTargets = collectXrefTargets(parsedSenses);
   const xrefVariants = [...new Set(xrefTargets.flatMap((t) => [t, t.normalize("NFC")]))];
   const siglaCodes = [...new Set(examples.map((x) => x.citation_siglum).filter((s): s is string => !!s))];
-  const [{ data: xrefRows }, { data: siglaRows }] = await Promise.all([
-    xrefVariants.length > 0 ? supabase.from("words").select("gurmukhi").in("gurmukhi", xrefVariants) : EMPTY,
+  const [{ data: xrefRows }, { data: siglaRows }, { data: curatorOnlyRows }] = await Promise.all([
+    xrefVariants.length > 0 ? db.from("words").select("gurmukhi").in("gurmukhi", xrefVariants) : EMPTY,
     siglaCodes.length > 0
-      ? supabase
+      ? db
           .from("citation_sigla")
           .select("siglum, title")
           .eq("source_code", "shackle")
           .in("siglum", siglaCodes)
       : EMPTY,
+    // Curator mode marks the sources the public can't see (#258).
+    curator ? db.from("source_rights").select("code").eq("visibility", "curator") : EMPTY,
   ]);
+  const curatorOnly = new Set(((curatorOnlyRows ?? []) as Array<{ code: string }>).map((r) => r.code));
   const linkableXrefs = new Set<string>();
   for (const r of (xrefRows ?? []) as { gurmukhi: string }[]) {
     linkableXrefs.add(nfdNormalize(r.gurmukhi));
@@ -482,6 +489,9 @@ export default async function WordPage({ params, searchParams }: Props) {
                   {sourceName}
                 </span>
                 {curator && <ProvenanceBadge provenance={provenance} reviewStatus={reviewStatus} />}
+                {curator && curatorOnly.has(code) && (
+                  <span className="badge" title="Hidden from the public until the rights holder agrees (#258)">curator only</span>
+                )}
                 {entryLink(code, word) && (
                   <a
                     href={entryLink(code, word)!}

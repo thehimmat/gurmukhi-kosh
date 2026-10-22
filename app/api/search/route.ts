@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { fetchPublicCodes, publicOriginFilter } from "@/lib/curator";
 import { foldGurmukhi } from "@/lib/gurmukhi-fold";
 import { SOURCE_COLUMNS, type SourceMeta } from "@/lib/sources";
 import {
@@ -130,12 +131,15 @@ export async function GET(req: NextRequest) {
 
   const hits: SearchHit[] = [];
   const seen = new Set<number>();
+  // Off-corpus words from curator-only sources (#258) stay out of public results.
+  const visible = publicOriginFilter(await fetchPublicCodes());
 
   // Tier 1: exact prefix on the spelling as typed.
   const { data: prefix, error } = await supabase
     .from("words")
     .select("id, gurmukhi, frequency")
     .ilike("gurmukhi", `${q}%`)
+    .or(visible)
     .order("frequency", { ascending: false })
     .limit(limit);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -154,6 +158,7 @@ export async function GET(req: NextRequest) {
         .from("words")
         .select("id, gurmukhi, frequency")
         .like("search_fold", `${folded}%`)
+        .or(visible)
         .order("frequency", { ascending: false })
         .limit(limit);
       for (const w of foldHits ?? []) {
@@ -171,6 +176,7 @@ export async function GET(req: NextRequest) {
       .from("words")
       .select("id, gurmukhi, frequency")
       .ilike("gurmukhi", `%${q}%`)
+      .or(visible)
       .order("frequency", { ascending: false })
       .limit(limit);
     if (containsErr) return NextResponse.json({ error: containsErr.message }, { status: 500 });
