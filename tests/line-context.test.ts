@@ -3,8 +3,22 @@
  * words, how its place is labelled per corpus, and the link into it.
  */
 import { describe, it, expect } from "vitest";
-import { lineHref, lineParts } from "../lib/line-context";
+import { lineHref, linePath, lineParts } from "../lib/line-context";
 import { isSggs, placeLabel } from "../lib/sources";
+
+describe("linePath and lineHref", () => {
+  it("point a visitor at the public line pages", () => {
+    expect(linePath(5, "passage", null)).toBe("/line/5");
+    expect(linePath(5, "ang", null)).toBe("/line/5/ang");
+    expect(lineHref(5)).toBe("/line/5#line-5");
+  });
+
+  it("point the curator at the admin line pages, which can show a curator-only corpus (070)", () => {
+    expect(linePath(5, "passage", "k")).toBe("/admin/line/5?key=k");
+    expect(linePath(5, "ang", "k")).toBe("/admin/line/5/ang?key=k");
+    expect(lineHref(5, "k")).toBe("/admin/line/5?key=k#line-5");
+  });
+});
 
 describe("lineParts", () => {
   it("links each word to its entry and keeps the spacing and dandas as text", () => {
