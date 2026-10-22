@@ -10,10 +10,11 @@ English translation. Only Asees runs are kept, converted to Unicode by
 gurmukhi-transliterate. Joy (the editor's headings and introduction) and
 GurbaniLipi (quotations in the notes) are not the text and are left out.
 
-Writes one JSON object per line: {"page": PDF page, "y": baseline, "bold": printed
-bold (the edition's headings), "raw": Asees keys, "gurmukhi": Unicode}, in reading
-order. Structure (chapters, chhands,
-verse numbers) is parsed from this by the TypeScript build.
+Writes one JSON object per line: {"page": PDF page, "notes": on a REFERENCES page
+(quotations, not the text), "y": baseline, "bold": printed bold (the edition's
+headings), "raw": Asees keys, "gurmukhi": Unicode}, in reading order. Structure
+(chapters, chhands, verse numbers) is parsed from this by the TypeScript build
+(pipeline/gur-sobha/lines.ts).
 
 Needs pdfminer.six and gurmukhi-transliterate.
 """
@@ -95,7 +96,8 @@ def page_lines(runs: list[Run]) -> list[Line]:
 
 
 def pdf_runs(pdf: str):
-    """(page number, [Run]) for each page, from pdfminer's text lines."""
+    """(page number, [Run], notes) for each page, from pdfminer's text lines. notes: the page
+    is one of the edition's REFERENCES pages, whose Asees lines quote other works."""
     from pdfminer.high_level import extract_pages
     from pdfminer.layout import LTChar, LTTextLine
 
@@ -108,20 +110,23 @@ def pdf_runs(pdf: str):
 
     for number, page in enumerate(extract_pages(pdf), start=1):
         runs = []
+        notes = False
         for tl in text_lines(page):
             chars = [c for c in tl if isinstance(c, LTChar) and TEXT_FONT in c.fontname]
             raw = "".join(c.get_text() for c in chars)
             if raw.strip():
                 runs.append(Run(raw, chars[0].x0, chars[0].y0, chars[-1].x1))
-        yield number, runs
+            elif "REFERENCES" in tl.get_text():
+                notes = True
+        yield number, runs, notes
 
 
 def main(pdf: str, out: str) -> None:
     n = 0
     with open(out, "w") as f:
-        for page, runs in pdf_runs(pdf):
+        for page, runs, notes in pdf_runs(pdf):
             for line in page_lines(runs):
-                f.write(json.dumps({"page": page, "y": line.y, "bold": line.bold, "raw": line.raw,
+                f.write(json.dumps({"page": page, "notes": notes, "y": line.y, "bold": line.bold, "raw": line.raw,
                                     "gurmukhi": line.gurmukhi},
                                    ensure_ascii=False) + "\n")
                 n += 1
