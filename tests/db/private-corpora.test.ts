@@ -189,6 +189,7 @@ describe("070: publishing a corpus", () => {
       { code: "sarbloh_budha_dal", visibility: "public" },
       { code: "bhai_gurdas_banidb_v2", visibility: "public" },
       { code: "nand_lal_ghazals", visibility: "public" },
+      { code: "gur_sobha_iss", visibility: "curator" },
     ]);
   });
 
