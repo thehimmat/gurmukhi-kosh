@@ -11,7 +11,7 @@ import { linesLoadSql, type LoadLine } from "../../pipeline/shared/load-sql";
 
 const PRIVATE = "test_private";
 const SGGS_SHABAD = 1;
-const PRIVATE_SHABAD = 920001;
+const PRIVATE_SHABAD = 990001;
 
 // ਸਤਿ is in both sources; ਗੁਪਤੁ and ਬਚਨੁ only in the private one.
 const publicLines: LoadLine[] = [
