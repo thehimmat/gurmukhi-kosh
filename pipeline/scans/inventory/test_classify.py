@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from classify import Font, classify, parse_pdffonts  # noqa: E402
 
-JAPJI_UNICODE = "ਆਦਿ ਸਚੁ ਜੁਗਾਦਿ ਸਚੁ ॥ ਹੈ ਭੀ ਸਚੁ ਨਾਨਕ ਹੋਸੀ ਭੀ ਸਚੁ ॥੧॥\n" * 5
+JAPJI_UNICODE = "ਆਦਿ ਸਚੁ ਜੁਗਾਦਿ ਸਚੁ ॥ ਹੈ ਭੀ ਸਚੁ ਨਾਨਕ ਹੋਸੀ ਭੀ ਸਚੁ ॥੧॥\n" * 10
 JAPJI_AKHAR = "Awid scu jugwid scu ]\nhY BI scu nwnk hosI BI scu ]1]\n" * 5
 ENGLISH = "The Guru's word is the light of the world and all who read it.\n" * 5
 
@@ -74,11 +74,41 @@ class TextLayer(unittest.TestCase):
         c = classify(None, numbered(ENGLISH.splitlines()[0], 100) + "".join(numbered(h, 3) for h in heads.splitlines()), pages=10)
         self.assertEqual(c.text_layer, "latin")
 
+    def test_short_ocr_scraps_are_not_legacy(self):
+        # OCR of an old English print (Ganguli's Mahabharata): running heads come out as
+        # 'VUl CONTENTS,' or 'ji COlifTENm', which read as AnmolLipi
+        scraps = "ji COlifTENm\nVI corrENis.\nVUl CONTENTS,\nCONTENm X4\nBHiRATA PRESS.\nCALCUTTA i\n"
+        text = numbered(ENGLISH.splitlines()[0], 300) + "".join(numbered(s, 3) for s in scraps.splitlines())
+        self.assertEqual(classify(None, text, pages=10).text_layer, "latin")
+
+    def test_latin_ocr_of_an_indic_page_is_garbled_not_legacy(self):
+        # OCR of Devanagari or Gurmukhi pages read as Latin passes AnmolLipi's spelling
+        # rules, but converted it makes no words
+        junk = ("HirrwfT ^nrrini sr^f^r^nr in. n q^rq^inirrfirfin iTniTn j\n"
+                "Tra^3 tfl g?§ goigg 3»W35ftM bSBuS tfl\n"
+                "318 33 3'foT 8tP8l 8T33 §3» §4 83T 33T 513\n"
+                "eHT^r T^ri^ i ^'^sirr-E^nfr^Rir i ^nrr\n")
+        c = classify(None, "".join(numbered(l, 20) for l in junk.splitlines()), pages=10)
+        self.assertEqual(c.text_layer, "garbled")
+        self.assertEqual(c.encodings, [])
+
     def test_scanner_watermarks_are_not_a_text_layer(self):
         stamps = ("CC-0. Panjab University Library, Chandigarh. Digitized by eGangotri\n"
                   "Scanned with CamScanner\n"
                   "Digitized by Google\n")
         c = classify(None, "\f".join([stamps] * 30), pages=30)
+        self.assertEqual(c.text_layer, "none")
+
+    def test_library_notices_are_not_a_text_layer(self):
+        notice = ("Sri Satguru Jagjit Singh Ji eLibrary NamdhariElibrary@gmail.com\n"
+                  "This book is part of the collection held by the Bodleian Libraries and scanned by Google, Inc.\n"
+                  "For more information see: http://www.bodleian.ox.ac.uk/dbooks\n")
+        c = classify(None, notice, pages=1)
+        self.assertEqual(c.text_layer, "none")
+
+    def test_a_title_page_alone_in_a_long_scan_is_none(self):
+        title = "Prabodhacandrodayanāṭaka : prasiddha nāṭaka Saṃskr̥ta jisameṃ mahābibeka aura mahāmoha\n"
+        c = classify(None, title * 3, pages=135)
         self.assertEqual(c.text_layer, "none")
 
     def test_a_stamp_repeated_on_every_page_is_ignored(self):
@@ -120,9 +150,15 @@ class Unindexed(unittest.TestCase):
         self.assertEqual((r["text_layer"], r["pages"]), ("none", 2))
 
 
+    def test_page_markup_is_not_counted_as_text(self):
+        from probe import classify_drive_content
+        content = "".join(f"|  |\n| :-: |\n| [**Page {i}**]() |\n\n-----\n\n" for i in range(1, 60))
+        self.assertEqual(classify_drive_content(content)["text_layer"], "none")
+
+
 class Garbled(unittest.TestCase):
     def test_vowel_signs_without_consonants_mark_bad_ocr(self):
-        bad = "ਿੀ ਾੁ ਂੇ ਕਿਿ ੋੋ ਾਾ ਿਕ ੀੀ ੁੁ ਂਂ ਰ\n" * 5
+        bad = "ਿੀ ਾੁ ਂੇ ਕਿਿ ੋੋ ਾਾ ਿਕ ੀੀ ੁੁ ਂਂ ਰ\n" * 10
         c = classify(None, bad, pages=1)
         self.assertEqual(c.text_layer, "garbled")
 

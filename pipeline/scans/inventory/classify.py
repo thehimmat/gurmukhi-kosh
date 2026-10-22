@@ -12,8 +12,10 @@ Legacy fonts are recognised by gurmukhi-transliterate: by font name
 (`detect_lines`).
 """
 
+import logging
 import re
 from collections import Counter
+from functools import lru_cache
 from dataclasses import dataclass, field
 
 from gurmukhi_transliterate.legacy import ENCODINGS, GurmukhiLegacy
@@ -21,6 +23,8 @@ from gurmukhi_transliterate.legacy import ENCODINGS, GurmukhiLegacy
 # Fewer non-space characters per page than this is page numbers or a
 # scanner's stamp, not a text layer.
 MIN_CHARS_PER_PAGE = 20
+# ...and fewer than this in all is a title page or a notice.
+MIN_CHARS = 200
 # Share of letters in a script for the text to count as written in it.
 SCRIPT_SHARE = 0.3
 # Gurmukhi counts at a lower share: bani sheets and steeks print each line
@@ -33,6 +37,11 @@ MAX_DETECT_LINES = 2000
 LEGACY_MIN_SCORE = 0.8
 LEGACY_MIN_LINES = 5
 LEGACY_MIN_SHARE = 0.03
+LEGACY_MIN_WORDS = 4
+# Converted legacy lines must make real words: this share of them in the lexicon,
+# from at least this many words.
+LEGACY_MIN_LEXICON = 0.4
+LEGACY_MIN_LEXICON_WORDS = 50
 # Share of Gurmukhi syllables that break spelling rules for OCR to count as bad.
 GARBLED_SHARE = 0.15
 
@@ -57,7 +66,8 @@ STAMP_MIN_PAGES = 6
 # Scanner and library stamps: text a page-image PDF carries without a text layer.
 WATERMARKS = re.compile(
     r"egangotri|camscanner|digiti[sz]ed by|google|dharmartha trust|raghunath temple|"
-    r"namdhari e-?library|panjab digital library|archive\.org|internet archive|"
+    r"namdhari ?e-?library|elibrary|panjab digital library|archive\.org|internet archive|"
+    r"bodleian|part of the collection held by|for more information see|"
     r"scanned (by|with)|cc-0\.|public domain|sikh ?heritage|ocr by|adobe",
     re.I)
 
@@ -146,23 +156,54 @@ def is_unicode_font(name: str) -> bool:
     return bare.startswith(UNICODE_FONT_PREFIXES) or bare in ("[none]", "")
 
 
-def _encodings_from_text(text: str) -> list[str]:
-    """Legacy layouts found in Latin-looking text, most lines first. A steek or a
-    translation may hold only a little verse among its prose, so a small share of
-    confidently legacy lines is enough."""
+def _encodings_from_text(text: str) -> tuple[list[str], bool]:
+    """Legacy layouts found in Latin-looking text, most lines first, and whether the
+    text looked legacy but converted to no words (Latin OCR of an Indic page).
+
+    A steek or a translation may hold only a little verse among its prose, so a
+    small share of confidently legacy lines is enough, provided they convert to
+    real words."""
     # A line with no lower case is a heading in capitals, which reads as valid
     # AnmolLipi; legacy Gurmukhi always mixes cases.
-    lines = [l for l in text.splitlines() if len(l.strip()) >= 8 and re.search(r"[a-z]", l)]
+    # Short lines are left out too: OCR scraps of English running heads
+    # ('VUl CONTENTS,') read as AnmolLipi, while verse lines run to several words.
+    lines = [l for l in text.splitlines()
+             if len(l.split()) >= LEGACY_MIN_WORDS and re.search(r"[a-z]", l)]
     if len(lines) > MAX_DETECT_LINES:
         step = len(lines) / MAX_DETECT_LINES
         lines = [lines[int(i * step)] for i in range(MAX_DETECT_LINES)]
     if not lines:
-        return []
+        return [], False
     guesses = GurmukhiLegacy.detect_lines("\n".join(lines))
-    legacy = Counter(g.label for g in guesses if g.label in ENCODINGS and g.score >= LEGACY_MIN_SCORE)
-    if sum(legacy.values()) < max(LEGACY_MIN_LINES, LEGACY_MIN_SHARE * len(lines)):
-        return []
-    return [k for k, _ in legacy.most_common()]
+    by_encoding: dict[str, list[str]] = {}
+    for line, g in zip(lines, guesses):
+        if g.label in ENCODINGS and g.score >= LEGACY_MIN_SCORE:
+            by_encoding.setdefault(g.label, []).append(line)
+    if sum(map(len, by_encoding.values())) < max(LEGACY_MIN_LINES, LEGACY_MIN_SHARE * len(lines)):
+        return [], False
+    found = [enc for enc, ls in sorted(by_encoding.items(), key=lambda kv: -len(kv[1]))
+             if _lexicon_share(ls, enc) >= LEGACY_MIN_LEXICON]
+    return found, not found
+
+
+def _lexicon_share(lines: list[str], encoding: str) -> float:
+    """Share of words in the Gurbani lexicon once *lines* are converted from
+    *encoding*: about two thirds for real legacy text, under a fifth for OCR junk."""
+    lexicon = _lexicon()
+    logging.disable(logging.WARNING)  # the converter warns on every unmapped key
+    try:
+        words = [w for l in lines for w in re.findall(r"[\u0A00-\u0A7F]+", GurmukhiLegacy.to_unicode(l, encoding))]
+    finally:
+        logging.disable(logging.NOTSET)
+    if len(words) < LEGACY_MIN_LEXICON_WORDS:
+        return 0.0
+    return sum(w in lexicon for w in words) / len(words)
+
+
+@lru_cache(maxsize=1)
+def _lexicon() -> frozenset[str]:
+    from gurmukhi_transliterate.lexicon import load_lexicon
+    return frozenset(load_lexicon())
 
 
 def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
@@ -184,12 +225,15 @@ def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
                 unknown.append(bare)
 
     result = Classification("none", unknown_fonts=unknown, scripts=scripts, chars=chars)
-    if chars < MIN_CHARS_PER_PAGE * max(pages, 1) and chars < 200:
+    if chars < max(MIN_CHARS, MIN_CHARS_PER_PAGE * max(pages, 1)):
         return result
 
     gurmukhi_chars = sum(1 for ch in text if "\u0A00" <= ch <= "\u0A7F")
     unicode_gurmukhi = scripts["gurmukhi"] >= GURMUKHI_SHARE and gurmukhi_chars >= GURMUKHI_MIN_CHARS
-    encodings = font_encodings or (_encodings_from_text(text) if scripts["latin"] >= SCRIPT_SHARE else [])
+    junk_ocr = False
+    encodings = font_encodings
+    if not encodings and scripts["latin"] >= SCRIPT_SHARE:
+        encodings, junk_ocr = _encodings_from_text(text)
     result.encodings = encodings
 
     if unicode_gurmukhi and encodings:
@@ -198,6 +242,8 @@ def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
         result.text_layer = "garbled" if _garbled_share(text) > GARBLED_SHARE else "unicode"
     elif encodings:
         result.text_layer = "legacy"
+    elif junk_ocr:
+        result.text_layer = "garbled"
     elif scripts["latin"] >= SCRIPT_SHARE:
         result.text_layer = "latin"
     elif scripts["devanagari"] >= SCRIPT_SHARE or scripts["arabic"] >= SCRIPT_SHARE:

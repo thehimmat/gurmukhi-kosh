@@ -19,7 +19,7 @@ from dataclasses import asdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from classify import classify  # noqa: E402
-from probe import probe_drive_text, probe_pdf  # noqa: E402
+from probe import classify_drive_content, probe_drive_text, probe_pdf  # noqa: E402
 
 
 def main(probes: str, drive_id: str, mode: str, arg: str) -> dict:
@@ -32,9 +32,7 @@ def main(probes: str, drive_id: str, mode: str, arg: str) -> dict:
     elif mode == "drive":
         out = probe_drive_text(arg)
     elif mode == "drive-text":
-        text = open(arg).read()
-        pages = max(text.count("**Page "), 1)
-        out = {"pages": pages, "fonts": [], "probe": "drive-text", **asdict(classify(None, text, pages=pages))}
+        out = classify_drive_content(open(arg).read())
     elif mode == "empty" and int(arg) == 0:
         out = {"pages": None, "fonts": [], "probe": "drive-text", "text_layer": "unindexed"}
     elif mode == "empty":
