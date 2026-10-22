@@ -373,3 +373,9 @@ twice (lines 169421, 169439, 171115, 173273). Checked after: no line or word hol
 211 → 212 occurrences (Sarbloh 77 → 78 in both stats tables) and ਸਸਤ੍ਨ (898002) 2 → 3, their misspellings 908120
 and 921408 deleted; 925959 renamed ਨ੍ਪਬਰ and 891466 ਪ੍ਸਾਦਿ (fold ਪ੍ਸਾਦ); each line's words read back in order.
 `pipeline/sarbloh/lines.ts` cleanText now collapses doubled halants, so a rebuild keeps them fixed.
+
+**070_private_corpora** — run 2026-10-22 from the dashboard SQL editor, so there is no ledger row: the MCP's
+`apply_migration` timed out after 60 s and rolled back (nothing applied), as for 068. Kosh `070_private_corpora.sql`, as
+in the repo. Checked after: all 172,604 lines `is_public`; the five corpora have public `source_rights` rows; 10 of the
+13 line-search functions are now security definer (the other three don't read `lines` themselves); anon can no longer
+execute `refresh_computed_stats`.
