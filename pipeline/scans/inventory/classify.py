@@ -38,6 +38,8 @@ LEGACY_MIN_SCORE = 0.8
 LEGACY_MIN_LINES = 5
 LEGACY_MIN_SHARE = 0.03
 LEGACY_MIN_WORDS = 4
+# Latin-script text with fewer word-shaped tokens than this is glyph ids, not text.
+MIN_WORD_SHARE = 0.2
 # Converted legacy lines must make real words: this share of them in the lexicon,
 # from at least this many words.
 LEGACY_MIN_LEXICON = 0.4
@@ -71,6 +73,8 @@ WATERMARKS = re.compile(
     r"scanned (by|with)|cc-0\.|public domain|sikh ?heritage|ocr by|adobe",
     re.I)
 
+_GLYPH_IDS = re.compile(r"\(cid:\d+\)|[\x00-\x08\x0b\x0e-\x1f]")
+
 _VOWEL_SIGNS = set("ਾਿੀੁੂੇੈੋੌ")
 _NASALS = set("ਂੰ")
 _CONSONANT = re.compile(r"[ਕ-ਹਖ਼-ੜਫ਼ੲੳਅ-ਔ]")
@@ -89,6 +93,7 @@ class Classification:
     unknown_fonts: list[str] = field(default_factory=list)   # possibly Gurmukhi, no converter
     scripts: dict[str, float] = field(default_factory=dict)  # share of letters per script
     chars: int = 0                                           # non-space characters sampled
+    unmapped_glyphs: bool = False   # glyph ids with no character map: text only OCR can read
 
 
 def parse_pdffonts(output: str) -> list[Font]:
@@ -151,6 +156,13 @@ def strip_stamps(text: str, pages: int) -> str:
                      if not WATERMARKS.search(l) and counts.get(l.strip(), 0) < repeated)
 
 
+def _word_share(text: str) -> float:
+    """Share of tokens shaped like words (two or more letters with a vowel)."""
+    tokens = text.split()
+    words = [t for t in tokens if re.fullmatch(r"[A-Za-z\u00c0-\u024f'’.,;:()-]{2,}", t) and re.search(r"[aeiouyAEIOUY]", t)]
+    return len(words) / len(tokens) if tokens else 0.0
+
+
 def is_unicode_font(name: str) -> bool:
     bare = re.sub(r"^[A-Z]{6}\+", "", name).lower().replace("-", "").replace(" ", "")
     return bare.startswith(UNICODE_FONT_PREFIXES) or bare in ("[none]", "")
@@ -209,7 +221,10 @@ def _lexicon() -> frozenset[str]:
 def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
     """Classify a text layer from its fonts (None when unknown) and a text sample
     covering *pages* pages."""
-    text = strip_stamps(text, pages)
+    # Glyph ids from fonts with no character map: pdfminer writes them as
+    # (cid:N), poppler as control characters.
+    cid_count = len(_GLYPH_IDS.findall(text))
+    text = strip_stamps(_GLYPH_IDS.sub("", text), pages)
     chars = len(re.sub(r"\s", "", text))
     scripts = _script_shares(text)
     font_encodings: list[str] = []
@@ -224,7 +239,8 @@ def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
             if bare not in unknown:
                 unknown.append(bare)
 
-    result = Classification("none", unknown_fonts=unknown, scripts=scripts, chars=chars)
+    result = Classification("none", unknown_fonts=unknown, scripts=scripts, chars=chars,
+                            unmapped_glyphs=cid_count >= MIN_CHARS)
     if chars < max(MIN_CHARS, MIN_CHARS_PER_PAGE * max(pages, 1)):
         return result
 
@@ -244,6 +260,9 @@ def classify(fonts: list[Font] | None, text: str, pages: int) -> Classification:
         result.text_layer = "legacy"
     elif junk_ocr:
         result.text_layer = "garbled"
+    elif scripts["latin"] >= SCRIPT_SHARE and _word_share(text) < MIN_WORD_SHARE:
+        # glyph ids on printable keys (a font with no character map): no words at all
+        result.unmapped_glyphs = True
     elif scripts["latin"] >= SCRIPT_SHARE:
         result.text_layer = "latin"
     elif scripts["devanagari"] >= SCRIPT_SHARE or scripts["arabic"] >= SCRIPT_SHARE:

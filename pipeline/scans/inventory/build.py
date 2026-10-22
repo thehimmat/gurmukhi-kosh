@@ -67,6 +67,7 @@ def build_rows(tree: dict, probes: dict, manifest: dict) -> list[dict]:
             # re-filtered so fonts added to the Latin list since the probe drop out
             "unknown_fonts": [f for f in probe.get("unknown_fonts", []) if not is_unicode_font(f)],
             "scripts": {k: round(v, 2) for k, v in probe.get("scripts", {}).items() if v >= 0.05},
+            "unmapped_glyphs": probe.get("unmapped_glyphs", False),
             "probe": probe.get("probe"),
         }
         if node["id"] in manifest:
@@ -120,6 +121,8 @@ def render_markdown(rows: list[dict], images: dict[str, int]) -> str:
         layer = r["text_layer"]
         if r["encodings"]:
             layer += f" ({', '.join(r['encodings'])})"
+        if r["unmapped_glyphs"]:
+            layer += " (glyph ids only: needs OCR)"
         if r["unknown_fonts"]:
             layer += f"; unknown fonts: {', '.join(r['unknown_fonts'][:3])}"
         scripts = ", ".join(f"{k} {int(v * 100)}%" for k, v in r["scripts"].items())

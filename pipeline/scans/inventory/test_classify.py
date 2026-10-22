@@ -126,6 +126,21 @@ class TextLayer(unittest.TestCase):
         self.assertEqual(c.text_layer, "mixed")
         self.assertIn("asees", c.encodings)
 
+    def test_glyph_ids_without_a_character_map_are_not_text(self):
+        # embedded fonts with no ToUnicode extract as (cid:N): only OCR can read them
+        cids = "".join(f"(cid:{i % 40})" for i in range(3000))
+        c = classify([Font("TTE1D1A540t00")], cids, pages=5)
+        self.assertEqual(c.text_layer, "none")
+        self.assertTrue(c.unmapped_glyphs)
+
+    def test_glyph_ids_on_printable_keys_are_not_text(self):
+        # a printer driver's embedded TrueType (TTE…t00) with no character map:
+        # pdftotext gives the glyph ids as punctuation and stray letters, no words
+        soup = "".join(f"{'!.$\"#5468&/*)\'%,'[i % 15]}{'' if i % 4 else chr(65 + i % 26)}\n" for i in range(3000))
+        c = classify([Font("ECIJGB+TTE1D1A540t00")], soup, pages=5)
+        self.assertEqual(c.text_layer, "none")
+        self.assertTrue(c.unmapped_glyphs)
+
     def test_unknown_gurmukhi_font_is_reported(self):
         fonts = [Font("DrChatrikWeb", uni=False)]
         c = classify(fonts, "kuC Swbd ijs dw nwm nhIN ]\n" * 5, pages=1)
