@@ -50,7 +50,7 @@ export function lineParts(gurmukhi: string): LinePart[] {
   return parts;
 }
 
-// ─── Data ────────────────────────────────────────────────────────────────────────
+// ─── Data ────────────────────────────────────────────────────────────────────
 
 export type ContextLine = {
   id: number;
