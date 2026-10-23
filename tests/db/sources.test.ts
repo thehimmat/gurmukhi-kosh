@@ -41,6 +41,8 @@ describe("065: sources metadata", () => {
         page_unit: "Vaar", searched_by_default: false, external_refs: { banidb: "B", shabados: "VBGJ" } },
       { code: "nand_lal_ghazals", slug: "nand-lal-ghazals", kind: "poetry", tier: "historical", rank: 40,
         page_unit: "Ghazal", searched_by_default: false, external_refs: { banidb: "N", shabados: "GZNL" } },
+      { code: "gur_sobha_iss", slug: "gur-sobha", kind: "poetry", tier: "historical", rank: 50,
+        page_unit: "Page", searched_by_default: false, external_refs: {} },
     ]);
   });
 

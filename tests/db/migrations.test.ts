@@ -50,6 +50,7 @@ describe("the replayed schema", () => {
       { id: 3, code: "dasam_banidb_v2" },
       { id: 4, code: "sarbloh_budha_dal" },
       { id: 6, code: "nand_lal_ghazals" },
+      { id: 7, code: "gur_sobha_iss" },
     ]);
   });
 
