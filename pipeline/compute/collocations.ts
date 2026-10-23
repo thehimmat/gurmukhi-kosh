@@ -111,6 +111,20 @@ interface Occurrence {
   position: number;
 }
 
+/**
+ * The occurrences pairs are counted from: on public lines only (migration 069). The job runs with
+ * the service-role key, which RLS doesn't limit, so a private source must be filtered here or its
+ * text would feed the public bigrams and collocations.
+ */
+export function publicOccurrences(supabase: any) {
+  return supabase
+    .from('word_occurrences')
+    .select('word_id, line_id, position, lines!inner(is_public)')
+    .eq('lines.is_public', true)
+    .order('line_id', { ascending: true })
+    .order('position', { ascending: true });
+}
+
 /** Upsert in bounded chunks so a single request never exceeds payload limits. */
 async function upsertInChunks(
   supabase: any,
@@ -128,8 +142,8 @@ async function upsertInChunks(
 }
 
 /**
- * Main job: compute bigrams + collocations for the whole corpus.
- * Fetches every word occurrence (paginated), groups by line, tallies pairs and
+ * Main job: compute bigrams + collocations for the public corpus.
+ * Fetches every word occurrence on a public line (paginated), groups by line, tallies pairs and
  * per-word frequencies in one pass, then upserts bigrams (count ≥ 3) and the
  * top collocations (PMI, count ≥ 5). Lazy-loads the Supabase client.
  */
@@ -140,14 +154,8 @@ export async function computeCollocationsCorpusWide() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  console.log('Fetching all word occurrences (paginated)...');
-  const occs = await fetchAllRows<Occurrence>('word_occurrences', () =>
-    supabase
-      .from('word_occurrences')
-      .select('word_id, line_id, position')
-      .order('line_id', { ascending: true })
-      .order('position', { ascending: true })
-  );
+  console.log('Fetching word occurrences on public lines (paginated)...');
+  const occs = await fetchAllRows<Occurrence>('word_occurrences', () => publicOccurrences(supabase));
   console.log(`Fetched ${occs.length} occurrences across the corpus.`);
 
   // Group by line (rows arrive ordered by line_id, position) and tally per-word
