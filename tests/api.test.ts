@@ -47,7 +47,7 @@ describe("database", () => {
   it("words table has expected row count (>20k)", async () => {
     const { count, error } = await db
       .from("words")
-      .select("*", { count: "exact", head: true });
+      .select("id", { count: "exact", head: true });
     expect(error).toBeNull();
     expect(count).toBeGreaterThan(20000);
   });
@@ -55,7 +55,7 @@ describe("database", () => {
   it("word frequencies are populated (no all-zero rows)", async () => {
     const { count, error } = await db
       .from("words")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact", head: true })
       .gt("frequency", 0);
     expect(error).toBeNull();
     expect(count).toBeGreaterThan(20000);

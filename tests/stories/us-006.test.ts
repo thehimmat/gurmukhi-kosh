@@ -41,11 +41,14 @@ describe("US-006: flagging and data-quality monitoring", () => {
     const data = (await res.json()) as { metrics: Array<{ key: string; value: unknown }> };
     const byKey = new Map(data.metrics.map((m) => [m.key, m.value]));
     expect(byKey.has("open_flags_total")).toBe(true);
-    // Regression for the 1000-row truncation (PR #89): the capped computation
-    // reported exactly 24; the paginated one runs over all 20k+ rows.
+    // Regression for the 1000-row truncation (PR #89): the scan must page through every
+    // grammar row the public can read. Since 069 that is only the Mahan Kosh's (~8k rows;
+    // Shackle and the pad-arth are curator-only, #39 #264), so no word has a cross-source
+    // conflict and grammar_conflicts is 0. Its polysemy count (~1,000) would fall to ~130
+    // if the scan stopped at 1,000 rows.
     const conflicts = byKey.get("grammar_conflicts");
     expect(typeof conflicts).toBe("number");
-    expect(conflicts as number).toBeGreaterThan(24);
+    expect(byKey.get("grammar_polysemy") as number).toBeGreaterThan(500);
     // /api/health recomputes everything live, including the paginated 20k-row
     // conflict scan, so give it well beyond the default 5s.
   }, 60000);

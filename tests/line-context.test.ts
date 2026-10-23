@@ -5,6 +5,7 @@
 import { describe, it, expect } from "vitest";
 import { lineHref, linePath, lineParts } from "../lib/line-context";
 import { isSggs, placeLabel } from "../lib/sources";
+import { curatorDb, visibilityLive } from "./stories/helpers";
 
 describe("linePath and lineHref", () => {
   it("point a visitor at the public line pages", () => {
@@ -80,14 +81,22 @@ describe.skipIf(!process.env.NEXT_PUBLIC_SUPABASE_URL)("fetchLineContext (live)"
     expect(ctx!.nextId).toBe(ids.at(-1)! + 1);
     expect(ctx!.source?.code).toBe("sggs_banidb_v2");
     // Resources come with the shabad: BaniDB English from the line, the rest
-    // from line_translations, in view order.
+    // from line_translations, in view order. The Darpan is curator-only (#264).
     const codes = ctx!.resources.get(32)!.map((r) => r.source_code);
     expect(codes).toContain("banidb_en");
-    expect(codes).toContain("ss_darpan");
-    expect(codes.indexOf("manmohan_en")).toBeLessThan(codes.indexOf("ss_darpan"));
+    expect(codes.indexOf("manmohan_en")).toBeLessThan(codes.indexOf("faridkot"));
+    if (await visibilityLive()) expect(codes).not.toContain("ss_darpan");
     expect(ctx!.scope).toBe("passage");
     // Japji's paragraph here is the whole shabad, so the shabad stands.
     expect(ctx!.passage).toBeNull();
+  });
+
+  it("gives the curator the Darpan with the shabad, in view order (#264)", async (ctx) => {
+    const curator = curatorDb();
+    if (!curator) return ctx.skip();
+    const { fetchLineContext } = await import("../lib/line-context");
+    const codes = (await fetchLineContext(32, "passage", curator))!.resources.get(32)!.map((r) => r.source_code);
+    expect(codes.indexOf("manmohan_en")).toBeLessThan(codes.indexOf("ss_darpan"));
   });
 
   it("opens a line in Japji's first shabad in its own passage (#220)", async () => {
