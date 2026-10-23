@@ -401,3 +401,14 @@ expected. All four refreshes ran in the loader without a timeout; none was run b
 `source_fk = 7`, none `is_public`; 23,736 occurrences over 4,789 distinct words (786 of them new: words 88,972 →
 89,758); as anon, 0 lines of source 7. `npm run pronounce` and `npm run searchfold` then ran over all words: no word
 lacks `ipa_display`; three lack `search_fold`, all older bare vowel-sign rows (ੀ ੁ ਿ), none from Gur Sobha.
+
+**073_dasam_banidb_corrections** — run 2026-10-23 from the dashboard SQL editor, so there is no ledger row: the MCP's
+`apply_migration` and `execute_sql` both held it for a confirmation that never reached the maintainer and timed out
+(nothing applied), as for 068. Kosh `073_dasam_banidb_corrections.sql`, as in the repo. Twelve Dasam lines BaniDB
+mistyped (verses 80315, 80317, 130072, 130073, 130077, 130080, 130171, 130263, 130265, 130267, 141915, 402922),
+checked against the 1912 Sodhak print, the Hazur Sahib larivaar and a 19th-c. Ugardanti pothi
+(`pipeline/sggs/corrections.ts`). Checked after: all twelve lines read as corrected, words back in order; 130072 gained
+ਨ (5 → 6 occurrences, first letters ਤਹਬਨਕਜ); misspellings ਮੁਿਹ, ਘੇਿਰ, ਤਾਂੈ, ਬੁੱਿਧ, ਜੋਉੂ deleted; frequencies ਭਾਗ
+281 → 274, ਭਾਂਗ 2 → 9, ਮੁਹਿ, ਘੇਰਿ, ਤੈਂ, ਨ, ਕਹਾ, ਬੁੱਧਿ, ਜੋਊ +1, ਕਹ −1, both stats tables matching occurrences;
+the numerals in 130073 and 130171 still span ੩੬ and ੫੮. `bigrams` and `collocations` catch up on the next
+`pipeline/compute` run.
