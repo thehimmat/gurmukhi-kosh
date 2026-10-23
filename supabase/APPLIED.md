@@ -394,3 +394,10 @@ scanned every row; the second starts from `lines`. `analyze lines` was then run 
 so the planner expected many private lines and merge-joined over all of `lines` (9 s). After: `/api/health` 200, same
 totals (172,604 lines, 1,430 angs, 1,113,815 occurrences). The function still takes ~14 s on its other, older parts
 (definitions and line_translations scans), inside its 20 s limit.
+
+**Gur Sobha lines (source 7)** — loaded 2026-10-23 with `npm run load:gur-sobha` (REST, service key) from the ISS 2014
+PDF on Drive; no migration. The build printed 3,708 lines, 483 shabads, 20 chapters, 23,736 tokens, 4,789 distinct, as
+expected. All four refreshes ran in the loader without a timeout; none was run by hand. Checked after: 3,708 lines with
+`source_fk = 7`, none `is_public`; 23,736 occurrences over 4,789 distinct words (786 of them new: words 88,972 →
+89,758); as anon, 0 lines of source 7. `npm run pronounce` and `npm run searchfold` then ran over all words: no word
+lacks `ipa_display`; three lack `search_fold`, all older bare vowel-sign rows (ੀ ੁ ਿ), none from Gur Sobha.
