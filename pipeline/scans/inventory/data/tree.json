@@ -1,0 +1,3182 @@
+{
+"nodes": {
+"1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W": {
+"id": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"parentId": "1hRn8hExaVtPkTUShQ3klVN99cKmwqyWk",
+"kind": "F",
+"size": 0,
+"title": "Texts & Granths (PDFs & Scans)"
+},
+"1_2m8EM35S5OrRsTxx9AZtbJJi3_HIxVP": {
+"id": "1_2m8EM35S5OrRsTxx9AZtbJJi3_HIxVP",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "P",
+"size": 20631137,
+"title": "Sri Guru Granth Sahib Darpan - Prof Sahib Singh.pdf"
+},
+"14uBq7CDJ12a1V0VRbZkH8NG6JzH4QvGP": {
+"id": "14uBq7CDJ12a1V0VRbZkH8NG6JzH4QvGP",
+"parentId": "1C6bCWx_HKLQ6IJZ_X3ldDfm4gdrWfawZ",
+"kind": "F",
+"size": 0,
+"title": "Ghazal Class"
+},
+"13_UkB8GlRd0-vg-xVwRKG2ysE98xAjji": {
+"id": "13_UkB8GlRd0-vg-xVwRKG2ysE98xAjji",
+"parentId": "1C6bCWx_HKLQ6IJZ_X3ldDfm4gdrWfawZ",
+"kind": "F",
+"size": 0,
+"title": "Nangli Humanology"
+},
+"1lR4ftpUAoZwxc3bUBlOBIhReTQxasVrb": {
+"id": "1lR4ftpUAoZwxc3bUBlOBIhReTQxasVrb",
+"parentId": "1C6bCWx_HKLQ6IJZ_X3ldDfm4gdrWfawZ",
+"kind": "F",
+"size": 0,
+"title": "Class Talks & Questions"
+},
+"1IVH2HniZvBxS9aftQcmZ_oqcXKYwEUE6": {
+"id": "1IVH2HniZvBxS9aftQcmZ_oqcXKYwEUE6",
+"parentId": "1hRn8hExaVtPkTUShQ3klVN99cKmwqyWk",
+"kind": "F",
+"size": 0,
+"title": "Santhya Recordings"
+},
+"17NCN7BgK0uOsIvqOgmZV9rGb6Jg2JAax": {
+"id": "17NCN7BgK0uOsIvqOgmZV9rGb6Jg2JAax",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "F",
+"size": 0,
+"title": "Santhya Scans"
+},
+"1RWpri4lZ8zWPhk7bhN17DA57B2TEdunj": {
+"id": "1RWpri4lZ8zWPhk7bhN17DA57B2TEdunj",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "P",
+"size": 403632239,
+"title": "Sri Amir Bhandar Teeka - Giani Kirpal Singh.pdf"
+},
+"1IqsO3j3O1ZTBq1_yq1gko7ac26FwSjNH": {
+"id": "1IqsO3j3O1ZTBq1_yq1gko7ac26FwSjNH",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "P",
+"size": 12259902,
+"title": "Fareedkot Teeka.pdf"
+},
+"1n7Fh2rMz0SltfSE-yX8zvFrxAy2Kj90A": {
+"id": "1n7Fh2rMz0SltfSE-yX8zvFrxAy2Kj90A",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "P",
+"size": 37563669,
+"title": "Gurbani Arth Bhandar - Sant Hari Singh.pdf"
+},
+"1RLWfNSkDGhAe1Q8Wx5nqkTBy3KIQNalk": {
+"id": "1RLWfNSkDGhAe1Q8Wx5nqkTBy3KIQNalk",
+"parentId": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"kind": "P",
+"size": 58857689,
+"title": "Manmohan Singh Complete Translation - English and Panjabi.pdf"
+},
+"1QMuJgjb2eEBrTJF5lAOBgz6v68lCfDJQ": {
+"id": "1QMuJgjb2eEBrTJF5lAOBgz6v68lCfDJQ",
+"parentId": "1hRn8hExaVtPkTUShQ3klVN99cKmwqyWk",
+"kind": "F",
+"size": 0,
+"title": "Gurbani Kosh & Transcription"
+},
+"1K11qA2lQITQrzxF41nu2FhLX1vzChapW": {
+"id": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Sri Guru Granth Sahib - Early Birs"
+},
+"1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy": {
+"id": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Pre-1900 Texts (new finds)"
+},
+"11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw": {
+"id": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Anandpur Library"
+},
+"1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9": {
+"id": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Ucharan, Grammar & Chhand"
+},
+"1IDZ_Q12_fDO4utHfc5b1jcW5DorPrJv7": {
+"id": "1IDZ_Q12_fDO4utHfc5b1jcW5DorPrJv7",
+"parentId": "1IVH2HniZvBxS9aftQcmZ_oqcXKYwEUE6",
+"kind": "F",
+"size": 0,
+"title": "Ghazal Class"
+},
+"1VvhXlYV8GYrjO7W0KcwQ6N622x-0YVLr": {
+"id": "1VvhXlYV8GYrjO7W0KcwQ6N622x-0YVLr",
+"parentId": "1IVH2HniZvBxS9aftQcmZ_oqcXKYwEUE6",
+"kind": "F",
+"size": 0,
+"title": "Nangli Humanology"
+},
+"19p2jDJAGhI1PgM7fycVvdsOR9pr9WoZG": {
+"id": "19p2jDJAGhI1PgM7fycVvdsOR9pr9WoZG",
+"parentId": "1IVH2HniZvBxS9aftQcmZ_oqcXKYwEUE6",
+"kind": "F",
+"size": 0,
+"title": "Class Talks & Questions"
+},
+"1o_tgLKBBxiIPk0dmo0jsHAxPWvEHCuT6": {
+"id": "1o_tgLKBBxiIPk0dmo0jsHAxPWvEHCuT6",
+"parentId": "17NCN7BgK0uOsIvqOgmZV9rGb6Jg2JAax",
+"kind": "P",
+"size": 30787949,
+"title": "ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf.pdf"
+},
+"1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-": {
+"id": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Bhai Nand Lal"
+},
+"1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe": {
+"id": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Sarbloh Granth"
+},
+"10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc": {
+"id": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Nitnem, Gutkas & Bani Sheets"
+},
+"1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH": {
+"id": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Bhai Gurdas Vaaran"
+},
+"1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK": {
+"id": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Hanuman Natak, Vichar Sagar & Other Granths"
+},
+"13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc": {
+"id": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Itihas, Rehit & Sakhis"
+},
+"1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf": {
+"id": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Dasam Granth"
+},
+"1fDns8Pzcc7HrCThTmtV-P-QCU1b3574B": {
+"id": "1fDns8Pzcc7HrCThTmtV-P-QCU1b3574B",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Audio (Jap Ji, Moharni, Fatehnama)"
+},
+"1Y4rTVitTHNV0XkYXQnFeWtFmpSU2QMSX": {
+"id": "1Y4rTVitTHNV0XkYXQnFeWtFmpSU2QMSX",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Unidentified Scans"
+},
+"1wuXx11FBTjt0f48fFi7gFd5t-yBPPwDX": {
+"id": "1wuXx11FBTjt0f48fFi7gFd5t-yBPPwDX",
+"parentId": "1qi5PkQXtysTl5Y5QQ6e4XKYKM84nvR1W",
+"kind": "F",
+"size": 0,
+"title": "Gurbani Sangeet & Kirtan"
+},
+"19pKeEcE_-rwaLJmq8K7slOPj4N78R2yb": {
+"id": "19pKeEcE_-rwaLJmq8K7slOPj4N78R2yb",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Prabodh Chandrodaya Natak (Anathdas's Gurmukhi ver"
+},
+"1GDTYtUIUwFG7a3Sh6nXoYnX2F7DCj-xb": {
+"id": "1GDTYtUIUwFG7a3Sh6nXoYnX2F7DCj-xb",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1OiMuD-AUdo3O-99dU3UCV3Lb9MQBwkgR": {
+"id": "1OiMuD-AUdo3O-99dU3UCV3Lb9MQBwkgR",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Janamsakhi Guru Nanak"
+},
+"1VVxADDRe_H3ZjIDu-1nW4Rt1tb3pT39P": {
+"id": "1VVxADDRe_H3ZjIDu-1nW4Rt1tb3pT39P",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Parchian Bhai Seva Das"
+},
+"1RsdR5Yk-63L8F9WUYs-ysJfK7_AVkJXX": {
+"id": "1RsdR5Yk-63L8F9WUYs-ysJfK7_AVkJXX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "066 Praya Sri Guru Granth Sahib Ji Ke"
+},
+"1JXQaSOW1Mr6AL7FDDlptNuTtnjcUOodP": {
+"id": "1JXQaSOW1Mr6AL7FDDlptNuTtnjcUOodP",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Prem Sumarag Granth + Sakhis of the ten Gurus"
+},
+"1czeGnMduw-cFHAnJW9pWZbxYlHg_TN25": {
+"id": "1czeGnMduw-cFHAnJW9pWZbxYlHg_TN25",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Japji Sahib Teeka (Anandghan)"
+},
+"1IZU13q8qdq8AMsOpO8tO6tI0HqOyzsd-": {
+"id": "1IZU13q8qdq8AMsOpO8tO6tI0HqOyzsd-",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1tunJzMV4zNiS77B6a64YziNVhK06DI29": {
+"id": "1tunJzMV4zNiS77B6a64YziNVhK06DI29",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Pothi Bhai Mohan Ji"
+},
+"1HKVhJL8hdls8UCS34NROU68Mv7-LBmv_": {
+"id": "1HKVhJL8hdls8UCS34NROU68Mv7-LBmv_",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "044 Pricha Guru Gobind Singh"
+},
+"1ldES_7zqQOr_JqnifovNx_M4G2j_4rsr": {
+"id": "1ldES_7zqQOr_JqnifovNx_M4G2j_4rsr",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Paras Bhag"
+},
+"14PuBP-RDyuRMNV8OtnKEjmsr5fD7jaHC": {
+"id": "14PuBP-RDyuRMNV8OtnKEjmsr5fD7jaHC",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Akal Takht hukamnama on Amrit sanchar, 1877"
+},
+"1pf6wNHH9zO77Ts9aFtwdwBwv_EQ7nfFw": {
+"id": "1pf6wNHH9zO77Ts9aFtwdwBwv_EQ7nfFw",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Puratan Janamsakhi (Colebrooke Vilayat-vali)"
+},
+"1M4ukJ99ki82P_NGEALF5S3BIpdv1jXPB": {
+"id": "1M4ukJ99ki82P_NGEALF5S3BIpdv1jXPB",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Gurparnali"
+},
+"1UmcLXh7xhVwhLyXNM5zXLsQghAd-pIdI": {
+"id": "1UmcLXh7xhVwhLyXNM5zXLsQghAd-pIdI",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Janamsakhi Bhai Bala"
+},
+"12Xo4rXy4sMuAcp1whjmopS3o0e6WDcBI": {
+"id": "12Xo4rXy4sMuAcp1whjmopS3o0e6WDcBI",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1Xd2qPnfgkXEkAVpvUiI9hHOe6mkvkzL5": {
+"id": "1Xd2qPnfgkXEkAVpvUiI9hHOe6mkvkzL5",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Japji Sahib steek (Udasi teeka)"
+},
+"1rLC3WaU2po6Z3w8uYu1bpPXOrogpLzDX": {
+"id": "1rLC3WaU2po6Z3w8uYu1bpPXOrogpLzDX",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Gobind Gita"
+},
+"1Hg73NtIxh9metvMjm2ZyHk899WqCBuuu": {
+"id": "1Hg73NtIxh9metvMjm2ZyHk899WqCBuuu",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1r1vVWURDcVNoqQN3-D2gVdPTmaG7hNtq": {
+"id": "1r1vVWURDcVNoqQN3-D2gVdPTmaG7hNtq",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Gurbilas Patshahi 10"
+},
+"13A7BRP6XLgJ-Z7zP4UtyDjsEfrVG5y7f": {
+"id": "13A7BRP6XLgJ-Z7zP4UtyDjsEfrVG5y7f",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Sri Gur Panth Prakash"
+},
+"1m2hzx5AzF5QAJAABzF3wi928fWJo7yV1": {
+"id": "1m2hzx5AzF5QAJAABzF3wi928fWJo7yV1",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Bhavrasamrit"
+},
+"1Zxu6E2SBzi6k4R5PhVLZoYnsj8ksN9Cb": {
+"id": "1Zxu6E2SBzi6k4R5PhVLZoYnsj8ksN9Cb",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"19T2ePlmWakYJygBhnCxM-ZqN6O5DNGlW": {
+"id": "19T2ePlmWakYJygBhnCxM-ZqN6O5DNGlW",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Mahima Prakash"
+},
+"1OHL-A_ZToiuv0DeJaF6v1gtsUFjVSxRE": {
+"id": "1OHL-A_ZToiuv0DeJaF6v1gtsUFjVSxRE",
+"parentId": "1MMi1M2_PCSzoEkezu0HzPBQP4PREsGVy",
+"kind": "F",
+"size": 0,
+"title": "Gurbilas Patshahi 6"
+},
+"17nQihaGgP9gcSIB9b2qSSm7khlUUAstJ": {
+"id": "17nQihaGgP9gcSIB9b2qSSm7khlUUAstJ",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1Guz8SkdRA_uyfBaS6-MCOvk6a7BcA9qJ": {
+"id": "1Guz8SkdRA_uyfBaS6-MCOvk6a7BcA9qJ",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "021 Zindaginama"
+},
+"15ogFox5-wIzD36o5G9pAvGXFkoMOwyyC": {
+"id": "15ogFox5-wIzD36o5G9pAvGXFkoMOwyyC",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "002 Rajniti Ra Kabit"
+},
+"1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg": {
+"id": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "F",
+"size": 0,
+"title": "Early witnesses"
+},
+"1QeWzaLS_IM_yzThH874hjaPVEuQBrAJu": {
+"id": "1QeWzaLS_IM_yzThH874hjaPVEuQBrAJu",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "_akhar-ocr"
+},
+"11o1ZlhrsVYTUfNifhGlRovkZ4kd7RrtH": {
+"id": "11o1ZlhrsVYTUfNifhGlRovkZ4kd7RrtH",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "_Finding aids"
+},
+"1dgi-JpwMCVSKUk0WdmiNkIBACq7RMqvC": {
+"id": "1dgi-JpwMCVSKUk0WdmiNkIBACq7RMqvC",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "087 Suannama"
+},
+"1nWSkPefr94aunqRYOEIistTFHJxFHnEX": {
+"id": "1nWSkPefr94aunqRYOEIistTFHJxFHnEX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "145 Ikadas"
+},
+"1r0A8n2-JtOS72HqTz3mM74FR8aHJmsc3": {
+"id": "1r0A8n2-JtOS72HqTz3mM74FR8aHJmsc3",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "090 Sargita"
+},
+"18eJA-1F07yYV4LIuJdz6nnMa3hjw1GgJ": {
+"id": "18eJA-1F07yYV4LIuJdz6nnMa3hjw1GgJ",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "009 Pandav Gita"
+},
+"1sKBCp743up_g5LThpzmvfvIWbErsKWJn": {
+"id": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "088 Hanuman Natak"
+},
+"1w0qseQJnuS80fX9Voueqxa5AEeXKtdp2": {
+"id": "1w0qseQJnuS80fX9Voueqxa5AEeXKtdp2",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "064 Var Patshahi Dasvin Ki"
+},
+"13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0": {
+"id": "13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "032 Panj Sau Sakhi"
+},
+"1A-KBZmlaRlNwrO58yUuoSGe1Kh4VEWmN": {
+"id": "1A-KBZmlaRlNwrO58yUuoSGe1Kh4VEWmN",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "103 Nitishakt"
+},
+"1tQ-6RW_e0fTQxTCxOnV_ZlXRklAFqKW5": {
+"id": "1tQ-6RW_e0fTQxTCxOnV_ZlXRklAFqKW5",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "147 Tasnif Bhai Nand Lal Ji"
+},
+"12OqcN3iXJquvDt4nHQii71wxjv-2w2X1": {
+"id": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "144 Bhakha Bhukhan"
+},
+"1dltF3Jcyu8LQXQcOf9jJQZvGnVx3UKXd": {
+"id": "1dltF3Jcyu8LQXQcOf9jJQZvGnVx3UKXd",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "018 Sikhan Di Bhagatmala"
+},
+"1x1cLDaa-kNeLM0SMt9UDoprCYu1a27Tp": {
+"id": "1x1cLDaa-kNeLM0SMt9UDoprCYu1a27Tp",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "001 Singh Gau Ki Katha"
+},
+"12TuQQMDvq4pKFYNHx9obGdGCyzjSjTNP": {
+"id": "12TuQQMDvq4pKFYNHx9obGdGCyzjSjTNP",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "107 Padam Puran"
+},
+"1d0ZDmdgkJmNu4_r6O0TqaU1sHFbnnBC8": {
+"id": "1d0ZDmdgkJmNu4_r6O0TqaU1sHFbnnBC8",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "146 Prabodh Chandar Natak"
+},
+"18ifFnwu5G4TASpmj2rnxY2SbQW_s8JFk": {
+"id": "18ifFnwu5G4TASpmj2rnxY2SbQW_s8JFk",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "047 Jangnama Guru Gobind Singh"
+},
+"1zYNz9ZCO9FitrjF20ZNMUkBs2jhG_Rdr": {
+"id": "1zYNz9ZCO9FitrjF20ZNMUkBs2jhG_Rdr",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "020 Divan-e-Goya"
+},
+"1yU4GXGu04Skd3JT6_RItP_aAAn7so5EK": {
+"id": "1yU4GXGu04Skd3JT6_RItP_aAAn7so5EK",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "043 Udyog Parab"
+},
+"1gzv0Chpr9Q_QwbqeE15NcflM12865UZH": {
+"id": "1gzv0Chpr9Q_QwbqeE15NcflM12865UZH",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "025 Dastur-ul-Insha"
+},
+"1ynh2r7griggzlr2psLsAd6letZc7EjXw": {
+"id": "1ynh2r7griggzlr2psLsAd6letZc7EjXw",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "036 Samudrik"
+},
+"1UiEjOx0Em99_0l9MI0kNPYDpyXpyPm63": {
+"id": "1UiEjOx0Em99_0l9MI0kNPYDpyXpyPm63",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "029 Sakhi Rahit Ki"
+},
+"1APYfDHjTvWtJvdoJ4fsdI9Fml9V2IbP6": {
+"id": "1APYfDHjTvWtJvdoJ4fsdI9Fml9V2IbP6",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "026 Arz-ul-Ilfaz"
+},
+"1ch6B_lPRiikdsEq0OpfD9Do-iZJ-MRvd": {
+"id": "1ch6B_lPRiikdsEq0OpfD9Do-iZJ-MRvd",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "138 Mahabharata"
+},
+"1jgBpUJKqye84BsLfLQFqIIATqDufs8Rl": {
+"id": "1jgBpUJKqye84BsLfLQFqIIATqDufs8Rl",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "031 Love poetry in various ragas"
+},
+"18Ge-T4iXSMR5CraHttNnwa3hyq4c5r7L": {
+"id": "18Ge-T4iXSMR5CraHttNnwa3hyq4c5r7L",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "065 Barahmah Sri Ramchandar Ji Ka"
+},
+"1dwNjRCjSRWhwiTLiwV5XTW26mBruiZbC": {
+"id": "1dwNjRCjSRWhwiTLiwV5XTW26mBruiZbC",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "037 Rati Rahas Kok"
+},
+"1xVjKDiue-q9uGe24r6QiDC1qBVZeI26L": {
+"id": "1xVjKDiue-q9uGe24r6QiDC1qBVZeI26L",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "114 Manu (Simriti)"
+},
+"1m4I53pdAPzRQF7eujOqaoNlFuvbzQhQW": {
+"id": "1m4I53pdAPzRQF7eujOqaoNlFuvbzQhQW",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "084 Baznama"
+},
+"1gXOXv4PNEvgBaNe7_53k48oNNRaUqSq9": {
+"id": "1gXOXv4PNEvgBaNe7_53k48oNNRaUqSq9",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "003 Lav Kus Di Var"
+},
+"1TcwpI3eBx3lZeGhFGa4B5GnN3jf4thIt": {
+"id": "1TcwpI3eBx3lZeGhFGa4B5GnN3jf4thIt",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "148 Ustat Sri Amritsar Ji Ki"
+},
+"1ErMPlycgTw8hDqFWwwZ18fET6nR08fOn": {
+"id": "1ErMPlycgTw8hDqFWwwZ18fET6nR08fOn",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "051 Bhav Panchashika"
+},
+"1pkzTakUZlhnkMuvfcc411xGuQ4iEM0IX": {
+"id": "1pkzTakUZlhnkMuvfcc411xGuQ4iEM0IX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "085 Filnama"
+},
+"1EA0B7d0rNVLKTlpoQ7ci2d8rML1f99_B": {
+"id": "1EA0B7d0rNVLKTlpoQ7ci2d8rML1f99_B",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "118 Yajur Veda"
+},
+"1paCjoRkw9hi8HPgmanzCcaiPuhwW1C03": {
+"id": "1paCjoRkw9hi8HPgmanzCcaiPuhwW1C03",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "086 Aspnama"
+},
+"16dSLK-Nr9LWmEm9H7ahp1RAyDVNWwO0z": {
+"id": "16dSLK-Nr9LWmEm9H7ahp1RAyDVNWwO0z",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "080 Poetry in praise of a friend soon to be married"
+},
+"1WWLcxoVO-eSQxT_GrRMGgnK-I2n_9Gxd": {
+"id": "1WWLcxoVO-eSQxT_GrRMGgnK-I2n_9Gxd",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "030 Hazoori Rahitnama"
+},
+"198H23QkMUfdVb-1J4NyuwCm7rbY1ggBm": {
+"id": "198H23QkMUfdVb-1J4NyuwCm7rbY1ggBm",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "109 Mahabharat"
+},
+"15eQHR6XgUjW8_XITE5pZ4KRV43SEOuw5": {
+"id": "15eQHR6XgUjW8_XITE5pZ4KRV43SEOuw5",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "035 Draun Parab"
+},
+"1hc9QulXfldY9UryIGrrUuxIwrYve2K3o": {
+"id": "1hc9QulXfldY9UryIGrrUuxIwrYve2K3o",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "136 Garuda Purana"
+},
+"1CGDfAv9LO3-RQqXtnUgH9Mq2dTK5mqPK": {
+"id": "1CGDfAv9LO3-RQqXtnUgH9Mq2dTK5mqPK",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "119 Atharva Veda"
+},
+"1AGgwExyWErJrTop6WXNNE5x_V802SyUN": {
+"id": "1AGgwExyWErJrTop6WXNNE5x_V802SyUN",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "033 Karan Parab"
+},
+"12Zf4iviFKXIvpGc2XVfLVLb26TgNC8Ff": {
+"id": "12Zf4iviFKXIvpGc2XVfLVLb26TgNC8Ff",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "123 Shiva Purana"
+},
+"1-yDDU0DwqZSA7Xx7XgOlqDqAc3H77VmJ": {
+"id": "1-yDDU0DwqZSA7Xx7XgOlqDqAc3H77VmJ",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "038 Asvamedh Parab"
+},
+"1WttxfUi7ZOfTgHbyPMaWDpv9ZuP_rywb": {
+"id": "1WttxfUi7ZOfTgHbyPMaWDpv9ZuP_rywb",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "014 Shalya Parab"
+},
+"17O1S0XDLTgmFKfB43VeK6K15hiScHMPx": {
+"id": "17O1S0XDLTgmFKfB43VeK6K15hiScHMPx",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "028 Prashanuttar Rahitnama"
+},
+"12NuGlXOBm15St7VwIak68lBUQbwc6UwX": {
+"id": "12NuGlXOBm15St7VwIak68lBUQbwc6UwX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "012 Sabha Parab"
+},
+"106gwPU0IHKA3X0BY746chHD-bCtnkdeg": {
+"id": "106gwPU0IHKA3X0BY746chHD-bCtnkdeg",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "006 Chanaka Shastra Bhakha"
+},
+"1zLCRFqaSoZUkBa-_cab0FiC_uSymaggs": {
+"id": "1zLCRFqaSoZUkBa-_cab0FiC_uSymaggs",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "140 Manu Simriti"
+},
+"1HA3g4B6YvFiA3L9J5niBCMoydc3VMksE": {
+"id": "1HA3g4B6YvFiA3L9J5niBCMoydc3VMksE",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "061 Panchtantra"
+},
+"197hOGoKQjTmvIU_wVePBwlJQnHQRL8gU": {
+"id": "197hOGoKQjTmvIU_wVePBwlJQnHQRL8gU",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "115 Yagvalak"
+},
+"1a-uz8XgM-w-kZY333EW6Qt_-CsNV1Z5X": {
+"id": "1a-uz8XgM-w-kZY333EW6Qt_-CsNV1Z5X",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "004 Hitupdesha"
+},
+"12IRCtp7HvwiY-BxYCH-icy1e9m0toIr8": {
+"id": "12IRCtp7HvwiY-BxYCH-icy1e9m0toIr8",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "097 Hitupdesha"
+},
+"1Dm5weMlH0LCFPz83DgR3FPVtrj7SIMqF": {
+"id": "1Dm5weMlH0LCFPz83DgR3FPVtrj7SIMqF",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "143 Bachitar Natak"
+},
+"1k35k_f3C0Fr88XZNPkEz14DGuIuf1-VX": {
+"id": "1k35k_f3C0Fr88XZNPkEz14DGuIuf1-VX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "099 Balmiki Ramayan"
+},
+"1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X": {
+"id": "1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "105 Vishnu Bhagvat Da Dasam"
+},
+"1ulTaBJMr7QfR_iaL4zKd0syUzfc8AGF8": {
+"id": "1ulTaBJMr7QfR_iaL4zKd0syUzfc8AGF8",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "134 Kurma Purana"
+},
+"1z_da9Li94yj3LWQV27QTYJABC4G2lMhx": {
+"id": "1z_da9Li94yj3LWQV27QTYJABC4G2lMhx",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "110 Jaimini"
+},
+"12BZOI8Mndi4n6V3CkscFxOFkuuOsiliu": {
+"id": "12BZOI8Mndi4n6V3CkscFxOFkuuOsiliu",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "104 Devi Bhagvat"
+},
+"1-1EV73NYKR9VruU4yNOxvLwuP5Hi-Vlh": {
+"id": "1-1EV73NYKR9VruU4yNOxvLwuP5Hi-Vlh",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "089 Sur Sagar"
+},
+"1bo7fiM4AdovwxxEdaEeT-rDgRMMEl5rP": {
+"id": "1bo7fiM4AdovwxxEdaEeT-rDgRMMEl5rP",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "060 Prem Ambodh"
+},
+"16KSfA-dxEPdEKbIwLsKow66HLcpvglum": {
+"id": "16KSfA-dxEPdEKbIwLsKow66HLcpvglum",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "112 Shukraniti"
+},
+"1vurQClakZcAsusbPqDuKrp09u4srvgxG": {
+"id": "1vurQClakZcAsusbPqDuKrp09u4srvgxG",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "128 Bhavishya Purana"
+},
+"1imkfx4yuOZKo8y4zRqvkJcQ5oFp7zcgd": {
+"id": "1imkfx4yuOZKo8y4zRqvkJcQ5oFp7zcgd",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "050 Brind Satsei"
+},
+"1yCqu24lRv5_bm_cxPqTBH2lC3a_aUNoz": {
+"id": "1yCqu24lRv5_bm_cxPqTBH2lC3a_aUNoz",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "135 Matsya Purana"
+},
+"1rqX4vWIq7ydDeBGNHw8E7Yx2CC5ihYxG": {
+"id": "1rqX4vWIq7ydDeBGNHw8E7Yx2CC5ihYxG",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "108 Vishnu Purana"
+},
+"1bMl8sKojQNGeI2IcVzZl80uMHgk0Xu93": {
+"id": "1bMl8sKojQNGeI2IcVzZl80uMHgk0Xu93",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "133 Vamana Purana"
+},
+"1zovw7e9bAQ8UTUDMiWXZoZCCXrSjJCSa": {
+"id": "1zovw7e9bAQ8UTUDMiWXZoZCCXrSjJCSa",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "017 Fifty Upanishads (translations)"
+},
+"1epHObcZY6s8CEb4O4oc-Rdcza-Mfi5JO": {
+"id": "1epHObcZY6s8CEb4O4oc-Rdcza-Mfi5JO",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "098 Upanishads"
+},
+"14c7-PecOukXbR992csrWOH9MYZVLd3bK": {
+"id": "14c7-PecOukXbR992csrWOH9MYZVLd3bK",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "100 (Yog) Vashisht"
+},
+"136Yc2ZaCokw_tNsfAD1tzK4Yofi982uV": {
+"id": "136Yc2ZaCokw_tNsfAD1tzK4Yofi982uV",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "019 Gyan Ratnavali"
+},
+"1LDY4Q_rVJlToenrEUTCDOsw31kaX1LAc": {
+"id": "1LDY4Q_rVJlToenrEUTCDOsw31kaX1LAc",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 246839341,
+"title": "Guru Granth Sahib (Ram Rai saroop) - Handwritten SGGS saroop associated with Baba Ram Rai (Dehradun tradition).pdf"
+},
+"1SVt4-8bCTZfgDJuz3Wv3ayVrOfUovdf4": {
+"id": "1SVt4-8bCTZfgDJuz3Wv3ayVrOfUovdf4",
+"parentId": "19pKeEcE_-rwaLJmq8K7slOPj4N78R2yb",
+"kind": "P",
+"size": 23946668,
+"title": "Prabodh Chandrodaya Natak (Anathdas's Gurmukhi version rende - Lucknow Munshi Nawal Kishor, 1883; 124 pp. - title states Brajbasidas's Braj natak, plus a.pdf"
+},
+"17QResmtrztI-KG9WeTG7EFfJ5yUyvY1z": {
+"id": "17QResmtrztI-KG9WeTG7EFfJ5yUyvY1z",
+"parentId": "1GDTYtUIUwFG7a3Sh6nXoYnX2F7DCj-xb",
+"kind": "P",
+"size": 3925267,
+"title": "Tankhahnama (Bhai Nand Lal) - Undated puratan MS, 9 pp. (1800s (uploader's estimat).pdf"
+},
+"199MP44EgPOTpm_m_hM-Uoh88ozyGujQ_": {
+"id": "199MP44EgPOTpm_m_hM-Uoh88ozyGujQ_",
+"parentId": "1OiMuD-AUdo3O-99dU3UCV3Lb9MQBwkgR",
+"kind": "P",
+"size": 17400349,
+"title": "Janamsakhi Guru Nanak - Puratan Janam Sakhi Guru Nanak, Gurmukhi MS (PDL scan, MS no. 431), 60 pp. (undated).pdf"
+},
+"1SXgdiSJ2kNOmQv_ux2tND52SgbNx8m4C": {
+"id": "1SXgdiSJ2kNOmQv_ux2tND52SgbNx8m4C",
+"parentId": "1VVxADDRe_H3ZjIDu-1nW4Rt1tb3pT39P",
+"kind": "P",
+"size": 21792213,
+"title": "Parchian Bhai Seva Das - Gurmukhi MS, 71 pp. (undated).pdf"
+},
+"1XDSLt1QkwtYyAQStLuyNpQuIIUxPrZLJ": {
+"id": "1XDSLt1QkwtYyAQStLuyNpQuIIUxPrZLJ",
+"parentId": "1RsdR5Yk-63L8F9WUYs-ysJfK7_AVkJXX",
+"kind": "P",
+"size": 59385136,
+"title": "Adi Granth commentary (steek praya) - Gurmukhi MS commentary on the Adi Granth collected by Trumpp, BSB Cod.panj. 5, 66 ff. (1871 (Lahore)).pdf"
+},
+"1VEoMb7X5DusFMfhIysiR05OFx2PCVQiN": {
+"id": "1VEoMb7X5DusFMfhIysiR05OFx2PCVQiN",
+"parentId": "1RsdR5Yk-63L8F9WUYs-ysJfK7_AVkJXX",
+"kind": "P",
+"size": 101877837,
+"title": "Adi Granth commentary (steek praya) - Gurmukhi MS commentary on the Adi Granth collected by Trumpp, BSB Cod.panj. 4, 37 ff. (1871 (Lahore)).pdf"
+},
+"1B-h06AuA8gVLDy8ot5VYqAKeZsdBOJH7": {
+"id": "1B-h06AuA8gVLDy8ot5VYqAKeZsdBOJH7",
+"parentId": "1JXQaSOW1Mr6AL7FDDlptNuTtnjcUOodP",
+"kind": "P",
+"size": 255596116,
+"title": "Prem Sumarag Granth + Sakhis of the ten Gurus - Gurmukhi MS collected by Ernst Trumpp Sakhis of the ten Gurus and Rahitnama (Prem Sumarag) (1872 (Lahore; BSB acquisi).pdf"
+},
+"1Y046G5IaEFMFURqnG6zNUcLImXc_1_ww": {
+"id": "1Y046G5IaEFMFURqnG6zNUcLImXc_1_ww",
+"parentId": "1IZU13q8qdq8AMsOpO8tO6tI0HqOyzsd-",
+"kind": "P",
+"size": 83955873,
+"title": "Sarbloh Granth - Sarbloh Granth bir of Mata Bhag Kaur Bunga (courtesy Simranpreet Singh DhanLikhari) (undated).pdf"
+},
+"1Ve7GJm1aTj6NR8YWFjPxMGBRoeuqxRJD": {
+"id": "1Ve7GJm1aTj6NR8YWFjPxMGBRoeuqxRJD",
+"parentId": "1IZU13q8qdq8AMsOpO8tO6tI0HqOyzsd-",
+"kind": "P",
+"size": 327771364,
+"title": "Sarbloh Granth - Sarbloh Granth bir dated 1878 CE (Bikrami date in colophon), 1003 pp..pdf"
+},
+"1UzMUwdvdkub9KO-hmF42ZE8SX_23-N8A": {
+"id": "1UzMUwdvdkub9KO-hmF42ZE8SX_23-N8A",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 246607023,
+"title": "Adi Granth Guru Granth Sahib - Gurmukhi MS (Ram Rai recension) dated Sammat 1752 1695 CE, 634 folios, with Punjabi descri (1695 (Sammat 1752, in tat).pdf"
+},
+"1cL3VfG8ruRbHZgnSjVGAslITGnlLJbkl": {
+"id": "1cL3VfG8ruRbHZgnSjVGAslITGnlLJbkl",
+"parentId": "1czeGnMduw-cFHAnJW9pWZbxYlHg_TN25",
+"kind": "P",
+"size": 97701446,
+"title": "Japji Sahib Teeka (Anandghan) - Gurmukhi MS of Anandghan Udasi's Japji teeka, 216 pp (undated).pdf"
+},
+"10GL2xz0UeqlK4B8DrCptNv5VIUiR_GTE": {
+"id": "10GL2xz0UeqlK4B8DrCptNv5VIUiR_GTE",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 146408493,
+"title": "Sri Guru Granth Sahib (Adi Granth) - Handwritten saroop dated Bikrami 1787 (= 1730 CE), 985 images (Bk 1787 1730 CE (per titl).pdf"
+},
+"1mLAUmdJTqA2rFx_Lo325vM_EB7MwxoJ6": {
+"id": "1mLAUmdJTqA2rFx_Lo325vM_EB7MwxoJ6",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 348737405,
+"title": "Sri Guru Granth Sahib (Adi Granth) - Old handwritten saroop of Sri Guru Granth Sahib dated 1714 CE (per uploader), 889 images (1714 (per uploader descri).pdf"
+},
+"1ZqRhpGnrr1kJ7ixtxjvCY7YPzFNxPKzr": {
+"id": "1ZqRhpGnrr1kJ7ixtxjvCY7YPzFNxPKzr",
+"parentId": "1IZU13q8qdq8AMsOpO8tO6tI0HqOyzsd-",
+"kind": "P",
+"size": 423624556,
+"title": "Sarbloh Granth - Old handwritten Sarbloh Granth saroop, 453 images (undated (old MS per uploa).pdf"
+},
+"1Wtv2_fvx-oEUgLqFLf7Eo8XW2Ijt-bDZ": {
+"id": "1Wtv2_fvx-oEUgLqFLf7Eo8XW2Ijt-bDZ",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 191223835,
+"title": "Guru Granth Sahib (Adi Granth) - GGS MS c.1660-75, British Library (bought 1884 from Rev. A. Fischer) - microfilm scan (c.1660-1675).pdf"
+},
+"1SuhG3QBycrGqYx8M916S2Ncn8qhmBBK8": {
+"id": "1SuhG3QBycrGqYx8M916S2Ncn8qhmBBK8",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 98506929,
+"title": "Guru Granth Sahib (Adi Granth) - (Alleged) original Bhai Banno bir, 1642 CE, at Gurdwara Bhai Banno (Kanpur) (1642 (claimed)).pdf"
+},
+"1UKNqKTFxjp3jAEH6bHDehE4yEvv5HCFO": {
+"id": "1UKNqKTFxjp3jAEH6bHDehE4yEvv5HCFO",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 123981739,
+"title": "Guru Granth Sahib (Adi Granth) - Selected photographs of the Kartarpuri Bir (1604).pdf"
+},
+"1aNjcHRYvxvcDS_PZD6mV4ljL0XLkVO5d": {
+"id": "1aNjcHRYvxvcDS_PZD6mV4ljL0XLkVO5d",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 493999424,
+"title": "Guru Granth Sahib (Adi Granth) - Ram Rai GGS MS, 1675 CE.pdf"
+},
+"16_T4V6oCZR-e-wGAYpyHxYEDey6djmpX": {
+"id": "16_T4V6oCZR-e-wGAYpyHxYEDey6djmpX",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 501647131,
+"title": "Guru Granth Sahib (Adi Granth) - Archive of 17th-c. GGS MSS (16 PDFs) Bhai Rupa, Bidhi Chand, Gurdas jild, Kartarpuri, nish (1605-1698).pdf"
+},
+"1JU_I5KDjscvfJPz4Taruw0ZK1jHmWkkM": {
+"id": "1JU_I5KDjscvfJPz4Taruw0ZK1jHmWkkM",
+"parentId": "1K11qA2lQITQrzxF41nu2FhLX1vzChapW",
+"kind": "P",
+"size": 59884958,
+"title": "Guru Granth Sahib (Adi Granth) - Guru Granth Sahib MS dated 1676 CE; custodian Dr. Man Singh Nirankari, Chandigarh; PDL acc.pdf"
+},
+"1FjLQwL8vI4ZWbsDZN91zrfdYlzuBN-bX": {
+"id": "1FjLQwL8vI4ZWbsDZN91zrfdYlzuBN-bX",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 30787949,
+"title": "ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf"
+},
+"1aSJRugWCpgoREKWwuVIJO7RqOCzC-fPf": {
+"id": "1aSJRugWCpgoREKWwuVIJO7RqOCzC-fPf",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 197377,
+"title": "The Path to Learning Gurbānī Pronunciation.pdf"
+},
+"1wtt5u7ypC3PwDA-kzosOiNhMVQG774lG": {
+"id": "1wtt5u7ypC3PwDA-kzosOiNhMVQG774lG",
+"parentId": "1Y4rTVitTHNV0XkYXQnFeWtFmpSU2QMSX",
+"kind": "P",
+"size": 25077546,
+"title": "ਉੱਥਾਨਕਾ ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ ਕੀ - Uthanka Sri Guru Granth Sahib Ji Ki - Mahant Sadhu Singh (Lahore 1898-99, PDL BK-000934).pdf"
+},
+"14ER61YCHhfk9bknSd8-wJDx44yVTTCFN": {
+"id": "14ER61YCHhfk9bknSd8-wJDx44yVTTCFN",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 921463,
+"title": "Sir Gur Sobha - Sainapati.pdf"
+},
+"1kv7Ew4x7NH-nKOMWeVcd8VQ7Skw_mXn0": {
+"id": "1kv7Ew4x7NH-nKOMWeVcd8VQ7Skw_mXn0",
+"parentId": "1Y4rTVitTHNV0XkYXQnFeWtFmpSU2QMSX",
+"kind": "P",
+"size": 49603693,
+"title": "ਸੰਪੂਰਨ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ - Sampuran Sri Sarbloh Granth Sahib Ji (Budha Dal, Baba Santa Singh; PDL scan, 1118 pp).pdf"
+},
+"1kQuxQLDctyEli72znRfRe6i3daG3Ix9d": {
+"id": "1kQuxQLDctyEli72znRfRe6i3daG3Ix9d",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 11805330,
+"title": "Santan di Mahima - Kavishri (Gurjant Singh Bainka).pdf"
+},
+"1LgrioVeD35agiQfDsXaOuzV0c5BzMSsA": {
+"id": "1LgrioVeD35agiQfDsXaOuzV0c5BzMSsA",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 5268199,
+"title": "Gur Shabad Sidhi Shardha Puran Granth - Bhai Mani Singh Ji.pdf"
+},
+"1BS_eme3pYKNRY9h09M9-pLX0FXk3aQBd": {
+"id": "1BS_eme3pYKNRY9h09M9-pLX0FXk3aQBd",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 6473216,
+"title": "Sau Sakhi - Sahib Sri Guru Gobind Singh Ji Maharaj.pdf"
+},
+"1L24DD8Nu4pfS8fPRr5zmbDI6-CLyolKY": {
+"id": "1L24DD8Nu4pfS8fPRr5zmbDI6-CLyolKY",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "P",
+"size": 6463506,
+"title": "Sachi Preet - Bhai Nand Lal Ghazals Steek (Harbhajan Singh).pdf"
+},
+"1E6pN4oqSfMWtcEmDJpnaVNE9z9jmIdmR": {
+"id": "1E6pN4oqSfMWtcEmDJpnaVNE9z9jmIdmR",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "P",
+"size": 37724137,
+"title": "Jaap Sahib Arth Parbodh - Sant Kartar Singh.pdf"
+},
+"1SbJxTbQZ6WnHcZ6mn8TuKriAtxZvswvl": {
+"id": "1SbJxTbQZ6WnHcZ6mn8TuKriAtxZvswvl",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 44353599,
+"title": "Complete Sri Sarbloh Granth Sahib Ji Steek.pdf"
+},
+"1Of7jbUTpHErFkoXmR9WKtnErTAUCewWM": {
+"id": "1Of7jbUTpHErFkoXmR9WKtnErTAUCewWM",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 44909,
+"title": "Brahm Kavach (Gurmukhi, transliteration, English).pdf"
+},
+"1bK_ozg_3Fy_e4EytWhm65vwuFxLc5pn5": {
+"id": "1bK_ozg_3Fy_e4EytWhm65vwuFxLc5pn5",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "P",
+"size": 40872,
+"title": "Vaar Bhagauti - Bhai Gurdas Singh.pdf"
+},
+"10NMBg0eRUcnQUG1woErQtxfuyR7Xh54P": {
+"id": "10NMBg0eRUcnQUG1woErQtxfuyR7Xh54P",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "P",
+"size": 162010071,
+"title": "VaranBhaiGurdasJi-VolumeI.pdf"
+},
+"1f33LrNIf6_0AWsIjGyufgeYx_w2uYsz9": {
+"id": "1f33LrNIf6_0AWsIjGyufgeYx_w2uYsz9",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "P",
+"size": 57029179,
+"title": "ਵੀਚਾਰ ਸਾਗਰ(ਸਾਧੂ ਸ੍ਰੀ ਨਿਸਚਲ ਦਾਸ ਜੀ).pdf"
+},
+"1-Xli29lWGbxGCVM82ZaVuR1jLvNco1h2": {
+"id": "1-Xli29lWGbxGCVM82ZaVuR1jLvNco1h2",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 145747,
+"title": "v3 DHAN GURU TEG BAHADAR SAHIB - ALL BANI MAHALLA NAVA SM9 v2.pdf"
+},
+"1zKVZOVlbx6UvZQI8ILb-_LFVpwliIagS": {
+"id": "1zKVZOVlbx6UvZQI8ILb-_LFVpwliIagS",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 7181749,
+"title": "Shaheed-Bilas-bhai-mani-singh-by-Kavi-Sewa-Singh.pdf"
+},
+"1JwArUCWtX1I0hI4JxXZU509n7ghgaUPZ": {
+"id": "1JwArUCWtX1I0hI4JxXZU509n7ghgaUPZ",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 63124730,
+"title": "ਦਸ਼ਹਰਾ_ਮਹਾਤਮ_ਪੋਥੀ_ਹਜੂਰ_ਸਾਹਿਬ.pdf"
+},
+"1fKpSLqKcSKe-sD2HCfTUqG79K-54YbbG": {
+"id": "1fKpSLqKcSKe-sD2HCfTUqG79K-54YbbG",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "P",
+"size": 27458123,
+"title": "ZINDGINAMA.pdf"
+},
+"12fmPz9lEbSSxYH1FtoHLBU3O77o5h780": {
+"id": "12fmPz9lEbSSxYH1FtoHLBU3O77o5h780",
+"parentId": "1wuXx11FBTjt0f48fFi7gFd5t-yBPPwDX",
+"kind": "P",
+"size": 6156454,
+"title": "Gurbani-Sangeet-Prachin-Reet-Ratnavali-Part-1.pdf"
+},
+"19k_f_KpuuP50h6LN9_6EDF6_ubudsYFF": {
+"id": "19k_f_KpuuP50h6LN9_6EDF6_ubudsYFF",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 463901,
+"title": "Shri Sarbloh Granth Path Maryada .pdf"
+},
+"1TortCGjhctE3XHivhAFkkCKlaZj6Ft0q": {
+"id": "1TortCGjhctE3XHivhAFkkCKlaZj6Ft0q",
+"parentId": "1wuXx11FBTjt0f48fFi7gFd5t-yBPPwDX",
+"kind": "P",
+"size": 29050739,
+"title": "Gurbani-Sangeet-Prachin-Reet-Ratnavali-Part-2.pdf"
+},
+"1LZAVo0hRkjdNyy9s9cPA8VmguKCHlJE4": {
+"id": "1LZAVo0hRkjdNyy9s9cPA8VmguKCHlJE4",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 4468362,
+"title": "Nihangnama.pdf"
+},
+"1agc7NcK3UVDDPIaV8inLG6WGj3eQ5r9j": {
+"id": "1agc7NcK3UVDDPIaV8inLG6WGj3eQ5r9j",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "P",
+"size": 128830802,
+"title": "Vaaran Bhai Gurdaas Ji - SGPC.pdf"
+},
+"1cqBDhgc76X3t1vpZIlenXnSACbbLgxEX": {
+"id": "1cqBDhgc76X3t1vpZIlenXnSACbbLgxEX",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 2867724,
+"title": "Sarbloh Granth Manglacharan.pdf"
+},
+"1BEDCX8HQTGcgvarBhr_K1uhi8N8Q1AsM": {
+"id": "1BEDCX8HQTGcgvarBhr_K1uhi8N8Q1AsM",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "P",
+"size": 866121,
+"title": "Chritropakhyaan Vol I.pdf"
+},
+"1y7lxQt2c01eSB_veqLv8gmn6SbYa7xGq": {
+"id": "1y7lxQt2c01eSB_veqLv8gmn6SbYa7xGq",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 171925657,
+"title": "Sarbloh santheya bhag 1.pdf"
+},
+"1WQeHNQB2EYP_BhA6rS6T_UZtzDhneP8H": {
+"id": "1WQeHNQB2EYP_BhA6rS6T_UZtzDhneP8H",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "P",
+"size": 16584806,
+"title": "BHAI NAND LAL SINGH JI.pdf"
+},
+"1WyaaSGAb-n_Nx5Q8U0znU6KGfP3tqLuy": {
+"id": "1WyaaSGAb-n_Nx5Q8U0znU6KGfP3tqLuy",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "P",
+"size": 2310727,
+"title": "ਹਨੂਮਾਨ ਨਾਟਕ Kamalroop.pdf"
+},
+"1Pvr6MIJnUqrGGn2s0gtOr1GlmFQVoFw8": {
+"id": "1Pvr6MIJnUqrGGn2s0gtOr1GlmFQVoFw8",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "P",
+"size": 4875018,
+"title": "Uggardanti-Punjabi-and-English-Translation-Dalsingh-veerji.pdf"
+},
+"1AZFUqaK8Frj3Jh_M8he45aOXKwm2iCA2": {
+"id": "1AZFUqaK8Frj3Jh_M8he45aOXKwm2iCA2",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 270984,
+"title": "gutka sahib nitnem - 20-6-2019.pdf"
+},
+"1V9mpXdiMZvaY2KSY2dOzyKcQovorFprM": {
+"id": "1V9mpXdiMZvaY2KSY2dOzyKcQovorFprM",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 1046463,
+"title": "SARBLOH GRANTH MANAGAL CHARAN - 322.pdf"
+},
+"16Kn7SvHmcqX42McAi6LfiozzP6VxJ9f9": {
+"id": "16Kn7SvHmcqX42McAi6LfiozzP6VxJ9f9",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 136861,
+"title": "Lesson 1 Varags.pdf"
+},
+"1J5-EmvtopdSXJbWy3IWB_UhDmvOdfpHc": {
+"id": "1J5-EmvtopdSXJbWy3IWB_UhDmvOdfpHc",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "P",
+"size": 15712462,
+"title": "ਹਨੂਮਾਨ ਨਾਟਕ.pdf"
+},
+"1GV3x_uz5-KjJsCPypjlamQpTTgsw_o_7": {
+"id": "1GV3x_uz5-KjJsCPypjlamQpTTgsw_o_7",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 5252465,
+"title": "sarbloh-1-1.pdf"
+},
+"1Lz7U8AKN711EMC4QMFd9uV6ffYo8p7zU": {
+"id": "1Lz7U8AKN711EMC4QMFd9uV6ffYo8p7zU",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "P",
+"size": 144681698,
+"title": "VaranBhaiGurdasJi-VolumeII.pdf"
+},
+"1HA9l75k7YwPHHCEVbnzOyCB6WV-PWB43": {
+"id": "1HA9l75k7YwPHHCEVbnzOyCB6WV-PWB43",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 43751315,
+"title": "Dushera Mahatam Pothi.pdf"
+},
+"1IAUIgUXYL6-ZmezgmOC10V30gHH3q8IL": {
+"id": "1IAUIgUXYL6-ZmezgmOC10V30gHH3q8IL",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 53571288,
+"title": "ਸੰਧਿਆ ਨਿਤਨੇਮ ਗੁਟਕਾ - ਸ਼ਹੀਦੀ ਬਾਗ.pdf"
+},
+"12GTAjUFgVFYbQu05WUSB9ODy-RiGUve4": {
+"id": "12GTAjUFgVFYbQu05WUSB9ODy-RiGUve4",
+"parentId": "1I09Ae36dP7k-u0NzvgUIJmcCWD3NJAoe",
+"kind": "P",
+"size": 12355114,
+"title": "Sarbloh Granth Managal 33333.pdf"
+},
+"1CJ4TRjjIXIr46zmTqf6TBn_KHGMFccmS": {
+"id": "1CJ4TRjjIXIr46zmTqf6TBn_KHGMFccmS",
+"parentId": "13rx28W1Ytbrw95IAxViYxAKFiAUNi9Nc",
+"kind": "P",
+"size": 33943514,
+"title": "ਸੰਖਾਪ ਬਿਬੇਕ ਗ੍ਰੰਥ.pdf"
+},
+"1E0Ev6lOwuvTRz41vqw_uC8RzJjMslVSW": {
+"id": "1E0Ev6lOwuvTRz41vqw_uC8RzJjMslVSW",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "P",
+"size": 130651,
+"title": "Ghazals Bhai Nand Laal Goyaa Complete.pdf"
+},
+"18qu0CINNqgBNIz6pXyi_8BoiU8TAPwE5": {
+"id": "18qu0CINNqgBNIz6pXyi_8BoiU8TAPwE5",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 51595,
+"title": "Lesson 2 Gurmukhi Lippi.pdf"
+},
+"1Y7R9o8Or7RIvGoHWAYnKuRL_iBJ4G86b": {
+"id": "1Y7R9o8Or7RIvGoHWAYnKuRL_iBJ4G86b",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 3985250,
+"title": "Nitnem Sahib Nangali Ji.pdf"
+},
+"1qGj8KwQJ7daHEMLFk_spdwb1VwuL-ECQ": {
+"id": "1qGj8KwQJ7daHEMLFk_spdwb1VwuL-ECQ",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "P",
+"size": 3284612,
+"title": "VicharSagarC1.pdf"
+},
+"1TDckaEsq-_oeUHButhOyvRJ7BpEJkwfJ": {
+"id": "1TDckaEsq-_oeUHButhOyvRJ7BpEJkwfJ",
+"parentId": "1gng0XTWM2iN6W1kD0vDX8KkKLgS0pWB-",
+"kind": "P",
+"size": 5655568,
+"title": "ਗੰਜ ਨਾਮਗ ਭਾਈ ਨੰਦ ਲਾਲ ਜੀ.pdf"
+},
+"1L4SZSRMn-DdjvheTYdojvleWRfe0XC-w": {
+"id": "1L4SZSRMn-DdjvheTYdojvleWRfe0XC-w",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 1684431,
+"title": "Roop deep pingall.pdf"
+},
+"1zNfcihiRSuoOgsZPSqz477eSmm2BxeTB": {
+"id": "1zNfcihiRSuoOgsZPSqz477eSmm2BxeTB",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "P",
+"size": 303579,
+"title": "zafarnama.pdf"
+},
+"1Viw3It4-7al6fbN9W75J9KGzFPKW-9us": {
+"id": "1Viw3It4-7al6fbN9W75J9KGzFPKW-9us",
+"parentId": "1EU8okKaqQRCsq4I4rBoQPpBpGr3kdSSf",
+"kind": "P",
+"size": 132836,
+"title": "Chandi_Charitar_Part_2.pdf"
+},
+"13gLurwly7uVYVsp7hi0c1IHPijS2v5ky": {
+"id": "13gLurwly7uVYVsp7hi0c1IHPijS2v5ky",
+"parentId": "1NAJ7n-qXVDQRriz_lKpiET2Hnsrjy4DK",
+"kind": "P",
+"size": 15712462,
+"title": "ਹਨੂਮਾਨ ਨਾਟਕ.pdf"
+},
+"1yPI6wS_qLqR_YReTbto2vMf9E0B39gPR": {
+"id": "1yPI6wS_qLqR_YReTbto2vMf9E0B39gPR",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 76490,
+"title": "ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ - Gurbani Viakaran - Review notes on the cleanup.pdf"
+},
+"16ePwYWfo2uQuPLEMVoB_fhmDoU_ZKg9_": {
+"id": "16ePwYWfo2uQuPLEMVoB_fhmDoU_ZKg9_",
+"parentId": "1dap1zXt6xAKo38SmCUqDyT7vdIVJ64f9",
+"kind": "P",
+"size": 21570394,
+"title": "ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ - Gurbani Viakaran - Prof. Sahib Singh (Singh Brothers 2011, clean searchable).pdf"
+},
+"1Lpk9F-Cvjn1NJB0R-1qZbqzkCKgULQHn": {
+"id": "1Lpk9F-Cvjn1NJB0R-1qZbqzkCKgULQHn",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "101 Chanakya Rajniti"
+},
+"1mp0ot96pKo2pn3EpmpHVPmTeulC7Jk0U": {
+"id": "1mp0ot96pKo2pn3EpmpHVPmTeulC7Jk0U",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "121 Padma Purana"
+},
+"1qU7HLiYjwKkm2CVFX-fI38Vc07fBqg4i": {
+"id": "1qU7HLiYjwKkm2CVFX-fI38Vc07fBqg4i",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "116 Rig Veda"
+},
+"1t4pTnNc6fhWDyWcOOj6hhnrFYIGqt3b_": {
+"id": "1t4pTnNc6fhWDyWcOOj6hhnrFYIGqt3b_",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "126 Markandeya Purana"
+},
+"1CzI5i3jXgCzS6oTr37-Uf6lbUPHLm2SZ": {
+"id": "1CzI5i3jXgCzS6oTr37-Uf6lbUPHLm2SZ",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "045 Triya Charitar"
+},
+"1AiYaH2U55wpsdpaS044TBjwoJEAiOFWF": {
+"id": "1AiYaH2U55wpsdpaS044TBjwoJEAiOFWF",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "120 Brahma Purana"
+},
+"10v6opxpaAd1PTlkvQqjKlja4KMhxbxa4": {
+"id": "10v6opxpaAd1PTlkvQqjKlja4KMhxbxa4",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "077 Poetry in Sanskrit"
+},
+"1pHextXAJA0cK6rK3D-GsoaxZamypMcl4": {
+"id": "1pHextXAJA0cK6rK3D-GsoaxZamypMcl4",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "092 Pothi Vaidgi Ki"
+},
+"1Av3CcHj9_Wfek4Yo8hg7hiLYUXCEGGzW": {
+"id": "1Av3CcHj9_Wfek4Yo8hg7hiLYUXCEGGzW",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "137 Brahmanda Purana"
+},
+"1EW841BhgJOukk42Z-QMj-YuMU9MTUl_w": {
+"id": "1EW841BhgJOukk42Z-QMj-YuMU9MTUl_w",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "129 Brahma Vaivarta Purana"
+},
+"1NFEMhT-JgH5ZAXl3q-jpbFwSiQIm1OMG": {
+"id": "1NFEMhT-JgH5ZAXl3q-jpbFwSiQIm1OMG",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "039 Ratandam"
+},
+"1AQVZl0xI6Y_Bwkr4TMb3ahORxpFRiTVs": {
+"id": "1AQVZl0xI6Y_Bwkr4TMb3ahORxpFRiTVs",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "149 Uthanka Granth Sahib Ki"
+},
+"1dS8h6otOBfMwx8l4weVRi2Nm2VrLlRpR": {
+"id": "1dS8h6otOBfMwx8l4weVRi2Nm2VrLlRpR",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "130 Linga Purana"
+},
+"1PxDkNJCHnN-BrCqq2NAZxN4KI-Ew7ddf": {
+"id": "1PxDkNJCHnN-BrCqq2NAZxN4KI-Ew7ddf",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "141 Six darshanas Vedanta, Nyay, Vaisheshik, Sankhya,"
+},
+"1rVnm1fnVnDR0wmwLWj8xg_Ai7km-SURV": {
+"id": "1rVnm1fnVnDR0wmwLWj8xg_Ai7km-SURV",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "094 Shahnama"
+},
+"1p8lqI_Xpa6O6LZHyWjO6VgJfhpjVXLC2": {
+"id": "1p8lqI_Xpa6O6LZHyWjO6VgJfhpjVXLC2",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "124 Bhagwata Purana"
+},
+"1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos": {
+"id": "1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "106 Ekadash Skand"
+},
+"1MzIUgDwQECGT6_Pofci1UH-j7rEU-jmg": {
+"id": "1MzIUgDwQECGT6_Pofci1UH-j7rEU-jmg",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "091 Pothi Salihotar Ki"
+},
+"1rEzcVAvQW6eYJYL3BfwUTdryVDGT6dwl": {
+"id": "1rEzcVAvQW6eYJYL3BfwUTdryVDGT6dwl",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "131 Varaha Purana"
+},
+"1rfb1BkDK6DCnP4uTccikBhxTt5qPcVby": {
+"id": "1rfb1BkDK6DCnP4uTccikBhxTt5qPcVby",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "113 Bahar-e Danish"
+},
+"1Vfhdi2IUgGznfPX8Sanw28KKW8kbmVrk": {
+"id": "1Vfhdi2IUgGznfPX8Sanw28KKW8kbmVrk",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "132 Skanda Purana"
+},
+"1_1UPFgQP_mDXmX_EzHfA1tsrZVXt30rQ": {
+"id": "1_1UPFgQP_mDXmX_EzHfA1tsrZVXt30rQ",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "048 Adhyatam Prakash"
+},
+"16mOf_yMIcWtzPzOXox5vJdHH3AUqAYV8": {
+"id": "16mOf_yMIcWtzPzOXox5vJdHH3AUqAYV8",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "125 Narayana Purana"
+},
+"188WTynSrp5XW1aXIzhlZhGYMn0e8p3SU": {
+"id": "188WTynSrp5XW1aXIzhlZhGYMn0e8p3SU",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "011 Parsuram Sanvad"
+},
+"1GyGv0lEc0PV8SrUWl-Qr_S7ztfvgpPQW": {
+"id": "1GyGv0lEc0PV8SrUWl-Qr_S7ztfvgpPQW",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "093 Mujarbate Akbari"
+},
+"1akComdS_rs2Y3YvjHqQ0HLq_MEJW5rCr": {
+"id": "1akComdS_rs2Y3YvjHqQ0HLq_MEJW5rCr",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "095 Golestan"
+},
+"1MlI26uVTmGRJNApveBpWFmRIOC9kU1K_": {
+"id": "1MlI26uVTmGRJNApveBpWFmRIOC9kU1K_",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "007 Sri Gur Sobha"
+},
+"14f4W_YASecFG5M1v-ayKr0jpiABVDLQ9": {
+"id": "14f4W_YASecFG5M1v-ayKr0jpiABVDLQ9",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "111 Bhoj Parbandh"
+},
+"1UphB3j18rNxirr83ggrBXV-oeJIi9y2t": {
+"id": "1UphB3j18rNxirr83ggrBXV-oeJIi9y2t",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "102 Guru Gita Khasdh Shastrodip Suraj"
+},
+"1lswRE86UAjHinMhlj9bQzuW_66JSOiaR": {
+"id": "1lswRE86UAjHinMhlj9bQzuW_66JSOiaR",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "117 Sama Veda"
+},
+"1TJrY4-n_XnhuTFhZ5jGqdAH8dSYnMewN": {
+"id": "1TJrY4-n_XnhuTFhZ5jGqdAH8dSYnMewN",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "127 Agni Purana"
+},
+"1OIq_B0OcXnO7dnsuj9AhcfmcarYMShzc": {
+"id": "1OIq_B0OcXnO7dnsuj9AhcfmcarYMShzc",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "142 Adhyatam Ramayana"
+},
+"1xJlccW0aWYsmls2ToB2i1GwHevceNSBX": {
+"id": "1xJlccW0aWYsmls2ToB2i1GwHevceNSBX",
+"parentId": "11xekW7m6Hxeb2D8HTYYxtvJ6EhlQtkyw",
+"kind": "F",
+"size": 0,
+"title": "096 Bustan"
+},
+"0B1qPJbSH0BqiV1hCTXBnVjB6Z1U": {
+"id": "0B1qPJbSH0BqiV1hCTXBnVjB6Z1U",
+"parentId": "10ayMeBk_m82rXOaeE3cUJH45-VpVG3rc",
+"kind": "P",
+"size": 317245,
+"title": "Asa di Vaar translation"
+},
+"0B1qPJbSH0BqiR2xMTEo3UU9MMXc": {
+"id": "0B1qPJbSH0BqiR2xMTEo3UU9MMXc",
+"parentId": "1KLDkKj4DobjQ0WW5o4sgpHgjj7jUrZsH",
+"kind": "P",
+"size": 38339064,
+"title": "Vaaran Bhai Gurudas Ji-Bhai Vir Singh Punjabi.pdf"
+},
+"1qqH1Hp1ux9KW6Tl56w-0TiJnVsyIZgDo": {
+"id": "1qqH1Hp1ux9KW6Tl56w-0TiJnVsyIZgDo",
+"parentId": "18eJA-1F07yYV4LIuJdz6nnMa3hjw1GgJ",
+"kind": "P",
+"size": 66384852,
+"title": "Pandav Gita - Gurmukhi MS of Pandava Gita, 191 pp. (undated).pdf"
+},
+"11KLKsthTipycha4GVbGw967-YKhyqg0l": {
+"id": "11KLKsthTipycha4GVbGw967-YKhyqg0l",
+"parentId": "12Xo4rXy4sMuAcp1whjmopS3o0e6WDcBI",
+"kind": "P",
+"size": 147800954,
+"title": "Sundar Gutka - 1800s Puratan Sundar Gutka MS, 770 pp. (1800s (uploader)).pdf"
+},
+"15Lt2leAzENIHkozps4pk1q-QR-CfUoUr": {
+"id": "15Lt2leAzENIHkozps4pk1q-QR-CfUoUr",
+"parentId": "1r1vVWURDcVNoqQN3-D2gVdPTmaG7hNtq",
+"kind": "P",
+"size": 357961848,
+"title": "Gurbilas Patshahi 10 (Sumer Singh) - Gurmukhi MS, Panjab University Chandigarh MS 1175 (undated).pdf"
+},
+"1vQYfoLH0XeAOHBANdtbe1IRX7g3coQrj": {
+"id": "1vQYfoLH0XeAOHBANdtbe1IRX7g3coQrj",
+"parentId": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"kind": "P",
+"size": 8484924,
+"title": "Hanuman Natak - Gurmukhi lithograph (DLI), 2 parts (1887 (DLI catalogue)).pdf"
+},
+"16csD-UJFr_9f7RJ4jvq3OMCeNCKF1umE": {
+"id": "16csD-UJFr_9f7RJ4jvq3OMCeNCKF1umE",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 41655931,
+"title": "Das Granthi - Gurmukhi larivaar lithograph (stone print), PDL (undated lithograph (likel).pdf"
+},
+"1hzKf9D6FoMz_bORXZETbrsbqoA1yXwOg": {
+"id": "1hzKf9D6FoMz_bORXZETbrsbqoA1yXwOg",
+"parentId": "1w0qseQJnuS80fX9Voueqxa5AEeXKtdp2",
+"kind": "P",
+"size": 2222406,
+"title": "Var Sri Bhagauti Ji Ki (Chandi di Var) - Gurmukhi MS pothi, 50 leaves, Sialkoti paper (undated).pdf"
+},
+"1agBxKuEOITwsYmekO0L3USWSlORoxHQN": {
+"id": "1agBxKuEOITwsYmekO0L3USWSlORoxHQN",
+"parentId": "1tunJzMV4zNiS77B6a64YziNVhK06DI29",
+"kind": "P",
+"size": 98941886,
+"title": "Pothi Bhai Mohan Ji - Gurmukhi MS, Panjab University Chandigarh MS no. 425 (eGangotri scan) (undated (pre-1900 inferre).pdf"
+},
+"1vVSvJB7CijpgTtMD_fej0i8izlWKnA3C": {
+"id": "1vVSvJB7CijpgTtMD_fej0i8izlWKnA3C",
+"parentId": "1HKVhJL8hdls8UCS34NROU68Mv7-LBmv_",
+"kind": "P",
+"size": 15991189,
+"title": "Parichha (Pricha Guru Gobind Singh) - Gurmukhi MS, Panjab University Chandigarh MS no. 493 (eGangotri scan).pdf"
+},
+"1mogujj1APWqY8jI5mkC_bF7Dtj93rnGN": {
+"id": "1mogujj1APWqY8jI5mkC_bF7Dtj93rnGN",
+"parentId": "1ldES_7zqQOr_JqnifovNx_M4G2j_4rsr",
+"kind": "P",
+"size": 208217804,
+"title": "Paras Bhag - Gurmukhi MS, Kurukshetra University MS MN-000210 (eGangotri scan).pdf"
+},
+"1tN1WsykIxvHKeOEr2Wq0nVcUErPHSdrW": {
+"id": "1tN1WsykIxvHKeOEr2Wq0nVcUErPHSdrW",
+"parentId": "14PuBP-RDyuRMNV8OtnKEjmsr5fD7jaHC",
+"kind": "P",
+"size": 60213179,
+"title": "Akal Takht hukamnama on Amrit sanchar, 1877 - Scan of 1877 Akal Takht hukamnama (4 images).pdf"
+},
+"15jG1wteOPSVcbQcwOOXmWUZTCBEmso9Y": {
+"id": "15jG1wteOPSVcbQcwOOXmWUZTCBEmso9Y",
+"parentId": "1pf6wNHH9zO77Ts9aFtwdwBwv_EQ7nfFw",
+"kind": "P",
+"size": 83278225,
+"title": "Puratan Janamsakhi (Colebrooke Vilayat-vali) - Photozincograph facsimile of the India Office (Colebrooke) Janamsakhi (1885).pdf"
+},
+"18vjGBIrOHwHbwRNUp1K8frlZ8dMGuLEU": {
+"id": "18vjGBIrOHwHbwRNUp1K8frlZ8dMGuLEU",
+"parentId": "1M4ukJ99ki82P_NGEALF5S3BIpdv1jXPB",
+"kind": "P",
+"size": 54901821,
+"title": "Gurparnali (Guru-vansavali) - Panjab University Chandigarh Gurmukhi MS no. 96 (undated).pdf"
+},
+"16dxzXI9RN1i0Nb1DmrD7mtqzksjyjaq1": {
+"id": "16dxzXI9RN1i0Nb1DmrD7mtqzksjyjaq1",
+"parentId": "1UmcLXh7xhVwhLyXNM5zXLsQghAd-pIdI",
+"kind": "P",
+"size": 226311130,
+"title": "Janamsakhi Bhai Bala - Bhai Bala Janamsakhi water stone print (lithograph) 1823-1833 CE.pdf"
+},
+"1PTKvsNemdBfg3weDtXW0HTHM5ADVvBqp": {
+"id": "1PTKvsNemdBfg3weDtXW0HTHM5ADVvBqp",
+"parentId": "1UmcLXh7xhVwhLyXNM5zXLsQghAd-pIdI",
+"kind": "P",
+"size": 217674418,
+"title": "Janamsakhi Bhai Bala - Bhai Bala Janamsakhi MS archive 1760 CE, 1788 CE, large 1800s MS, illustrated 1800s MS (1760-1890).pdf"
+},
+"1WGrya59tiX8etLk3YvyDauZtkV3EwsrS": {
+"id": "1WGrya59tiX8etLk3YvyDauZtkV3EwsrS",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 53090587,
+"title": "Zafarnama and Hikayat - Gurmukhi and Persian scripts, 1827 CE, Butasinghwala saroop.pdf"
+},
+"1UWnA43p-FTJf8bwH0yvu2X7yrAMbx2xC": {
+"id": "1UWnA43p-FTJf8bwH0yvu2X7yrAMbx2xC",
+"parentId": "13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0",
+"kind": "P",
+"size": 19355480,
+"title": "Sau Sakhi (English translation The Sakhee Book) (Benares 1873).pdf"
+},
+"1f9UlD8EecRRuHyAdKJ3aSaCrJjrBqb3-": {
+"id": "1f9UlD8EecRRuHyAdKJ3aSaCrJjrBqb3-",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 79236779,
+"title": "Jaap Sahib teeka Chakradhar Charitra Charu Chandrika - First print, Lahore, Sammat 1955 Bk (= 1898).pdf"
+},
+"1BNawYomxG19eVft5npDIlz3hem85m4Ay": {
+"id": "1BNawYomxG19eVft5npDIlz3hem85m4Ay",
+"parentId": "1Xd2qPnfgkXEkAVpvUiI9hHOe6mkvkzL5",
+"kind": "P",
+"size": 97615371,
+"title": "Japji Sahib steek (Udasi teeka) - Gurmukhi MS, PDL (undated (19th c. inferred).pdf"
+},
+"1ZFpS7MvD7pf2rbMoBO_OBseJpcgrYGvD": {
+"id": "1ZFpS7MvD7pf2rbMoBO_OBseJpcgrYGvD",
+"parentId": "12Xo4rXy4sMuAcp1whjmopS3o0e6WDcBI",
+"kind": "P",
+"size": 164867050,
+"title": "Gutka (Nitnem bani gutka) - Hand-written gutka attributed to Shaheed Baba Deep Singh (mid-18th c.).pdf"
+},
+"19NUhF6xWZ2dqQkTFo8JbCxKRbMaMT22l": {
+"id": "19NUhF6xWZ2dqQkTFo8JbCxKRbMaMT22l",
+"parentId": "1rLC3WaU2po6Z3w8uYu1bpPXOrogpLzDX",
+"kind": "P",
+"size": 7922383,
+"title": "Gobind Gita - Gurmukhi MS, said to be written by Shaheed Baba Deep Singh (18th c.).pdf"
+},
+"1Sjm6GCz6vy4gegeyA4CKivEIzQDUZPOj": {
+"id": "1Sjm6GCz6vy4gegeyA4CKivEIzQDUZPOj",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 5497314,
+"title": "Report of the Sodhak Committee on the Dasam Granth - Original print, Amritsar (1897).pdf"
+},
+"1SrhNJqhEFeel4aefakj4qGrnWc50ByO9": {
+"id": "1SrhNJqhEFeel4aefakj4qGrnWc50ByO9",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 225594546,
+"title": "Dasam Granth - Gurmukhi MS (puratan saroop), PDL digitisation (undated (old)).pdf"
+},
+"1HyJIt3KV8tdlKKG7Fv6-LYITL6oYLRr1": {
+"id": "1HyJIt3KV8tdlKKG7Fv6-LYITL6oYLRr1",
+"parentId": "1Hg73NtIxh9metvMjm2ZyHk899WqCBuuu",
+"kind": "P",
+"size": 102990027,
+"title": "Vaaran Bhai Gurdas (as 'Varan Gian Ratnavali') + Kabitt - Gurmukhi MS (undated).pdf"
+},
+"1YH_12gUUhEcLZjZ01kjjj1ZVwaNel9kH": {
+"id": "1YH_12gUUhEcLZjZ01kjjj1ZVwaNel9kH",
+"parentId": "1r1vVWURDcVNoqQN3-D2gVdPTmaG7hNtq",
+"kind": "P",
+"size": 233587411,
+"title": "Gurbilas Patshahi 10 - Gurmukhi lithograph of Sukha Singh's Gurbilas (Namdhari eLibrary).pdf"
+},
+"1LiypUTiIWdOIgOBTy4lAexrleC9JI7Tg": {
+"id": "1LiypUTiIWdOIgOBTy4lAexrleC9JI7Tg",
+"parentId": "13A7BRP6XLgJ-Z7zP4UtyDjsEfrVG5y7f",
+"kind": "P",
+"size": 227309441,
+"title": "Sri Gur Panth Prakash - Gurmukhi lithograph with tatkara (Namdhari eLibrary) (1880).pdf"
+},
+"1HW2Pkk6eD99Aw2QIzKZMZ64S2GP_hBTq": {
+"id": "1HW2Pkk6eD99Aw2QIzKZMZ64S2GP_hBTq",
+"parentId": "1m2hzx5AzF5QAJAABzF3wi928fWJo7yV1",
+"kind": "P",
+"size": 7754801,
+"title": "Bhavrasamrit - Gurmukhi print (1881 (IA metadata)).pdf"
+},
+"1o-iURDkCiRSZ8Xd0ej5XKkh8lmshRTMA": {
+"id": "1o-iURDkCiRSZ8Xd0ej5XKkh8lmshRTMA",
+"parentId": "1Zxu6E2SBzi6k4R5PhVLZoYnsj8ksN9Cb",
+"kind": "P",
+"size": 57390206,
+"title": "Vichar Sagar - Gurmukhi printed, Namdhari eLibrary (1893).pdf"
+},
+"1pQID_v4_nSONY12vdOjSbTowERpR82l8": {
+"id": "1pQID_v4_nSONY12vdOjSbTowERpR82l8",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 437303842,
+"title": "Dasam Granth - Dasam Granth bir with rubricated tatkara, titled '1755' (Namdhari eLibrary).pdf"
+},
+"1_4iGGPOm2_5TV5W_c-fuzDyRIxzL_i_Z": {
+"id": "1_4iGGPOm2_5TV5W_c-fuzDyRIxzL_i_Z",
+"parentId": "19T2ePlmWakYJygBhnCxM-ZqN6O5DNGlW",
+"kind": "P",
+"size": 237513626,
+"title": "Mahima Prakash (verse) - likely Sarup Das Bhalla - UPSS Lucknow Gurmukhi MS 2725 (undated).pdf"
+},
+"1x_GopqcTGBXA-XM2bF6VMIKDHoxZtrMh": {
+"id": "1x_GopqcTGBXA-XM2bF6VMIKDHoxZtrMh",
+"parentId": "1OHL-A_ZToiuv0DeJaF6v1gtsUFjVSxRE",
+"kind": "P",
+"size": 167954353,
+"title": "Gurbilas Patshahi 6 - MS, 652 pp. (19th c.).pdf"
+},
+"1z9FZru_atytl-xudSQ0QLOuZRcQaTqrr": {
+"id": "1z9FZru_atytl-xudSQ0QLOuZRcQaTqrr",
+"parentId": "17nQihaGgP9gcSIB9b2qSSm7khlUUAstJ",
+"kind": "P",
+"size": 286801644,
+"title": "Sri Nanak Prakash Gur Partap Suraj Granth - Nanak Prakash, full handwritten MS (undated (19th c.)).pdf"
+},
+"1JQFzUCoc4pzKol8Tb4JhMfcFD8QnXXXY": {
+"id": "1JQFzUCoc4pzKol8Tb4JhMfcFD8QnXXXY",
+"parentId": "1Guz8SkdRA_uyfBaS6-MCOvk6a7BcA9qJ",
+"kind": "P",
+"size": 339470582,
+"title": "Zindaginama (Bandginama) - Panjab Univ. MS 394, Gurmukhi script (undated).pdf"
+},
+"1taR9mBEMmReVoObjFr6i9rrmAY1ptvdc": {
+"id": "1taR9mBEMmReVoObjFr6i9rrmAY1ptvdc",
+"parentId": "18eJA-1F07yYV4LIuJdz6nnMa3hjw1GgJ",
+"kind": "P",
+"size": 22019052,
+"title": "Pandav Gita - Panjab Univ. MS 1476, Gurmukhi Pandav Gita + Japa Suraj + Varta (Gurdas) (undated).pdf"
+},
+"19DJWfqOS_WNoLB9IDqdfSeCNpqJ_VCeI": {
+"id": "19DJWfqOS_WNoLB9IDqdfSeCNpqJ_VCeI",
+"parentId": "15ogFox5-wIzD36o5G9pAvGXFkoMOwyyC",
+"kind": "P",
+"size": 8295526,
+"title": "Rajniti ra Kabit - 'Rajniti Kavitt - Devi Das', Panjab Univ. MS 288, Devanagari (undated).pdf"
+},
+"1eh3ibAer2rE45BQqTi2T9dS01nGz090V": {
+"id": "1eh3ibAer2rE45BQqTi2T9dS01nGz090V",
+"parentId": "15ogFox5-wIzD36o5G9pAvGXFkoMOwyyC",
+"kind": "P",
+"size": 40980742,
+"title": "Rajniti - Gurmukhi MS 'Rajneeti', Kurukshetra Univ. MN-000026 (undated).pdf"
+},
+"1eJjxP6e7-teSn2JOy6PNNUf4ldH3FD_Y": {
+"id": "1eJjxP6e7-teSn2JOy6PNNUf4ldH3FD_Y",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 26543789,
+"title": "Ugardanti - Ugardanti pothi, 163 pp. (19th c.).pdf"
+},
+"1oMyGZGe9Va-amx9ySW9x1KLG1ln6kDfB": {
+"id": "1oMyGZGe9Va-amx9ySW9x1KLG1ln6kDfB",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 367236513,
+"title": "Dasam Granth - Second Patna Sahib Dasam bir, attributed to Bhai Sukha Singh (late 18th-19th c).pdf"
+},
+"1nnlbm6WalFGm17X87QRV1AAxH-RqgKIq": {
+"id": "1nnlbm6WalFGm17X87QRV1AAxH-RqgKIq",
+"parentId": "1dSonq3yzIUtuRmuR7OiqnvlSZOL_HjLg",
+"kind": "P",
+"size": 120659402,
+"title": "Dasam Granth - Dasam Granth MS dated 1823 CE.pdf"
+},
+"1NVrGQjHG7pSSY-llxniEgdH737TUMfWh": {
+"id": "1NVrGQjHG7pSSY-llxniEgdH737TUMfWh",
+"parentId": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"kind": "P",
+"size": 192401885,
+"title": "Hanuman Natak (with Ram Gita) - Gurmukhi MS with red rubrics (Namdhari eLibrary) (1753 per IA).pdf"
+},
+"1RoPwfvQiORBBzx6eQuoT4QO3r3XJrJqK": {
+"id": "1RoPwfvQiORBBzx6eQuoT4QO3r3XJrJqK",
+"parentId": "13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0",
+"kind": "P",
+"size": 374795750,
+"title": "Sau Sakhi (Gur Ratan Mal) - Gurmukhi MS collected by Ernst Trumpp, BSB (mid-19th c.).pdf"
+},
+"1L1L-8zAptzXFBLxy_OAfv6Mv3HxgzNWI": {
+"id": "1L1L-8zAptzXFBLxy_OAfv6Mv3HxgzNWI",
+"parentId": "1w0qseQJnuS80fX9Voueqxa5AEeXKtdp2",
+"kind": "P",
+"size": 225505177,
+"title": "MS - Varan Bhai Gurdas (selected) with Var Bhai Gurdas Singh, Gurmukhi MS, Panjab University MS 367.pdf"
+},
+"1QMyIBji8daoQopbycdnm5M-lfWItqobT": {
+"id": "1QMyIBji8daoQopbycdnm5M-lfWItqobT",
+"parentId": "1QeWzaLS_IM_yzThH874hjaPVEuQBrAJu",
+"kind": "F",
+"size": 0,
+"title": "crops"
+},
+"1W3xwreHI0a1EuNSYsIzJkS5UxSuKAWt5": {
+"id": "1W3xwreHI0a1EuNSYsIzJkS5UxSuKAWt5",
+"parentId": "11o1ZlhrsVYTUfNifhGlRovkZ4kd7RrtH",
+"kind": "P",
+"size": 29477083,
+"title": "Catalogue - Ashok, Panjabi Hath Likhtan di Suchi vol 2 (Bhasha Vibhag 1963).pdf"
+},
+"1Bae-6NLapEqpUHrQQySAbPxhEKN1NpP6": {
+"id": "1Bae-6NLapEqpUHrQQySAbPxhEKN1NpP6",
+"parentId": "11o1ZlhrsVYTUfNifhGlRovkZ4kd7RrtH",
+"kind": "P",
+"size": 25307419,
+"title": "Catalogue - Ashok, Sikh Reference Library manuscript catalogue (SGPC 1968).pdf"
+},
+"1cscde5DaEHg64tfCX95FQ6VDgxVemJfW": {
+"id": "1cscde5DaEHg64tfCX95FQ6VDgxVemJfW",
+"parentId": "1nWSkPefr94aunqRYOEIistTFHJxFHnEX",
+"kind": "P",
+"size": 10583704,
+"title": "Early print - Ekadash Skandh Bhasha, Chatur Das (Calcutta, 1927).pdf"
+},
+"1uqr8XuFxlhbydzG4_gVycAlx7jjjMvck": {
+"id": "1uqr8XuFxlhbydzG4_gVycAlx7jjjMvck",
+"parentId": "1nWSkPefr94aunqRYOEIistTFHJxFHnEX",
+"kind": "P",
+"size": 9904387,
+"title": "Early print - Ekadash Skandh Bhasha, Chatur Das (Venkateshwar Press, 1926).pdf"
+},
+"1ltTOvgb0SnDmx2LW13ysf3isE0kBxjes": {
+"id": "1ltTOvgb0SnDmx2LW13ysf3isE0kBxjes",
+"parentId": "1r0A8n2-JtOS72HqTz3mM74FR8aHJmsc3",
+"kind": "P",
+"size": 7705224,
+"title": "Source - Gitasara-muktipada, Sanskrit MS (Raghunath Temple Jammu 4512-gha).pdf"
+},
+"1VQWpevJE2uKRqSakEs-LdPqz8E0NxeAG": {
+"id": "1VQWpevJE2uKRqSakEs-LdPqz8E0NxeAG",
+"parentId": "1r0A8n2-JtOS72HqTz3mM74FR8aHJmsc3",
+"kind": "P",
+"size": 10171599,
+"title": "MS - Bhasha Gita Sara, Devanagari MS (Raghunath Temple Jammu 957-gha).pdf"
+},
+"1uvO9twlCS00S0GMR1TbUoh1x0Piky6Fl": {
+"id": "1uvO9twlCS00S0GMR1TbUoh1x0Piky6Fl",
+"parentId": "1r0A8n2-JtOS72HqTz3mM74FR8aHJmsc3",
+"kind": "P",
+"size": 19403376,
+"title": "MS - Sar Gita, Gurmukhi MS (UPSS Lucknow 4151).pdf"
+},
+"1u_VWe5QfB7TJSQkw4wyxBbw3lBn3jQMf": {
+"id": "1u_VWe5QfB7TJSQkw4wyxBbw3lBn3jQMf",
+"parentId": "13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0",
+"kind": "P",
+"size": 93788239,
+"title": "MS - Sau Sakhi, handwritten copy (Namdhari eLibrary).pdf"
+},
+"19SflYViLmvRfGEMS3ZbHVMTqQp6i173s": {
+"id": "19SflYViLmvRfGEMS3ZbHVMTqQp6i173s",
+"parentId": "13sdqOlXP2jBUnRjlTA5wAn-24x7DmKD0",
+"kind": "P",
+"size": 93368458,
+"title": "MS - Sau Sakhi, 19th-century Gurmukhi manuscript.pdf"
+},
+"1tSH8cldVzsIh2mi2wqDNksATG3RP0QbH": {
+"id": "1tSH8cldVzsIh2mi2wqDNksATG3RP0QbH",
+"parentId": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"kind": "P",
+"size": 260793050,
+"title": "MS - Hanuman Natak, old handwritten Gurmukhi pothi (PDL scan).pdf"
+},
+"1czcHcgonGhg5tjtEeeAGTFttVhv_67KE": {
+"id": "1czcHcgonGhg5tjtEeeAGTFttVhv_67KE",
+"parentId": "1w0qseQJnuS80fX9Voueqxa5AEeXKtdp2",
+"kind": "P",
+"size": 230114563,
+"title": "MS - Bhai Gurdas Vaaran manuscript archive pothis of 1826 and 1882 CE plus.pdf"
+},
+"1It0mrDwDjwgLTaLeSE1yEnx2556fteYl": {
+"id": "1It0mrDwDjwgLTaLeSE1yEnx2556fteYl",
+"parentId": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"kind": "P",
+"size": 233628963,
+"title": "MS - Hanuman Natak, illuminated Gurmukhi manuscript in 2 volumes.pdf"
+},
+"1ynlz_MyVIh-fxezxOxInj2hqYoce2LTI": {
+"id": "1ynlz_MyVIh-fxezxOxInj2hqYoce2LTI",
+"parentId": "1sKBCp743up_g5LThpzmvfvIWbErsKWJn",
+"kind": "P",
+"size": 60490887,
+"title": "Early print - Hanuman Natak, Gurmukhi lithograph (1883).pdf"
+},
+"1_LU8AYzAe9WPZClEuS9B8-wPgR0_G7Mw": {
+"id": "1_LU8AYzAe9WPZClEuS9B8-wPgR0_G7Mw",
+"parentId": "1A-KBZmlaRlNwrO58yUuoSGe1Kh4VEWmN",
+"kind": "P",
+"size": 33334510,
+"title": "Niti Shatak (Bhartrihari) in Gurmukhi - UPSS Lucknow Gurmukhi MS 2943 'Neeti Shatak' (undated).pdf"
+},
+"1LunN4hO4uuioCshGevtQnPmLvEHI8NBj": {
+"id": "1LunN4hO4uuioCshGevtQnPmLvEHI8NBj",
+"parentId": "1tQ-6RW_e0fTQxTCxOnV_ZlXRklAFqKW5",
+"kind": "P",
+"size": 26835563,
+"title": "Zafarnama & Hikayat - Zafarnama & Hikayat with word-glosses, dated 1882 CE (1882 (file name)).pdf"
+},
+"1fveOA3OeBUp7CpU5v8dhlPHdAL-LSII3": {
+"id": "1fveOA3OeBUp7CpU5v8dhlPHdAL-LSII3",
+"parentId": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"kind": "P",
+"size": 31703739,
+"title": "Bhasha Bhushan (with Sikh-nakh, 24 Avatars, etc.) - Panjab Univ. MS 1407 Bhasha Bhushan + Sikh-nakh + 24 Avatars + battle-strength list (undated).pdf"
+},
+"1I4yLXINdCUdby8N-Guwd_NV-N7knni_s": {
+"id": "1I4yLXINdCUdby8N-Guwd_NV-N7knni_s",
+"parentId": "1dltF3Jcyu8LQXQcOf9jJQZvGnVx3UKXd",
+"kind": "P",
+"size": 311436135,
+"title": "Sikhan di Bhagatmala (likely) — 'Sakhian Chhevin Patshahi, M - Panjab Univ. MS 42, Gurmukhi prose sakhis attributed to Mani Singh, 'of the sixth Guru' (undated).pdf"
+},
+"1qylHNTH9ByJRLrbQcEF8O6upAPXpBUY7": {
+"id": "1qylHNTH9ByJRLrbQcEF8O6upAPXpBUY7",
+"parentId": "1x1cLDaa-kNeLM0SMt9UDoprCYu1a27Tp",
+"kind": "P",
+"size": 29937466,
+"title": "Singh-Gau ki Katha - Complete Gurmukhi MS, Kurukshetra Univ. MN-000018 (catalogued 'Sri Hamsa Puran Singh Gau P (undated).pdf"
+},
+"15NqjeqkJXwAAxKUvq-Dm8wMY_IoEb-Wn": {
+"id": "15NqjeqkJXwAAxKUvq-Dm8wMY_IoEb-Wn",
+"parentId": "1zYNz9ZCO9FitrjF20ZNMUkBs2jhG_Rdr",
+"kind": "P",
+"size": 31687642,
+"title": "Edition - Ganda Singh (ed.), Kulliyat-e-Bhai Nand Lal Goya (Malaya, 1963).pdf"
+},
+"1HoKWEWlEPh4K1I0ZacYgpLFGcj5yiPoD": {
+"id": "1HoKWEWlEPh4K1I0ZacYgpLFGcj5yiPoD",
+"parentId": "18ifFnwu5G4TASpmj2rnxY2SbQW_s8JFk",
+"kind": "P",
+"size": 16947927,
+"title": "Edition - Jaibhagwan Goyal (ed.), Jangnama Guru Gobindsingh Virkavya (Panjab Uni.pdf"
+},
+"1tudAyombXOteEnsrRtiS9OxazQO6k-DY": {
+"id": "1tudAyombXOteEnsrRtiS9OxazQO6k-DY",
+"parentId": "15eQHR6XgUjW8_XITE5pZ4KRV43SEOuw5",
+"kind": "P",
+"size": 333777284,
+"title": "Edition - Mahabharata Drona Parvan, BORI critical edition (Poona 1958).pdf"
+},
+"16DRlrzEZVgUn65jwyrF5-BIDDPzk8D9c": {
+"id": "16DRlrzEZVgUn65jwyrF5-BIDDPzk8D9c",
+"parentId": "18ifFnwu5G4TASpmj2rnxY2SbQW_s8JFk",
+"kind": "P",
+"size": 124385650,
+"title": "Anthology - Shamsher Singh Ashok (ed.), Prachin Varan te Jangname (SGPC, 1950).pdf"
+},
+"1qFHRF1Qa8f4IcDcfuLrCqwYOzP5seSeN": {
+"id": "1qFHRF1Qa8f4IcDcfuLrCqwYOzP5seSeN",
+"parentId": "1gzv0Chpr9Q_QwbqeE15NcflM12865UZH",
+"kind": "P",
+"size": 36920189,
+"title": "Edition - Ganda Singh (ed.), Bhai Nand Lal Granthavali (Punjabi University, Pati.pdf"
+},
+"1LlzRRLLtVr-t7Q5B3-DMH_AwC7DmlpKu": {
+"id": "1LlzRRLLtVr-t7Q5B3-DMH_AwC7DmlpKu",
+"parentId": "1zLCRFqaSoZUkBa-_cab0FiC_uSymaggs",
+"kind": "P",
+"size": 51753176,
+"title": "Translation - G. Bühler, The Laws of Manu, SBE 25 (1886).pdf"
+},
+"1witZU7qZNFHcdJmFmGaYBxrMWVfRrjeL": {
+"id": "1witZU7qZNFHcdJmFmGaYBxrMWVfRrjeL",
+"parentId": "1UiEjOx0Em99_0l9MI0kNPYDpyXpyPm63",
+"kind": "P",
+"size": 811999,
+"title": "Study - Karamjit K. Malhotra, 'The Earliest Manual on the Sikh Way of Life'.pdf"
+},
+"1njlrsNbIS7u6Sp7-EmV7dHVsBuMZE4Ca": {
+"id": "1njlrsNbIS7u6Sp7-EmV7dHVsBuMZE4Ca",
+"parentId": "1zYNz9ZCO9FitrjF20ZNMUkBs2jhG_Rdr",
+"kind": "P",
+"size": 40250508,
+"title": "Edition - Giani Mahan Singh (ed.), Tasnifat-e-Goya (Khalsa Tract Society, Amrits.pdf"
+},
+"1TMA_zVksMBkBMmCXnGmthQizU-12aRhy": {
+"id": "1TMA_zVksMBkBMmCXnGmthQizU-12aRhy",
+"parentId": "1yU4GXGu04Skd3JT6_RItP_aAAn7so5EK",
+"kind": "P",
+"size": 328412199,
+"title": "Edition - Mahabharata Udyoga Parvan, BORI critical edition (Poona 1940).pdf"
+},
+"139FEs8mCMkrujZ5VxTkMApxUJwzns0YE": {
+"id": "139FEs8mCMkrujZ5VxTkMApxUJwzns0YE",
+"parentId": "1CGDfAv9LO3-RQqXtnUgH9Mq2dTK5mqPK",
+"kind": "P",
+"size": 29694024,
+"title": "Translation - Whitney & Lanman, Atharva-Veda Saṃhitā, HOS 7 (1905), vol. 1.pdf"
+},
+"1EKuysACUnD7jH0Sb-gIs25e8YN92xNEg": {
+"id": "1EKuysACUnD7jH0Sb-gIs25e8YN92xNEg",
+"parentId": "198H23QkMUfdVb-1J4NyuwCm7rbY1ggBm",
+"kind": "P",
+"size": 23113901,
+"title": "Translation - The Mahabharata, tr. K. M. Ganguli P. C. Roy.pdf"
+},
+"1NETHgAcDr5SMezCmNYmXjWAIZv1tyhPk": {
+"id": "1NETHgAcDr5SMezCmNYmXjWAIZv1tyhPk",
+"parentId": "1-yDDU0DwqZSA7Xx7XgOlqDqAc3H77VmJ",
+"kind": "P",
+"size": 424795813,
+"title": "Edition - Mahabharata Ashvamedhika Parvan, BORI critical edition (Poona 1960).pdf"
+},
+"1AJEIzl5j_-wHtE9QPY_pOz_VRyOud_hf": {
+"id": "1AJEIzl5j_-wHtE9QPY_pOz_VRyOud_hf",
+"parentId": "1AGgwExyWErJrTop6WXNNE5x_V802SyUN",
+"kind": "P",
+"size": 207292498,
+"title": "Edition - Mahabharata Karna Parvan, BORI critical edition (Poona 1950).pdf"
+},
+"1f00fM0YJM9tF1N0GuincU7i6Zp4nQ69U": {
+"id": "1f00fM0YJM9tF1N0GuincU7i6Zp4nQ69U",
+"parentId": "1gzv0Chpr9Q_QwbqeE15NcflM12865UZH",
+"kind": "P",
+"size": 107348565,
+"title": "Commentary - Giani Gurwinder Singh Nangli, Sampooran Bhai Nand Lal Ji Granthavali (.pdf"
+},
+"15iyBak7asW-hu0sRBB-YUz__Df4scmAE": {
+"id": "15iyBak7asW-hu0sRBB-YUz__Df4scmAE",
+"parentId": "1x1cLDaa-kNeLM0SMt9UDoprCYu1a27Tp",
+"kind": "P",
+"size": 84750870,
+"title": "Anthology - Padam, Sri Guru Gobind Singh Ji de Darbari Ratan (Kalam Mandir, Patial.pdf"
+},
+"1Y8Zsqh97dgmF-i8qDkBg-GhjGhCed9yg": {
+"id": "1Y8Zsqh97dgmF-i8qDkBg-GhjGhCed9yg",
+"parentId": "1ynh2r7griggzlr2psLsAd6letZc7EjXw",
+"kind": "P",
+"size": 168278018,
+"title": "Translation - Samudrika Shastra with Bhasha tika (Khemraj Shrikrishnadas, Bombay 192.pdf"
+},
+"1cMuQ7SYsi1X8PNoz_yacgRcDGfLugqU4": {
+"id": "1cMuQ7SYsi1X8PNoz_yacgRcDGfLugqU4",
+"parentId": "1MzIUgDwQECGT6_Pofci1UH-j7rEU-jmg",
+"kind": "P",
+"size": 108863837,
+"title": "Translation - A Treatise on Horses, entitled Saloter (tr. Joseph Earles, Calcutta 17.pdf"
+},
+"1LJdH8OX_ogCn8CVEleJ5MB7_9pSMl8Gg": {
+"id": "1LJdH8OX_ogCn8CVEleJ5MB7_9pSMl8Gg",
+"parentId": "1pkzTakUZlhnkMuvfcc411xGuQ4iEM0IX",
+"kind": "P",
+"size": 47371217,
+"title": "Edition - Hastyayurveda (DLI copy).pdf"
+},
+"1ACGbyRrEaomeP6q4bSPH6mKV5TVVlKjz": {
+"id": "1ACGbyRrEaomeP6q4bSPH6mKV5TVVlKjz",
+"parentId": "1UiEjOx0Em99_0l9MI0kNPYDpyXpyPm63",
+"kind": "P",
+"size": 52942395,
+"title": "Edition - Padam (ed.), Rahitname (Singh Brothers).pdf"
+},
+"1BgFVm1ylKNZoeQGJHsKyFI3UHj1_EF3y": {
+"id": "1BgFVm1ylKNZoeQGJHsKyFI3UHj1_EF3y",
+"parentId": "1xVjKDiue-q9uGe24r6QiDC1qBVZeI26L",
+"kind": "P",
+"size": 110648139,
+"title": "Edition - Manava-dharma-sastra with Medhatithi, ed. V. N. Mandlik, vol. 1.pdf"
+},
+"1Xh2_T9cWf1xHJARnAZr4veFZkdtkcUVV": {
+"id": "1Xh2_T9cWf1xHJARnAZr4veFZkdtkcUVV",
+"parentId": "1EA0B7d0rNVLKTlpoQ7ci2d8rML1f99_B",
+"kind": "P",
+"size": 28833605,
+"title": "Translation - Griffith, The Texts of the White Yajurveda (1899).pdf"
+},
+"19NFqQQjTh-ISABT2JjMFIeKfmNu0VrHx": {
+"id": "19NFqQQjTh-ISABT2JjMFIeKfmNu0VrHx",
+"parentId": "1A-KBZmlaRlNwrO58yUuoSGe1Kh4VEWmN",
+"kind": "P",
+"size": 23112617,
+"title": "Study - Twarikh Guru Khalsa, Bhasha Vibhag ed. (DLI scan).pdf"
+},
+"1gK6QpAHgxdCpqoTCUEurDvQ-FJj7e9tO": {
+"id": "1gK6QpAHgxdCpqoTCUEurDvQ-FJj7e9tO",
+"parentId": "1HA3g4B6YvFiA3L9J5niBCMoydc3VMksE",
+"kind": "P",
+"size": 8369435,
+"title": "Edition - Edgerton, The Pañcatantra I-V text in its oldest form (Poona 1930).pdf"
+},
+"1qe04VAuoz8A1t9MSD25lnMJusCNpFLYX": {
+"id": "1qe04VAuoz8A1t9MSD25lnMJusCNpFLYX",
+"parentId": "1m4I53pdAPzRQF7eujOqaoNlFuvbzQhQW",
+"kind": "P",
+"size": 7186404,
+"title": "Edition - Baznama of Abu'l-Hasan Ali b. Ahmad Nasavi (Persian edition).pdf"
+},
+"16Au8YDevMrDGWOHJcIEJ8NGy6Jpk1Hb5": {
+"id": "16Au8YDevMrDGWOHJcIEJ8NGy6Jpk1Hb5",
+"parentId": "12Zf4iviFKXIvpGc2XVfLVLb26TgNC8Ff",
+"kind": "P",
+"size": 5725234,
+"title": "Translation - Shiv Puran, Urdu translation by Munshi Shankar Dayal Farhat (1870).pdf"
+},
+"1ubVrYYEsMEaEyaO5p-TI2BL7twUHwhHt": {
+"id": "1ubVrYYEsMEaEyaO5p-TI2BL7twUHwhHt",
+"parentId": "1APYfDHjTvWtJvdoJ4fsdI9Fml9V2IbP6",
+"kind": "P",
+"size": 58179381,
+"title": "Edition - Bhai Nand Lal Granthavali (Punjabi Univ. reprint of 1968 ed.).pdf"
+},
+"1XjRkFCICDGP1Woq__5NxQMq4asd0C_Rx": {
+"id": "1XjRkFCICDGP1Woq__5NxQMq4asd0C_Rx",
+"parentId": "1ch6B_lPRiikdsEq0OpfD9Do-iZJ-MRvd",
+"kind": "P",
+"size": 47151489,
+"title": "Translation - K.M. Ganguli P.C. Roy, The Mahabharata translated into English prose,.pdf"
+},
+"1rAuiFbcezzAAECR8ATDDEU5lU48vA8Om": {
+"id": "1rAuiFbcezzAAECR8ATDDEU5lU48vA8Om",
+"parentId": "1jgBpUJKqye84BsLfLQFqIIATqDufs8Rl",
+"kind": "P",
+"size": 44318322,
+"title": "Study - Bharat Bhushan Chaudhari, Guru Govind Singh ke Darbari Kavi (1976).pdf"
+},
+"1zQf35D_AcXU8e2v_JUxItv8rPx-HuG7E": {
+"id": "1zQf35D_AcXU8e2v_JUxItv8rPx-HuG7E",
+"parentId": "18Ge-T4iXSMR5CraHttNnwa3hyq4c5r7L",
+"kind": "P",
+"size": 28656055,
+"title": "Edition - Padam, Punjabi Baramahe (1959), no. 9 'Baramah Sri Ram Chand Ji Ka (Gu.pdf"
+},
+"11xd_2YlqGOlBp81h2fq1Yn4tqK-X3pvk": {
+"id": "11xd_2YlqGOlBp81h2fq1Yn4tqK-X3pvk",
+"parentId": "1dwNjRCjSRWhwiTLiwV5XTW26mBruiZbC",
+"kind": "P",
+"size": 20413428,
+"title": "Translation - Kokkoka, Ratirahasya, ed. tr. S.C. Upadhyaya (1965).pdf"
+},
+"14xRMQUGpM8ToOLlnNTz2L3tv7yHzc3XL": {
+"id": "14xRMQUGpM8ToOLlnNTz2L3tv7yHzc3XL",
+"parentId": "1xVjKDiue-q9uGe24r6QiDC1qBVZeI26L",
+"kind": "P",
+"size": 25339761,
+"title": "Edition - Manava Dharma-Sastra, ed. Julius Jolly.pdf"
+},
+"1tMMPUDS6pBij2So3beVpb9F4t3YDCD7M": {
+"id": "1tMMPUDS6pBij2So3beVpb9F4t3YDCD7M",
+"parentId": "1paCjoRkw9hi8HPgmanzCcaiPuhwW1C03",
+"kind": "P",
+"size": 11467184,
+"title": "Edition - Do Faras-nama, mansur va manzum (Persian edition).pdf"
+},
+"1U2HHN2VHnvcG3QL7Hb0yWLckBHlD_BK2": {
+"id": "1U2HHN2VHnvcG3QL7Hb0yWLckBHlD_BK2",
+"parentId": "1m4I53pdAPzRQF7eujOqaoNlFuvbzQhQW",
+"kind": "P",
+"size": 5524729,
+"title": "Translation - Baz-nama-yi Nasiri, tr. D.C. Phillott (London 1908).pdf"
+},
+"1lvnJw1LdcE0584u8-rg0fv3R_Lm4NS0g": {
+"id": "1lvnJw1LdcE0584u8-rg0fv3R_Lm4NS0g",
+"parentId": "1gXOXv4PNEvgBaNe7_53k48oNNRaUqSq9",
+"kind": "P",
+"size": 14986692,
+"title": "Anthology - Padam, Punjabi Varan (Singh Brothers, Amritsar, 2008 ed.).pdf"
+},
+"1Tq3-sFIGv6rQLK_5XtXs9boQQbb8UWGO": {
+"id": "1Tq3-sFIGv6rQLK_5XtXs9boQQbb8UWGO",
+"parentId": "1TcwpI3eBx3lZeGhFGa4B5GnN3jf4thIt",
+"kind": "P",
+"size": 10373103,
+"title": "Study - Dharam Singh, Kavi Saundha ik alochanatmak adhiain (GNDU).pdf"
+},
+"1XVY7NQSCXaVxCmPbkalcKACwpATGpq4N": {
+"id": "1XVY7NQSCXaVxCmPbkalcKACwpATGpq4N",
+"parentId": "1MzIUgDwQECGT6_Pofci1UH-j7rEU-jmg",
+"kind": "P",
+"size": 6678782,
+"title": "Edition - Salihotra of Bhoja, ed. E.D. Kulkarni (Deccan College 1953).pdf"
+},
+"1JjuTmpPHipR-POsIamdMaGnCiuTXDHge": {
+"id": "1JjuTmpPHipR-POsIamdMaGnCiuTXDHge",
+"parentId": "1ErMPlycgTw8hDqFWwwZ18fET6nR08fOn",
+"kind": "P",
+"size": 11405097,
+"title": "Edition - Vrind Granthavali, ed. Janardan Rao Chaler (Agra 1971) Bhav Panchashik.pdf"
+},
+"1-BhW7WKJYQ93LlcLRclOFB752lZm1o9b": {
+"id": "1-BhW7WKJYQ93LlcLRclOFB752lZm1o9b",
+"parentId": "1pkzTakUZlhnkMuvfcc411xGuQ4iEM0IX",
+"kind": "P",
+"size": 2439102,
+"title": "Edition - Matangalila of Nilakantha (Trivandrum Sanskrit Series 10, 1910).pdf"
+},
+"1YHzohEHGg-cCO44xxmuTFIcHTqSFOXjb": {
+"id": "1YHzohEHGg-cCO44xxmuTFIcHTqSFOXjb",
+"parentId": "197hOGoKQjTmvIU_wVePBwlJQnHQRL8gU",
+"kind": "P",
+"size": 6147541,
+"title": "Edition - Yajnavalkya Dharma Sastra, ed. A. F. Stenzler.pdf"
+},
+"197DY3R-XuFrR-Nta458HaQ92YlG9J3hx": {
+"id": "197DY3R-XuFrR-Nta458HaQ92YlG9J3hx",
+"parentId": "1UphB3j18rNxirr83ggrBXV-oeJIi9y2t",
+"kind": "P",
+"size": 6928457,
+"title": "Study - Gian Singh, Twarikh Guru Khalsa pt. 10 (source list naming this work).pdf"
+},
+"1vtPttnQVRb2D-DQb5Xr2GaiBtffWGTFP": {
+"id": "1vtPttnQVRb2D-DQb5Xr2GaiBtffWGTFP",
+"parentId": "1paCjoRkw9hi8HPgmanzCcaiPuhwW1C03",
+"kind": "P",
+"size": 2793919,
+"title": "Translation - Faras-nama of Hashimi, ed. tr. D.C. Phillott (1910).pdf"
+},
+"1s8WW1dyW2oxK0ToVFPegerFEOluaODDV": {
+"id": "1s8WW1dyW2oxK0ToVFPegerFEOluaODDV",
+"parentId": "1hc9QulXfldY9UryIGrrUuxIwrYve2K3o",
+"kind": "P",
+"size": 18500075,
+"title": "Translation - M.N. Dutt, The Garuda Purana English translation vol. 1 (1908).pdf"
+},
+"11Zqt-nnR0MpfEVm31zyWZAv1R0GSjhVT": {
+"id": "11Zqt-nnR0MpfEVm31zyWZAv1R0GSjhVT",
+"parentId": "16dSLK-Nr9LWmEm9H7ahp1RAyDVNWwO0z",
+"kind": "P",
+"size": 12206337,
+"title": "Edition - Kavi Sewa Singh, Shahid Bilas Bhai Mani Singh, ed. Giani Garja Singh (.pdf"
+},
+"1YScbBLhWNWjz_gW5Dls65anwdVsKe1pI": {
+"id": "1YScbBLhWNWjz_gW5Dls65anwdVsKe1pI",
+"parentId": "1WWLcxoVO-eSQxT_GrRMGgnK-I2n_9Gxd",
+"kind": "P",
+"size": 8234490,
+"title": "Edition - W.H. McLeod, The Chaupa Singh Rahit-nama (Univ. of Otago Press, 1987).pdf"
+},
+"1LiL-V2nL244Re9PaGBKVh2UO04UUFmbg": {
+"id": "1LiL-V2nL244Re9PaGBKVh2UO04UUFmbg",
+"parentId": "17O1S0XDLTgmFKfB43VeK6K15hiScHMPx",
+"kind": "P",
+"size": 877041,
+"title": "Edition - Rehatnama Bhai Nand Lal, Gurmukhi text.pdf"
+},
+"17YsUZtk3aPw-RwEbRwn59bLD-ICK6VL5": {
+"id": "17YsUZtk3aPw-RwEbRwn59bLD-ICK6VL5",
+"parentId": "106gwPU0IHKA3X0BY746chHD-bCtnkdeg",
+"kind": "P",
+"size": 251403,
+"title": "Edition - Chanakya Niti, Sanskrit text (verse order).pdf"
+},
+"17bfZTY2UjeXROX3zH_rfd2HwEOdLTWOC": {
+"id": "17bfZTY2UjeXROX3zH_rfd2HwEOdLTWOC",
+"parentId": "1UphB3j18rNxirr83ggrBXV-oeJIi9y2t",
+"kind": "P",
+"size": 234574,
+"title": "Edition - Guru Gita (Sanskrit e-text).pdf"
+},
+"1i9D-msW5xmVOKi6fvwuXhiBUHlDhe4yn": {
+"id": "1i9D-msW5xmVOKi6fvwuXhiBUHlDhe4yn",
+"parentId": "1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X",
+"kind": "P",
+"size": 2119880150,
+"title": "MS - Dasam Granth, Patna Misal bir (contains Krishna Avatar).pdf"
+},
+"1q3KoOaeJyAoInVYYJCLUItxfkOPrDUUE": {
+"id": "1q3KoOaeJyAoInVYYJCLUItxfkOPrDUUE",
+"parentId": "1p8lqI_Xpa6O6LZHyWjO6VgJfhpjVXLC2",
+"kind": "P",
+"size": 1340162129,
+"title": "MS - Dasam Granth, Krishna Avtār (Braj rendering of Bhāgavata Book 10), ill.pdf"
+},
+"1NQNDrpWIWULuAwdBnnvYZmXH71cKIWpn": {
+"id": "1NQNDrpWIWULuAwdBnnvYZmXH71cKIWpn",
+"parentId": "1OIq_B0OcXnO7dnsuj9AhcfmcarYMShzc",
+"kind": "P",
+"size": 494094661,
+"title": "MS - Adhyatma Ramayan with 7 paintings, Gulab Singh (PU MS 1484).pdf"
+},
+"1p0QYl_7KsCTSW5NbP5wHgPRasC9uYO7-": {
+"id": "1p0QYl_7KsCTSW5NbP5wHgPRasC9uYO7-",
+"parentId": "1-1EV73NYKR9VruU4yNOxvLwuP5Hi-Vlh",
+"kind": "P",
+"size": 843858061,
+"title": "Early print - Sur Sagar, ed. Radhakrishna Das (Khemraj, Bombay 1907).pdf"
+},
+"1TRcBNrMt8GR0iwlL1m0gK7SS451AVzPS": {
+"id": "1TRcBNrMt8GR0iwlL1m0gK7SS451AVzPS",
+"parentId": "1dS8h6otOBfMwx8l4weVRi2Nm2VrLlRpR",
+"kind": "P",
+"size": 649745063,
+"title": "MS - Liṅga Purāṇa Sanskrit MS, Panjab Univ. MS 13.pdf"
+},
+"1oef61veiG7zvtg8-vNauHVMQjuftMxhI": {
+"id": "1oef61veiG7zvtg8-vNauHVMQjuftMxhI",
+"parentId": "14c7-PecOukXbR992csrWOH9MYZVLd3bK",
+"kind": "P",
+"size": 808299839,
+"title": "MS - Yoga Vasishtha, Nirvana Prakarana, Gurmukhi 'Sant Bhakha' MS, Panjab U.pdf"
+},
+"1twpNdH3Aebq1Nj2YEqPIEPK4Ykx11DWU": {
+"id": "1twpNdH3Aebq1Nj2YEqPIEPK4Ykx11DWU",
+"parentId": "1EW841BhgJOukk42Z-QMj-YuMU9MTUl_w",
+"kind": "P",
+"size": 506887028,
+"title": "MS - Brahmavaivarta Mahāpurāṇa Sanskrit MS, Panjab Univ. MS 334.pdf"
+},
+"1TvxD3wauiH75C89Vjc5KDMctoysffgfP": {
+"id": "1TvxD3wauiH75C89Vjc5KDMctoysffgfP",
+"parentId": "1z_da9Li94yj3LWQV27QTYJABC4G2lMhx",
+"kind": "P",
+"size": 427989339,
+"title": "MS - Jaimini Ashvamedh, Sanskrit MS (Ramtek M-2684).pdf"
+},
+"14n5VplaCnFGmGkqWRLBBDAx_tSx6s20A": {
+"id": "14n5VplaCnFGmGkqWRLBBDAx_tSx6s20A",
+"parentId": "1GyGv0lEc0PV8SrUWl-Qr_S7ztfvgpPQW",
+"kind": "P",
+"size": 271087875,
+"title": "Early print - Tarjuma Mujarrabat-i Akbari, Gurmukhi lithograph (1892).pdf"
+},
+"1XXM61MhAURN-TWyuoZzojKeKSx-aggXd": {
+"id": "1XXM61MhAURN-TWyuoZzojKeKSx-aggXd",
+"parentId": "1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X",
+"kind": "P",
+"size": 386932137,
+"title": "MS - Bhagawat Dasham Skandha, Gurmukhi MS (PU MS 1483, Krishan Lal).pdf"
+},
+"1f66lAInvqIarxtiZbwvAiCZxNjOTEz4W": {
+"id": "1f66lAInvqIarxtiZbwvAiCZxNjOTEz4W",
+"parentId": "1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X",
+"kind": "P",
+"size": 356193528,
+"title": "MS - Bhagwat Purana 10th skandh MS bound with Makke Madine di Gosht.pdf"
+},
+"1UtpTp3LH2AGCDubi8vsZx0mxaoehdxkH": {
+"id": "1UtpTp3LH2AGCDubi8vsZx0mxaoehdxkH",
+"parentId": "1z_da9Li94yj3LWQV27QTYJABC4G2lMhx",
+"kind": "P",
+"size": 276205642,
+"title": "Early print - Jaimini Ashvamedha, illustrated pothi, Bombay.pdf"
+},
+"1SFrMiNYIY21ipRZHbsq7p3sU_6G1M07a": {
+"id": "1SFrMiNYIY21ipRZHbsq7p3sU_6G1M07a",
+"parentId": "12BZOI8Mndi4n6V3CkscFxOFkuuOsiliu",
+"kind": "P",
+"size": 735351485,
+"title": "Early print - Srimad Devi Bhagavat with commentary, Venkateshvar Press.pdf"
+},
+"1oCiH79OfM7uaLpQEeyf9TykN1heQy_7S": {
+"id": "1oCiH79OfM7uaLpQEeyf9TykN1heQy_7S",
+"parentId": "1-1EV73NYKR9VruU4yNOxvLwuP5Hi-Vlh",
+"kind": "P",
+"size": 702323230,
+"title": "MS - Sur Sagar, personal copy of Maharaja Ranbir Singh (Raghunath Temple MS.pdf"
+},
+"19nm42yDoLf_-RjMAA88FLU5Rpp-OAbXr": {
+"id": "19nm42yDoLf_-RjMAA88FLU5Rpp-OAbXr",
+"parentId": "1CzI5i3jXgCzS6oTr37-Uf6lbUPHLm2SZ",
+"kind": "P",
+"size": 610676168,
+"title": "Early print - Dasam Granth, Lahore metal-type print (1895).pdf"
+},
+"1Yr5agSHHI6hS3A0nEW2ljVvBawOwqHIe": {
+"id": "1Yr5agSHHI6hS3A0nEW2ljVvBawOwqHIe",
+"parentId": "1Dm5weMlH0LCFPz83DgR3FPVtrj7SIMqF",
+"kind": "P",
+"size": 2993332954,
+"title": "Early print - Dasam Granth, early print following the 1897 Sodhak Committee text.pdf"
+},
+"1gtx01pMiyriug2JDCCKx3o0PhbooNWTa": {
+"id": "1gtx01pMiyriug2JDCCKx3o0PhbooNWTa",
+"parentId": "1k35k_f3C0Fr88XZNPkEz14DGuIuf1-VX",
+"kind": "P",
+"size": 752417204,
+"title": "MS - Ramayana, Gurmukhi verse MS, Panjab University MS 118.pdf"
+},
+"1P38ORCfSgvRe6yQCyd7mjCM8-FlC6Vw1": {
+"id": "1P38ORCfSgvRe6yQCyd7mjCM8-FlC6Vw1",
+"parentId": "12IRCtp7HvwiY-BxYCH-icy1e9m0toIr8",
+"kind": "P",
+"size": 566457977,
+"title": "MS - Rajniti Granth (Braj Hitopadesha), Gurmukhi MS, Panjab University MS 4.pdf"
+},
+"1dHN9YaYA9JNwmrA7B-Hucibz-PvEKq1T": {
+"id": "1dHN9YaYA9JNwmrA7B-Hucibz-PvEKq1T",
+"parentId": "1Av3CcHj9_Wfek4Yo8hg7hiLYUXCEGGzW",
+"kind": "P",
+"size": 460128478,
+"title": "MS - Brahmāṇḍa Purāṇa MS, Panjab Univ. MS 1490.pdf"
+},
+"1HacPVX7_yi_puxtM8MepE37r-IwNoNUO": {
+"id": "1HacPVX7_yi_puxtM8MepE37r-IwNoNUO",
+"parentId": "1Av3CcHj9_Wfek4Yo8hg7hiLYUXCEGGzW",
+"kind": "P",
+"size": 452943894,
+"title": "MS - Adhyātam Rāmāyan (Brahmāṇḍa Purāṇa section) by Sadhu Gulab Singh, Gurm.pdf"
+},
+"1SWc6AcHS02-dA0wWUCEuxfzauxrBPH27": {
+"id": "1SWc6AcHS02-dA0wWUCEuxfzauxrBPH27",
+"parentId": "1rqX4vWIq7ydDeBGNHw8E7Yx2CC5ihYxG",
+"kind": "P",
+"size": 439929701,
+"title": "MS - Bishan Puran Bhasha, Gurmukhi MS (PU MS 386).pdf"
+},
+"1J0FNKgnS6owPyMwyL6d9QwCaha1NQ_Nw": {
+"id": "1J0FNKgnS6owPyMwyL6d9QwCaha1NQ_Nw",
+"parentId": "1Dm5weMlH0LCFPz83DgR3FPVtrj7SIMqF",
+"kind": "P",
+"size": 1305845829,
+"title": "MS - Dasam Granth MS, Kesgarh Sahib.pdf"
+},
+"1VmS9gN_RMP-1aa0ZIITpXuoB2N_Nf3Ny": {
+"id": "1VmS9gN_RMP-1aa0ZIITpXuoB2N_Nf3Ny",
+"parentId": "1k35k_f3C0Fr88XZNPkEz14DGuIuf1-VX",
+"kind": "P",
+"size": 399937206,
+"title": "MS - Kavi Santokh Singh, Valmiki Ramayana (Braj, 1834), Gurmukhi MS.pdf"
+},
+"16KIQ1a07hsbvI1TuavGvRODtPL-qu8Jv": {
+"id": "16KIQ1a07hsbvI1TuavGvRODtPL-qu8Jv",
+"parentId": "1rqX4vWIq7ydDeBGNHw8E7Yx2CC5ihYxG",
+"kind": "P",
+"size": 257826142,
+"title": "MS - Vishnu Puran + Pran Sangli, Gurmukhi MS.pdf"
+},
+"189J6B2Fg-R4vEUfpZZXf0TnrlcS3ex7E": {
+"id": "189J6B2Fg-R4vEUfpZZXf0TnrlcS3ex7E",
+"parentId": "12TuQQMDvq4pKFYNHx9obGdGCyzjSjTNP",
+"kind": "P",
+"size": 221439616,
+"title": "MS - Padma Puran in Gurmukhi MS (private upload).pdf"
+},
+"1_t-G4E1HcluOuzjBOuFyuzVYb0ADPR0w": {
+"id": "1_t-G4E1HcluOuzjBOuFyuzVYb0ADPR0w",
+"parentId": "1rNiZGmgDNjzRrHCDRXfBRW2bPr_Uub7X",
+"kind": "P",
+"size": 229699051,
+"title": "MS - Bhagavat Dasham Skandha with illustrations, Gurmukhi MS (Kurukshetra M.pdf"
+},
+"1t2455PtjIdWvhGGnvSXxO2n8OKSht2Ps": {
+"id": "1t2455PtjIdWvhGGnvSXxO2n8OKSht2Ps",
+"parentId": "1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos",
+"kind": "P",
+"size": 214311052,
+"title": "MS - Ekadash Skandha Bhagavata by Sant Das (PU MS 1370).pdf"
+},
+"1ow8_aJ9d4yrIFMP24io9VN1GvTG0TlFp": {
+"id": "1ow8_aJ9d4yrIFMP24io9VN1GvTG0TlFp",
+"parentId": "1akComdS_rs2Y3YvjHqQ0HLq_MEJW5rCr",
+"kind": "P",
+"size": 579476351,
+"title": "Early print - Gulistan-e Sa'di (Persian, DLI 1914).pdf"
+},
+"1sVRE55EHNBwY4WX-98-mRdi4kTCQ_pgk": {
+"id": "1sVRE55EHNBwY4WX-98-mRdi4kTCQ_pgk",
+"parentId": "1ulTaBJMr7QfR_iaL4zKd0syUzfc8AGF8",
+"kind": "P",
+"size": 223518365,
+"title": "Early print - The Kūrma Purāṇa, Bibliotheca Indica, ed. Nilmani Mukhopadhyaya (1890).pdf"
+},
+"1Jb6speDoHz7PCOvo-z2GmRKGIsp24CGQ": {
+"id": "1Jb6speDoHz7PCOvo-z2GmRKGIsp24CGQ",
+"parentId": "1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos",
+"kind": "P",
+"size": 208472183,
+"title": "Early print - Bhagvat Ekadash Skandh Bhasha, Hari Prasad Bhagirath.pdf"
+},
+"1ZzG8wcx2KYGTdqu9bIKReucK3L9tUq1k": {
+"id": "1ZzG8wcx2KYGTdqu9bIKReucK3L9tUq1k",
+"parentId": "1z_da9Li94yj3LWQV27QTYJABC4G2lMhx",
+"kind": "P",
+"size": 198148376,
+"title": "Early print - Jaiminiya Ashvamedha Parva, Lakshmi Venkateshwar Press.pdf"
+},
+"1zItGIxPJWl87ddnyUms4vV1mOEQJ_cN3": {
+"id": "1zItGIxPJWl87ddnyUms4vV1mOEQJ_cN3",
+"parentId": "1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos",
+"kind": "P",
+"size": 207919388,
+"title": "MS - Srimat Bhagvat, Gurmukhi MS (PU MS 299).pdf"
+},
+"1mALXjzjIIfJPuicFBcdU-Odfl5ORF-o_": {
+"id": "1mALXjzjIIfJPuicFBcdU-Odfl5ORF-o_",
+"parentId": "12BZOI8Mndi4n6V3CkscFxOFkuuOsiliu",
+"kind": "P",
+"size": 413242049,
+"title": "Early print - Shrimad Devi Bhagavatam satika, Khemraj Shrikrishnadas.pdf"
+},
+"1oWL5rafXnYEFKfaJYizvvyLLjVEB57VQ": {
+"id": "1oWL5rafXnYEFKfaJYizvvyLLjVEB57VQ",
+"parentId": "1t4pTnNc6fhWDyWcOOj6hhnrFYIGqt3b_",
+"kind": "P",
+"size": 188942018,
+"title": "MS - Dasam Granth MS ('Patna bir', uploader dates 1698) containing Chandī C.pdf"
+},
+"1gG52Q1t49fziRL2YpYtLUmZjktpBwgkr": {
+"id": "1gG52Q1t49fziRL2YpYtLUmZjktpBwgkr",
+"parentId": "1-1EV73NYKR9VruU4yNOxvLwuP5Hi-Vlh",
+"kind": "P",
+"size": 357922083,
+"title": "MS - Sur Sagar, partial MS, Panjab University Chandigarh MS 823.pdf"
+},
+"10aHZC2UKQwjE4gkDT-Rxsow9pw37av4x": {
+"id": "10aHZC2UKQwjE4gkDT-Rxsow9pw37av4x",
+"parentId": "1bo7fiM4AdovwxxEdaEeT-rDgRMMEl5rP",
+"kind": "P",
+"size": 187764848,
+"title": "MS - Illustrated Gurmukhi MS of Prem Ambodh Pothi.pdf"
+},
+"1B8A51hAlthk9SDgbzrjdVTNOI2bqXzZv": {
+"id": "1B8A51hAlthk9SDgbzrjdVTNOI2bqXzZv",
+"parentId": "1imkfx4yuOZKo8y4zRqvkJcQ5oFp7zcgd",
+"kind": "P",
+"size": 130570923,
+"title": "MS - Brinda Satsai, Gurmukhi manuscript, Panjab University MS 106.pdf"
+},
+"1dupij-EnmKMJRmISCA2ty7nRSIloo6c4": {
+"id": "1dupij-EnmKMJRmISCA2ty7nRSIloo6c4",
+"parentId": "1bo7fiM4AdovwxxEdaEeT-rDgRMMEl5rP",
+"kind": "P",
+"size": 184329248,
+"title": "MS - Panjab University MS 521 Prem Abodh, Parchi Kabir Ji Ki.pdf"
+},
+"1zqq2qeCYVhz9EerSLW1N1IUSIZhoc8yV": {
+"id": "1zqq2qeCYVhz9EerSLW1N1IUSIZhoc8yV",
+"parentId": "1OIq_B0OcXnO7dnsuj9AhcfmcarYMShzc",
+"kind": "P",
+"size": 94882492,
+"title": "Early print - Adhyatam Ramayan, Gulab Singh & Sons, Lahore.pdf"
+},
+"17GNdVh3Eav7lC4IdgZaGK1RmZjz_6dX3": {
+"id": "17GNdVh3Eav7lC4IdgZaGK1RmZjz_6dX3",
+"parentId": "16KSfA-dxEPdEKbIwLsKow66HLcpvglum",
+"kind": "P",
+"size": 283547190,
+"title": "Early print - Shukraniti, Khemraj Shrikrishnadas.pdf"
+},
+"1LmGLdQ4RqlLes4vpIRjZHyWOpHW5jQnb": {
+"id": "1LmGLdQ4RqlLes4vpIRjZHyWOpHW5jQnb",
+"parentId": "1vurQClakZcAsusbPqDuKrp09u4srvgxG",
+"kind": "P",
+"size": 54801841,
+"title": "Early print - Bhavishya Purāṇa Bhāshā, pt. 2, Naval Kishore (DLI date 1869).pdf"
+},
+"1tzCCMqAOIAfEKshpoUMOOYdYfmj9NPGW": {
+"id": "1tzCCMqAOIAfEKshpoUMOOYdYfmj9NPGW",
+"parentId": "1imkfx4yuOZKo8y4zRqvkJcQ5oFp7zcgd",
+"kind": "P",
+"size": 46936770,
+"title": "MS - Vrinda Satsai, Gurmukhi manuscript, Kurukshetra University MN 000395.pdf"
+},
+"1Pb4FTyPXj6NAJB3BjavwkgIzwZb1E9uH": {
+"id": "1Pb4FTyPXj6NAJB3BjavwkgIzwZb1E9uH",
+"parentId": "1yCqu24lRv5_bm_cxPqTBH2lC3a_aUNoz",
+"kind": "P",
+"size": 46635184,
+"title": "Early print - Matsya Purāṇam, Sanskrit printed edition (Calcutta 1879).pdf"
+},
+"1pNETLWbZCH_M-pvsTqfOtthdVXsH9ob4": {
+"id": "1pNETLWbZCH_M-pvsTqfOtthdVXsH9ob4",
+"parentId": "1tQ-6RW_e0fTQxTCxOnV_ZlXRklAFqKW5",
+"kind": "P",
+"size": 117891185,
+"title": "Early print - Dasam Granth in Urdu script, incl. Zafarnama and Hikayat in Persian.pdf"
+},
+"1n86GF1RtLmsiHZBV4u83vOdXo35Jxbx0": {
+"id": "1n86GF1RtLmsiHZBV4u83vOdXo35Jxbx0",
+"parentId": "1rqX4vWIq7ydDeBGNHw8E7Yx2CC5ihYxG",
+"kind": "P",
+"size": 94774709,
+"title": "MS - Vishnu Puran, Gurmukhi MSS (Kurukshetra MN 000053 000054 000390).pdf"
+},
+"1JOQgRBkQ_u6_CSarrFOJcipJY38A-Gpm": {
+"id": "1JOQgRBkQ_u6_CSarrFOJcipJY38A-Gpm",
+"parentId": "1d0ZDmdgkJmNu4_r6O0TqaU1sHFbnnBC8",
+"kind": "P",
+"size": 481480132,
+"title": "MS - Prabodha Chandrodaya Bhasha Tika, Gulab Singh (Raghunath Temple, Jammu.pdf"
+},
+"18dSIjGktvhASP9zhVFmP6-YDaMMpYzRe": {
+"id": "18dSIjGktvhASP9zhVFmP6-YDaMMpYzRe",
+"parentId": "1dltF3Jcyu8LQXQcOf9jJQZvGnVx3UKXd",
+"kind": "P",
+"size": 234130560,
+"title": "MS - Sikhan di Bhagatmala (Bhagat Ratanavali), old Gurmukhi MS (Sikh Refere.pdf"
+},
+"1oOYcGpvr2ALEstdSxDJ20ESATJdfMVoc": {
+"id": "1oOYcGpvr2ALEstdSxDJ20ESATJdfMVoc",
+"parentId": "1bMl8sKojQNGeI2IcVzZl80uMHgk0Xu93",
+"kind": "P",
+"size": 286813804,
+"title": "Early print - Vamana Purana with Hindi, Venkateshwar Press, Bombay (1909).pdf"
+},
+"1NNuVgoo4PrGHo0lFppkY_qAF70lw5FNp": {
+"id": "1NNuVgoo4PrGHo0lFppkY_qAF70lw5FNp",
+"parentId": "1zovw7e9bAQ8UTUDMiWXZoZCCXrSjJCSa",
+"kind": "P",
+"size": 208437139,
+"title": "MS - Dara Shukoh, Sirr-i Akbar, Persian MS (Rashtriya Sanskrit Sansthan, Ja.pdf"
+},
+"1NFCSnAyqEyKD4UAmJLV3qZdBwUGQuo_L": {
+"id": "1NFCSnAyqEyKD4UAmJLV3qZdBwUGQuo_L",
+"parentId": "1dltF3Jcyu8LQXQcOf9jJQZvGnVx3UKXd",
+"kind": "P",
+"size": 156265794,
+"title": "MS - Sikhan di Bhagatmala MSS incl. an 1845 CE pothi (with Ugardanti and Kh.pdf"
+},
+"1BfOPq_A3jWITF_TSU0nK-1CD4QcJKqmd": {
+"id": "1BfOPq_A3jWITF_TSU0nK-1CD4QcJKqmd",
+"parentId": "1CzI5i3jXgCzS6oTr37-Uf6lbUPHLm2SZ",
+"kind": "P",
+"size": 120703911,
+"title": "MS - Ras Mandal and Charitropakhyan pothi (charitras 1-178), 19th c.pdf"
+},
+"15ZW4IWfLtyKUzG4glLiP3xQvVKIerjzb": {
+"id": "15ZW4IWfLtyKUzG4glLiP3xQvVKIerjzb",
+"parentId": "1epHObcZY6s8CEb4O4oc-Rdcza-Mfi5JO",
+"kind": "P",
+"size": 225329608,
+"title": "MS - Taittiriya Upanishad etc., Gurmukhi bhakha MS, Panjab University MS 42.pdf"
+},
+"1oHIujlVLGS7k7Uir7tBAO-Kfltc4MEnb": {
+"id": "1oHIujlVLGS7k7Uir7tBAO-Kfltc4MEnb",
+"parentId": "14c7-PecOukXbR992csrWOH9MYZVLd3bK",
+"kind": "P",
+"size": 101885324,
+"title": "MS - Yog Vashisht, Gurmukhi prose MS, Kurukshetra University MN-000214 (cat.pdf"
+},
+"1m4V2vk_fBQB2aJDHJenKr0UvzYeLy2Xg": {
+"id": "1m4V2vk_fBQB2aJDHJenKr0UvzYeLy2Xg",
+"parentId": "1mp0ot96pKo2pn3EpmpHVPmTeulC7Jk0U",
+"kind": "P",
+"size": 98292371,
+"title": "MS - Padma Purana Sanskrit MS, Panjab Univ. MS 742.pdf"
+},
+"1B_2r_Os_sHtjewFkk39Pl0FRoMmKS0Of": {
+"id": "1B_2r_Os_sHtjewFkk39Pl0FRoMmKS0Of",
+"parentId": "1PxDkNJCHnN-BrCqq2NAZxN4KI-Ew7ddf",
+"kind": "P",
+"size": 207601266,
+"title": "MS - Vedant Pothi, Gurmukhi MS, Panjab Univ. MS 472.pdf"
+},
+"1IXsv4pcprybb7wL4B-qGJiipn-_mjTHF": {
+"id": "1IXsv4pcprybb7wL4B-qGJiipn-_mjTHF",
+"parentId": "1Lpk9F-Cvjn1NJB0R-1qZbqzkCKgULQHn",
+"kind": "P",
+"size": 201260184,
+"title": "MS - Chanakyagranth, Gurmukhi MS (Panjab Univ. MS 102).pdf"
+},
+"1YnnBRfTIL00JR8m9nNdTXrJShKKd3otW": {
+"id": "1YnnBRfTIL00JR8m9nNdTXrJShKKd3otW",
+"parentId": "136Yc2ZaCokw_tNsfAD1tzK4Yofi982uV",
+"kind": "P",
+"size": 148826157,
+"title": "Early print - Pothi Janam Sakhi Bhai Mani Singh Ji, Lahore lithograph, Sammat 1947 B.pdf"
+},
+"1K3PYPIABd8Juvtmywn9pWT-OtMtoOxR3": {
+"id": "1K3PYPIABd8Juvtmywn9pWT-OtMtoOxR3",
+"parentId": "1d0ZDmdgkJmNu4_r6O0TqaU1sHFbnnBC8",
+"kind": "P",
+"size": 69130897,
+"title": "Early print - Prabodha Chandrodaya, Fort William College, Calcutta.pdf"
+},
+"1wdfh9XWHr1tX3dskyMvE9mvFy5ceFla6": {
+"id": "1wdfh9XWHr1tX3dskyMvE9mvFy5ceFla6",
+"parentId": "1Lpk9F-Cvjn1NJB0R-1qZbqzkCKgULQHn",
+"kind": "P",
+"size": 67181317,
+"title": "Early print - Chanakya Niti Darpan Rajniti Samuccaya, Naval Kishore Press.pdf"
+},
+"18Yqnxjjp65DFB4T__g-ojUgrpTeitvPu": {
+"id": "18Yqnxjjp65DFB4T__g-ojUgrpTeitvPu",
+"parentId": "1_1UPFgQP_mDXmX_EzHfA1tsrZVXt30rQ",
+"kind": "P",
+"size": 90361506,
+"title": "MS - 1857 Gurmukhi manuscript Sarkutavali, Vichar Mala, Adhyatam Prakash an.pdf"
+},
+"1weCM4Wt_P33G4cexSZebJ4RNWMffMtBL": {
+"id": "1weCM4Wt_P33G4cexSZebJ4RNWMffMtBL",
+"parentId": "1mp0ot96pKo2pn3EpmpHVPmTeulC7Jk0U",
+"kind": "P",
+"size": 81623565,
+"title": "Early print - Padma Puranam vol. 1, Sanskrit printed edition (1893, Anandashrama era).pdf"
+},
+"1EX7-e6874aZDB9rneOVEAQYMujkv-0WQ": {
+"id": "1EX7-e6874aZDB9rneOVEAQYMujkv-0WQ",
+"parentId": "1CzI5i3jXgCzS6oTr37-Uf6lbUPHLm2SZ",
+"kind": "P",
+"size": 569773728,
+"title": "Early print - Dasam Granth, stone lithograph (1892).pdf"
+},
+"1cTPOoLs4I-Wyb8I9kE_wScmhbiPHvyuQ": {
+"id": "1cTPOoLs4I-Wyb8I9kE_wScmhbiPHvyuQ",
+"parentId": "1qU7HLiYjwKkm2CVFX-fI38Vc07fBqg4i",
+"kind": "P",
+"size": 93426830,
+"title": "Early print - Max Muller ed. with Sayana's commentary, 1849-74 (all vols).pdf"
+},
+"1ThpX5-u-5HD9x8UOCJ-DpEMIJYu2zxdL": {
+"id": "1ThpX5-u-5HD9x8UOCJ-DpEMIJYu2zxdL",
+"parentId": "1t4pTnNc6fhWDyWcOOj6hhnrFYIGqt3b_",
+"kind": "P",
+"size": 74197875,
+"title": "MS - 'Chandi Charitar' Sanskrit MS, Panjab Univ. MS 1223 (likely Devi-mahat.pdf"
+},
+"1KFJxhNnzuzPUCwtzlFoudTSai31DgCCX": {
+"id": "1KFJxhNnzuzPUCwtzlFoudTSai31DgCCX",
+"parentId": "1tQ-6RW_e0fTQxTCxOnV_ZlXRklAFqKW5",
+"kind": "P",
+"size": 66456511,
+"title": "MS - Zafarnama Guru Gobind Singh, Gurmukhi MS (PU MS 353).pdf"
+},
+"1RZkH-7KyzKKTkhyXS45rtfUfIJHGcnB9": {
+"id": "1RZkH-7KyzKKTkhyXS45rtfUfIJHGcnB9",
+"parentId": "1AiYaH2U55wpsdpaS044TBjwoJEAiOFWF",
+"kind": "P",
+"size": 66405068,
+"title": "Early print - Brahma Puranam, Sanskrit printed edition (DLI date 1895, likely Ananda.pdf"
+},
+"1rjPIBTTz3k5ZQDTzkGQjfYg3sfnLMZ3Z": {
+"id": "1rjPIBTTz3k5ZQDTzkGQjfYg3sfnLMZ3Z",
+"parentId": "14f4W_YASecFG5M1v-ayKr0jpiABVDLQ9",
+"kind": "P",
+"size": 51168025,
+"title": "MS - Bhoj Prabandh of Ballala, Sharada MS (Nazki coll. #46).pdf"
+},
+"139WBkPQnCYhPaKEJdLiBS2b4G9Xh0uZh": {
+"id": "139WBkPQnCYhPaKEJdLiBS2b4G9Xh0uZh",
+"parentId": "10v6opxpaAd1PTlkvQqjKlja4KMhxbxa4",
+"kind": "P",
+"size": 56403443,
+"title": "Early print - Kavi Santokh Singh, Gurpratap Suraj Granth (Gurmukhi typed PDF).pdf"
+},
+"1oW60BAQYTM-FJC5E665vR9Rs4f0ioikZ": {
+"id": "1oW60BAQYTM-FJC5E665vR9Rs4f0ioikZ",
+"parentId": "1pHextXAJA0cK6rK3D-GsoaxZamypMcl4",
+"kind": "P",
+"size": 49944953,
+"title": "MS - Vaidyak Granth, Gurmukhi MS, Panjab University MS 354.pdf"
+},
+"1-p7Wc-6iEP6H7qhupVZWXwJNvIFd-OVF": {
+"id": "1-p7Wc-6iEP6H7qhupVZWXwJNvIFd-OVF",
+"parentId": "1d0ZDmdgkJmNu4_r6O0TqaU1sHFbnnBC8",
+"kind": "P",
+"size": 49912668,
+"title": "Early print - Prabodh Chandr Natak, 'Kavi Mahatma Gulab Das', Lahore.pdf"
+},
+"1nrs9ryWe_0f__0-Yxqs5tP--9hL07dPR": {
+"id": "1nrs9ryWe_0f__0-Yxqs5tP--9hL07dPR",
+"parentId": "1Av3CcHj9_Wfek4Yo8hg7hiLYUXCEGGzW",
+"kind": "P",
+"size": 50496195,
+"title": "MS - Adhyatma Ramayan, Gurmukhi MS, Kurukshetra Univ. MN-000633.pdf"
+},
+"1-vqotK9BJtwhzE2GGvmn7CgfaM4prkgm": {
+"id": "1-vqotK9BJtwhzE2GGvmn7CgfaM4prkgm",
+"parentId": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"kind": "P",
+"size": 45133437,
+"title": "MS - Bhasha Bhushan Hari Charan Das, Devanagari MS (PU MS 296).pdf"
+},
+"11lR9U3tzg28rwFRLz_qKXjiDA5AJnYKR": {
+"id": "11lR9U3tzg28rwFRLz_qKXjiDA5AJnYKR",
+"parentId": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"kind": "P",
+"size": 44259129,
+"title": "Early print - Bhasha Bhushan with Gujarati commentaries, Bombay.pdf"
+},
+"1vb5K7vIFJxSiQHvP1Hy6Qc_74b2SOx9u": {
+"id": "1vb5K7vIFJxSiQHvP1Hy6Qc_74b2SOx9u",
+"parentId": "1EW841BhgJOukk42Z-QMj-YuMU9MTUl_w",
+"kind": "P",
+"size": 43331973,
+"title": "Early print - Brahmavaivarta Purana vol. 1, ed. Jivananda Vidyasagar (Calcutta 1888).pdf"
+},
+"15Ewe7l8MhyZPE19wwqeZfRK8kWwYOCXA": {
+"id": "15Ewe7l8MhyZPE19wwqeZfRK8kWwYOCXA",
+"parentId": "14f4W_YASecFG5M1v-ayKr0jpiABVDLQ9",
+"kind": "P",
+"size": 42868520,
+"title": "Early print - Bhoj Prabandh Sar, Naval Kishore Press.pdf"
+},
+"1SV2Z9cxo2RHQ54mHHZgm73n9s3ylBeco": {
+"id": "1SV2Z9cxo2RHQ54mHHZgm73n9s3ylBeco",
+"parentId": "1xJlccW0aWYsmls2ToB2i1GwHevceNSBX",
+"kind": "P",
+"size": 41236595,
+"title": "Early print - Bustan, Persian text with marginal notes (1877).pdf"
+},
+"1tebnAd3asqOcnyg776-4a9THhg1dYxXD": {
+"id": "1tebnAd3asqOcnyg776-4a9THhg1dYxXD",
+"parentId": "12TuQQMDvq4pKFYNHx9obGdGCyzjSjTNP",
+"kind": "P",
+"size": 40052090,
+"title": "MS - Padam Puran, Gurmukhi MS (Kurukshetra MN 000025).pdf"
+},
+"1v_EGgBxI2EbH35jy8-nkrk7g2D0WvazD": {
+"id": "1v_EGgBxI2EbH35jy8-nkrk7g2D0WvazD",
+"parentId": "12TuQQMDvq4pKFYNHx9obGdGCyzjSjTNP",
+"kind": "P",
+"size": 37809526,
+"title": "MS - Padam Puran in Hindi, Gurmukhi MS (Kurukshetra MN 000398).pdf"
+},
+"18REMHI5NKmW-ipr9eiF74gFDhMuYDXXw": {
+"id": "18REMHI5NKmW-ipr9eiF74gFDhMuYDXXw",
+"parentId": "1NFEMhT-JgH5ZAXl3q-jpbFwSiQIm1OMG",
+"kind": "P",
+"size": 36649325,
+"title": "Early print - Amarakosa with the commentary of Maheshvara (Bombay 1882).pdf"
+},
+"15lULGHG1GuWC8BSStnST9I-MpIIzUm8S": {
+"id": "15lULGHG1GuWC8BSStnST9I-MpIIzUm8S",
+"parentId": "1AQVZl0xI6Y_Bwkr4TMb3ahORxpFRiTVs",
+"kind": "P",
+"size": 34891624,
+"title": "Early print - Sri Guru Granth Sahib ji ad di Uthanka, Bhai Gian Singh, Lahore.zip"
+},
+"1UQ5yJWO-dNnFZ8vtT8_wsOGmLIUiK_Zj": {
+"id": "1UQ5yJWO-dNnFZ8vtT8_wsOGmLIUiK_Zj",
+"parentId": "1dS8h6otOBfMwx8l4weVRi2Nm2VrLlRpR",
+"kind": "P",
+"size": 32967313,
+"title": "Early print - Linga Purana, ed. Jivananda Vidyasagar (Calcutta 1885).pdf"
+},
+"1870fog_wx4Dy7cgMzTDy1XdKfuqx97IW": {
+"id": "1870fog_wx4Dy7cgMzTDy1XdKfuqx97IW",
+"parentId": "1PxDkNJCHnN-BrCqq2NAZxN4KI-Ew7ddf",
+"kind": "P",
+"size": 32449553,
+"title": "MS - Adi-anta-vihin Vedanta, Gurmukhi MS, Kurukshetra Univ. MN-000030.pdf"
+},
+"1pJzvoC8oCqAdvTzxPPJfBGIwzZEC3tf_": {
+"id": "1pJzvoC8oCqAdvTzxPPJfBGIwzZEC3tf_",
+"parentId": "1rfb1BkDK6DCnP4uTccikBhxTt5qPcVby",
+"kind": "P",
+"size": 30377693,
+"title": "MS - Bahar-i-danish, Persian MS (Jamia Millia, DLI).pdf"
+},
+"1obfRp7W0mJweWzwYDJUgGUJJrp_MXtOg": {
+"id": "1obfRp7W0mJweWzwYDJUgGUJJrp_MXtOg",
+"parentId": "1rVnm1fnVnDR0wmwLWj8xg_Ai7km-SURV",
+"kind": "P",
+"size": 28900127,
+"title": "Early print - Shahnameh, Persian text ed. Turner Macan (Calcutta 1829), vol. 1 of 4.pdf"
+},
+"1VPuuGltmi7OzF0KiigJAunewtQQoZeha": {
+"id": "1VPuuGltmi7OzF0KiigJAunewtQQoZeha",
+"parentId": "1p8lqI_Xpa6O6LZHyWjO6VgJfhpjVXLC2",
+"kind": "P",
+"size": 28091434,
+"title": "Early print - Burnouf, Le Bhagavata Purana, text and French translation (1840).pdf"
+},
+"16MO7ein2g69BcVkf43kA--aSWN8H78m3": {
+"id": "16MO7ein2g69BcVkf43kA--aSWN8H78m3",
+"parentId": "1xHEVbmRROvIoXG_hP1fFhnCWA-0jQJos",
+"kind": "P",
+"size": 26730535,
+"title": "MS - Bhagwata Mahapuran, Gurmukhi MS (Kurukshetra MN 003300).pdf"
+},
+"1lLJg7AXI--Q4d87oPRYP3brJg0X5VWB-": {
+"id": "1lLJg7AXI--Q4d87oPRYP3brJg0X5VWB-",
+"parentId": "1rfb1BkDK6DCnP4uTccikBhxTt5qPcVby",
+"kind": "P",
+"size": 25560846,
+"title": "Early print - Bahar-i-danish, Persian text.pdf"
+},
+"1pkZRAz39e7oYra-o-vd-dIMtt7NRlJ4v": {
+"id": "1pkZRAz39e7oYra-o-vd-dIMtt7NRlJ4v",
+"parentId": "1MzIUgDwQECGT6_Pofci1UH-j7rEU-jmg",
+"kind": "P",
+"size": 23826128,
+"title": "MS - Shalihotra, Gurmukhi MS, Kurukshetra University MN-000049.pdf"
+},
+"1rnuDW5qF-w7GZLFYl2S0TBjZaJfiz63O": {
+"id": "1rnuDW5qF-w7GZLFYl2S0TBjZaJfiz63O",
+"parentId": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"kind": "P",
+"size": 21888519,
+"title": "Early print - Bhasha Bhushan (DLI).pdf"
+},
+"1ruVo5UG7ibGyj54QArIYaQxJVJABS_rS": {
+"id": "1ruVo5UG7ibGyj54QArIYaQxJVJABS_rS",
+"parentId": "1rEzcVAvQW6eYJYL3BfwUTdryVDGT6dwl",
+"kind": "P",
+"size": 21708791,
+"title": "Early print - The Varaha Purana, fasc. 1, Bibliotheca Indica, ed. Hrishikesa Sastri.pdf"
+},
+"1UrZG4InZkYxhdRyWrYUhjvYkUTbUSuWf": {
+"id": "1UrZG4InZkYxhdRyWrYUhjvYkUTbUSuWf",
+"parentId": "1_1UPFgQP_mDXmX_EzHfA1tsrZVXt30rQ",
+"kind": "P",
+"size": 20709550,
+"title": "Early print - Adhyatma Prakash, 'Kavi Shukdev krit' (Shri Venkateshwar Press, Bombay.pdf"
+},
+"1W012GmP5iG726OmvsZF_0wpTWP1rz6Hy": {
+"id": "1W012GmP5iG726OmvsZF_0wpTWP1rz6Hy",
+"parentId": "1rfb1BkDK6DCnP4uTccikBhxTt5qPcVby",
+"kind": "P",
+"size": 19539424,
+"title": "Early print - Bahar-e-Danish, Persian text.pdf"
+},
+"1f_kT3bE1fOJ-vF6BzFUElxJiBfbpWumI": {
+"id": "1f_kT3bE1fOJ-vF6BzFUElxJiBfbpWumI",
+"parentId": "1Vfhdi2IUgGznfPX8Sanw28KKW8kbmVrk",
+"kind": "P",
+"size": 19472026,
+"title": "Early print - Sahyadri Khanda of the Skanda Purana, ed. J. Gerson da Cunha (1877).pdf"
+},
+"1nkelB062P84h-x2MBKSfdLK8ZRL48D8I": {
+"id": "1nkelB062P84h-x2MBKSfdLK8ZRL48D8I",
+"parentId": "1Vfhdi2IUgGznfPX8Sanw28KKW8kbmVrk",
+"kind": "P",
+"size": 18785112,
+"title": "MS - Kartik Mahatmya (Skanda Padma tradition), Gurmukhi MS, Kurukshetra Uni.pdf"
+},
+"1txOcQEzJ4FLcXIGZF4BpGeCZo43UgSP5": {
+"id": "1txOcQEzJ4FLcXIGZF4BpGeCZo43UgSP5",
+"parentId": "1_1UPFgQP_mDXmX_EzHfA1tsrZVXt30rQ",
+"kind": "P",
+"size": 17318112,
+"title": "Early print - Adhyatma Prakash, Venkateshwar Press reprint (1997).pdf"
+},
+"1UEdLGObAQALbnP58y5J1PmFMQEpC1Tkc": {
+"id": "1UEdLGObAQALbnP58y5J1PmFMQEpC1Tkc",
+"parentId": "16mOf_yMIcWtzPzOXox5vJdHH3AUqAYV8",
+"kind": "P",
+"size": 17275017,
+"title": "Early print - Sri Naradiya Mahapuranam, Khemraj (Venkateshwar) text, Nag Publishers.pdf"
+},
+"1LCQJfR_54O_Uka2JGT4w9tDjhgau8-zw": {
+"id": "1LCQJfR_54O_Uka2JGT4w9tDjhgau8-zw",
+"parentId": "188WTynSrp5XW1aXIzhlZhGYMn0e8p3SU",
+"kind": "P",
+"size": 15950165,
+"title": "Early print - Hirde Ram Bhalla, Hanuman Natak (1899 print), Act 1 Parashurama dialog.pdf"
+},
+"1BGrvwYTxULgph25ZLojdH-ihYvGqDtlO": {
+"id": "1BGrvwYTxULgph25ZLojdH-ihYvGqDtlO",
+"parentId": "1GyGv0lEc0PV8SrUWl-Qr_S7ztfvgpPQW",
+"kind": "P",
+"size": 14910818,
+"title": "MS - Mujarrabat-i Akbari, Persian MS (DLI 2015.351921).pdf"
+},
+"1uhbzWUP2PTk72dlV7tHBvRbp4EyNHEi2": {
+"id": "1uhbzWUP2PTk72dlV7tHBvRbp4EyNHEi2",
+"parentId": "12OqcN3iXJquvDt4nHQii71wxjv-2w2X1",
+"kind": "P",
+"size": 13189353,
+"title": "MS - Bhasha Bhushan, Devanagari MS (LBS Sanskrit Univ. #654).pdf"
+},
+"13LBoruW60PD-HEUPINdLZMWTbIXd00CK": {
+"id": "13LBoruW60PD-HEUPINdLZMWTbIXd00CK",
+"parentId": "1akComdS_rs2Y3YvjHqQ0HLq_MEJW5rCr",
+"kind": "P",
+"size": 12387309,
+"title": "Early print - Gulistan, Persian text ed. A. Sprenger (Calcutta 1851).pdf"
+},
+"1AchbKqIdbvjoYpiAHP9VfYOl0Okf7Ehb": {
+"id": "1AchbKqIdbvjoYpiAHP9VfYOl0Okf7Ehb",
+"parentId": "1MlI26uVTmGRJNApveBpWFmRIOC9kU1K_",
+"kind": "P",
+"size": 11710430,
+"title": "Early print - Akali Kaur Singh Nihang (ed.), Sri Gur Sobha, Pardesi Malwa Press, Amr.pdf"
+},
+"1H2VvrD18JMhk-Z0WelyaA6OfDgs8LENZ": {
+"id": "1H2VvrD18JMhk-Z0WelyaA6OfDgs8LENZ",
+"parentId": "14f4W_YASecFG5M1v-ayKr0jpiABVDLQ9",
+"kind": "P",
+"size": 11683535,
+"title": "Early print - Bhoj Prabandh vol. I (DLI).pdf"
+},
+"1M6kQN-0P-chxyGhROx6o9hFszwA9EjQN": {
+"id": "1M6kQN-0P-chxyGhROx6o9hFszwA9EjQN",
+"parentId": "1UphB3j18rNxirr83ggrBXV-oeJIi9y2t",
+"kind": "P",
+"size": 11303781,
+"title": "Early print - Guru Gita Stotra, Calcutta.pdf"
+},
+"1mX7nOSiL4AVeaHNQUVmcYZUg5KVnh6w5": {
+"id": "1mX7nOSiL4AVeaHNQUVmcYZUg5KVnh6w5",
+"parentId": "1lswRE86UAjHinMhlj9bQzuW_66JSOiaR",
+"kind": "P",
+"size": 9675479,
+"title": "Early print - Sanhita of the Sama-Veda, Sanskrit text (London 1843, Stevenson ed.).pdf"
+},
+"1gFigy3X_aQgo-g8cYyKVEADpE_Deicwq": {
+"id": "1gFigy3X_aQgo-g8cYyKVEADpE_Deicwq",
+"parentId": "1TJrY4-n_XnhuTFhZ5jGqdAH8dSYnMewN",
+"kind": "P",
+"size": 6071857,
+"title": "Early print - Agni Purana vol. 2 (ch. 115-268), Bibliotheca Indica, ed. Rajendralala.pdf"
+},
+"1FnviJytSoVXZKjRlSrGkCp6vuaOFKCjx": {
+"id": "1FnviJytSoVXZKjRlSrGkCp6vuaOFKCjx",
+"parentId": "1OIq_B0OcXnO7dnsuj9AhcfmcarYMShzc",
+"kind": "P",
+"size": 4613379,
+"title": "MS - Adhyatam Ramayana, Gurmukhi MS (PU MS 507).pdf"
+},
+"1UrgtmePurjxC1EJs8Q-h4T8o5O2CcSAj": {
+"id": "1UrgtmePurjxC1EJs8Q-h4T8o5O2CcSAj",
+"parentId": "1xJlccW0aWYsmls2ToB2i1GwHevceNSBX",
+"kind": "P",
+"size": 3990869,
+"title": "MS - Bostan, Persian manuscript, vol. 2 (DLI 247100).pdf"
+},
+"1hRn8hExaVtPkTUShQ3klVN99cKmwqyWk": {
+"id": "1hRn8hExaVtPkTUShQ3klVN99cKmwqyWk",
+"parentId": "",
+"kind": "F",
+"size": 0,
+"title": "06 Sikhi & Gurbani"
+},
+"1DBVgiM1f4OimujRMwQApO35eHI-qIdi7": {
+"id": "1DBVgiM1f4OimujRMwQApO35eHI-qIdi7",
+"parentId": "",
+"kind": "F",
+"size": 0,
+"title": "Desktop / Gurmukhi Project 2025"
+},
+"1C6bCWx_HKLQ6IJZ_X3ldDfm4gdrWfawZ": {
+"id": "1C6bCWx_HKLQ6IJZ_X3ldDfm4gdrWfawZ",
+"parentId": "",
+"kind": "F",
+"size": 0,
+"title": "Desktop / Santhya Library"
+}
+}
+}
