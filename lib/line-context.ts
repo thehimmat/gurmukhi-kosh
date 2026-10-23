@@ -11,9 +11,19 @@ import { SOURCE_COLUMNS, type SourceMeta } from "./sources";
 import type { LineVishraam } from "./vishraam";
 import { narrowerThanShabad, pickPassage } from "./passages";
 
+/**
+ * A line page's path. The curator (?key=ADMIN_KEY) gets the admin line pages, which read through the
+ * service role and so can show a curator-only corpus (migration 070); the public pages, cached for a
+ * day, read through the anon key.
+ */
+export function linePath(id: number, scope: Scope, curatorKey: string | null = null): string {
+  const path = scope === "ang" ? `/line/${id}/ang` : `/line/${id}`;
+  return curatorKey ? `/admin${path}?key=${encodeURIComponent(curatorKey)}` : path;
+}
+
 /** The viewer link for a line: its context page, scrolled to and marking it. */
-export function lineHref(id: number): string {
-  return `/line/${id}#line-${id}`;
+export function lineHref(id: number, curatorKey: string | null = null): string {
+  return `${linePath(id, "passage", curatorKey)}#line-${id}`;
 }
 
 // `i` is a word's index among the line's space-separated tokens, the index
