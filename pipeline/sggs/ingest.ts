@@ -22,6 +22,7 @@ import { fetchAng, type BaniDBSourceId, type BaniDBVerse } from "../../lib/banid
 import { tokenize } from "../../lib/tokenizer";
 import { sleep, parseArgs, progress } from "../shared/utils";
 import { shabadUpsertRow } from "./shabad-meta";
+import { correctLine } from "./corrections";
 
 // Registry: our sources.code → the BaniDB SourceID and the source's page
 // count ("ang" = the source's own page unit; for Bhai Gurdas, the vaar).
@@ -84,12 +85,20 @@ async function processAng(
   db: ReturnType<typeof supabaseAdmin>,
   ang: number,
   sourceFk: number,
+  sourceCode: string,
   banidbSource: BaniDBSourceId
 ) {
   const data = await fetchAng(ang, banidbSource);
 
   for (const verse of data.page) {
     await upsertShabad(db, verse);
+
+    // Lines BaniDB has mistyped (corrections.ts). A stale entry means BaniDB's line changed
+    // since we recorded it: likely fixed upstream, so check the entry and retire it.
+    const line = correctLine(sourceCode, verse.verseId, verse.verse.unicode, verse.transliteration?.english ?? null);
+    if (line.status === "stale") {
+      console.warn(`\nCorrection for verse ${verse.verseId} no longer matches BaniDB's line; kept BaniDB's. Check pipeline/sggs/corrections.ts.`);
+    }
 
     const { data: lineData, error: lineErr } = await db
       .from("lines")
@@ -100,9 +109,9 @@ async function processAng(
           shabad_id: verse.shabadId,
           ang: verse.pageNo,
           line_no: verse.lineNo,
-          gurmukhi: verse.verse.unicode,
+          gurmukhi: line.gurmukhi,
           translation_en: verse.translation?.en?.bdb ?? verse.translation?.en?.ms ?? null,
-          transliteration_en: verse.transliteration?.english ?? null,
+          transliteration_en: line.transliteration,
         },
         { onConflict: "source_fk,verse_id" }
       )
@@ -115,7 +124,7 @@ async function processAng(
     }
 
     const lineId = lineData.id;
-    const tokens = tokenize(verse.verse.unicode);
+    const tokens = tokenize(line.gurmukhi);
     if (tokens.length === 0) continue;
 
     const { error: wordErr } = await db.from("words").upsert(
@@ -175,7 +184,7 @@ async function main() {
 
   for (let ang = start; ang <= end; ang++) {
     try {
-      await processAng(db, ang, sourceFk, corpus.banidbSource);
+      await processAng(db, ang, sourceFk, args.sourceCode, corpus.banidbSource);
       progress(ang, end, t0, "Ang ");
     } catch (err) {
       console.error(`\nFailed ang ${ang}:`, err);
