@@ -964,7 +964,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                     {/* Opens the line in its shabad (the viewer, #146), for
                         every corpus; each pages in its own unit (Bhai Gurdas:
                         the vaar; Dasam Bani: its own angs). */}
-                    <a href={lineHref(line.id)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
+                    <a href={lineHref(line.id, curatorKey)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
                       {placeLabel(line.sources, line.ang)}
                       {line.sources && !isSggs(line.sources) && <>{" · "}{line.sources.name}</>}
                     </a>

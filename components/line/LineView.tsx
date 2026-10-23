@@ -1,7 +1,8 @@
 import {
-  GRID_ID, VIEWS, defaultSources, gridAttributes, lineParts, sourceLabel, viewerCss,
+  GRID_ID, VIEWS, defaultSources, gridAttributes, linePath, lineParts, sourceLabel, viewerCss,
   type LineContext, type PickerState, type ViewId,
 } from "@/lib/line-context";
+import { withCuratorKey } from "@/lib/curator";
 import { isSggs, placeLabel } from "@/lib/sources";
 import { vishraamSets, wordMarks } from "@/lib/vishraam";
 import { ResourcePicker } from "./ResourcePicker";
@@ -16,9 +17,9 @@ import { VishraamPicker } from "./VishraamPicker";
 const META: React.CSSProperties = { fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)" };
 const NAV: React.CSSProperties = { fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--accent)" };
 
-const scopePath = (id: number, scope: LineContext["scope"]) => (scope === "ang" ? `/line/${id}/ang` : `/line/${id}`);
-
-export function LineView({ ctx }: { ctx: LineContext }) {
+// curatorKey: the page is an admin line page (/admin/line/…), whose links keep to the admin pages.
+export function LineView({ ctx, curatorKey = null }: { ctx: LineContext; curatorKey?: string | null }) {
+  const scopePath = (id: number, scope: LineContext["scope"]) => linePath(id, scope, curatorKey);
   const first = ctx.lines[0];
   const sggs = isSggs(ctx.source);
   const angs = [...new Set(ctx.lines.map((l) => l.ang))];
@@ -71,7 +72,7 @@ export function LineView({ ctx }: { ctx: LineContext }) {
       <header style={{ margin: "1.5rem 0 1rem", display: "flex", flexWrap: "wrap", gap: "0.25rem 1.25rem", alignItems: "baseline" }}>
         <span style={{ ...META, fontWeight: 600, color: "var(--text-primary)" }}>{ctx.source?.name ?? "Gurbani"}</span>
         {sggs && angs.length === 1 && ctx.scope === "passage"
-          ? <a href={`/line/${ctx.lineId}/ang${target}`} style={META}>{place}</a>
+          ? <a href={`${scopePath(ctx.lineId, "ang")}${target}`} style={META}>{place}</a>
           : <span style={META}>{place}</span>}
         {ctx.passage && (
           <span style={META}>
@@ -123,7 +124,7 @@ export function LineView({ ctx }: { ctx: LineContext }) {
                     const marks = wordMarks(line.vishraam, part.i ?? -1);
                     const data = marks ? Object.fromEntries(Object.entries(marks).map(([k, v]) => [`data-${k}`, v])) : {};
                     return (
-                      <a key={j} className="viewer-word" href={`/word/${encodeURIComponent(part.word)}`}>
+                      <a key={j} className="viewer-word" href={withCuratorKey(`/word/${encodeURIComponent(part.word)}`, curatorKey)}>
                         {marks ? <span className="vishraam" {...data}>{part.text}</span> : part.text}
                       </a>
                     );
