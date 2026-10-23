@@ -3,7 +3,7 @@
 // occurrences that breaks placement shows up here. Groundwork for #165.
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb } from "./stories/helpers";
+import { viewFor } from "./stories/helpers";
 import { parsePadarth } from "../lib/padarth/parse";
 import { alignTerms, type TermMatch } from "../lib/padarth/align";
 
@@ -14,9 +14,16 @@ const PAURI_1 = [5, 6, 7, 8, 9, 10];
 
 describe("pad-arth parse + align on Japji Pauri 1", () => {
   const placed: { term: string; match: TermMatch | null; tokens: string[] }[] = [];
+  // The pad-arth is curator-only until permission arrives (#264): read through viewFor, and skip
+  // when no available key can see it.
+  let hidden = false;
 
   beforeAll(async () => {
-    const db = anonDb();
+    const db = await viewFor(["ss_padarth"]);
+    if (!db) {
+      hidden = true;
+      return;
+    }
     const [o, p] = await Promise.all([
       db.from("word_occurrences").select("line_id, position, words(gurmukhi)").in("line_id", PAURI_1),
       db.from("line_translations").select("line_id, body_unicode").in("line_id", PAURI_1).eq("source_code", "ss_padarth"),
@@ -33,13 +40,15 @@ describe("pad-arth parse + align on Japji Pauri 1", () => {
     }
   });
 
-  it("places nearly every glossed term on a word of its own line", () => {
+  it("places nearly every glossed term on a word of its own line", (ctx) => {
+    if (hidden) return ctx.skip();
     expect(placed.length).toBeGreaterThan(20);
     const hits = placed.filter((p) => p.match !== null).length;
     expect(hits / placed.length).toBeGreaterThan(0.9);
   });
 
-  it("finds the phrases, including one whose words are apart", () => {
+  it("finds the phrases, including one whose words are apart", (ctx) => {
+    if (hidden) return ctx.skip();
     const at = (term: string) => placed.find((p) => p.term === term)?.match;
     expect(at("ਨ ਹੋਵਈ")?.positions).toEqual([2, 3]);
     expect(at("ਕੂੜੈ ਪਾਲਿ")).toEqual({ positions: [4, 6], match: "gapped" });

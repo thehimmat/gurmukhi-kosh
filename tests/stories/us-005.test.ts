@@ -48,9 +48,12 @@ describe("US-005: per-line commentary and etymology", () => {
   // Enforced once 069 is live; until then the Darpan is still public.
   it("US-005: the public sees no Darpan commentary (#264)", async (ctx) => {
     if (!(await visibilityLive())) return ctx.skip();
+    // Lines 5-10 (Japji Pauri 1) carry both. Asking the whole table instead makes Postgres scan
+    // every row the policy hides, past the anon statement timeout.
     const { data, error } = await pub
       .from("line_translations")
       .select("id")
+      .in("line_id", [5, 6, 7, 8, 9, 10])
       .in("source_code", ["ss_darpan", "ss_padarth"])
       .limit(1);
     expect(error).toBeNull();
