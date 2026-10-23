@@ -83,9 +83,14 @@ Run the build to see the full list.
 2. `npm run build:gur-sobha -- <extract.jsonl> <out.json> <load.sql>` writes the rows and the SQL
    that loads them. It prints 3,708 lines, 483 shabads, 20 chapters, 23,736 words (4,789 distinct)
    and the numbering breaks.
-3. Apply migrations 070 (curator-only corpora) and 071 (this source and its 483 shabads), then run
-   `<load.sql>`. Then run `refresh_word_frequencies`,
-   `refresh_word_corpus_stats`, `refresh_word_corpus_writer_stats` and `refresh_line_first_letters`.
+3. Apply migrations 070 (curator-only corpora) and 071 (this source and its 483 shabads); both are
+   in production (`supabase/APPLIED.md`). Then load the lines and refresh the stats:
+   `npm run load:gur-sobha -- <out.json>`, with `NEXT_PUBLIC_SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY` set. It loads through the REST API (`pipeline/shared/load-lines.ts`)
+   and then runs `refresh_word_frequencies`, `refresh_word_corpus_stats`,
+   `refresh_word_corpus_writer_stats` and `refresh_line_first_letters`. Re-running is a no-op apart
+   from the refreshes. Where only SQL reaches the database, run `<load.sql>` and those four
+   functions instead.
 4. Fill the new words' `ipa_display` and `search_fold` (`npm run pronounce`, `npm run searchfold`).
 
 ## Tests
