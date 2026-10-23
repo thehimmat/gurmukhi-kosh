@@ -1,6 +1,7 @@
 /**
  * Load the built Sri Gur Sobha lines (build.ts's <out.json>) into Supabase with the service key,
- * then refresh the word frequencies, per-corpus and per-writer stats and first-letter keys.
+ * then refresh the word frequencies, per-corpus and per-writer stats, first-letter keys and the
+ * /health totals.
  *
  *   npm run load:gur-sobha -- <out.json>
  *
@@ -39,6 +40,7 @@ async function main() {
     "refresh_word_corpus_stats",
     "refresh_word_corpus_writer_stats",
     "refresh_line_first_letters",
+    "refresh_health_stats",
   ] as const) {
     const { error } = await db.rpc(fn);
     if (error) {

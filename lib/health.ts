@@ -1,7 +1,8 @@
-// Data-quality / coverage stats for the /health dashboard. Recomputed live on
-// every load (no snapshot table) so it always reflects the current database.
+// Data-quality / coverage stats for the /health dashboard. Open flags are counted
+// live on every load; the slower totals come from health_stats_cache, which the
+// ingests refresh (073), and the "Totals last recomputed" metric says how old they are.
 //
-// Most metrics come from the `health_stats()` Postgres RPC (013_health_stats.sql) —
+// Most metrics come from the `health_stats()` Postgres RPC (013, 073) —
 // PostgREST can't express distinct-counts or group-bys directly, so that single
 // call returns every pure-SQL aggregate as one jsonb blob. The one metric that
 // needs TS logic (grammar_conflicts / polysemy) reuses buildGrammarView, the same
@@ -14,6 +15,7 @@ import { supabase } from "./supabase";
 import { buildGrammarView } from "./grammar-view";
 import { fetchAllRows } from "./fetch-all-rows";
 import { fetchPosMap } from "./word-data";
+import { statsAgeMetric } from "./health-age";
 import type { WordGrammarWithRule } from "./supabase";
 import legendJson from "../pipeline/mahan-kosh/abbreviations.json";
 
@@ -41,6 +43,9 @@ export interface HealthReport {
 }
 
 type HealthStats = {
+  stats_computed_at: string | null;
+  stats_age_seconds: number | null;
+
   total_words: number;
   total_lines: number;
   total_angs: number;
@@ -218,6 +223,8 @@ export async function computeHealth(): Promise<HealthReport> {
   const [mkParseM, mkSplitM] = await Promise.all([mkParseStalenessMetric(s), mkSenseSplitMetrics()]);
 
   const metrics: Metric[] = [
+    statsAgeMetric(s.stats_computed_at, s.stats_age_seconds),
+
     // Corpus / ingest
     { key: "total_words", label: "Unique words indexed", group: "Corpus", value: s.total_words },
     { key: "total_lines", label: "Lines ingested", group: "Corpus", value: s.total_lines },
