@@ -412,3 +412,14 @@ checked against the 1912 Sodhak print, the Hazur Sahib larivaar and a 19th-c. Ug
 281 → 274, ਭਾਂਗ 2 → 9, ਮੁਹਿ, ਘੇਰਿ, ਤੈਂ, ਨ, ਕਹਾ, ਬੁੱਧਿ, ਜੋਊ +1, ਕਹ −1, both stats tables matching occurrences;
 the numerals in 130073 and 130171 still span ੩੬ and ੫੮. `bigrams` and `collocations` catch up on the next
 `pipeline/compute` run.
+
+**075_health_stats_cache** — applied 2026-10-24 with the MCP's `apply_migration`, under the name it had then (ledger
+row `20261024171652 073_health_stats_cache`). Kosh `075_health_stats_cache.sql`, as in the repo; it was
+`073_health_stats_cache.sql` until `073_dasam_banidb_corrections` (#304) and `074_trim_indexes` were found to have taken
+073 and 074 first, so the file was renumbered to keep one migration per number. The two don't touch the same objects,
+so the replay's order (dasam 073, 074, then this) gives the same schema as production's. `health_stats()` had taken
+17.2 s (explain analyze, 2026-10-23); every total only an ingest changes is now computed by `refresh_health_stats()`
+into `health_stats_cache`, and `health_stats()` counts only open flags and the source registries live. Checked after:
+`health_stats()` 5.6 ms warm (497 ms on its first call); cache totals unchanged at 172,604 lines and 1,430 angs, with
+1,113,816 occurrences; anon and authenticated can execute neither `refresh_health_stats` nor `refresh_computed_stats`
+and cannot read `health_stats_cache` (RLS on); `/api/health` 200 with "Totals last recomputed: 2 min ago".

@@ -1,4 +1,4 @@
-// How old health_stats()' cached totals are (073). Only open flags and the source
+// How old health_stats()' cached totals are (075). Only open flags and the source
 // registries are counted live; everything else is as of the last refresh_health_stats(),
 // which the ingests and refresh_computed_stats() run.
 
