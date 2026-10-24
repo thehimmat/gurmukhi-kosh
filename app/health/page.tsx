@@ -172,7 +172,7 @@ export default async function HealthPage() {
           Data Health
         </h1>
         <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-          Recomputed on every load · {new Date(report.generatedAt).toLocaleString()}
+          Flags counted live, totals as of the last refresh · {new Date(report.generatedAt).toLocaleString()}
         </p>
       </div>
 
