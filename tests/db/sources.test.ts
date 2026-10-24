@@ -35,6 +35,8 @@ describe("065: sources metadata", () => {
         searched_by_default: true, external_refs: { banidb: "G", shabados: "SGGS" } },
       { code: "dasam_banidb_v2", slug: "dasam", kind: "scripture", tier: "gurbani", rank: 10, page_unit: "Ang",
         searched_by_default: true, external_refs: { banidb: "D", shabados: "SDGR" } },
+      { code: "chandi_charitar_2_dg", slug: "chandi-charitar-2", kind: "scripture", tier: "gurbani", rank: 15,
+        page_unit: "Page", searched_by_default: false, external_refs: { banidb: "D" } },
       { code: "sarbloh_budha_dal", slug: "sarbloh", kind: "scripture", tier: "gurbani", rank: 20, page_unit: "Ang",
         searched_by_default: false, external_refs: { shabados: "SRBL" } },
       { code: "bhai_gurdas_banidb_v2", slug: "bhai-gurdas-vaaran", kind: "poetry", tier: "historical", rank: 30,

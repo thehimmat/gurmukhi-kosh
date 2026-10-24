@@ -32,6 +32,8 @@
     "build:sarbloh": "tsx pipeline/sarbloh/build.ts",
     "build:gur-sobha": "tsx pipeline/gur-sobha/build.ts",
     "load:gur-sobha": "tsx pipeline/gur-sobha/load.ts",
+    "build:chandi-charitar-2": "tsx pipeline/chandi-charitar-2/build.ts",
+    "load:chandi-charitar-2": "tsx pipeline/chandi-charitar-2/load.ts",
     "build:nand-lal": "tsx pipeline/nand-lal/build.ts",
     "scans:collate": "tsx pipeline/scans/collate-cli.ts",
     "teardown": "tsx pipeline/teardown.ts",

@@ -51,6 +51,7 @@ describe("the replayed schema", () => {
       { id: 4, code: "sarbloh_budha_dal" },
       { id: 6, code: "nand_lal_ghazals" },
       { id: 7, code: "gur_sobha_iss" },
+      { id: 9, code: "chandi_charitar_2_dg" },
     ]);
   });
 
