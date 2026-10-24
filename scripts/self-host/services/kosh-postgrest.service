@@ -1,0 +1,16 @@
+# systemd unit (Ubuntu). setup.sh services fills in @@...@@ and installs it to /etc/systemd/system.
+[Unit]
+Description=PostgREST for gurmukhi-kosh
+After=postgresql.service network-online.target
+Requires=postgresql.service
+
+[Service]
+User=@@USER@@
+ExecStart=@@POSTGREST@@ @@PREFIX@@/etc/postgrest.conf
+# SIGUSR1 reloads the schema cache, SIGUSR2 the config, without dropping connections.
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+# Serves PostgREST at /rest/v1, the path supabase-js builds every request on
+# (`${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/<table>`). Caddy because it is one static binary on both
+# macOS (brew) and Ubuntu (apt), and needs no config beyond this file. Behind a Cloudflare Tunnel
+# it serves plain HTTP on localhost (the tunnel terminates TLS); on a VPS with its own domain,
+# replace ":8000" with the domain name and Caddy fetches a certificate itself.
+#
+# Supabase's gateway (Kong) also rejects requests whose `apikey` header is not one of the project
+# keys. PostgREST has no such gate: a request with no JWT runs as anon, which is what the anon key
+# grants anyway, so nothing is lost. A request with only `apikey` (no Authorization) has the key
+# promoted to a bearer token, as Kong does, so curl examples written for Supabase still work.
+{
+	admin off
+}
+
+:8000 {
+	@apikey_only {
+		header apikey *
+		not header Authorization *
+	}
+	request_header @apikey_only Authorization "Bearer {http.request.header.apikey}"
+
+	handle_path /rest/v1/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# Plain liveness probe for the tunnel / uptime checks.
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle {
+		respond "not found" 404
+	}
+}

@@ -1,0 +1,22 @@
+# PostgREST config, matching what Supabase's hosted PostgREST does for this app. setup.sh fills in
+# the @@...@@ placeholders and writes it to $PREFIX/etc/postgrest.conf (mode 600: it holds secrets).
+db-uri = "postgres://authenticator:@@AUTHENTICATOR_PASSWORD@@@@@DB_HOST@@:5432/@@DB_NAME@@"
+# Only public: the app reads nothing else, and akhar is for its own writer role, not the API.
+db-schemas = "public"
+db-anon-role = "anon"
+db-extra-search-path = "public, extensions"
+# Supabase's max-rows. Keeping it means lib/fetch-all-rows.ts pages exactly as it does in
+# production; raising it would hide paging bugs locally that then bite on Supabase.
+db-max-rows = 1000
+# A 2015 MacBook Pro has 2 cores; 10 connections is plenty for the app's request rate.
+db-pool = 10
+db-pool-acquisition-timeout = 10
+# The same HS256 secret mint-jwt.mjs signed the keys with.
+jwt-secret = "@@JWT_SECRET@@"
+jwt-secret-is-base64 = false
+# Only the proxy talks to PostgREST.
+server-host = "127.0.0.1"
+server-port = 3000
+# Lets setup.sh / migrations reload the schema cache with NOTIFY pgrst, 'reload schema'.
+db-channel-enabled = true
+log-level = "warn"

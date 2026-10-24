@@ -1,0 +1,27 @@
+# Cloudflare Tunnel: exposes the home machine's Caddy (:8000) at https://<hostname> without opening
+# a port on the home router or needing a static IP. Free with a Cloudflare account and a domain on
+# Cloudflare DNS.
+#
+# One-time, on the home machine:
+#   cloudflared tunnel login                         # browser: pick the domain
+#   cloudflared tunnel create kosh-db                # prints the tunnel UUID, writes credentials
+#   cloudflared tunnel route dns kosh-db db.example.org
+#   cp scripts/self-host/cloudflared.yml.template ~/.cloudflared/config.yml   # then fill in below
+#   cloudflared tunnel run kosh-db                   # try it in the foreground first
+# Run it as a service:
+#   Ubuntu: sudo cloudflared --config ~/.cloudflared/config.yml service install
+#           (copies the config to /etc/cloudflared; systemd unit cloudflared.service)
+#   macOS:  sudo cloudflared service install         # launchd daemon; reads /etc/cloudflared/config.yml
+#           (sudo mkdir -p /etc/cloudflared && sudo cp ~/.cloudflared/config.yml ~/.cloudflared/<UUID>.json /etc/cloudflared/,
+#            and point credentials-file below at /etc/cloudflared/<UUID>.json)
+#
+# Then NEXT_PUBLIC_SUPABASE_URL=https://db.example.org
+tunnel: <TUNNEL-UUID>
+credentials-file: /home/<user>/.cloudflared/<TUNNEL-UUID>.json   # macOS: /Users/<user>/...
+
+ingress:
+  # Only the API path and the liveness probe; everything else 404s at the edge.
+  - hostname: db.example.org
+    path: ^/(rest/v1/|healthz$)
+    service: http://127.0.0.1:8000
+  - service: http_status:404
