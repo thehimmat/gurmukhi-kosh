@@ -1,0 +1,69 @@
+name: Weekly database backup
+
+# A pg_dump of the production database, encrypted, kept as a workflow artifact for 90 days
+# (about 12 weekly copies). Supabase's Free plan keeps no backups of its own. The repo is public
+# and artifacts are readable by anyone who can read it, so the dump is encrypted before upload:
+# it holds curator-only texts. Restore steps: supabase/BACKUP.md.
+#
+# Secrets:
+#   SUPABASE_DB_URL     session-pooler connection string (port 5432), from the dashboard's
+#                       Connect button. The direct db.<ref> host is IPv6-only, which runners lack.
+#   BACKUP_PASSPHRASE   long random passphrase; keep a copy outside GitHub or the backups are lost.
+
+on:
+  schedule:
+    - cron: "17 9 * * 0" # Sundays 09:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install pg_dump 17 (the server's major version)
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+      - name: Dump and encrypt
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          test -n "$SUPABASE_DB_URL" || { echo "::error::SUPABASE_DB_URL secret is not set"; exit 1; }
+          test -n "$BACKUP_PASSPHRASE" || { echo "::error::BACKUP_PASSPHRASE secret is not set"; exit 1; }
+          set -o pipefail
+          name="kosh-$(date -u +%Y-%m-%d).dump.gpg"
+          # Custom format (compressed; pg_restore can pick tables, and drop owners and grants at
+          # restore time), schemas the app owns only: Supabase recreates auth/storage itself.
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+              --format=custom \
+              --schema=public --schema=akhar --schema=supabase_migrations \
+            | gpg --batch --yes --pinentry-mode loopback --symmetric --cipher-algo AES256 \
+                  --passphrase-fd 3 --output "$name" 3<<<"$BACKUP_PASSPHRASE"
+          # A dump that failed part-way is short: refuse anything implausibly small.
+          size=$(stat -c %s "$name")
+          echo "$name: $((size / 1048576)) MB"
+          test "$size" -gt 20000000 || { echo "::error::dump is only $size bytes"; exit 1; }
+          # Prove it decrypts in full (gpg checks its integrity at the end) and pg_restore can read
+          # its table of contents. To a file, not a pipe: pg_restore --list stops reading after the
+          # table of contents, which would break gpg's pipe and fail the step.
+          gpg --batch --quiet --pinentry-mode loopback --decrypt --passphrase-fd 3 \
+              --output check.dump "$name" 3<<<"$BACKUP_PASSPHRASE"
+          /usr/lib/postgresql/17/bin/pg_restore --list check.dump > toc.txt
+          rm check.dump
+          grep -q "TABLE DATA public lines" toc.txt
+          echo "NAME=$name" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: ${{ env.NAME }}
+          retention-days: 90
+          compression-level: 0 # already compressed and encrypted
