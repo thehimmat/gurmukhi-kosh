@@ -1,0 +1,39 @@
+# The same stack as setup.sh, in containers: the trial ran this way, and it suits a VPS that already
+# runs Docker. Not recommended on the 2015 MacBook (Docker Desktop no longer supports macOS 12, and
+# its VM costs RAM the database wants); use setup.sh there.
+#
+#   cp scripts/self-host/compose.env.example scripts/self-host/.env   # fill in, see mint-jwt.mjs
+#   docker compose -f scripts/self-host/docker-compose.yml up -d
+#   then bootstrap.sql + restore/replay as in setup.sh, against localhost:5432
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: kosh
+    command: postgres -c shared_buffers=256MB -c max_wal_size=2GB -c listen_addresses=*
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+  rest:
+    image: postgrest/postgrest:v12.2.8
+    restart: unless-stopped
+    depends_on: [db]
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${AUTHENTICATOR_PASSWORD}@db:5432/kosh
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_EXTRA_SEARCH_PATH: public, extensions
+      PGRST_DB_MAX_ROWS: "1000"
+      PGRST_DB_POOL: "10"
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_CHANNEL_ENABLED: "true"
+      PGRST_SERVER_PORT: "3000"
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [rest]
+    ports: ["127.0.0.1:8000:8000"]
+    volumes: ["./Caddyfile.compose:/etc/caddy/Caddyfile:ro"]
+volumes:
+  pgdata:

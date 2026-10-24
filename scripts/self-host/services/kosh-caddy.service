@@ -1,0 +1,15 @@
+# systemd unit (Ubuntu). Serves PostgREST at /rest/v1 on :8000 (scripts/self-host/Caddyfile).
+[Unit]
+Description=Caddy proxy for gurmukhi-kosh PostgREST
+After=kosh-postgrest.service network-online.target
+
+[Service]
+User=@@USER@@
+ExecStart=@@CADDY@@ run --config @@PREFIX@@/etc/Caddyfile --adapter caddyfile
+Restart=always
+RestartSec=2
+# Needed only if the Caddyfile is changed to bind :80/:443 (VPS with its own domain).
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

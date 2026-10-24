@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- launchd agent (macOS). setup.sh services fills in @@...@@ and loads it from ~/Library/LaunchAgents. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>org.gurmukhikosh.postgrest</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@@POSTGREST@@</string>
+    <string>@@PREFIX@@/etc/postgrest.conf</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <!-- Restart on crash; PostgREST itself retries the database until Postgres is up. -->
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>5</integer>
+  <key>StandardOutPath</key><string>@@PREFIX@@/log/postgrest.log</string>
+  <key>StandardErrorPath</key><string>@@PREFIX@@/log/postgrest.log</string>
+</dict>
+</plist>
