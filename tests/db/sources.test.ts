@@ -39,6 +39,8 @@ describe("065: sources metadata", () => {
         searched_by_default: false, external_refs: { shabados: "SRBL" } },
       { code: "bhai_gurdas_banidb_v2", slug: "bhai-gurdas-vaaran", kind: "poetry", tier: "historical", rank: 30,
         page_unit: "Vaar", searched_by_default: false, external_refs: { banidb: "B", shabados: "VBGJ" } },
+      { code: "gurdas_singh_vaar_2008", slug: "gurdas-singh-vaar", kind: "poetry", tier: "historical", rank: 35,
+        page_unit: "Page", searched_by_default: false, external_refs: { banidb: "S" } },
       { code: "nand_lal_ghazals", slug: "nand-lal-ghazals", kind: "poetry", tier: "historical", rank: 40,
         page_unit: "Ghazal", searched_by_default: false, external_refs: { banidb: "N", shabados: "GZNL" } },
       { code: "gur_sobha_iss", slug: "gur-sobha", kind: "poetry", tier: "historical", rank: 50,
