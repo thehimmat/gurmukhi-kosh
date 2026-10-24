@@ -199,6 +199,7 @@ describe("070: publishing a corpus", () => {
     expect(rows).toEqual([
       { code: "sggs_banidb_v2", visibility: "public" },
       { code: "dasam_banidb_v2", visibility: "public" },
+      { code: "chandi_charitar_2_dg", visibility: "curator" },
       { code: "sarbloh_budha_dal", visibility: "public" },
       { code: "bhai_gurdas_banidb_v2", visibility: "public" },
       { code: "nand_lal_ghazals", visibility: "public" },
