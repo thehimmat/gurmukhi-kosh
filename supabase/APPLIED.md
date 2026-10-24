@@ -412,3 +412,11 @@ checked against the 1912 Sodhak print, the Hazur Sahib larivaar and a 19th-c. Ug
 281 → 274, ਭਾਂਗ 2 → 9, ਮੁਹਿ, ਘੇਰਿ, ਤੈਂ, ਨ, ਕਹਾ, ਬੁੱਧਿ, ਜੋਊ +1, ਕਹ −1, both stats tables matching occurrences;
 the numerals in 130073 and 130171 still span ੩੬ and ੫੮. `bigrams` and `collocations` catch up on the next
 `pipeline/compute` run.
+
+**074_trim_indexes** — run 2026-10-24 from the dashboard SQL editor, so there is no ledger row: the MCP holds any
+statement containing DROP for a confirmation that times out (nothing applied), as for 068. Kosh `074_trim_indexes.sql`,
+as in the repo (PR #305). Drops `lines_first_letters_cover`, `word_occurrences_word_id`, `line_translations_line_id`,
+`words_phonetic_ipa_trgm` and `word_occurrences_position_word`; the PR has the before/after plans (hypopg-hidden, in
+rolled-back transactions). Checked after: none of the five remain; `lines_first_letters_cover_public`,
+`word_occurrences_unique`, `word_occurrences_line_id`, `line_translations_line_id_source_code_key` and
+`words_gurmukhi_fold1`/`_fold2`/`_fold2_trgm` do. Database 927 → 861 MB.
