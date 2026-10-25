@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { statsAgeMetric } from "../lib/health-age";
 
-describe("statsAgeMetric: how old health_stats' cached totals are (073)", () => {
+describe("statsAgeMetric: how old health_stats' cached totals are (075)", () => {
   it("says how long ago the totals were computed", () => {
     const at = "2026-10-23T10:00:00+00:00";
     expect(statsAgeMetric(at, 30).value).toBe(`just now (${at})`);

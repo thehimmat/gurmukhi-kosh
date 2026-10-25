@@ -420,3 +420,14 @@ as in the repo (PR #305). Drops `lines_first_letters_cover`, `word_occurrences_w
 rolled-back transactions). Checked after: none of the five remain; `lines_first_letters_cover_public`,
 `word_occurrences_unique`, `word_occurrences_line_id`, `line_translations_line_id_source_code_key` and
 `words_gurmukhi_fold1`/`_fold2`/`_fold2_trgm` do. Database 927 → 861 MB.
+
+**075_health_stats_cache** — applied 2026-10-24 with the MCP's `apply_migration`, under the name it had then (ledger
+row `20261024171652 073_health_stats_cache`). Kosh `075_health_stats_cache.sql`, as in the repo; it was
+`073_health_stats_cache.sql` until `073_dasam_banidb_corrections` (#304) and `074_trim_indexes` were found to have taken
+073 and 074 first, so the file was renumbered to keep one migration per number. The two don't touch the same objects,
+so the replay's order (dasam 073, 074, then this) gives the same schema as production's. `health_stats()` had taken
+17.2 s (explain analyze, 2026-10-23); every total only an ingest changes is now computed by `refresh_health_stats()`
+into `health_stats_cache`, and `health_stats()` counts only open flags and the source registries live. Checked after:
+`health_stats()` 5.6 ms warm (497 ms on its first call); cache totals unchanged at 172,604 lines and 1,430 angs, with
+1,113,816 occurrences; anon and authenticated can execute neither `refresh_health_stats` nor `refresh_computed_stats`
+and cannot read `health_stats_cache` (RLS on); `/api/health` 200 with "Totals last recomputed: 2 min ago".

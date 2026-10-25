@@ -1,8 +1,8 @@
 // Data-quality / coverage stats for the /health dashboard. Open flags are counted
 // live on every load; the slower totals come from health_stats_cache, which the
-// ingests refresh (073), and the "Totals last recomputed" metric says how old they are.
+// ingests refresh (075), and the "Totals last recomputed" metric says how old they are.
 //
-// Most metrics come from the `health_stats()` Postgres RPC (013, 073) —
+// Most metrics come from the `health_stats()` Postgres RPC (013, 075) —
 // PostgREST can't express distinct-counts or group-bys directly, so that single
 // call returns every pure-SQL aggregate as one jsonb blob. The one metric that
 // needs TS logic (grammar_conflicts / polysemy) reuses buildGrammarView, the same
