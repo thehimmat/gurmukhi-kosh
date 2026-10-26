@@ -20,6 +20,11 @@ begin
   if not exists (select from pg_roles where rolname = 'authenticator') then
     create role authenticator login noinherit;
   end if;
+  -- Writes akhar.annotations over a direct Postgres connection, not the API. Created without a
+  -- password, so it can't log in until one is set by hand for whatever tool uses it.
+  if not exists (select from pg_roles where rolname = 'akhar_writer') then
+    create role akhar_writer login noinherit;
+  end if;
 end
 $$;
 
@@ -29,5 +34,6 @@ grant anon, authenticated, service_role to authenticator;
 alter role anon set statement_timeout = '3s';
 alter role authenticated set statement_timeout = '8s';
 alter role authenticator set statement_timeout = '8s';
+alter role authenticator set lock_timeout = '8s';
 
 create extension if not exists pg_trgm with schema public;

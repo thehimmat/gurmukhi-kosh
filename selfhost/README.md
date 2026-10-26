@@ -38,6 +38,23 @@ SELFHOST_URL=http://localhost:8000 SELFHOST_ANON_KEY=$ANON_KEY SELFHOST_SERVICE_
 
 `selfhost/.env` is gitignored. It holds every secret the stack has.
 
+## Rehearsal result (2026-10-26)
+
+`restore.sh` restored the 2026-10-25 backup in under a minute with no errors. Row counts in every
+table checked match production exactly, and so do the 38 RLS policies and 76 functions. The restored
+database is 664 MB. The full test suite, pointed at the stack (`NEXT_PUBLIC_SUPABASE_URL`, anon and
+service keys from `selfhost/.env`), passed 890 of 901 tests. The 9 failures were 8 tests of the
+deployed Vercel site, which the rehearsal machine couldn't reach, and 1 that expected a
+`supabase.co` URL (fixed).
+
+**`akhar_writer`** is a login role that writes `akhar.annotations` over a direct Postgres
+connection, not through the API. `sql/roles.sql` creates it with no password, so whatever tool uses
+it can't connect until it gets a password and a way in (an SSH tunnel; Postgres isn't exposed).
+
+Two differences from Supabase, both harmless: no `safeupdate`, so an UPDATE/DELETE without a WHERE
+is allowed here but not on Supabase (write migrations for the stricter one), and no `supabase_admin`
+role.
+
 ## Later: moving to Supabase Pro or a VPS
 
 Run the backup workflow, restore its dump into the new host (supabase/BACKUP.md), and swap the URL
