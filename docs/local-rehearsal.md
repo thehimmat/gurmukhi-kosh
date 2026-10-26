@@ -1,6 +1,7 @@
 # Local rehearsal: restore production on a Mac and measure bloat
 
-Paste this whole file into Claude Code on the laptop as the task. It is self-contained.
+Instructions for Claude Code on a Mac, started in `~/kosh-rehearsal/` with this file saved there. It is
+self-contained: nothing else from the repository is needed.
 
 ## Goal
 
@@ -48,15 +49,20 @@ The client tools must be 17.x. A 16 client refuses to dump a 17 server.
 
 ## 2. Production connection (the user does this part)
 
-Ask the user to:
+The user should have exported `SUPABASE_DB_URL` (the **Session pooler** connection string from the Supabase
+dashboard's **Connect** button) in the terminal *before* launching Claude Code, so it is in this shell's environment.
+Check it's set without printing it:
 
-1. Open the Supabase dashboard for the project, click **Connect**, and copy the **Session pooler** connection
-   string. The direct `db.<ref>.supabase.co` host is IPv6-only on the Free plan and often fails from home
-   networks.
-2. Export it in their own terminal, or put it in `~/.pgpass`, so it never passes through this chat:
-   `export SUPABASE_DB_URL='postgresql://postgres.brczghxvpfikezsevbkh:<password>@<host>:5432/postgres'`
+```sh
+test -n "$SUPABASE_DB_URL" && echo set || echo MISSING
+```
 
-Then check it without printing it:
+If it's missing, stop and ask the user to quit Claude Code, run
+`export SUPABASE_DB_URL='postgresql://postgres.brczghxvpfikezsevbkh:<password>@<host>:5432/postgres'` in that
+terminal, and relaunch it. Don't ask them to paste it into the chat. The direct `db.<ref>.supabase.co` host is IPv6-only
+on the Free plan and often fails from home networks, so it must be the Session pooler string.
+
+Then check the connection without printing it:
 
 ```sh
 psql "$SUPABASE_DB_URL" -Atc "select version()"   # expect PostgreSQL 17.6
