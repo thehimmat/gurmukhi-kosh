@@ -1,0 +1,52 @@
+# The Supabase-shaped API the apps talk to, without Supabase: Postgres 17, PostgREST (the same REST
+# server Supabase runs) and Caddy in front of it, serving /rest/v1 and checking the apikey header the
+# way Supabase's gateway does. supabase-js needs only a different URL and keys. See selfhost/README.md.
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in selfhost/.env}
+      AUTHENTICATOR_PASSWORD: ${AUTHENTICATOR_PASSWORD:?set in selfhost/.env}
+    command: ["postgres", "-c", "shared_buffers=${PG_SHARED_BUFFERS:-256MB}", "-c", "effective_cache_size=${PG_EFFECTIVE_CACHE_SIZE:-1GB}"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+      - ./sql:/selfhost/sql:ro
+    # Local only: pipelines and psql reach it through an SSH tunnel, never the internet.
+    ports: ["127.0.0.1:5432:5432"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 20
+
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${AUTHENTICATOR_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:?set in selfhost/.env}
+      PGRST_DB_MAX_ROWS: "1000" # Supabase's default; the apps page at 1000 (lib/fetch-all-rows)
+      PGRST_DB_POOL: "20"
+
+  gateway:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    depends_on: [rest]
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:8000}
+      ANON_KEY: ${ANON_KEY:?run selfhost/scripts/mint-keys.mjs}
+      SERVICE_KEY: ${SERVICE_KEY:?run selfhost/scripts/mint-keys.mjs}
+    ports: ["${GATEWAY_PORTS:-8000:8000}"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  pgdata:
+  caddy_data:

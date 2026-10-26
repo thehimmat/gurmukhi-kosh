@@ -1,0 +1,25 @@
+# SITE_ADDRESS is ":8000" locally; on the server it's the API's domain, and Caddy fetches its TLS
+# certificate itself.
+{$SITE_ADDRESS} {
+	# Supabase's gateway refuses any request whose apikey isn't one of the project's keys. Same here,
+	# so the API answers nobody who hasn't loaded one of the apps. Preflights carry no apikey.
+	@preflight method OPTIONS
+	@keyed expression `{header.apikey} == "{$ANON_KEY}" || {header.apikey} == "{$SERVICE_KEY}"`
+
+	handle_path /rest/v1/* {
+		handle @preflight {
+			reverse_proxy rest:3000
+		}
+		handle @keyed {
+			reverse_proxy rest:3000
+		}
+		handle {
+			header Content-Type application/json
+			respond `{"message":"Invalid API key"}` 401
+		}
+	}
+
+	handle {
+		respond 404
+	}
+}

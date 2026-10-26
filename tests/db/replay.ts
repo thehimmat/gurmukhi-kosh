@@ -50,7 +50,8 @@ const BOOTSTRAP = "tests/db/supabase-bootstrap.sql";
 // Seeded right after 001, where production's add_sources_table seeded it.
 const AFTER_001 = "tests/db/sggs-source.sql";
 
-const allFiles = () =>
+/** Every file a fresh database runs, bootstrap and seeds included, in order. */
+export const allFiles = () =>
   [BOOTSTRAP, ...replayOrder().flatMap((f) => (f.endsWith("/001_schema.sql") ? [f, AFTER_001] : [f]))];
 
 // The index of the file named `migration` (e.g. "065_data_driven_sources.sql").
