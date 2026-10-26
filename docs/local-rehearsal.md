@@ -30,22 +30,50 @@ Supabase stays the production database throughout. This is a read-only copy.
 
 ## 0. Preflight
 
-- Check the machine: `uname -m`, `sw_vers`, and `df -h ~` (need **5 GB free**).
-- Check for Homebrew (`brew --version`). If it's missing, ask before installing it.
+- Check the machine: `uname -m` (`arm64` = Apple Silicon, `x86_64` = Intel), `sw_vers`, `sysctl -n hw.ncpu hw.memsize`,
+  and `df -h ~` (need **5 GB free**).
+- See what Postgres is already there: `which -a pg_dump psql`, `pg_dump --version`, and
+  `lsof -nP -iTCP -sTCP:LISTEN | grep -i postgres`. An existing server on 5432 is left alone. This plan always runs its
+  own 17 server on **port 5433**.
 - `mkdir -p ~/kosh-rehearsal && cd ~/kosh-rehearsal`
 
-## 1. Postgres 17
+## 1. Postgres 17 on port 5433
 
-If `pg_dump --version` already prints 17.x, skip to step 2. Otherwise:
+The client tools must be 17.x: a 14 or 16 client refuses to dump a 17 server. **Never build Postgres from source.** If
+neither route below works on this Mac, stop and report.
+
+**Apple Silicon (`arm64`)**, with Homebrew (ask before installing Homebrew if it's missing). The package is prebuilt:
 
 ```sh
 brew install postgresql@17
+PGDATA17="$(brew --prefix)/var/postgresql@17"
+sed -i '' -E 's/^#?port = [0-9]+/port = 5433/' "$PGDATA17/postgresql.conf"
 brew services start postgresql@17
-export PATH="$(brew --prefix postgresql@17)/bin:$PATH"   # also add this line to ~/.zshrc
-pg_dump --version && psql --version                      # both must say 17.x
+export PG17BIN="$(brew --prefix postgresql@17)/bin"
 ```
 
-The client tools must be 17.x. A 16 client refuses to dump a 17 server.
+**Intel (`x86_64`)**. Homebrew has no prebuilt Postgres 17 for Intel Macs, so use Postgres.app's universal binaries.
+Before installing, check on postgresapp.com (or its GitHub releases) that the current release includes PostgreSQL 17
+and supports this macOS version. Tell the user the exact version and URL, and wait for their approval. Then install it
+to `/Applications`, but don't start its default server. Run a server of its own inside the rehearsal folder:
+
+```sh
+export PG17BIN=/Applications/Postgres.app/Contents/Versions/17/bin
+"$PG17BIN/initdb" -D ~/kosh-rehearsal/pgdata -U "$USER" --encoding=UTF8 --locale=C
+"$PG17BIN/pg_ctl" -D ~/kosh-rehearsal/pgdata -o "-p 5433" -l ~/kosh-rehearsal/pg.log start
+```
+
+That server stops with `"$PG17BIN/pg_ctl" -D ~/kosh-rehearsal/pgdata stop`. Deleting the folder removes it.
+
+**Both:** put the 17 tools first, point every local command at port 5433, and check:
+
+```sh
+export PATH="$PG17BIN:$PATH" PGHOST=localhost PGPORT=5433
+pg_dump --version && pg_restore --version && psql --version   # all must say 17.x
+psql -d postgres -Atc "show server_version"                    # must say 17.x
+```
+
+Every later step assumes these three variables are set in the shell. If a new shell is opened, set them again.
 
 ## 2. Production connection (the user does this part)
 
@@ -61,6 +89,9 @@ If it's missing, stop and ask the user to quit Claude Code, run
 `export SUPABASE_DB_URL='postgresql://postgres.brczghxvpfikezsevbkh:<password>@<host>:5432/postgres'` in that
 terminal, and relaunch it. Don't ask them to paste it into the chat. The direct `db.<ref>.supabase.co` host is IPv6-only
 on the Free plan and often fails from home networks, so it must be the Session pooler string.
+
+The host and port inside `SUPABASE_DB_URL` take precedence over `PGHOST`/`PGPORT`, so production commands still go to
+Supabase while local ones go to 5433.
 
 Then check the connection without printing it:
 
@@ -125,6 +156,9 @@ Record the wall time and the file size.
 
 ## 5. Local database
 
+Check first that local commands reach the 17 server, not another one (step 1):
+`test "$PGPORT" = 5433 && psql -d postgres -Atc "show server_version"` must print 17.x.
+
 The policies name Supabase roles, and some functions set `search_path = public, extensions`, so create those roles
 and an empty `extensions` schema first. Drop the default `public` schema so the dump creates its own.
 
@@ -145,7 +179,8 @@ SQL
 ## 6. Restore
 
 ```sh
-time pg_restore --no-owner --no-privileges --jobs=4 -d kosh_rehearsal kosh.dump 2> restore.log
+JOBS=$(( $(sysctl -n hw.ncpu) < 4 ? $(sysctl -n hw.ncpu) : 4 ))
+time pg_restore --no-owner --no-privileges --jobs=$JOBS -d kosh_rehearsal kosh.dump 2> restore.log
 grep -c 'error' restore.log; cat restore.log | head -50
 psql -d kosh_rehearsal -c "analyze"
 ```
@@ -187,7 +222,8 @@ totals, not database sizes.
 ## 9. Maintenance timings
 
 The copy is already packed, so these runs time a rewrite of the same data that production would do. Supabase Free
-runs on a much smaller machine than this Mac, so treat these as a **lower bound** for production.
+is a small shared instance: on an Apple Silicon Mac, treat these times as a **lower bound** for production. An older
+Intel dual-core is closer to it. Either way, put the hardware next to the times in the report.
 
 ```sh
 psql -d kosh_rehearsal <<'SQL'
@@ -220,5 +256,6 @@ Write `~/kosh-rehearsal/REPORT.md` and print it, so the user can paste it back:
 ## Keep it as a dev database
 
 Leave `kosh_rehearsal` and `kosh.dump` in place. The local connection string is
-`postgresql://localhost:5432/kosh_rehearsal` (as the macOS user, no password). It has no Supabase auth or PostgREST.
-To stop Postgres: `brew services stop postgresql@17`.
+`postgresql://localhost:5433/kosh_rehearsal` (as the macOS user, no password). It has no Supabase auth or PostgREST.
+To stop the 17 server: `brew services stop postgresql@17` (Apple Silicon) or
+`"$PG17BIN/pg_ctl" -D ~/kosh-rehearsal/pgdata stop` (Intel). Any other Postgres server on 5432 was never touched.
