@@ -65,8 +65,10 @@ else
 fi
 
 echo "== stack"
-sudo docker compose --project-directory "$dir/selfhost" up -d --quiet-pull
-sudo docker compose --project-directory "$dir/selfhost" ps --format '{{.Service}}: {{.Status}}'
+# From inside selfhost/: Compose reads COMPOSE_FILE from .env relative to where it runs.
+cd "$dir/selfhost"
+sudo docker compose up -d --quiet-pull
+sudo docker compose ps --format '{{.Service}}: {{.Status}}'
 echo
 echo "Done. Public anon key (safe to share; it ships to browsers):"
 grep '^ANON_KEY=' "$env_file" | cut -d= -f2

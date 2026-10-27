@@ -7,7 +7,7 @@
 set -eu
 cd "$(dirname "$0")/../.."
 
-psql_db() { docker compose --project-directory selfhost exec -T db psql -v ON_ERROR_STOP=1 -q -U postgres -d postgres "$@"; }
+psql_db() { (cd selfhost && docker compose exec -T db psql -v ON_ERROR_STOP=1 -q -U postgres -d postgres "$@"); }
 
 npx tsx selfhost/scripts/replay-order.ts |
 while read -r file; do
