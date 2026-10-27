@@ -38,6 +38,24 @@ SELFHOST_URL=http://localhost:8000 SELFHOST_ANON_KEY=$ANON_KEY SELFHOST_SERVICE_
 
 `selfhost/.env` is gitignored. It holds every secret the stack has.
 
+## Run it on the server (Oracle VM, Ubuntu 24.04)
+
+From a machine that can SSH to the VM (one command per step; each prints a short result):
+
+```sh
+# 1. Set up: updates, firewall, Docker, the stack, and secrets in /opt/kosh/selfhost/.env
+ssh ubuntu@<ip> 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/feat/selfhost-postgrest/selfhost/scripts/server-setup.sh | bash -s -- <api-domain>'
+
+# 2. Restore a fresh dump from Supabase (prompts for the session-pooler URL; nothing is echoed or saved)
+ssh -t ubuntu@<ip> 'cd /opt/kosh && read -rsp "Supabase session pooler URL: " SUPABASE_DB_URL && echo && SUPABASE_DB_URL=$SUPABASE_DB_URL sh selfhost/scripts/restore.sh --supabase'
+
+# 3. Run the test suite on the server against its own stack
+ssh ubuntu@<ip> 'cd /opt/kosh && sh selfhost/scripts/check.sh'
+```
+
+`<api-domain>` can be `<ip-with-dashes>.sslip.io` until there's a real domain: it resolves to the
+IP, and Caddy gets a certificate for it. Re-running step 1 with a new domain switches to it.
+
 ## Rehearsal result (2026-10-26)
 
 `restore.sh` restored the 2026-10-25 backup in under a minute with no errors. Row counts in every
