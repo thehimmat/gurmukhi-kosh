@@ -11,7 +11,8 @@
 -- transliteration and rebuild its word occurrences, first-letter key, numeral offsets and the counts
 -- of every word it touched, then delete a misspelling left unused with nothing attached. Unlike 073,
 -- most corrected spellings are new words, so this creates them first, with their search_fold; their
--- ipa_display is left for npm run pronounce. Matching on the old text makes it safe to rerun.
+-- ipa_display is left for npm run pronounce. Last it refreshes health_stats_cache (075), since the word
+-- total changes. Matching on the old text makes it safe to rerun.
 
 create temp table fix_076 (verse_id int, old_g text, new_g text, old_t text, new_t text);
 insert into fix_076 values
@@ -717,3 +718,6 @@ begin
 end $$;
 
 drop table fix_076, fix_lines_076, fix_tokens_076, fix_words_076;
+
+-- The word total changed: refresh the totals the health page reads (075), as an ingest does.
+select refresh_health_stats();

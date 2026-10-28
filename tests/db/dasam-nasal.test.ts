@@ -83,6 +83,12 @@ describe("076: ਾਂ after a vowel sign in the Dasam Granth", () => {
     expect([...r.g].slice(r.s, r.e).join("")).toBe("੧੫੪੦");
   });
 
+  it("refreshes the cached totals the health page shows (075)", async () => {
+    const [r] = await q<{ cached: number; actual: number }>(
+      "select (stats->>'total_words')::int cached, (select count(*)::int from words) actual from health_stats_cache");
+    expect(r.cached).toBe(r.actual);
+  });
+
   it("is safe to run again", async () => {
     await applyFrom(db, M);
     expect(await words(83565)).toEqual(["ਬਾਤ", "ਪੁਰਾਤਨ", "ਭਾਖ", "ਸੁਨਾਊਂ"]);
