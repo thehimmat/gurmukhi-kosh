@@ -1,5 +1,5 @@
 /**
- * Migration 076: Chandi Charitar II, as printed in a Punjabi-translated Sri Dasam Granth (pp. 131-157),
+ * Migration 077: Chandi Charitar II, as printed in a Punjabi-translated Sri Dasam Granth (pp. 131-157),
  * as a curator-only corpus (source_rights 069, corpora 070), with its 64 shabads. Who printed the
  * edition, and so who holds rights to its typing, is unknown, so it stays hidden until that is settled.
  */
@@ -23,7 +23,7 @@ beforeAll(async () => {
 
 const one = async <T>(sql: string) => (await db.query<{ v: T }>(sql)).rows[0]?.v;
 
-describe("076: Chandi Charitar II (Punjabi-translated Dasam Granth)", () => {
+describe("077: Chandi Charitar II (Punjabi-translated Dasam Granth)", () => {
   it("is a curator-only Gurbani source read after the Dasam Granth", async () => {
     const s = (await db.query<Record<string, unknown>>(
       `select s.id::int, s.slug, s.kind, s.tier, s.rank, s.page_unit, s.searched_by_default, s.author, s.external_refs,
