@@ -82,6 +82,10 @@ ssh -t ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && read -rsp "Backup passphra
 Then add that URL as the repository secret `KOSH_BACKUP_URL`, and run the workflow once by hand.
 Restore one with `restore.sh --gpg` (on an empty database).
 
+To change the token (the file is encrypted either way, but the URL shouldn't circulate): set a new
+`BACKUP_TOKEN=` in `/opt/kosh/selfhost/.env`, run `docker compose up -d` in that folder, and update
+the `KOSH_BACKUP_URL` secret.
+
 ## Uptime
 
 `.github/workflows/uptime.yml` checks `/health` every 30 minutes once the repository variable
