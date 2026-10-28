@@ -183,3 +183,59 @@ describe.skipIf(!live)("self-hosted gateway", () => {
     expect(Array.isArray(data)).toBe(true);
   });
 });
+
+// The akhar annotation site (gurmukhi-akhar-ocr, site/) reaches akhar.annotations through the
+// gateway with a key of its own, signed for the akhar_writer role: that schema and nothing else.
+// Writes here ask PostgREST to roll their transaction back, so a live server keeps no test rows.
+const AKHAR = process.env.SELFHOST_AKHAR_KEY ?? "";
+const akhar = (path: string, init: RequestInit & { key?: string } = {}) => {
+  const key = init.key ?? AKHAR;
+  return fetch(`${URL}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Accept-Profile": "akhar",
+      "Content-Profile": "akhar",
+      "Content-Type": "application/json",
+      ...(init.headers as Record<string, string>),
+    },
+  });
+};
+
+describe.skipIf(!live || !AKHAR)("akhar key", () => {
+  it("reads akhar.annotations", async () => {
+    const res = await akhar("annotations?select=manuscript,id,updated_at&limit=1");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(await res.json())).toBe(true);
+  });
+
+  it("upserts an answer, stamping updated_at (the on_write trigger), then rolls it back", async () => {
+    const row = { manuscript: "selfhost_test", id: "t:1", data: { id: "t/1", status: "confirmed", label_raw: "ਕ" } };
+    const res = await akhar("annotations?on_conflict=manuscript,id", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation,tx=rollback" },
+      body: JSON.stringify(row),
+    });
+    expect(res.status).toBe(201);
+    const [saved] = (await res.json()) as { data: unknown; updated_at: string }[];
+    expect(saved.data).toEqual(row.data);
+    expect(Date.parse(saved.updated_at)).toBeGreaterThan(Date.now() - 60_000);
+
+    const after = await akhar("annotations?manuscript=eq.selfhost_test&select=id");
+    expect(await after.json()).toEqual([]);
+  });
+
+  it("can't touch the public schema", async () => {
+    const read = await fetch(`${URL}/rest/v1/words?select=id&limit=1`, {
+      headers: { apikey: AKHAR, Authorization: `Bearer ${AKHAR}` },
+    });
+    expect(read.status).toBe(403); // PostgREST: a signed-in role without the grant
+    expect(((await read.json()) as { code: string }).code).toBe("42501");
+  });
+
+  it("anon can't read akhar", async () => {
+    const res = await akhar("annotations?select=id&limit=1", { key: ANON });
+    expect(res.status).toBe(401);
+  });
+});

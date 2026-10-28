@@ -65,6 +65,10 @@ else
 fi
 # Added after the first server was set up, so appended when missing.
 grep -q '^BACKUP_TOKEN=' "$env_file" || echo "BACKUP_TOKEN=$(openssl rand -hex 24)" >> "$env_file"
+if ! grep -q '^AKHAR_KEY=' "$env_file"; then
+  sudo docker run --rm -e JWT_SECRET="$(grep '^JWT_SECRET=' "$env_file" | cut -d= -f2)" \
+      -v "$dir/selfhost/scripts:/s:ro" node:22-alpine node /s/mint-keys.mjs | grep '^AKHAR_KEY=' >> "$env_file"
+fi
 
 echo "== nightly backup (03:30 UTC, scripts/backup.sh)"
 install -d "$dir/selfhost/backups"
@@ -95,7 +99,12 @@ sudo systemctl enable --now kosh-backup.timer
 echo "== stack"
 # From inside selfhost/: Compose reads COMPOSE_FILE from .env relative to where it runs.
 cd "$dir/selfhost"
-sudo docker compose up -d --quiet-pull
+sudo docker compose up -d --quiet-pull --wait
+# Roles and grants (sql/roles.sql, idempotent) on every run, so a server picks up new ones; then
+# PostgREST reloads what each role may see.
+sudo docker compose exec -T db psql -U postgres -v ON_ERROR_STOP=1 -q \
+    -v auth_pw="$(grep '^AUTHENTICATOR_PASSWORD=' .env | cut -d= -f2)" -f /selfhost/sql/roles.sql
+sudo docker compose exec -T db psql -U postgres -q -c "notify pgrst, 'reload schema'"
 sudo docker compose ps --format '{{.Service}}: {{.Status}}'
 echo
 echo "Done. Public anon key (safe to share; it ships to browsers):"
