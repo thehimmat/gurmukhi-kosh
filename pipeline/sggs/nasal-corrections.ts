@@ -8,10 +8,10 @@
  * Every line was read in the Hazur Sahib print (PDF page = printed page), and 39 of them again in the
  * 1912 print (printed page; leaf = page + 23); see corrections.ts for both. Where the two disagree, the
  * reading chosen is recorded in the evidence (decided by thehimmat, 2026-10-26). Full tables, scans
- * and the decisions: thehimmat/gurmukhi-kosh#312. Migration 076 fixed the copy already loaded.
+ * and the decisions: thehimmat/gurmukhi-kosh#312. Migration 076 fixed NASAL in the copy already loaded.
  *
- * Held back until the tippi-or-bindi review on #312: 106630, 113536, 118908, 118909, 126247,
- * 126395, 129315 (ਹਿ followed by a nasal I read as a tippi; 129314's turned out to be a bindi).
+ * NASAL_HI holds the last seven, all a nasal after ਹਿ, which waited on a second look at the Hazur mark
+ * (tippi or bindi; decided by thehimmat, 2026-10-28); migration 077 fixed those.
  */
 import type { LineCorrection } from "./corrections";
 
@@ -983,5 +983,64 @@ export const NASAL: LineCorrection[] = [
     translitFrom: "vazaa raa b bakhhasheedh hukameaa(n) raheem ||57||",
     translitTo: "vazaa(n) raa b bakhhasheedh hukame raheem ||57||",
     evidence: "ਵਜ਼ਾ ਰਾ … ਹੁਕਮੇਾਂ → ਵਜ਼ਾਂ ਰਾ … ਹੁਕਮੇ: the nasal belongs on ਵਜ਼ਾਂ; Hazur Sahib p.1427, 1912 p.1398",
+  },
+];
+
+export const NASAL_HI: LineCorrection[] = [
+  {
+    verseId: 106630, ang: 730,
+    from: "ਜਮੁਨਾ ਪ੍ਰਿਥਮ ਬਖਾਨਿ ਕੈ ਏਸਰਾਯੁਧਹਿਾਂ ਬਖਾਨ ॥",
+    to: "ਜਮੁਨਾ ਪ੍ਰਿਥਮ ਬਖਾਨਿ ਕੈ ਏਸਰਾਯੁਧਹਿਂ ਬਖਾਨ ॥",
+    translitFrom: "jamunaa piratham bakhaan kai esaraayudhahiaa(n) bakhaan ||",
+    translitTo: "jamunaa piratham bakhaan kai esaraayudhahi(n) bakhaan ||",
+    evidence: "ਏਸਰਾਯੁਧਹਿਾਂ → ਏਸਰਾਯੁਧਹਿਂ: ਾਂ for a bindi after ਹਿ; Hazur Sahib p.738, mark read as a bindi (thehimmat, 2026-10-28); 1912 p.713, nasal on ਹਿ",
+  },
+  {
+    verseId: 113536, ang: 875,
+    from: "ਕਹੂੰ ਪਾਖਰੇ ਹੈ ਹਿਾਂਹਨਾਹੀ ॥",
+    to: "ਕਹੂੰ ਪਾਖਰੇ ਹੈ ਹਿਂਹਨਾਹੀ ॥",
+    translitFrom: "kahoo(n) paakhare hai hiaa(n)hanaahee ||",
+    translitTo: "kahoo(n) paakhare hai hi(n)hanaahee ||",
+    evidence: "ਹਿਾਂਹਨਾਹੀ → ਹਿਂਹਨਾਹੀ: ਾਂ for a bindi after ਹਿ; Hazur Sahib p.880, mark read as a bindi (thehimmat, 2026-10-28); 1912 p.857, nasal on ਹਿ",
+  },
+  {
+    verseId: 118908, ang: 979,
+    from: "ਡਿਮਿ ਡਿਮਿ ਡਿਮਿ ਡਾਮਰੂ ਡਮਕਹਿਾਂ ॥",
+    to: "ਡਿਮਿ ਡਿਮਿ ਡਿਮਿ ਡਾਮਰੂ ਡਮਕਹਿਂ ॥",
+    translitFrom: "ddim ddim ddim ddaamaroo ddamakahiaa(n) ||",
+    translitTo: "ddim ddim ddim ddaamaroo ddamakahi(n) ||",
+    evidence: "ਡਮਕਹਿਾਂ → ਡਮਕਹਿਂ: ਾਂ for a bindi after ਹਿ; Hazur Sahib p.983, mark read as a bindi (thehimmat, 2026-10-28); 1912 p.960, nasal on ਹਿ",
+  },
+  {
+    verseId: 118909, ang: 979,
+    from: "ਅਸਿ ਅਨੇਕ ਹਾਥਨ ਮਹਿੰ ਦਮਕਹਿਾਂ ॥",
+    to: "ਅਸਿ ਅਨੇਕ ਹਾਥਨ ਮਹਿੰ ਦਮਕਹਿਂ ॥",
+    translitFrom: "as anek haathan mahi(n) dhamakahiaa(n) ||",
+    translitTo: "as anek haathan mahi(n) dhamakahi(n) ||",
+    evidence: "ਦਮਕਹਿਾਂ → ਦਮਕਹਿਂ: ਾਂ for a bindi after ਹਿ; Hazur Sahib p.983, mark read as a bindi (thehimmat, 2026-10-28); 1912 p.960, nasal on ਹਿ",
+  },
+  {
+    verseId: 126247, ang: 1120,
+    from: "ਅਮਿਤਿ ਸੁਭਟ ਧਾਵਹਿਾਂ ਮਿਲਿ ਕੋਈ ॥੩੭॥",
+    to: "ਅਮਿਤਿ ਸੁਭਟ ਧਾਵਹਿੰ ਮਿਲਿ ਕੋਈ ॥੩੭॥",
+    translitFrom: "amit subhaT dhaavahiaa(n) mil koiee ||37||",
+    translitTo: "amit subhaT dhaavahi(n) mil koiee ||37||",
+    evidence: "ਧਾਵਹਿਾਂ → ਧਾਵਹਿੰ: ਾਂ for a tippi after ਹਿ; Hazur Sahib p.1122, mark read as a tippi (thehimmat, 2026-10-28); 1912 p.1102, nasal on ਹਿ",
+  },
+  {
+    verseId: 126395, ang: 1123,
+    from: "ਹੋ ਬੀਤਹਿਾਂ ਬਰਸ ਪਚਾਸ ਨ ਜਾਨੋ ਏਕ ਦਿਨ ॥੬॥",
+    to: "ਹੋ ਬੀਤਹਿੰ ਬਰਸ ਪਚਾਸ ਨ ਜਾਨੋ ਏਕ ਦਿਨ ॥੬॥",
+    translitFrom: "ho beetahiaa(n) baras pachaas na jaano ek dhin ||6||",
+    translitTo: "ho beetahi(n) baras pachaas na jaano ek dhin ||6||",
+    evidence: "ਬੀਤਹਿਾਂ → ਬੀਤਹਿੰ: ਾਂ for a tippi after ਹਿ; Hazur Sahib p.1125, mark read as a tippi (thehimmat, 2026-10-28); 1912 p.1105, no nasal",
+  },
+  {
+    verseId: 129315, ang: 1179,
+    from: "ਹੋ ਸਪਤ ਮਾਤ੍ਰ ਕੁਲ ਸਪਤ ਪਿਤਰ ਕੁਲ ਤਰਹਿਾਂਗੇ ॥੫॥",
+    to: "ਹੋ ਸਪਤ ਮਾਤ੍ਰ ਕੁਲ ਸਪਤ ਪਿਤਰ ਕੁਲ ਤਰਹਿਂਗੇ ॥੫॥",
+    translitFrom: "ho sapat maatr kul sapat pitar kul tarahiaa(n)ge ||5||",
+    translitTo: "ho sapat maatr kul sapat pitar kul tarahi(n)ge ||5||",
+    evidence: "ਤਰਹਿਾਂਗੇ → ਤਰਹਿਂਗੇ: ਾਂ for a bindi after ਹਿ; Hazur Sahib p.1183, mark read as a bindi (thehimmat, 2026-10-28); 1912 p.1162, nasal on ਹਿ",
   },
 ];
