@@ -453,3 +453,9 @@ gurdas) gives the same schema whichever ran first. The last seven Dasam lines of
 the API: all 128 lines from 076 and 077 read as corrected, with their transliterations; the 7 new words have a
 `search_fold`, a frequency above 0 and, after `npm run pronounce`, an `ipa_display`; no public line in any corpus has
 ਾਂ after a vowel sign.
+
+**077_gurdas_singh_vaar_source** — applied to the self-hosted server before 2026-10-28, date and method not recorded
+here (#307); it shares its number with `077_dasam_hi_nasal` (see above), so the file keeps its name to match what ran.
+Kosh `077_gurdas_singh_vaar_source.sql`, as in the repo. Checked on 2026-10-28 with psql on the server: the
+`gurdas_singh_vaar_2008` source exists, and `npm run load:gurdas-singh-vaar` has loaded its 351 lines. The corpus is
+curator-only (`source_rights`), so the public API shows neither.
