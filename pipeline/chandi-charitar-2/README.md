@@ -45,7 +45,7 @@ Spellings that differ from BaniDB, e.g. ਧੂਮਨੈਨ (p. 135 heading), ਸ
 2. `npm run build:chandi-charitar-2 -- <extract.jsonl> <out.json> <load.sql>`. It prints 1,102 lines,
    64 shabads, 8 chapters, 262 verses, 4,704 words (2,269 distinct) and 0 problems: both verse counts
    run unbroken.
-3. Apply migration 076. Then `npm run load:chandi-charitar-2 -- <out.json>` with
+3. Apply migration 077. Then `npm run load:chandi-charitar-2 -- <out.json>` with
    `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set (or run `<load.sql>` and the four
    refresh functions and `refresh_health_stats`, as for Gur Sobha).
 4. Fill the new words' `ipa_display` and `search_fold` (`npm run pronounce`, `npm run searchfold`).
