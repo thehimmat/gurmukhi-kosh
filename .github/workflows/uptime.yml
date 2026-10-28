@@ -1,0 +1,20 @@
+name: API uptime
+
+# Every 30 minutes: the self-hosted API's /health (selfhost/Caddyfile) answers 200 only when
+# PostgREST is up and reaches the database. A failed run is GitHub's email that the API is down.
+# Set the repository variable KOSH_API_URL (Settings → Secrets and variables → Actions → Variables)
+# to turn it on; without it the check is skipped.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    if: ${{ vars.KOSH_API_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /health
+        run: curl -fsS --retry 3 --retry-delay 20 --retry-all-errors -o /dev/null -w "%{http_code} in %{time_total}s\n" "${{ vars.KOSH_API_URL }}/health"

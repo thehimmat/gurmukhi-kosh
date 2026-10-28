@@ -27,10 +27,11 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # Public client-side values (shipped in every browser bundle of the
-      # deployed site); RLS is the security boundary, not these strings.
-      NEXT_PUBLIC_SUPABASE_URL: https://brczghxvpfikezsevbkh.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyY3pnaHh2cGZpa2V6c2V2YmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzODE0NDgsImV4cCI6MjA5NDk1NzQ0OH0.g8PHrRaWECquYUUyv_KiC4MdVmOffSFA0O3Jgg6NRuY
+      # Public client-side values (the anon key is meant to ship to browsers);
+      # RLS is the security boundary, not these strings. The self-hosted API
+      # (selfhost/) that replaced the Supabase project.
+      NEXT_PUBLIC_SUPABASE_URL: https://141-148-39-45.sslip.io
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJndXJtdWtoaS1rb3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjEyMjUsImV4cCI6MjEwODQ4MTIyNX0.yWAh4km1An_ird8OcKxzzyjId7cVCVfZ0a5JDeoX8EA
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

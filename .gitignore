@@ -56,3 +56,7 @@ __pycache__/
 
 # scan texts (editions, OCR output): copyright varies, kept out of git
 pipeline/scans/data/
+
+# Self-hosted stack: backups and the passphrase that encrypts them (selfhost/README.md)
+selfhost/backups/
+selfhost/backup.pass
