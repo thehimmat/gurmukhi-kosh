@@ -3898,6 +3898,91 @@
    "known_from": [
     "Drive"
    ]
+  },
+  {
+   "id": "w-singh-sagar",
+   "title": {
+    "roman": "Singh Sagar"
+   },
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "authors": [
+    {
+     "name": "Vir Singh Bal"
+    }
+   ],
+   "notes": "Braj verse life of Guru Gobind Singh in 14 tarangs, written at Patiala (1884 Bk / 1827); sequel to the author's Gur Kirat Prakash. EoS reports two MSS (one at Motibagh Palace) and a 1986 Punjabi University edition.",
+   "known_from": [
+    "Encyclopaedia of Sikhism, 'Singh Sagar' (Rattan Singh Jaggi)"
+   ]
+  },
+  {
+   "id": "w-gur-kirat-prakash",
+   "title": {
+    "roman": "Gur Kirat Prakash"
+   },
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "authors": [
+    {
+     "name": "Vir Singh Bal"
+    }
+   ],
+   "notes": "Braj verse lives of the first nine Gurus in ten hulas, completed 1891 Bk / 1834 at the Patiala court. EoS reports MSS at Punjab State Archives (No. 682) and Punjabi University, and a 1986 Punjabi University edition.",
+   "known_from": [
+    "Encyclopaedia of Sikhism, 'Gur Kirat Prakash' (Piara Singh Padam)"
+   ]
+  },
+  {
+   "id": "w-bansavalinama-dasan-patshahian-ka",
+   "title": {
+    "roman": "Bansavalinama Dasan Patshahian Ka"
+   },
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "authors": [
+    {
+     "name": "Kesar Singh Chhibbar"
+    }
+   ],
+   "notes": "Punjabi verse account of the Gurus and after, 2,564 stanzas in 14 chapters, completed 1826 Bk / 1769 at Jammu. EoS reports a MS at Khalsa College Amritsar, one lost in 1984 at the Sikh Reference Library, and Jaggi's 1972 edition in Parakh (Panjab University).",
+   "known_from": [
+    "Encyclopaedia of Sikhism, 'Bansavalinama Dasan Patshahian Ka' (Rattan Singh Jaggi)"
+   ]
+  },
+  {
+   "id": "w-sri-guru-dasam-panchasika",
+   "title": {
+    "roman": "Sri Guru Dasam Panchasika"
+   },
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "authors": [
+    {
+     "name": "Sahib Singh Mrigind"
+    }
+   ],
+   "notes": "Braj panegyric of the Gurus by a Jind court poet, completed c. 1919 Bk / 1862. EoS: unpublished; only MS at Motibagh Palace, Patiala, MS 148 (29 ff.).",
+   "known_from": [
+    "Encyclopaedia of Sikhism, 'Sri Guru Dasam Panchasika' (Dharam Singh)"
+   ]
+  },
+  {
+   "id": "w-gurpranali-anonymous-motibagh-ms",
+   "title": {
+    "roman": "Gurpranali (anonymous, Motibagh MS)"
+   },
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "notes": "Anonymous short chronology of the Ten Gurus (births, children, deaths, years of guruship). EoS: unpublished, one MS of six folios in the Motibagh Palace Library, Patiala; no shelfmark given.",
+   "known_from": [
+    "Encyclopaedia of Sikhism, 'Gurpranali' (Dharam Singh)"
+   ]
   }
  ],
  "versions": [
@@ -17906,6 +17991,186 @@
    "drive_title": "ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf.pdf",
    "drive_folder": "Desktop / Gurmukhi Project 2025 / Santhya Scans",
    "text_layer": "none"
+  },
+  {
+   "label": "Encyclopaedia of Sikhism entry 'Singh Sagar' (MS at Motibagh Palace, Patiala; ed. Punjabi University 1986)",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-singh-sagar",
+     "note": "EoS names two MS copies, one at Motibagh Palace, Patiala, and a 1986 Punjabi University edition; no shelfmark or editor given."
+    }
+   ],
+   "languages": [
+    "Braj/Bhakha"
+   ],
+   "date": {
+    "text": "1884 Bk/AD 1827",
+    "from": 1827,
+    "to": 1827,
+    "approx": false
+   },
+   "contributors": "Vir Singh Bal (author)",
+   "host": "Encyclopaedia of Sikhism (Punjabi University)",
+   "availability": "none",
+   "item_url": "https://eos.learnpunjabi.org/SINGH%20SAGAR.html",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-encyclopaedia-of-sikhism-entry-singh-sagar-ms-at-motibagh-pa"
+  },
+  {
+   "label": "Encyclopaedia of Sikhism entry 'Gur Kirat Prakash' (MSS Punjab State Archives No. 682 and Punjabi University; ed. 1986)",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-gur-kirat-prakash",
+     "note": "EoS: Braj in Gurmukhi script; MSS at Punjab State Archives, Patiala (No. 682) and Punjabi University; published by Punjabi University 1986."
+    }
+   ],
+   "scripts": [
+    "Gurmukhi"
+   ],
+   "languages": [
+    "Braj/Bhakha"
+   ],
+   "date": {
+    "text": "1891 Bk/AD 1834",
+    "from": 1834,
+    "to": 1834,
+    "approx": false
+   },
+   "contributors": "Vir Singh Bal (author)",
+   "repository": "Punjab State Archives, Patiala",
+   "shelfmark": "682",
+   "host": "Encyclopaedia of Sikhism (Punjabi University)",
+   "availability": "none",
+   "item_url": "https://eos.learnpunjabi.org/GUR%20KIRAT%20PRAKASH.html",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-encyclopaedia-of-sikhism-entry-gur-kirat-prakash-mss-punjab"
+  },
+  {
+   "label": "Encyclopaedia of Sikhism entry 'Bansavalinama Dasan Patshahian Ka' (MS Khalsa College Amritsar; ed. Jaggi, Parakh 1972)",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-bansavalinama-dasan-patshahian-ka",
+     "note": "EoS: MS at Khalsa College Library, Amritsar; Sikh Reference Library copy destroyed 1984; Jaggi's edition in Parakh (1972) from an undated private MS at Batala."
+    }
+   ],
+   "languages": [
+    "Panjabi"
+   ],
+   "date": {
+    "text": "1826 Bk/AD 1769",
+    "from": 1769,
+    "to": 1769,
+    "approx": false
+   },
+   "contributors": "Kesar Singh Chhibbar (author)",
+   "host": "Encyclopaedia of Sikhism (Punjabi University)",
+   "availability": "none",
+   "item_url": "https://eos.learnpunjabi.org/BANSAVALINAMA%20DASAN%20PATSHAHIAN%20KA.html",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-encyclopaedia-of-sikhism-entry-bansavalinama-dasan-patshahia"
+  },
+  {
+   "label": "Motibagh Palace, Patiala, MS 148: Sri Guru Dasam Panchasika (per Encyclopaedia of Sikhism)",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-sri-guru-dasam-panchasika",
+     "note": "EoS: the only known MS, 29 folios, 7+7 lines a folio; unpublished."
+    }
+   ],
+   "languages": [
+    "Braj/Bhakha"
+   ],
+   "date": {
+    "text": "c. 1919 Bk/AD 1862",
+    "from": 1862,
+    "to": 1862,
+    "approx": true
+   },
+   "contributors": "Sahib Singh Mrigind (author)",
+   "repository": "Motibagh Palace Library, Patiala",
+   "shelfmark": "MS 148",
+   "pages": 29,
+   "host": "Encyclopaedia of Sikhism (Punjabi University)",
+   "availability": "none",
+   "item_url": "https://eos.learnpunjabi.org/SRI%20GURU%20DASAM%20PANCHASIKA.html",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-motibagh-palace-patiala-ms-148-sri-guru-dasam-panchasika-per"
+  },
+  {
+   "label": "Motibagh Palace Library, Patiala: Gurpranali MS, 6 ff. (per Encyclopaedia of Sikhism)",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-gurpranali-anonymous-motibagh-ms",
+     "note": "EoS: unpublished, six folios, follows the Bala janamsakhi in dating Guru Nanak's birth to Kartik; no shelfmark."
+    }
+   ],
+   "repository": "Motibagh Palace Library, Patiala",
+   "pages": 6,
+   "host": "Encyclopaedia of Sikhism (Punjabi University)",
+   "availability": "none",
+   "item_url": "https://eos.learnpunjabi.org/GURPRANALI%20.html",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-motibagh-palace-library-patiala-gurpranali-ms-6-ff-per-encyc"
+  },
+  {
+   "label": "Atharv Ved, Punjabi tr. Gyani Jujhar Singh Azad (B. Chattar Singh Jiwan Singh, Amritsar), 248 pp.",
+   "type": "translation",
+   "contains": [
+    {
+     "work_id": "w-atharva-veda",
+     "note": "Modern Punjabi rendering sold by a Sikh bookseller; year not shown on the listing. The catalogue's first Panjabi version of this work."
+    }
+   ],
+   "languages": [
+    "Panjabi"
+   ],
+   "contributors": "Gyani Jujhar Singh Azad (translator)",
+   "publisher": "B. Chattar Singh Jiwan Singh, Amritsar",
+   "pages": 248,
+   "host": "Sikh Virasat (bookseller)",
+   "availability": "paid",
+   "item_url": "https://www.sikhvirasat.ca/sikhism-sikh-sardar-sardari-mustache-singh-kaur-religious-literature-poetry-gurbani-books-poets-language-atharv-ved",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-atharv-ved-punjabi-tr-gyani-jujhar-singh-azad-b-chattar-sing"
+  },
+  {
+   "label": "Manu Simriti: Puratan Hindu Dharam Shastar, Punjabi (B. Chattar Singh Jiwan Singh, Amritsar), 192 pp.",
+   "type": "translation",
+   "contains": [
+    {
+     "work_id": "w-manu-simriti",
+     "note": "Punjabi version sold by a Sikh bookseller; translator and year not shown on the listing."
+    }
+   ],
+   "languages": [
+    "Panjabi"
+   ],
+   "publisher": "B. Chattar Singh Jiwan Singh, Amritsar",
+   "pages": 192,
+   "host": "Sikh Virasat (bookseller)",
+   "availability": "paid",
+   "item_url": "https://www.sikhvirasat.ca/sikhism-sikh-sardar-sardari-mustache-singh-kaur-religious-literature-poetry-gurbani-books-poets-language-manusmriti",
+   "status": "candidate",
+   "found_on": "2026-10-28",
+   "found_by": "sweep-catalogue-mining",
+   "id": "v-manu-simriti-puratan-hindu-dharam-shastar-punjabi-b-chattar"
   }
  ]
 }
