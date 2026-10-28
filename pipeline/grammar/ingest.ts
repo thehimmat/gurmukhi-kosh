@@ -19,6 +19,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { fetchWordSet } from "../shared/word-sets";
 import { getArg, progress } from "../shared/utils";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
@@ -114,6 +115,8 @@ async function main() {
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`\nDone in ${elapsed}s. word_grammar: ${gramDone}.`);
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {
