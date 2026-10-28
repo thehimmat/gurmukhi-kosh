@@ -1,5 +1,5 @@
 /**
- * Migration 073: health_stats() reads its slow totals from health_stats_cache, which
+ * Migration 075: health_stats() reads its slow totals from health_stats_cache, which
  * refresh_health_stats() rebuilds after an ingest. Only the counts a user can change (open flags) and
  * the source registries stay live. Before, the function scanned definitions and line_translations on
  * every /api/health load (~17 s on production, against a 20 s limit).
@@ -37,7 +37,7 @@ const refresh = () => asRole("service_role", () => db.query("select refresh_heal
 const fnDef = async (sig: string) =>
   (await db.query<{ v: string }>(`select pg_get_functiondef('${sig}'::regprocedure) as v`)).rows[0].v;
 
-describe("073: health_stats reads its slow totals from a cache", () => {
+describe("075: health_stats reads its slow totals from a cache", () => {
   it("is filled by the migration, so health_stats answers before the first refresh", async () => {
     const s = await stats();
     expect(s.total_lines).toBe(0); // the cache predates the line loaded above

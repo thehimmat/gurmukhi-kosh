@@ -1,5 +1,7 @@
--- 073: health_stats reads its slow totals from a cache. After 072 the function still took ~17 s on
--- production (2026-10-23, explain analyze), against its own 20 s limit: the definitions scans
+-- 075: health_stats reads its slow totals from a cache. Applied as 073_health_stats_cache, then
+-- renumbered: 073_dasam_banidb_corrections (#304) took 073 first, and 074 followed it.
+--
+-- After 072 the function still took ~17 s on production (2026-10-23, explain analyze), against its own 20 s limit: the definitions scans
 -- (definitions_per_source, words_without_definition, words_with_definition_but_no_pos), the
 -- line_translations scans (lines_per_source, empty_bodies, dup_line_source, lines_with_no_commentary)
 -- and the provenance and review_status breakdowns. Under load it went past 20 s and /api/health
