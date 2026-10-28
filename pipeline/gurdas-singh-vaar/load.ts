@@ -1,11 +1,12 @@
 /**
  * Load the built Bhai Gurdas Singh vaar (build.ts's <out.json>) into Supabase with the service key,
- * then refresh the word frequencies, per-corpus and per-writer stats and first-letter keys.
+ * then refresh the word frequencies, per-corpus and per-writer stats, first-letter keys and the
+ * /health totals.
  *
  *   npm run load:gurdas-singh-vaar -- <out.json>
  *
  * Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (in .env.local or the
- * environment). Migration 075 (the source and its shabads) must be applied first. Re-running is a
+ * environment). Migration 077 (the source and its shabads) must be applied first. Re-running is a
  * no-op apart from the refreshes.
  */
 
@@ -38,6 +39,7 @@ async function main() {
     "refresh_word_corpus_stats",
     "refresh_word_corpus_writer_stats",
     "refresh_line_first_letters",
+    "refresh_health_stats",
   ] as const) {
     const { error } = await db.rpc(fn);
     if (error) {

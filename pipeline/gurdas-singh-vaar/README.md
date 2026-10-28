@@ -52,7 +52,7 @@ The keys are as typed and the page prints them, so these are the typist's slips,
    It needs pdfminer.six and gurmukhi-transliterate.
 2. `npm run build:gurdas-singh-vaar -- <extract.jsonl> <out.json> <load.sql>`. It prints 351 lines,
    28 shabads, last pauri 28, pages 1-16, 2,238 tokens and 1,049 distinct, with 0 problems.
-3. Apply migration 075, then load:
+3. Apply migration 077, then load:
    `npm run load:gurdas-singh-vaar -- <out.json>` (needs `NEXT_PUBLIC_SUPABASE_URL` and
    `SUPABASE_SERVICE_ROLE_KEY`). It loads through `pipeline/shared/load-lines.ts` and runs the four
    refreshes. Where only SQL reaches the database, run `<load.sql>` and the refreshes instead

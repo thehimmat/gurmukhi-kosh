@@ -1,7 +1,7 @@
--- 075: Bhai Gurdas Singh's vaar (ਵਾਹ ਵਾਹ ਗੋਬਿੰਦ ਸਿੰਘ ਆਪੇ ਗੁਰੁ ਚੇਲਾ), a 2008 GurbaniLipi typed text, as a
+-- 077: Bhai Gurdas Singh's vaar (ਵਾਹ ਵਾਹ ਗੋਬਿੰਦ ਸਿੰਘ ਆਪੇ ਗੁਰੁ ਚੇਲਾ), a 2008 GurbaniLipi typed text, as a
 -- curator-only corpus.
 --
--- See pipeline/gurdas-singh-vaar/README.md. Numbered 075, not 074: 074 is taken by the open index-trim PR.
+-- See pipeline/gurdas-singh-vaar/README.md. Numbered 077: 074-076 were taken while this PR waited.
 -- Who typed the text, and who holds rights to it, is unknown, so the corpus is loaded curator-only
 -- (source_rights, 069; corpora, 070) until that is settled. Publishing is one update, then re-run
 -- refresh_word_frequencies and refresh_word_corpus_stats, and refresh word_writer_stats:
