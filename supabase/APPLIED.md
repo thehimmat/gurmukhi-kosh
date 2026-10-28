@@ -431,3 +431,15 @@ into `health_stats_cache`, and `health_stats()` counts only open flags and the s
 `health_stats()` 5.6 ms warm (497 ms on its first call); cache totals unchanged at 172,604 lines and 1,430 angs, with
 1,113,816 occurrences; anon and authenticated can execute neither `refresh_health_stats` nor `refresh_computed_stats`
 and cannot read `health_stats_cache` (RLS on); `/api/health` 200 with "Totals last recomputed: 2 min ago".
+
+**076_dasam_kanna_nasal** — run 2026-10-28 on the self-hosted server (`selfhost/`, production since the cutover)
+with `docker compose exec -T db psql -v ON_ERROR_STOP=1 -1 -U postgres -d postgres < 076_dasam_kanna_nasal.sql`, in
+one transaction; Supabase, frozen at cutover, still has BaniDB's text. Kosh `076_dasam_kanna_nasal.sql`, as in the
+repo (#316). 121 Dasam lines where BaniDB has ਾਂ after a vowel sign, read in the Hazur Sahib print and 39 of them in
+the 1912 print (`pipeline/sggs/nasal-corrections.ts`, evidence and decisions on #312); seven more wait on a
+tippi-or-bindi review. psql reported 121 lines matched, 63 new words inserted, 826 occurrences rebuilt, 659 word
+counts updated. Checked after through the API: all 121 lines and transliterations read as corrected; the 91 corrected
+spellings are words with a `search_fold` and a frequency above 0; 89 of the 91 misspellings deleted (ਕਿਨੋ and ਵਜ਼ਾ
+stay, used elsewhere); the only Dasam lines left with ਾਂ after a vowel sign are the seven held back (106630, 113536,
+118908, 118909, 126247, 126395, 129315). The 63 new words have no `ipa_display` until `npm run pronounce` runs.
+`bigrams` and `collocations` catch up on the next `pipeline/compute` run.
