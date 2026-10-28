@@ -63,6 +63,34 @@ if [ ! -f "$env_file" ]; then
 else
   sed -i "s|^SITE_ADDRESS=.*|SITE_ADDRESS=$site|" "$env_file"
 fi
+# Added after the first server was set up, so appended when missing.
+grep -q '^BACKUP_TOKEN=' "$env_file" || echo "BACKUP_TOKEN=$(openssl rand -hex 24)" >> "$env_file"
+
+echo "== nightly backup (03:30 UTC, scripts/backup.sh)"
+install -d "$dir/selfhost/backups"
+sudo tee /etc/systemd/system/kosh-backup.service >/dev/null <<UNIT
+[Unit]
+Description=Nightly encrypted backup of the kosh database
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/bin/sh $dir/selfhost/scripts/backup.sh
+UNIT
+sudo tee /etc/systemd/system/kosh-backup.timer >/dev/null <<'UNIT'
+[Unit]
+Description=Nightly encrypted backup of the kosh database
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable --now kosh-backup.timer
 
 echo "== stack"
 # From inside selfhost/: Compose reads COMPOSE_FILE from .env relative to where it runs.
@@ -72,3 +100,7 @@ sudo docker compose ps --format '{{.Service}}: {{.Status}}'
 echo
 echo "Done. Public anon key (safe to share; it ships to browsers):"
 grep '^ANON_KEY=' "$env_file" | cut -d= -f2
+if [ ! -s "$dir/selfhost/backup.pass" ]; then
+  echo
+  echo "Backups are not on yet: selfhost/backup.pass is missing (selfhost/README.md, Backups)."
+fi

@@ -65,6 +65,11 @@ describe.skipIf(!live)("self-hosted gateway", () => {
     expect(status).toBe(200);
   });
 
+  it("answers /health without an apikey once the database is reachable (uptime checks)", async () => {
+    const res = await fetch(`${URL}/health`);
+    expect(res.status).toBe(200);
+  });
+
   it("refuses a request without an apikey", async () => {
     const res = await fetch(`${URL}/rest/v1/words?select=id&limit=1`);
     expect(res.status).toBe(401);

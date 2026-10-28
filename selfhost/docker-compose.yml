@@ -33,6 +33,7 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET:?set in selfhost/.env}
       PGRST_DB_MAX_ROWS: "1000" # Supabase's default; the apps page at 1000 (lib/fetch-all-rows)
       PGRST_DB_POOL: "20"
+      PGRST_ADMIN_SERVER_PORT: "3001" # /ready answers 200 once the database is reachable
 
   gateway:
     image: caddy:2.8.4
@@ -42,9 +43,11 @@ services:
       SITE_ADDRESS: ${SITE_ADDRESS:-:8000}
       ANON_KEY: ${ANON_KEY:?run selfhost/scripts/mint-keys.mjs}
       SERVICE_KEY: ${SERVICE_KEY:?run selfhost/scripts/mint-keys.mjs}
+      BACKUP_TOKEN: ${BACKUP_TOKEN:?set in selfhost/.env (openssl rand -hex 24)}
     ports: ["${GATEWAY_PORTS:-8000:8000}"]
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./backups:/srv/backups:ro
       - caddy_data:/data
 
 volumes:

@@ -19,6 +19,21 @@
 		}
 	}
 
+	# The latest nightly backup (encrypted; scripts/backup.sh) for .github/workflows/backup.yml to
+	# copy offsite. Only that one file, behind a random token from .env.
+	handle /backups/{$BACKUP_TOKEN}/latest.dump.gpg {
+		root * /srv/backups
+		rewrite * /latest.dump.gpg
+		file_server
+	}
+
+	# For uptime checks: 200 only when PostgREST is up and reaches the database. No apikey needed;
+	# it says nothing but up or down.
+	handle /health {
+		rewrite * /ready
+		reverse_proxy rest:3001
+	}
+
 	handle {
 		respond 404
 	}
