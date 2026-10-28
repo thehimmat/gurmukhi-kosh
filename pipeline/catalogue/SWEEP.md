@@ -69,7 +69,8 @@ account there that must not get flagged.
    branch as its own commit ("Promote reviewed sweep finds").
 
 2. **Plan.** `python3 pipeline/catalogue/sweep_plan.py <today, America/Los_Angeles>` gives the
-   slice and five wanted works.
+   slice and five wanted works. The rotation follows the run count in `data/sweeps.jsonl`,
+   so always log the run (step 5), whatever the schedule.
 
 3. **Search.** Spend most effort on the slice; for each of the five wanted works, also search
    the slice's sources *and* the web generally. Search in roman and Gurmukhi spellings and any

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Which source slice and which wanted works a sweep covers on a given date.
+"""Which source slice and which wanted works a sweep run covers.
 
   python3 pipeline/catalogue/sweep_plan.py YYYY-MM-DD
 
-Deterministic from the date, so runs need no shared state: the slices rotate daily,
-and a window of WANTED_PER_DAY works walks down the wanted list (neediest first).
+Keyed to the run count (lines in data/sweeps.jsonl), not the date, so the rotation holds
+whatever the schedule: run n takes slice n mod 7, and a window of WANTED_PER_RUN works
+walks down the wanted list (earliest era first, then neediest).
 """
 
 import json
 import os
 import sys
-from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -18,8 +18,8 @@ sys.path.insert(0, HERE)
 from build import by_work, composed_by, holding, wanted  # noqa: E402
 from schema import era, load  # noqa: E402
 
-EPOCH = date(2026, 10, 29)  # first sweep
-WANTED_PER_DAY = 5
+LOG = os.path.join(HERE, "data", "sweeps.jsonl")
+WANTED_PER_RUN = 5
 
 SLICES = [
     {"key": "pdl", "name": "Panjab Digital Library",
@@ -46,14 +46,22 @@ SLICES = [
 ]
 
 
-def plan(cat: dict, day: str) -> dict:
-    n = (date.fromisoformat(day) - EPOCH).days
+def runs_logged(path: str = LOG) -> int:
+    try:
+        with open(path, encoding="utf-8") as f:
+            return sum(1 for line in f if line.strip())
+    except FileNotFoundError:
+        return 0
+
+
+def plan(cat: dict, day: str, run: int) -> dict:
     w = wanted(cat)
-    window = [w[(n * WANTED_PER_DAY + i) % len(w)] for i in range(min(WANTED_PER_DAY, len(w)))] if w else []
+    window = [w[(run * WANTED_PER_RUN + i) % len(w)] for i in range(min(WANTED_PER_RUN, len(w)))] if w else []
     vbw = by_work(cat)
     return {
         "date": day,
-        "slice": SLICES[n % len(SLICES)],
+        "run": run,
+        "slice": SLICES[run % len(SLICES)],
         "wanted": [{"id": work["id"], "title": work["title"]["roman"],
                     "authors": [a["name"] for a in work.get("authors", [])],
                     "era": era(composed_by(work, vbw[work["id"]])),
@@ -62,4 +70,4 @@ def plan(cat: dict, day: str) -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(plan(load(), sys.argv[1]), ensure_ascii=False, indent=1))
+    print(json.dumps(plan(load(), sys.argv[1], runs_logged()), ensure_ascii=False, indent=1))
