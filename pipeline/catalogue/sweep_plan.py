@@ -15,8 +15,8 @@ from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from build import holding, by_work, wanted  # noqa: E402
-from schema import load  # noqa: E402
+from build import by_work, composed_by, holding, wanted  # noqa: E402
+from schema import era, load  # noqa: E402
 
 EPOCH = date(2026, 10, 29)  # first sweep
 WANTED_PER_DAY = 5
@@ -56,6 +56,7 @@ def plan(cat: dict, day: str) -> dict:
         "slice": SLICES[n % len(SLICES)],
         "wanted": [{"id": work["id"], "title": work["title"]["roman"],
                     "authors": [a["name"] for a in work.get("authors", [])],
+                    "era": era(composed_by(work, vbw[work["id"]])),
                     "holding": holding(vbw[work["id"]])} for work, _ in window],
     }
 
