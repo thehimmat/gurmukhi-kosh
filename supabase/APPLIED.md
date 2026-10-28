@@ -453,3 +453,14 @@ gurdas) gives the same schema whichever ran first. The last seven Dasam lines of
 the API: all 128 lines from 076 and 077 read as corrected, with their transliterations; the 7 new words have a
 `search_fold`, a frequency above 0 and, after `npm run pronounce`, an `ipa_display`; no public line in any corpus has
 ਾਂ after a vowel sign.
+
+**078_gurdas_singh_vaar_source** — run 2026-10-28 on the self-hosted server, about an hour after 077, with
+`docker compose exec -T db psql -v ON_ERROR_STOP=1 -1 -U postgres -d postgres` in one transaction, together with the
+vaar's line load and the five refreshes (`refresh_word_frequencies`, `refresh_word_corpus_stats`,
+`refresh_word_corpus_writer_stats`, `refresh_line_first_letters`, `refresh_health_stats`). Merged as #307 under the
+number 077, which #326 had also taken; renumbered 078 here, matching the server's order. The lines were built from
+Drive `1bK_ozg_3Fy_e4EytWhm65vwuFxLc5pn5` (`pipeline/gurdas-singh-vaar/`): 351 lines, 28 shabads, 2,238 tokens,
+1,049 distinct, 0 problems, as in the PR; the combined file was dry-run on the PGlite replay first (same counts,
+re-run a no-op). psql read back source 8 `gurdas_singh_vaar_2008`, `curator`, 351 lines, 0 public, 28 shabads,
+2,238 occurrences. New words have no `ipa_display` or `search_fold` until `npm run pronounce` and
+`npm run searchfold` run against the server.

@@ -1,5 +1,5 @@
 /**
- * Migration 077: Bhai Gurdas Singh's vaar (the 2008 GurbaniLipi typed text) as a curator-only corpus
+ * Migration 078: Bhai Gurdas Singh's vaar (the 2008 GurbaniLipi typed text) as a curator-only corpus
  * (source_rights 069, corpora 070), with one shabad per pauri. Who holds the rights to the typing is
  * unknown, so it stays hidden from the public until that is settled.
  */
@@ -23,7 +23,7 @@ beforeAll(async () => {
 
 const one = async <T>(sql: string) => (await db.query<{ v: T }>(sql)).rows[0]?.v;
 
-describe("077: Bhai Gurdas Singh's vaar", () => {
+describe("078: Bhai Gurdas Singh's vaar", () => {
   it("is a curator-only historical source read after Bhai Gurdas's vaars", async () => {
     const s = (await db.query<Record<string, unknown>>(
       `select s.id::int, s.slug, s.kind, s.tier, s.rank, s.page_unit, s.searched_by_default, s.author, s.external_refs,
