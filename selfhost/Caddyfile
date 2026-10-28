@@ -3,8 +3,10 @@
 {$SITE_ADDRESS} {
 	# Supabase's gateway refuses any request whose apikey isn't one of the project's keys. Same here,
 	# so the API answers nobody who hasn't loaded one of the apps. Preflights carry no apikey.
+	# The bearer token must be a current key too, or absent (PostgREST then uses anon): a replaced
+	# key is still validly signed, so this is what retires it.
 	@preflight method OPTIONS
-	@keyed expression `{header.apikey} == "{$ANON_KEY}" || {header.apikey} == "{$SERVICE_KEY}"`
+	@keyed expression `({header.apikey} == "{$ANON_KEY}" || {header.apikey} == "{$SERVICE_KEY}") && ({header.Authorization} == "" || {header.Authorization} == "Bearer {$ANON_KEY}" || {header.Authorization} == "Bearer {$SERVICE_KEY}")`
 
 	handle_path /rest/v1/* {
 		handle @preflight {

@@ -132,6 +132,25 @@ describe.skipIf(!live)("self-hosted gateway", () => {
     expect(res.status).toBe(401);
   });
 
+  // A key that's been replaced is still validly signed (same JWT secret), so the gateway accepts
+  // only the current keys as the bearer token too, or none (PostgREST then uses anon).
+  it("refuses a validly signed token that isn't one of the current keys", async () => {
+    const secret = process.env.SELFHOST_JWT_SECRET;
+    expect(secret, "set SELFHOST_JWT_SECRET").toBeTruthy();
+    const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+    const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64({ iss: "gurmukhi-kosh", role: "service_role", iat: 1 })}`;
+    const old = `${body}.${createHmac("sha256", secret!).update(body).digest("base64url")}`;
+    const res = await fetch(`${URL}/rest/v1/words?select=id&limit=1`, {
+      headers: { apikey: ANON, Authorization: `Bearer ${old}` },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("serves a request with only the apikey header (no Authorization) as anon", async () => {
+    const res = await fetch(`${URL}/rest/v1/words?select=id&limit=1`, { headers: { apikey: ANON } });
+    expect(res.status).toBe(200);
+  });
+
   it("hides curator-only sources from anon (RLS, migration 069)", async () => {
     const { data, error } = await anon().from("definitions").select("definition_text").eq("word_id", wordId);
     expect(error).toBeNull();
