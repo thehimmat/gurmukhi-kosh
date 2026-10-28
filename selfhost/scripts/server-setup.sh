@@ -1,14 +1,14 @@
 #!/bin/bash
 # One-time setup of the Oracle VM (Ubuntu 24.04, as the `ubuntu` user). Safe to re-run. From a Mac:
 #
-#   ssh ubuntu@<ip> 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/feat/selfhost-postgrest/selfhost/scripts/server-setup.sh | bash -s -- <api-domain>'
+#   ssh ubuntu@<ip> 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/main/selfhost/scripts/server-setup.sh | bash -s -- <api-domain>'
 #
 # <api-domain> is the name Caddy gets a TLS certificate for, e.g. api.example.org, pointing at the
 # VM. Without one, use <ip-with-dashes>.sslip.io (e.g. 141-148-39-45.sslip.io), which resolves to the
 # IP with no DNS setup.
 set -euo pipefail
 site=${1:?usage: server-setup.sh <api-domain>}
-branch=${KOSH_BRANCH:-feat/selfhost-postgrest}
+branch=${KOSH_BRANCH:-main}
 dir=/opt/kosh
 
 echo "== packages and automatic security updates"

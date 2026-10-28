@@ -12,7 +12,7 @@ and the dashboard.
 - **Server:** Oracle VM `kosh-db` (Ashburn, Ampere A1, 2 OCPU / 12 GB, Ubuntu 24.04), `141.148.39.45`
 - **API:** `https://141-148-39-45.sslip.io` (sslip.io resolves the name to the IP; swap in a real
   domain by re-running setup with it, then updating the apps' URL)
-- **Code and secrets on the server:** `/opt/kosh` (this branch); secrets in
+- **Code and secrets on the server:** `/opt/kosh` (`main`; re-running setup updates it); secrets in
   `/opt/kosh/selfhost/.env` and `backup.pass`, both gitignored and mode 600
 
 ## Files
@@ -57,7 +57,7 @@ From a machine that can SSH to the VM (one command per step; each prints a short
 
 ```sh
 # 1. Set up, or update to the latest code on this branch (safe to re-run; keeps existing secrets)
-ssh ubuntu@141.148.39.45 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/feat/selfhost-postgrest/selfhost/scripts/server-setup.sh | bash -s -- 141-148-39-45.sslip.io'
+ssh ubuntu@141.148.39.45 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/main/selfhost/scripts/server-setup.sh | bash -s -- 141-148-39-45.sslip.io'
 
 # 2. Restore a fresh dump from Supabase into an empty database (prompts for the session-pooler URL)
 ssh -t ubuntu@141.148.39.45 'cd /opt/kosh && read -rsp "Supabase session pooler URL: " SUPABASE_DB_URL && echo && SUPABASE_DB_URL=$SUPABASE_DB_URL sh selfhost/scripts/restore.sh --supabase'
