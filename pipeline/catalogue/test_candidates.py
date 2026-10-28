@@ -146,7 +146,7 @@ class Digest(unittest.TestCase):
     def test_groups_in_era_order_with_leads_last(self):
         heads = [line for line in self.md.splitlines() if line.startswith("### ")]
         self.assertEqual(heads, ["### Copies made before 1850", "### Copies made 1850–1899",
-                                 "### Copies made 1900 or later", "### Leads: manuscripts known from catalogues, no scan yet"])
+                                 "### Copies made 1900 or later", "### Leads: known from catalogues or citations, no copy online yet"])
 
     def test_lines_show_composed_and_copy_dates_converted(self):
         line = next(x for x in self.md.splitlines() if "GS MS 1790" in x)
@@ -154,6 +154,8 @@ class Digest(unittest.TestCase):
         line = next(x for x in self.md.splitlines() if "Litho 1876" in x)
         self.assertIn("composed c. 1700", line)
         self.assertIn("✚", line)  # a new work
+        line = next(x for x in self.md.splitlines() if "Modern ed." in x)
+        self.assertIn("printed 1972", line)
         lead = next(x for x in self.md.splitlines() if "Motibagh" in x)
         self.assertIn("composed c. 1919 Bk/AD 1862 (1852–1872 CE)", lead)
 

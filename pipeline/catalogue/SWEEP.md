@@ -41,6 +41,20 @@ numerals, keeps a CE year the source also gives, and leaves Nanakshahi and Khals
 years alone. Don't convert by hand. `schema.py` refuses a Bikrami date stored unconverted.
 Check the parsed CE year in the digest before opening the PR.
 
+## Pace (be a polite visitor)
+
+Libraries like the Panjab Digital Library throttle fast readers, and the user has an
+account there that must not get flagged.
+- **Only WebSearch and WebFetch.** Never a browser (Claude in Chrome, the in-app browser):
+  those carry the user's own sign-ins.
+- **One request at a time to any one site**, never several in parallel, and spend the gap
+  reading. At most **30 page loads per site per run** (PDL: 20).
+- **Catalogue and search pages only.** Never open a scan reader or viewer, page through a
+  scan, or download a scan file. Record the item page; the user downloads what they accept.
+- **Stop at the first sign of throttling** ("going too fast", "slow down", HTTP 429/503, a
+  captcha). Don't retry that site this run; note it in the log and the PR, and carry on with
+  other sources.
+
 ## Steps
 
 0. **Guard.** If 3 or more open PRs have branches starting `chore/catalogue-sweep-`, stop and
@@ -76,7 +90,7 @@ Check the parsed CE year in the digest before opening the PR.
    Then `python3 pipeline/catalogue/build.py` and the four `test_*.py` files and `schema.py`.
 
 5. **Log.** Append one line to `data/sweeps.jsonl`:
-   `{"date", "slice", "wanted_checked": [ids], "queries": [...], "added_works", "added_versions", "skipped": n, "unverified_leads": n}`.
+   `{"date", "slice", "wanted_checked": [ids], "queries": [...], "page_loads": {site: n}, "throttled": [sites], "added_works", "added_versions", "skipped": n, "unverified_leads": n}`.
 
 6. **PR**, only if something was added or promoted. Branch `chore/catalogue-sweep-<date>`,
    from main, PR base `main`. Body, kept short:

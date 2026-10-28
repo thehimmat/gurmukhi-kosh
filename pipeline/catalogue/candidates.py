@@ -162,7 +162,7 @@ def _date_str(label, d) -> str:
 
 GROUPS = [("pre-1850", "Copies made before 1850"), ("1850-1899", "Copies made 1850–1899"),
           ("1900+", "Copies made 1900 or later"), ("undated", "Undated copies")]
-LEADS = "Leads: manuscripts known from catalogues, no scan yet"
+LEADS = "Leads: known from catalogues or citations, no copy online yet"
 
 
 def digest(cat: dict) -> str:
@@ -186,7 +186,8 @@ def digest(cat: dict) -> str:
         else:
             mark = "+"
         composed = "; ".join(filter(None, (_date_str("composed", w.get("date")) for w in ws)))
-        bits = [composed, _date_str("copy", v.get("date")), ", ".join(v.get("scripts", [])),
+        made = "copy" if v["type"] in ("manuscript", "catalogue-record") else "printed"
+        bits = [composed, _date_str(made, v.get("date")), ", ".join(v.get("scripts", [])),
                 ", ".join(v.get("languages", []))]
         url = v.get("file_url") or v.get("item_url")
         if url:
