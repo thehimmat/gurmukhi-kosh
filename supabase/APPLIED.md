@@ -443,3 +443,13 @@ spellings are words with a `search_fold` and a frequency above 0; 89 of the 91 m
 stay, used elsewhere); the only Dasam lines left with ਾਂ after a vowel sign are the seven held back (106630, 113536,
 118908, 118909, 126247, 126395, 129315). The 63 new words have no `ipa_display` until `npm run pronounce` runs.
 `bigrams` and `collocations` catch up on the next `pipeline/compute` run.
+
+**077_dasam_hi_nasal** — run 2026-10-28 on the self-hosted server, the same way as 076 (psql, one transaction).
+Kosh `077_dasam_hi_nasal.sql`, as in the repo (#326). Not the only 077: `077_gurdas_singh_vaar_source.sql` (#307)
+merged the same day under the same number. The two touch different objects, so the replay's order (dasam, then
+gurdas) gives the same schema whichever ran first. The last seven Dasam lines of #312, a nasal after ਹਿ (bindi in
+106630, 113536, 118908, 118909 and 129315; tippi in 126247 and 126395; `NASAL_HI` in
+`pipeline/sggs/nasal-corrections.ts`). psql reported 7 lines matched and 7 new words inserted. Checked after through
+the API: all 128 lines from 076 and 077 read as corrected, with their transliterations; the 7 new words have a
+`search_fold`, a frequency above 0 and, after `npm run pronounce`, an `ipa_display`; no public line in any corpus has
+ਾਂ after a vowel sign.
