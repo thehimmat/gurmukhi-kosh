@@ -28,6 +28,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "./shared/db";
+import { refreshHealthStats } from "./shared/health-stats";
 import { getArg } from "./shared/utils";
 import { wipeFormLinks } from "./shared/wipe-form-links";
 
@@ -138,6 +139,8 @@ async function main() {
   console.log(
     `The dict_sources row itself is kept, so re-running the source's ingest restores everything.\n`
   );
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {

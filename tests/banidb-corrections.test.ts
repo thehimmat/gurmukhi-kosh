@@ -1,12 +1,13 @@
 /**
  * BaniDB lines we know are mistyped (pipeline/sggs/corrections.ts): the ingest swaps in the
- * corrected line, and migration 073 fixes the copy already loaded.
+ * corrected line, and migrations 073 (typos) and 076 (ਾਂ after a vowel sign) fix the copy already loaded.
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { CORRECTIONS, correctLine } from "../pipeline/sggs/corrections";
+import { CORRECTIONS, TYPOS, correctLine } from "../pipeline/sggs/corrections";
+import { NASAL } from "../pipeline/sggs/nasal-corrections";
 
-const MIGRATION = readFileSync("supabase/migrations/073_dasam_banidb_corrections.sql", "utf8");
+const sql = (f: string) => readFileSync(`supabase/migrations/${f}`, "utf8");
 const dasam = CORRECTIONS.dasam_banidb_v2;
 
 // Two vowel signs on one letter, the pattern that found most of these.
@@ -45,11 +46,30 @@ describe("BaniDB line corrections", () => {
     for (const c of dasam) expect(c.to, `verse ${c.verseId}`).not.toMatch(DOUBLE_VOWEL);
   });
 
-  it("is what migration 073 applies to the loaded copy", () => {
-    for (const c of dasam) {
-      for (const s of [String(c.verseId), c.from, c.to, c.translitFrom, c.translitTo]) {
-        expect(MIGRATION, `verse ${c.verseId}: ${s}`).toContain(s.replaceAll("'", "''"));
+  it("holds each list once", () => {
+    expect(dasam).toEqual([...TYPOS, ...NASAL]);
+  });
+
+  for (const [file, list] of [["073_dasam_banidb_corrections.sql", TYPOS], ["076_dasam_kanna_nasal.sql", NASAL]] as const) {
+    it(`is what migration ${file.slice(0, 3)} applies to the loaded copy`, () => {
+      const migration = sql(file);
+      for (const c of list) {
+        for (const s of [String(c.verseId), c.from, c.to, c.translitFrom, c.translitTo]) {
+          expect(migration, `verse ${c.verseId}: ${s}`).toContain(s.replaceAll("'", "''"));
+        }
       }
+    });
+  }
+
+  it("leaves no ਾਂ after a vowel sign", () => {
+    for (const c of dasam) expect(c.to, `verse ${c.verseId}`).not.toMatch(/[ਿੀੁੂੇੈੋੌਉਊਏ]ਾਂ/);
+  });
+
+  it("changes only the ਾਂ words, keeping the line's word count", () => {
+    for (const c of NASAL) {
+      expect(c.to.split(" ").length, `verse ${c.verseId}`).toBe(c.from.split(" ").length);
+      expect(c.translitTo.split(" ").length, `verse ${c.verseId}`).toBe(c.translitFrom.split(" ").length);
+      expect(c.from, `verse ${c.verseId}`).toMatch(/[ਿੀੁੂੇੈੋੌਉਊਏ]ਾਂ/);
     }
   });
 });

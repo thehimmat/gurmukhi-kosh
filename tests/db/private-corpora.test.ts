@@ -48,6 +48,7 @@ async function seed(db: PGlite) {
     select refresh_word_corpus_writer_stats();
     select refresh_line_first_letters();
     refresh materialized view word_writer_stats;
+    select refresh_health_stats();
   `);
 }
 
