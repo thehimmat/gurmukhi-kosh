@@ -2,7 +2,7 @@
 
 Generated from `catalogue.json` by `build.py`; don't edit by hand. See README.md.
 
-232 works, 470 versions (309 in Drive).
+232 works, 474 versions (309 in Drive).
 
 Holding: 95 historic, 93 edition, 37 extracts, 2 online-only, 0 known-only, 5 nothing.
 
@@ -200,7 +200,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Bachitar Natak (Bachittar Natak) | Guru Gobind Singh (traditional); contested by some modern scholars (court poets) | historic | 5 | 4 | 1688 |
 | Bahar-e Danish | Inayat Allah Kamboh (Persian original, 1651); Bhasha version made via Bhai Nand Chand per TGK | historic | 4 | 3 | 1799 |
 | Balmiki (Valmiki) Ramayana |  | historic | 5 | 2 | 1834 |
-| Bansavalinama Dasan Patshahian Ka | Kesar Singh Chhibbar | nothing | 1 | 0 | 1769 |
+| Bansavalinama Dasan Patshahian Ka | Kesar Singh Chhibbar | nothing | 2 | 0 | 1972 |
 | Barahmaha Sri Ram Chandar | Bhai Gurdas Singh ('Gurdas II') (the book; Wikipedia) — said to be written soon after 1708; not Bhai Gurdas Bhalla | edition | 2 | 2 | 1959 |
 | Bhagwata Purana |  | historic | 5 | 4 | 1840 |
 | Bhasha Bhushan (commentary) | Harcharandas as commentator (the book); original Bhasha Bhushan by Maharaja Jaswant Singh of Marwar | historic | 6 | 5 | 1866 |
@@ -238,7 +238,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Gitasara-muktipada |  | historic | 1 | 1 |  |
 | Gobind Gita |  | historic | 1 | 1 |  |
 | Gulistān | Sa'di Shirazi | historic | 5 | 2 | 1851 |
-| Gur Kirat Prakash | Vir Singh Bal | nothing | 1 | 0 | 1834 |
+| Gur Kirat Prakash | Vir Singh Bal | nothing | 3 | 0 | 1986 |
 | Gur Mahima | Brahm Bhatt | extracts | 1 | 1 | 1976 |
 | Gur Shabad Sidhi | Attributed on the title page to 'Sri Man Bhai Mani Singh ji wala' (traditional attribution, unverified) | edition | 1 | 1 | 2006 |
 | Gurbani Arth Bhandar |  | edition | 1 | 1 |  |
@@ -362,7 +362,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Shukar Niti (Shukraniti) |  | historic | 3 | 1 | 1882 |
 | Shāhnāma | Abu'l-Qasim Firdawsi | historic | 4 | 1 | 1829 |
 | Sikhan di Bhagatmala (Sikkhan di Bhagat-mal) | Bhai Mani Singh (d. 1734; traditional); Giani Surat Singh of the Gianian Bunga, from Mani Singh's oral teaching (Padam); unnamed author (most modern scholars). Note: no source found that separates two different Mani Singhs; worth checking in print | historic | 6 | 4 | 1845 |
-| Singh Sagar | Vir Singh Bal | nothing | 1 | 0 | 1827 |
+| Singh Sagar | Vir Singh Bal | nothing | 2 | 0 | 1986 |
 | Singh-Gau ki Katha | Devi Das Pandit (Chhibbar) | historic | 3 | 2 | 1976 |
 | Six darshanas: Vedanta, Nyay, Vaisheshik, Sankhya, Yog, Uttar Mimansa |  | historic | 5 | 2 | 1890 |
 | Skanda Purana |  | historic | 4 | 2 | 1877 |
@@ -372,7 +372,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Sri Diwali Path Mahatam – revised/expanded edition | Compilation | edition | 1 | 1 | 2019 |
 | Sri Gur Panth Prakash |  | historic | 1 | 1 |  |
 | Sri Gur Sobha | Sainapati (Chandra Sain) | historic | 6 | 2 | 1925 |
-| Sri Guru Dasam Panchasika | Sahib Singh Mrigind | nothing | 1 | 0 | 1862 |
+| Sri Guru Dasam Panchasika | Sahib Singh Mrigind | nothing | 1 | 0 |  |
 | Sri Guru Granth Sahib Darpan |  | edition | 1 | 1 |  |
 | Sri Nanak Prakash Gur Partap Suraj Granth |  | historic | 1 | 1 |  |
 | Srī Gurū Granth Prayāy (similar title) | Bhai Kirat Singh (the book, via Padam); anonymous (Encyclopaedia of Sikhism, for 'Sri Guru Granth Prayay'); later paryai compilers, e.g. Chanda Singh (1848) | extracts | 3 | 1 | 1976 |
