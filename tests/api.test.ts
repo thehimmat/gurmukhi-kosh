@@ -19,7 +19,8 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 describe("environment", () => {
   it("NEXT_PUBLIC_SUPABASE_URL is set", () => {
     expect(SUPABASE_URL).toBeTruthy();
-    expect(SUPABASE_URL).toContain("supabase.co");
+    // Supabase or the self-hosted gateway (selfhost/): any absolute http(s) URL.
+    expect(new URL(SUPABASE_URL).protocol).toMatch(/^https?:$/);
   });
 
   it("NEXT_PUBLIC_SUPABASE_ANON_KEY is set", () => {

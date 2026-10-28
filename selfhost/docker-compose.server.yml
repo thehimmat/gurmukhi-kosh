@@ -1,0 +1,7 @@
+# On the server, added to docker-compose.yml through COMPOSE_FILE in selfhost/.env: Caddy answers on
+# 80 and 443 and fetches its own TLS certificate for SITE_ADDRESS.
+services:
+  gateway:
+    ports:
+      - "80:80"
+      - "443:443"

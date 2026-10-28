@@ -1,5 +1,9 @@
 # Database backups
 
+> **Since 2026-10-28 production runs on the self-hosted server** (`selfhost/`). It backs itself up
+> nightly and the workflow below copies the latest file offsite: see `selfhost/README.md`, Backups.
+> The Supabase steps below apply while `KOSH_BACKUP_URL` is unset, and to restoring into Supabase.
+
 Supabase's Free plan keeps no backups. `.github/workflows/backup.yml` dumps the production database
 every Sunday (and on demand: Actions → Weekly database backup → Run workflow), encrypts it, and keeps
 it as a workflow artifact for 90 days. The repo is public and so are its artifacts, so a dump is only
