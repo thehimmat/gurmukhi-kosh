@@ -23,6 +23,7 @@ config({ path: ".env.local" });
 import * as fs from "fs";
 import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { sleep, progress } from "../shared/utils";
 import { duplicateSenseKeys } from "./sense-keys";
 
@@ -276,6 +277,8 @@ async function main() {
   console.log(
     `\n\nDone. ${done} rows upserted, ${errors} errors. Total: ${elapsed}s`
   );
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {

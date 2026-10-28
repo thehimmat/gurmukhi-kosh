@@ -23,6 +23,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { lineIdByVerseId, type LineQuery } from "../shared/lines";
 import { fetchAng } from "../../lib/banidb";
 import { getArg, sleep, progress } from "../shared/utils";
@@ -138,6 +139,8 @@ async function main() {
       (missingLines ? ` (${missingLines} verses had no matching line)` : "") +
       "."
   );
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {

@@ -21,6 +21,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { sleep, progress } from "../shared/utils";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { extractEtymologyCandidates, type ParsedOrigin } from "./parse";
@@ -254,6 +255,8 @@ async function main() {
     progress(done, allRows.length, t0, "Etymology ");
   }
   console.log(`\n\nDone. etymology: ${done} rows / ${wordIds.length} words.`);
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {

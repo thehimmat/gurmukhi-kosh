@@ -27,6 +27,7 @@ config({ path: ".env.local" });
 import * as fs from "fs";
 import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { sleep, progress, getArg } from "../shared/utils";
 
 const JSONL_PATH = getArg("in") ?? "pipeline/sikhri/output/entries.jsonl";
@@ -160,6 +161,8 @@ async function main() {
 
   await db.from("dict_sources").update({ ingested_at: new Date().toISOString() }).eq("id", dictSourceId);
   console.log(`\n\nDone. ${done} sikhri definition rows / ${byWord.size} words.`);
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {
