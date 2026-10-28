@@ -12,7 +12,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from candidates import add, promote, seen  # noqa: E402
+from candidates import add, digest, promote, seen  # noqa: E402
 from schema import validate  # noqa: E402
 
 BASE = {
@@ -98,6 +98,71 @@ class Add(unittest.TestCase):
             add(cat, {"versions": [{"label": "bad", "type": "book", "contains": [{"work_id": "w-sri-gur-sobha"}],
                                     "item_url": "https://e.org/b"}]}, DATE, BY)
         self.assertEqual(cat, BASE)
+
+
+class ComposedDates(unittest.TestCase):
+    def test_composed_goes_on_the_work_and_date_on_the_copy(self):
+        cat = fresh()
+        add(cat, {"versions": [{"label": "Bansavalinama MS, Khalsa College", "type": "catalogue-record",
+                                "contains": [{"work_title": "Bansavalinama", "composed": "1826 Bk/AD 1769"}],
+                                "repository": "Khalsa College", "shelfmark": "MS 1"}]}, DATE, BY)
+        w = cat["works"][-1]
+        self.assertEqual((w["date"]["text"], w["date"]["from"]), ("1826 Bk/AD 1769", 1769))
+        self.assertNotIn("date", cat["versions"][-1])
+
+    def test_composed_fills_a_gap_on_a_known_work_but_never_overwrites(self):
+        cat = fresh()
+        add(cat, {"versions": [{"label": "GS MS", "type": "manuscript", "item_url": "https://e.org/gs1",
+                                "contains": [{"work_id": "w-sri-gur-sobha", "composed": "1711"}]}]}, DATE, BY)
+        self.assertEqual(cat["works"][0]["date"]["from"], 1711)
+        add(cat, {"versions": [{"label": "GS MS 2", "type": "manuscript", "item_url": "https://e.org/gs2",
+                                "contains": [{"work_id": "w-sri-gur-sobha", "composed": "1741"}]}]}, DATE, BY)
+        self.assertEqual(cat["works"][0]["date"]["from"], 1711)
+
+    def test_unconverted_bikrami_refused(self):
+        cat = fresh()
+        with self.assertRaises(ValueError):
+            add(cat, {"versions": [{"label": "x", "type": "manuscript", "item_url": "https://e.org/x",
+                                    "contains": [{"work_id": "w-sri-gur-sobha"}],
+                                    "date": {"text": "Sammat 1884", "from": 1884, "to": 1884, "approx": True}}]},
+                DATE, BY)
+
+
+class Digest(unittest.TestCase):
+    def setUp(self):
+        self.cat = fresh()
+        add(self.cat, {"versions": [
+            {"label": "GS MS 1790", "type": "manuscript", "item_url": "https://e.org/1", "date": "Sammat 1847",
+             "scripts": ["Gurmukhi"], "contains": [{"work_id": "w-sri-gur-sobha"}]},
+            {"label": "Litho 1876", "type": "lithograph", "item_url": "https://e.org/2", "date": "1876",
+             "contains": [{"work_title": "Prem Sumarag", "composed": "c. 1700"}]},
+            {"label": "Modern ed.", "type": "edition", "item_url": "https://e.org/3", "date": "1972",
+             "contains": [{"work_id": "w-sri-gur-sobha"}]},
+            {"label": "Motibagh MS 148", "type": "catalogue-record", "repository": "Motibagh", "shelfmark": "148",
+             "item_url": "https://e.org/4", "contains": [{"work_title": "Dasam Panchasika", "composed": "c. 1919 Bk/AD 1862"}]},
+        ]}, DATE, BY)
+        self.md = digest(self.cat)
+
+    def test_groups_in_era_order_with_leads_last(self):
+        heads = [line for line in self.md.splitlines() if line.startswith("### ")]
+        self.assertEqual(heads, ["### Copies made before 1850", "### Copies made 1850–1899",
+                                 "### Copies made 1900 or later", "### Leads: manuscripts known from catalogues, no scan yet"])
+
+    def test_lines_show_composed_and_copy_dates_converted(self):
+        line = next(x for x in self.md.splitlines() if "GS MS 1790" in x)
+        self.assertIn("copy Sammat 1847 (1790 CE)", line)
+        line = next(x for x in self.md.splitlines() if "Litho 1876" in x)
+        self.assertIn("composed c. 1700", line)
+        self.assertIn("✚", line)  # a new work
+        lead = next(x for x in self.md.splitlines() if "Motibagh" in x)
+        self.assertIn("composed c. 1919 Bk/AD 1862 (1852–1872 CE)", lead)
+
+    def test_ids_and_links(self):
+        self.assertIn("[link](https://e.org/2)", self.md)
+        self.assertTrue(all(f"`{v['id']}`" in self.md for v in self.cat["versions"] if v["status"] == "candidate"))
+
+    def test_empty(self):
+        self.assertEqual(digest(fresh()), "No candidates.\n")
 
 
 class Seen(unittest.TestCase):

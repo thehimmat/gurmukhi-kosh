@@ -12,7 +12,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from build import holding, render_markdown, version_rows, wanted, work_rows, write_csvs, write_xlsx  # noqa: E402
+from build import composed_by, holding, render_markdown, version_rows, wanted, work_rows, write_csvs, write_xlsx  # noqa: E402
 
 
 def work(i, **kw):
@@ -89,6 +89,44 @@ class Wanted(unittest.TestCase):
         leads = {w["id"]: lead for w, lead in wanted(CAT)}
         self.assertEqual(leads["w-pandav"]["id"], "v-pandav-ms")
         self.assertIsNone(leads["w-chanakya"])
+
+
+class EraPriority(unittest.TestCase):
+    def cat(self):
+        return {"version": 1, "works": [
+            work("late", date={"text": "1880", "from": 1880, "to": 1880}),
+            work("undated"),
+            work("modern", date={"text": "1920", "from": 1920, "to": 1920}),
+            work("early", date={"text": "1769", "from": 1769, "to": 1769}),
+            work("copied-early"),
+        ], "versions": [
+            version("ce-ms", ["copied-early"], "catalogue-record", "catalogue-only",
+                    date={"text": "1801", "from": 1801, "to": 1801}),
+        ]}
+
+    def test_composed_by_uses_work_date_else_earliest_copy(self):
+        cat = self.cat()
+        from build import by_work
+        vbw = by_work(cat)
+        works = {w["id"]: w for w in cat["works"]}
+        self.assertEqual(composed_by(works["w-early"], vbw["w-early"])["from"], 1769)
+        self.assertEqual(composed_by(works["w-copied-early"], vbw["w-copied-early"])["from"], 1801)
+        self.assertIsNone(composed_by(works["w-undated"], []))
+
+    def test_wanted_puts_pre_1850_first_then_undated_then_later(self):
+        ids = [w["id"] for w, _ in wanted(self.cat())]
+        # within an era, neediest first: "early" has nothing, "copied-early" a known MS
+        self.assertEqual(ids, ["w-early", "w-copied-early", "w-undated", "w-late", "w-modern"])
+
+    def test_rows_carry_eras(self):
+        rows = {r["ID"]: r for r in work_rows(self.cat())}
+        self.assertEqual((rows["w-early"]["Era"], rows["w-late"]["Era"], rows["w-undated"]["Era"]),
+                         ("pre-1850", "1850-1899", "undated"))
+        v = version_rows(self.cat())[0]
+        self.assertEqual((v["Copy era"], v["Composed"]), ("pre-1850", ""))
+        rows2 = {r["ID"]: r for r in version_rows({**self.cat(), "versions": [
+            version("e-ed", ["early"], "edition", "available", date={"text": "1972", "from": 1972, "to": 1972})]})}
+        self.assertEqual((rows2["v-e-ed"]["Copy era"], rows2["v-e-ed"]["Composed"]), ("1900+", "1769"))
 
 
 class Rows(unittest.TestCase):

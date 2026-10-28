@@ -4,11 +4,15 @@
   python3 pipeline/catalogue/candidates.py seen URL [URL ...]          # already catalogued?
   python3 pipeline/catalogue/candidates.py add FINDS.json --date D --by sweep-<source>
   python3 pipeline/catalogue/candidates.py promote [--reject ID ...]
+  python3 pipeline/catalogue/candidates.py digest                      # PR body: finds by era
 
 FINDS.json: {"works": [...], "versions": [...]}. A version names its works in
 "contains" by "work_id", or by "work_title" (+ optional "authors", "gurmukhi") when the
 work may be new; titles are matched loosely against every known title and variant.
-"date" may be free text ("Sammat 1878", "c. 1800"). Ids are made if missing.
+Two dates, never mixed up: a version's "date" is when that copy was made (or printed);
+a "contains" entry's "composed" is when the work was written, and goes on the work (only
+filling a gap, never overwriting). Both may be free text ("Sammat 1878", "c. 1800",
+"1884 Bk/AD 1827"); Bikrami years are converted to CE. Ids are made if missing.
 
 Anything already known is skipped and reported: same item page or file (URLs
 normalized), same repository + shelfmark, or a work that was rejected. Rejected rows
@@ -26,7 +30,7 @@ from urllib.parse import urlsplit
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from schema import load, parse_date, save, slug, validate  # noqa: E402
+from schema import HISTORIC_TYPES, era, is_bikrami, load, parse_date, save, slug, validate  # noqa: E402
 from seed import norm_title, unique_id  # noqa: E402
 
 
@@ -79,6 +83,10 @@ def add(cat: dict, finds: dict, found_on: str, found_by: str) -> dict:
     taken = {x["id"] for x in new["works"] + new["versions"]}
     report = {"added_works": [], "added_versions": [], "skipped": []}
 
+    def set_composed(w, composed):
+        if composed and not w.get("date"):
+            w["date"] = parse_date(composed) if isinstance(composed, str) else composed
+
     def work_for(title, gurmukhi=None, authors=None, notes=None, known_from=None):
         w = titles.get(norm_title(title))
         if w is None:
@@ -98,7 +106,9 @@ def add(cat: dict, finds: dict, found_on: str, found_by: str) -> dict:
         return w
 
     for w in finds.get("works", []):
-        work_for(w["title"], w.get("gurmukhi"), w.get("authors"), w.get("notes"), w.get("known_from"))
+        made = work_for(w["title"], w.get("gurmukhi"), w.get("authors"), w.get("notes"), w.get("known_from"))
+        if made["status"] == "candidate":
+            set_composed(made, w.get("composed"))
 
     for raw in finds.get("versions", []):
         v = copy.deepcopy(raw)
@@ -109,11 +119,13 @@ def add(cat: dict, finds: dict, found_on: str, found_by: str) -> dict:
         contains, rejected = [], False
         for c in v.get("contains", []):
             if c.get("work_id"):
-                wid = c["work_id"]
-                status = next((w["status"] for w in new["works"] if w["id"] == wid), None)
+                w = next((x for x in new["works"] if x["id"] == c["work_id"]), None)
+                wid, status = c["work_id"], (w or {}).get("status")
             else:
                 w = work_for(c["work_title"], c.get("gurmukhi"), c.get("authors"))
                 wid, status = w["id"], w["status"]
+            if w is not None and status != "rejected":
+                set_composed(w, c.get("composed"))
             rejected |= status == "rejected"
             contains.append({k: x for k, x in {"work_id": wid, "locator": c.get("locator"),
                                                "note": c.get("note")}.items() if x})
@@ -136,6 +148,68 @@ def add(cat: dict, finds: dict, found_on: str, found_by: str) -> dict:
     cat.clear()
     cat.update(new)
     return report
+
+
+def _date_str(label, d) -> str:
+    if not d:
+        return ""
+    s = f"{label} {d['text']}"
+    if is_bikrami(d["text"]) and d.get("from") is not None:
+        ce = str(d["from"]) if d["from"] == d["to"] else f"{d['from']}–{d['to']}"
+        s += f" ({ce} CE)"
+    return s
+
+
+GROUPS = [("pre-1850", "Copies made before 1850"), ("1850-1899", "Copies made 1850–1899"),
+          ("1900+", "Copies made 1900 or later"), ("undated", "Undated copies")]
+LEADS = "Leads: manuscripts known from catalogues, no scan yet"
+
+
+def digest(cat: dict) -> str:
+    """The PR's list of finds: candidate versions grouped by when the copy was made, prime
+    interest first, then catalogue-only leads. ★ = first historic copy of a wanted work,
+    ✚ = a new work, + = another version."""
+    from build import by_work, composed_by, holding  # build imports schema; avoid a cycle at import
+    works = {w["id"]: w for w in cat["works"]}
+    vbw = by_work(cat)
+    cands = [v for v in cat["versions"] if v["status"] == "candidate"]
+    if not cands:
+        return "No candidates.\n"
+
+    def line(v):
+        ws = [works[c["work_id"]] for c in v["contains"]]
+        if any(w["status"] == "candidate" for w in ws):
+            mark = "✚"
+        elif v["type"] in HISTORIC_TYPES and any(
+                holding([x for x in vbw[w["id"]] if x is not v]) != "historic" for w in ws):
+            mark = "★"
+        else:
+            mark = "+"
+        composed = "; ".join(filter(None, (_date_str("composed", w.get("date")) for w in ws)))
+        bits = [composed, _date_str("copy", v.get("date")), ", ".join(v.get("scripts", [])),
+                ", ".join(v.get("languages", []))]
+        url = v.get("file_url") or v.get("item_url")
+        if url:
+            bits.append(f"[link]({url})")
+        bits.append(f"`{v['id']}`")
+        titles = "; ".join(w["title"]["roman"] for w in ws)
+        return f"- {mark} **{titles}**: {v['label']} · " + " · ".join(b for b in bits if b)
+
+    def is_lead(v):
+        return v["type"] == "catalogue-record" or v.get("availability") == "none"
+
+    out = []
+    for key, head in GROUPS:
+        group = [v for v in cands if not is_lead(v) and era(v.get("date")) == key]
+        if group:
+            out += [f"### {head}", ""] + [line(v) for v in sorted(group, key=lambda v: (v.get("date") or {}).get("from") or 0)] + [""]
+    leads = [v for v in cands if is_lead(v)]
+    if leads:
+        def lead_key(v):
+            d = min((composed_by(works[c["work_id"]], vbw[c["work_id"]]) or {}).get("from") or 9999 for c in v["contains"])
+            return d
+        out += [f"### {LEADS}", ""] + [line(v) for v in sorted(leads, key=lead_key)] + [""]
+    return "\n".join(out)
 
 
 def promote(cat: dict, reject=()) -> dict:
@@ -168,6 +242,9 @@ def promote(cat: dict, reject=()) -> dict:
 def main(argv):
     cmd, rest = argv[0], argv[1:]
     cat = load()
+    if cmd == "digest":
+        print(digest(cat), end="")
+        return
     if cmd == "seen":
         for url in rest:
             print(f"{url}\t{seen(cat, url) or '-'}")
