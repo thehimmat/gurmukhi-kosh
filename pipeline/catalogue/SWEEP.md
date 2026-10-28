@@ -57,8 +57,9 @@ account there that must not get flagged.
 
 ## Steps
 
-0. **Guard.** If 3 or more open PRs have branches starting `chore/catalogue-sweep-`, stop and
-   report "skipped: 3 sweep PRs awaiting review".
+0. **Guard.** If any open PR has a branch starting `chore/catalogue-sweep-`, stop and report
+   "skipped: sweep PR #<n> awaiting review". One at a time: every sweep regenerates the same
+   views (two open sweeps always conflict), and a run can't see finds in an unmerged PR.
 
 1. **Promote merged finds.** If `catalogue.json` on main has rows with status `candidate`, they
    came in through merged sweep PRs, so they are accepted, except any the user turned down: read
