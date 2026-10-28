@@ -24,21 +24,47 @@ function forged(role: string): string {
 }
 
 const WORD = "ਸੈਲਫ਼ਹੋਸਟ"; // a fixture word no corpus contains
+const PUBLIC_SRC = "selfhost_test_public";
+const CURATOR_SRC = "selfhost_test_curator";
 let db: SupabaseClient;
 let wordId: number;
+
+// Removes every fixture row, in foreign-key order. Safe to run when there are none.
+async function cleanUp() {
+  const w = await db.from("words").delete().eq("gurmukhi", WORD); // definitions and flags cascade
+  const ds = await db.from("dict_sources").delete().in("code", [PUBLIC_SRC, CURATOR_SRC]);
+  const sr = await db.from("source_rights").delete().in("code", [PUBLIC_SRC, CURATOR_SRC]);
+  for (const r of [w, ds, sr]) expect(r.error).toBeNull();
+}
+
+// The real rows the fixtures sit next to. This suite runs against live servers, so its setup and
+// cleanup must leave them exactly as they were (an upsert once renamed real dictionary sources).
+const realRows = async () => {
+  const [ds, sr] = await Promise.all([
+    admin().from("dict_sources").select("*").order("id"),
+    admin().from("source_rights").select("*").order("code"),
+  ]);
+  expect(ds.error).toBeNull();
+  expect(sr.error).toBeNull();
+  return JSON.stringify([ds.data, sr.data]);
+};
+let before = "";
 
 describe.skipIf(!live)("self-hosted gateway", () => {
   beforeAll(async () => {
     db = admin();
+    before = await realRows();
+    // Fixture sources of their own, never real ones: one released as public in source_rights,
+    // one with no row there (curator-only, migration 069). Leftovers from an interrupted run go first.
+    await cleanUp();
+    const rights = await db.from("source_rights").insert({ code: PUBLIC_SRC, visibility: "public" });
+    expect(rights.error).toBeNull();
     const ds = await db
       .from("dict_sources")
-      .upsert(
-        [
-          { code: "mahan_kosh", name: "Mahan Kosh" },
-          { code: "shackle", name: "A Guru Nanak Glossary" },
-        ],
-        { onConflict: "code" },
-      )
+      .insert([
+        { code: PUBLIC_SRC, name: "self-host test: public" },
+        { code: CURATOR_SRC, name: "self-host test: curator-only" },
+      ])
       .select("id, code");
     expect(ds.error).toBeNull();
     const id = (code: string) => ds.data!.find((d) => d.code === code)!.id;
@@ -49,14 +75,15 @@ describe.skipIf(!live)("self-hosted gateway", () => {
 
     await db.from("definitions").delete().eq("word_id", wordId);
     const defs = await db.from("definitions").insert([
-      { word_id: wordId, dict_source_id: id("mahan_kosh"), sense_number: 1, definition_text: "public sense" },
-      { word_id: wordId, dict_source_id: id("shackle"), sense_number: 1, definition_text: "curator-only sense" },
+      { word_id: wordId, dict_source_id: id(PUBLIC_SRC), sense_number: 1, definition_text: "public sense" },
+      { word_id: wordId, dict_source_id: id(CURATOR_SRC), sense_number: 1, definition_text: "curator-only sense" },
     ]);
     expect(defs.error).toBeNull();
   });
 
   afterAll(async () => {
-    if (wordId) await db.from("words").delete().eq("id", wordId); // definitions and flags cascade
+    await cleanUp();
+    expect(await realRows()).toBe(before);
   });
 
   it("serves PostgREST under /rest/v1", async () => {
