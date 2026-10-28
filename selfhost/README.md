@@ -22,7 +22,7 @@ and the dashboard.
 | `docker-compose.yml` | The three services. Postgres listens on localhost only. |
 | `docker-compose.server.yml` | On the server: Caddy on 80/443 with its own TLS certificate |
 | `Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token |
-| `sql/roles.sql` | Supabase's API roles and timeouts, plus `akhar_writer` |
+| `sql/roles.sql` | Supabase's API roles and timeouts, plus `akhar_writer` (the annotation site); re-applied by setup |
 | `scripts/server-setup.sh` | One-time (re-runnable) VM setup: updates, firewall, Docker, swap, secrets, stack, backup timer |
 | `scripts/mint-keys.mjs` | A JWT secret plus anon and service keys signed with it |
 | `scripts/restore.sh` | Restore from a live Supabase dump (`--supabase`) or an encrypted backup (`--gpg`) |
@@ -112,14 +112,27 @@ write freeze: check nothing changed since the restore, switch, check again.
      `ssh ubuntu@141.148.39.45 'grep ^SERVICE_KEY= /opt/kosh/selfhost/.env | cut -d= -f2'`
 3. **Check:** the sites work, Supabase's API logs go quiet, and `compare.sh` still matches.
 4. **Local `.env.local`** files (pipelines, gurmukhi-voice-search): the same three values.
-5. **akhar annotation tool:** connects as `akhar_writer` through an SSH tunnel
-   (`ssh -N -L 6543:localhost:5432 ubuntu@141.148.39.45`, then `localhost:6543`) once the role has
-   a password (`docker compose exec db psql -U postgres -c "alter role akhar_writer password '…'"`).
-   Don't use it against Supabase after the cutover: those writes would be stranded there.
+5. **akhar annotation site** (Vercel project `akhar-annotate`, repo gurmukhi-akhar-ocr): see
+   [The akhar annotation site](#the-akhar-annotation-site).
 
 **Rollback:** put the Supabase values back in Vercel (Supabase dashboard → Settings → API) and
 redeploy. Supabase is left untouched, so it's exactly as it was at cutover; anything written to the
 server since would need copying back (`compare.sh` lists which tables).
+
+## The akhar annotation site
+
+annotate.atthebunga.com (repo gurmukhi-akhar-ocr, `site/`) stores its answers in `akhar.annotations`.
+It reaches them through this API like the other apps, with a key of its own (`AKHAR_KEY` in
+`.env`), signed for the `akhar_writer` role: it can read and write that schema and nothing else, and
+anon can't see the schema at all. Postgres stays closed to the internet. In Vercel, `akhar-annotate`
+needs `AKHAR_API_URL` (this API's address) and `AKHAR_API_KEY`:
+
+```sh
+ssh ubuntu@141.148.39.45 'grep ^AKHAR_KEY= /opt/kosh/selfhost/.env | cut -d= -f2' | pbcopy
+```
+
+The gateway tests write an answer and have PostgREST roll it back (`PGRST_DB_TX_END`), so running
+them against the server leaves no rows.
 
 ## Rehearsal results
 
@@ -129,9 +142,6 @@ server since would need copying back (`compare.sh` lists which tables).
   reboot recovery verified; the full suite passed (894 tests, 0 failures) against the server.
 - **2026-10-28, sandbox:** backup → download through the gateway → restore round trip matched every
   row count.
-
-**`akhar_writer`** is a login role that writes `akhar.annotations` over a direct Postgres
-connection, not through the API. `sql/roles.sql` creates it with no password.
 
 Two differences from Supabase, both harmless: no `safeupdate`, so an UPDATE/DELETE without a WHERE
 is allowed here but not on Supabase (write migrations for the stricter one), and no `supabase_admin`

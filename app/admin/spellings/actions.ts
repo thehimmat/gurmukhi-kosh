@@ -2,6 +2,8 @@
 
 import { supabaseAdmin } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { refreshHealthStats } from "@/pipeline/shared/health-stats";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -87,6 +89,9 @@ export async function submitSpellingReview(formData: FormData) {
       const { data: clash } = await db.from("words").select("id").eq("gurmukhi", corrected).maybeSingle();
       if (clash && clash.id !== wordId) {
         await mergeWordInto(db, wordId, clash.id as number);
+        // A merge deletes a word and moves its content, so the /health totals (075) change. The
+        // refresh takes ~17 s: run it after the response, and log a failure (nobody is waiting).
+        after(() => refreshHealthStats(db).catch((e) => console.error(e)));
         revalidatePath("/admin/spellings");
         return; // source row is gone; nothing else to update
       }

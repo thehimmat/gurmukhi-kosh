@@ -6,6 +6,8 @@
 -- anon key, `service_role` for the service key. The timeouts are Supabase's defaults; the apps'
 -- search RPCs are written to finish inside them (see migration 030 and the imported 003).
 
+set client_min_messages = warning; -- re-runs are routine; "already exists" notices are noise
+
 do $$
 begin
   if not exists (select from pg_roles where rolname = 'anon') then
@@ -20,8 +22,8 @@ begin
   if not exists (select from pg_roles where rolname = 'authenticator') then
     create role authenticator login noinherit;
   end if;
-  -- Writes akhar.annotations over a direct Postgres connection, not the API. Created without a
-  -- password, so it can't log in until one is set by hand for whatever tool uses it.
+  -- The annotation site's role (gurmukhi-akhar-ocr): reaches only the akhar schema. It comes
+  -- through the API with AKHAR_KEY; it has no password, so it can't log in to Postgres directly.
   if not exists (select from pg_roles where rolname = 'akhar_writer') then
     create role akhar_writer login noinherit;
   end if;
@@ -29,7 +31,7 @@ end
 $$;
 
 alter role authenticator with password :'auth_pw';
-grant anon, authenticated, service_role to authenticator;
+grant anon, authenticated, service_role, akhar_writer to authenticator;
 
 alter role anon set statement_timeout = '3s';
 alter role authenticated set statement_timeout = '8s';

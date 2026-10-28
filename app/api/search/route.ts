@@ -141,6 +141,9 @@ export async function GET(req: NextRequest) {
     .ilike("gurmukhi", `${q}%`)
     .or(visible)
     .order("frequency", { ascending: false })
+    // Many words share a frequency; without a tiebreak the database picks which tied words make
+    // the cut, so identical databases return different results. Same order as /browse (#203).
+    .order("id", { ascending: true })
     .limit(limit);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   for (const w of prefix ?? []) {
@@ -160,6 +163,7 @@ export async function GET(req: NextRequest) {
         .like("search_fold", `${folded}%`)
         .or(visible)
         .order("frequency", { ascending: false })
+        .order("id", { ascending: true })
         .limit(limit);
       for (const w of foldHits ?? []) {
         if (seen.has(w.id) || hits.length >= limit) continue;
@@ -178,6 +182,7 @@ export async function GET(req: NextRequest) {
       .ilike("gurmukhi", `%${q}%`)
       .or(visible)
       .order("frequency", { ascending: false })
+      .order("id", { ascending: true })
       .limit(limit);
     if (containsErr) return NextResponse.json({ error: containsErr.message }, { status: 500 });
     for (const w of contains ?? []) hits.push({ ...w, match: "contains" });

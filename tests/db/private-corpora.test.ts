@@ -201,6 +201,7 @@ describe("070: publishing a corpus", () => {
       { code: "dasam_banidb_v2", visibility: "public" },
       { code: "sarbloh_budha_dal", visibility: "public" },
       { code: "bhai_gurdas_banidb_v2", visibility: "public" },
+      { code: "gurdas_singh_vaar_2008", visibility: "curator" },
       { code: "nand_lal_ghazals", visibility: "public" },
       { code: "gur_sobha_iss", visibility: "curator" },
     ]);

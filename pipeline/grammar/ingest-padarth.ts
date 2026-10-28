@@ -23,6 +23,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { supabaseAdmin } from "../shared/db";
+import { refreshHealthStats } from "../shared/health-stats";
 import { progress } from "../shared/utils";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { extractGrammarFacts, type GramAttr } from "./padarth";
@@ -164,6 +165,8 @@ async function main() {
     progress(done, inserts.length, t0, "Grammar ");
   }
   console.log(`\nDone. ${done} sourced grammar rows written from ${SOURCE_CODE}.`);
+
+  await refreshHealthStats(db); // the /health totals (075)
 }
 
 main().catch((err) => {

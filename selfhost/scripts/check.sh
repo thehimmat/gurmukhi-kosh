@@ -19,6 +19,6 @@ esac
 # Tests that call the deployed Vercel site (tests/api.test.ts "production", the stories' PROD_BASE)
 # still run; they test the apps, not this stack.
 docker run --rm --network host -v "$PWD:/app" -w /app \
-  -e SELFHOST_URL="$url" -e SELFHOST_ANON_KEY="$ANON_KEY" -e SELFHOST_SERVICE_KEY="$SERVICE_KEY" -e SELFHOST_JWT_SECRET="$JWT_SECRET" \
+  -e SELFHOST_URL="$url" -e SELFHOST_ANON_KEY="$ANON_KEY" -e SELFHOST_SERVICE_KEY="$SERVICE_KEY" -e SELFHOST_JWT_SECRET="$JWT_SECRET" -e SELFHOST_AKHAR_KEY="$AKHAR_KEY" \
   -e NEXT_PUBLIC_SUPABASE_URL="$url" -e NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" -e SUPABASE_SERVICE_ROLE_KEY="$SERVICE_KEY" \
   node:22 sh -c 'npm ci --silent --no-audit --no-fund >/dev/null && npx vitest run --exclude "tests/db/**" --exclude "**/node_modules/**" 2>&1 | grep -E "^ (FAIL|✓ tests/selfhost)| Test Files | Tests " | sort -u'
