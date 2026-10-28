@@ -1,7 +1,7 @@
 /**
  * BaniDB lines we know are mistyped, checked against printed sources. The ingest swaps the
- * corrected line in for BaniDB's, so a re-ingest keeps the fix; migrations 073 (TYPOS) and 076
- * (NASAL, nasal-corrections.ts) fixed the copy already loaded. Each entry matches BaniDB's whole line: once BaniDB corrects a line itself,
+ * corrected line in for BaniDB's, so a re-ingest keeps the fix; migrations 073 (TYPOS), 076 (NASAL)
+ * and 077 (NASAL_HI, both in nasal-corrections.ts) fixed the copy already loaded. Each entry matches BaniDB's whole line: once BaniDB corrects a line itself,
  * the entry stops matching and the ingest takes BaniDB's text and reports the entry as stale.
  *
  * Reported upstream: thehimmat/inbox#91. Sources and page images are indexed in the Drive doc
@@ -14,7 +14,7 @@
  * - Ugardanti pothi: 19th-c. manuscript (archive.org uggardanti_pothi), PDF page.
  */
 
-import { NASAL } from "./nasal-corrections";
+import { NASAL, NASAL_HI } from "./nasal-corrections";
 
 export type LineCorrection = {
   verseId: number;
@@ -131,7 +131,7 @@ export const TYPOS: LineCorrection[] = [
 ];
 
 export const CORRECTIONS: Record<string, LineCorrection[]> = {
-  dasam_banidb_v2: [...TYPOS, ...NASAL],
+  dasam_banidb_v2: [...TYPOS, ...NASAL, ...NASAL_HI],
 };
 
 export type CorrectedLine = {
