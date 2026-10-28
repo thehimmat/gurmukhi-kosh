@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Prints a fresh JWT secret and the anon and service keys signed with it, as selfhost/.env lines.
+// Prints a fresh JWT secret and the anon, service and akhar keys signed with it, as selfhost/.env lines.
 // The keys have the shape of Supabase's legacy keys (HS256, a `role` claim), so supabase-js and
 // PostgREST treat them the same way. With JWT_SECRET already set, signs keys for that secret instead.
 //
@@ -19,3 +19,4 @@ function sign(role) {
 if (!process.env.JWT_SECRET) console.log(`JWT_SECRET=${secret}`);
 console.log(`ANON_KEY=${sign("anon")}`);
 console.log(`SERVICE_KEY=${sign("service_role")}`);
+console.log(`AKHAR_KEY=${sign("akhar_writer")}`);
