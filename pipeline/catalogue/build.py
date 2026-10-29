@@ -14,8 +14,9 @@
   online-only  nothing in Drive, but a copy is available online
   known-only   known from a catalogue or citation; no copy found
   nothing      no version recorded yet
-Every catalogued work short of "historic" is on the wanted list (a work composed after 1947:
-short of "edition"); the sweep looks for historic copies, and any copy at all of the neediest.
+Every catalogued work short of "historic" is on the wanted list (a work composed 1900 or later:
+short of "edition"; reference works never); the sweep looks for historic copies, and any copy
+at all of the neediest.
 """
 
 import os
@@ -81,9 +82,6 @@ def composed_by(work: dict, versions: list[dict]):
     return min(dated, key=lambda d: d["from"]) if dated else None
 
 
-MODERN_FROM = 1947  # works composed after this have no "historic" copy to find
-
-
 def wanted(cat: dict):
     """[(work, best lead or None)] for catalogued works short of a historic copy (for a
     modern work, short of an edition), neediest first. Needs-curation works wait for curation."""
@@ -92,8 +90,11 @@ def wanted(cat: dict):
     for i, w in enumerate(cat["works"]):
         if w["status"] != "catalogued":
             continue
-        h = holding(vbw[w["id"]])
-        modern = ((w.get("date") or {}).get("from") or 0) >= MODERN_FROM
+        vs = vbw[w["id"]]
+        if vs and all(v["type"] == "reference" for v in vs):
+            continue  # catalogues and encyclopaedias are sources for the list, not wants
+        h = holding(vs)
+        modern = era(w.get("date")) == "1900+"  # the work's own date only, never a copy's
         if LEVELS.index(h) < LEVELS.index("edition" if modern else "historic"):
             rank = ERA_RANK[era(composed_by(w, vbw[w["id"]]))]
             out.append((rank, LEVELS.index(h), i, w, best_lead(vbw[w["id"]])))
@@ -167,13 +168,14 @@ def _md_table(headers, rows) -> list[str]:
 
 def render_markdown(cat: dict) -> str:
     rows = work_rows(cat)
-    counts = {lvl: sum(r["Holding"] == lvl for r in rows) for lvl in reversed(LEVELS)}
+    live = [r for r in rows if r["Status"] != "rejected"]
+    counts = {lvl: sum(r["Holding"] == lvl for r in live) for lvl in reversed(LEVELS)}
     lines = [
         "# Granth catalogue",
         "",
         "Generated from `catalogue.json` by `build.py`; don't edit by hand. See README.md.",
         "",
-        f"{len(cat['works'])} works, {len(cat['versions'])} versions "
+        f"{len(live)} works ({len(rows) - len(live)} rejected), {len(cat['versions'])} versions "
         f"({sum(v['status'] == 'in-drive' for v in cat['versions'])} in Drive).",
         "",
         "Holding: " + ", ".join(f"{n} {lvl}" for lvl, n in counts.items()) + ".",
@@ -196,7 +198,11 @@ def render_markdown(cat: dict) -> str:
     lines += _md_table(["ID", "Title", "Versions"], [r for r in rows if r["Status"] == "needs-curation"])
     lines += ["", "## All works", ""]
     lines += _md_table(["Title", "Authors", "Holding", "Versions", "In Drive", "Earliest dated version"],
-                       sorted(rows, key=lambda r: r["Title"].lower()))
+                       sorted((r for r in rows if r["Status"] != "rejected"), key=lambda r: r["Title"].lower()))
+    rejected = [r for r in rows if r["Status"] == "rejected"]
+    if rejected:
+        lines += ["", "## Rejected", "", "Kept so sweeps never propose them again; their Drive files stay linked.", ""]
+        lines += _md_table(["ID", "Title", "Notes"], rejected)
     return "\n".join(lines) + "\n"
 
 

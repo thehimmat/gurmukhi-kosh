@@ -47,7 +47,7 @@ historic is on the wanted list.
 
 `seed.py ANANDPUR.xlsx` built the first `catalogue.json` from:
 
-1. `Anandpur_Library_Holdings_and_Downloads.xlsx` (Drive, Anandpur Library folder): 149 works,
+1. `Anandpur_Library_Holdings_and_Downloads.xlsx` (Drive; archived with its copies in *99 Review – Maybe Delete* on 2026-10-29, after checking none held hand-entered notes): 149 works,
    and its Downloads rows as versions. Rows for the same file merged into one version with
    several `contains` entries (Padam's *Darbari Ratan* carries 71 works).
 2. Every PDF in `../scans/inventory/inventory.json`, joined by Drive id; `../scans/manifest.yaml`
@@ -58,8 +58,16 @@ It was a one-off; from here `catalogue.json` is edited directly.
 
 ## Curating
 
-Needs-curation works want a proper title (and Gurmukhi), merging where two are one text
-(move the versions' `contains`, delete the spare work), then `status: catalogued`.
+Curation is a list of operations in `data/curation/<date>-<topic>.json`, applied all or
+nothing by `curate.py` (merge, new_work, update_work, move_version, add_to_version,
+update_version, reject; see its docstring). Keeping the ops as files makes each decision
+reviewable in the PR and repeatable. Conventions:
+- A steek, translation or study is a work of its own, linked by `based_on` to the work it
+  is on. Its versions' `type` is their physical form (a handwritten teeka is a manuscript).
+- An extract of a larger granth (a Sarbloh Manglacharan, Chandi Charitar II) is a version
+  of that granth with a `locator`, not a separate work.
+- Teaching materials and guides are rejected, not deleted.
+
 After any edit:
 
 ```
@@ -74,6 +82,8 @@ python3 pipeline/catalogue/test_schema.py
 python3 pipeline/catalogue/test_seed.py
 python3 pipeline/catalogue/test_build.py
 python3 pipeline/catalogue/test_candidates.py
+python3 pipeline/catalogue/test_sweep_plan.py
+python3 pipeline/catalogue/test_curate.py
 ```
 
 `build.py --xlsx` and `seed.py` need openpyxl (`pip install openpyxl`); seeding also needs PyYAML.

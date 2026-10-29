@@ -198,6 +198,13 @@ def validate(cat: dict) -> list[str]:
             errs.append(f"{where}: candidate needs found_on")
         _check_date(where, w.get("date"), errs)
 
+    for w in cat.get("works", []):  # second pass: based_on may point forward
+        for b in w.get("based_on") or []:
+            if b == w.get("id"):
+                errs.append(f"{w.get('id')}: based_on names the work itself")
+            elif b not in work_ids:
+                errs.append(f"{w.get('id')}: based_on names unknown work {b}")
+
     drive_ids: dict[str, str] = {}
     for n, v in enumerate(cat.get("versions", [])):
         where = check_id(f"versions[{n}]", v, "v") or f"versions[{n}]"

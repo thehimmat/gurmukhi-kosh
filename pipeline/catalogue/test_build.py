@@ -91,6 +91,30 @@ class Wanted(unittest.TestCase):
         self.assertIsNone(leads["w-chanakya"])
 
 
+class WantedRules(unittest.TestCase):
+    def test_reference_works_are_never_wanted(self):
+        cat = {"version": 1, "works": [work("suchi")],
+               "versions": [version("suchi-pdf", ["suchi"], "reference", "in-drive")]}
+        self.assertEqual(wanted(cat), [])
+
+    def test_rejected_works_are_never_wanted(self):
+        cat = {"version": 1, "works": [work("lesson", status="rejected")], "versions": []}
+        self.assertEqual(wanted(cat), [])
+
+    def test_twentieth_century_work_needs_only_an_edition(self):
+        cat = {"version": 1, "works": [work("teeka", date={"text": "20th century", "from": 1901, "to": 2000})],
+               "versions": [version("teeka-ed", ["teeka"], "edition", "in-drive")]}
+        self.assertEqual(wanted(cat), [])
+
+    def test_old_work_known_only_from_a_modern_edition_stays_wanted(self):
+        # Shaheed Bilas: early 19th c., held only as a 1961 edition. A copy's date is
+        # no evidence the work is modern; only the work's own date can say that.
+        cat = {"version": 1, "works": [work("bilas")],
+               "versions": [version("bilas-1961", ["bilas"], "edition", "in-drive",
+                                    date={"text": "1961", "from": 1961, "to": 1961})]}
+        self.assertEqual([w["id"] for w, _ in wanted(cat)], ["w-bilas"])
+
+
 class EraPriority(unittest.TestCase):
     def cat(self):
         return {"version": 1, "works": [
@@ -147,10 +171,18 @@ class Rows(unittest.TestCase):
 class Outputs(unittest.TestCase):
     def test_markdown_has_counts_and_sections(self):
         md = render_markdown(CAT)
-        self.assertIn("6 works, 6 versions", md)
+        self.assertIn("6 works (0 rejected), 6 versions", md)
         self.assertIn("## Wanted", md)
         self.assertIn("## Needs curation", md)
         self.assertIn("| Chanakya |", md)
+
+    def test_markdown_lists_rejected_works_apart(self):
+        cat = {**CAT, "works": CAT["works"] + [work("lesson", status="rejected", notes="Rejected: teaching material")]}
+        md = render_markdown(cat)
+        all_works = md.split("## All works")[1].split("## Rejected")[0]
+        self.assertNotIn("Lesson", all_works)
+        self.assertIn("## Rejected", md)
+        self.assertIn("teaching material", md.split("## Rejected")[1])
 
     def test_csv_views(self):
         import csv

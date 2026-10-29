@@ -89,7 +89,7 @@ account there that must not get flagged.
    `python3 pipeline/catalogue/candidates.py add finds.json --date <today> --by sweep-<slice key>`.
    Name works by `work_id` when you know them; else `work_title` (+ `gurmukhi`, `authors`,
    `composed`).
-   Then `python3 pipeline/catalogue/build.py` and the four `test_*.py` files and `schema.py`.
+   Then `python3 pipeline/catalogue/build.py` then every `test_*.py` file (see README) and `schema.py`.
 
 5. **Log.** Append one line to `data/sweeps.jsonl`:
    `{"date", "slice", "wanted_checked": [ids], "queries": [...], "page_loads": {site: n}, "throttled": [sites], "added_works", "added_versions", "skipped": n, "unverified_leads": n}`.
