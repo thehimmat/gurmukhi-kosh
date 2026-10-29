@@ -3904,7 +3904,7 @@
    "title": {
     "roman": "Singh Sagar"
    },
-   "status": "candidate",
+   "status": "catalogued",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "authors": [
@@ -3928,7 +3928,7 @@
    "title": {
     "roman": "Gur Kirat Prakash"
    },
-   "status": "candidate",
+   "status": "catalogued",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "authors": [
@@ -3952,7 +3952,7 @@
    "title": {
     "roman": "Bansavalinama Dasan Patshahian Ka"
    },
-   "status": "candidate",
+   "status": "catalogued",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "authors": [
@@ -3976,7 +3976,7 @@
    "title": {
     "roman": "Sri Guru Dasam Panchasika"
    },
-   "status": "candidate",
+   "status": "catalogued",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "authors": [
@@ -4000,7 +4000,7 @@
    "title": {
     "roman": "Gurpranali (anonymous, Motibagh MS)"
    },
-   "status": "candidate",
+   "status": "catalogued",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "notes": "Anonymous short chronology of the Ten Gurus (births, children, deaths, years of guruship). EoS: unpublished, one MS of six folios in the Motibagh Palace Library, Patiala; no shelfmark given.",
@@ -18032,7 +18032,7 @@
    "host": "Encyclopaedia of Sikhism (Punjabi University)",
    "availability": "none",
    "item_url": "https://eos.learnpunjabi.org/SINGH%20SAGAR.html",
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-encyclopaedia-of-sikhism-entry-singh-sagar-ms-at-motibagh-pa",
@@ -18059,7 +18059,7 @@
    "host": "Encyclopaedia of Sikhism (Punjabi University)",
    "availability": "none",
    "item_url": "https://eos.learnpunjabi.org/GUR%20KIRAT%20PRAKASH.html",
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-encyclopaedia-of-sikhism-entry-gur-kirat-prakash-mss-punjab"
@@ -18080,7 +18080,7 @@
    "host": "Encyclopaedia of Sikhism (Punjabi University)",
    "availability": "none",
    "item_url": "https://eos.learnpunjabi.org/BANSAVALINAMA%20DASAN%20PATSHAHIAN%20KA.html",
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-encyclopaedia-of-sikhism-entry-bansavalinama-dasan-patshahia",
@@ -18105,7 +18105,7 @@
    "host": "Encyclopaedia of Sikhism (Punjabi University)",
    "availability": "none",
    "item_url": "https://eos.learnpunjabi.org/SRI%20GURU%20DASAM%20PANCHASIKA.html",
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-motibagh-palace-patiala-ms-148-sri-guru-dasam-panchasika-per"
@@ -18124,7 +18124,7 @@
    "host": "Encyclopaedia of Sikhism (Punjabi University)",
    "availability": "none",
    "item_url": "https://eos.learnpunjabi.org/GURPRANALI%20.html",
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-motibagh-palace-library-patiala-gurpranali-ms-6-ff-per-encyc"
@@ -18190,7 +18190,7 @@
      "note": "EoS: second known MS; no catalogue number."
     }
    ],
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-gur-kirat-prakash-ms-punjabi-university-patiala-known-from-t"
@@ -18215,7 +18215,7 @@
      "note": "EoS names no editor. Not found online yet."
     }
    ],
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-singh-sagar-ed-punjabi-university-patiala-1986"
@@ -18240,7 +18240,7 @@
      "note": "EoS names no editor. Not found online yet."
     }
    ],
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-gur-kirat-prakash-ed-punjabi-university-patiala-1986"
@@ -18266,7 +18266,7 @@
      "note": "EoS: edited from a private MS at Batala. Not found online yet."
     }
    ],
-   "status": "candidate",
+   "status": "catalogue-only",
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-bansavalinama-dasan-patshahian-ka-ed-rattan-singh-jaggi-para"
