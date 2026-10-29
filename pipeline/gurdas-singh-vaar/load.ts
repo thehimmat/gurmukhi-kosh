@@ -6,7 +6,7 @@
  *   npm run load:gurdas-singh-vaar -- <out.json>
  *
  * Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (in .env.local or the
- * environment). Migration 077 (the source and its shabads) must be applied first. Re-running is a
+ * environment). Migration 078 (the source and its shabads) must be applied first. Re-running is a
  * no-op apart from the refreshes.
  */
 
