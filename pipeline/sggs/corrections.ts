@@ -1,7 +1,7 @@
 /**
  * BaniDB lines we know are mistyped, checked against printed sources. The ingest swaps the
  * corrected line in for BaniDB's, so a re-ingest keeps the fix; migrations 073 (TYPOS), 076 (NASAL),
- * 077 (NASAL_HI, both in nasal-corrections.ts) and 078 (FOLLOW_UPS) fixed the copy already loaded.
+ * 077 (NASAL_HI, both in nasal-corrections.ts) and 079 (FOLLOW_UPS) fixed the copy already loaded.
  * A verse can have more than one entry: each applies to what the one before it produced. Each entry matches BaniDB's whole line: once BaniDB corrects a line itself,
  * the entry stops matching and the ingest takes BaniDB's text and reports the entry as stale.
  *

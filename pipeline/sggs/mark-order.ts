@@ -2,7 +2,7 @@
  * BaniDB stores some nasal marks before the aunkar or dulainkar: ਨੰੂ for ਨੂੰ, ਸਮੰੁਦ੍ਰ for ਸਮੁੰਦ੍ਰ (#310).
  * That is the legacy-font conversion's order, not Unicode's; it renders the same, but the stored words
  * differ, so word counts, search and the dictionary split them. The ingest puts the marks in Unicode
- * order for every line, and migration 078 did the same for the copy already loaded.
+ * order for every line, and migration 079 did the same for the copy already loaded.
  *
  * The transliteration was generated from the misordered text (ਨੰੂ → na(n)oo), so the words fixed
  * here get BaniDB's own transliteration of the right spelling (ਨੂੰ → noo(n)).

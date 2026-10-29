@@ -1,5 +1,5 @@
 /**
- * Migration 078 (#310): nasal marks BaniDB stores before the aunkar or dulainkar, put in Unicode order in
+ * Migration 079 (#310): nasal marks BaniDB stores before the aunkar or dulainkar, put in Unicode order in
  * every corpus loaded (pipeline/sggs/mark-order.ts), and ਤੈ → ਤੈਂ in Dasam 130267 (FOLLOW_UPS). Same steps
  * as 073-077, across sources.
  */
@@ -11,7 +11,7 @@ import { foldGurmukhi } from "../../lib/gurmukhi-fold";
 import { FOLLOW_UPS } from "../../pipeline/sggs/corrections";
 import { fixMarkOrder } from "../../pipeline/sggs/mark-order";
 
-const M = "078_mark_order.sql";
+const M = "079_mark_order.sql";
 const line = (verse_id: number, gurmukhi: string) => ({ verse_id, ang: 1, line_no: verse_id, shabad_id: null, gurmukhi });
 
 let db: PGlite;
@@ -38,7 +38,7 @@ const q = async <T>(sql: string, params: unknown[] = []) => (await db.query<T>(s
 const word = async (g: string) =>
   (await q<{ f: number; s: string | null }>("select frequency f, search_fold s from words where gurmukhi = $1", [g]))[0];
 
-describe("078: nasal marks in Unicode order, and ਤੈਂ in 130267", () => {
+describe("079: nasal marks in Unicode order, and ਤੈਂ in 130267", () => {
   it("reorders the marks in every corpus, transliteration included", async () => {
     const rows = await q<{ v: number; g: string; t: string }>(
       "select verse_id v, gurmukhi g, transliteration_en t from lines where verse_id in (80110, 201379) order by verse_id");

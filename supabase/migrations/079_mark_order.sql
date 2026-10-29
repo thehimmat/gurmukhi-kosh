@@ -1,4 +1,4 @@
--- 078: nasal marks in Unicode order, and ਤੈ → ਤੈਂ in Dasam 130267 (thehimmat/gurmukhi-kosh#310).
+-- 079: nasal marks in Unicode order, and ਤੈ → ਤੈਂ in Dasam 130267 (thehimmat/gurmukhi-kosh#310).
 --
 -- BaniDB stores some tippis and bindis before the aunkar or dulainkar: ਨੰੂ for ਨੂੰ, ਸਮੰੁਦ੍ਰ for ਸਮੁੰਦ੍ਰ,
 -- ਨਾੳਂੁ for ਨਾਉਂ. They render alike, but the stored words differ, so counts and search split them. This
@@ -14,9 +14,9 @@
 -- line and rebuild what hangs off it, delete a misspelling left unused with nothing attached, and
 -- refresh health_stats_cache. A fixed line no longer matches either rule, so rerunning is safe.
 
-create temp table fix_lines_078 (line_id bigint, old_g text, new_g text, old_t text, new_t text);
+create temp table fix_lines_079 (line_id bigint, old_g text, new_g text, old_t text, new_t text);
 
-insert into fix_lines_078
+insert into fix_lines_079
 select l.id, l.gurmukhi, g.new_g, l.transliteration_en,
        case
          when l.transliteration_en is null then null
@@ -37,7 +37,7 @@ from lines l,
 lateral (select replace(replace(regexp_replace(l.gurmukhi, '([ੰਂ])([ੁੂ])', '\2\1', 'g'), 'ੳੁ', 'ਉ'), 'ੳੂ', 'ਊ') as new_g) g
 where l.gurmukhi ~ '[ੰਂ][ੁੂ]';
 
-insert into fix_lines_078
+insert into fix_lines_079
 select l.id, f.old_g, f.new_g, f.old_t, f.new_t
 from (values
   (130267, 'ਤੈ ਮੂਜੀ ਪੀ ਭਾਂਗ ਕਹੋ ਕਾ ਕਾਜ ਸਵਰਿ ਹੈਂ ॥',
@@ -50,9 +50,9 @@ join lines l on l.verse_id = f.verse_id and l.gurmukhi = f.old_g
 
 -- The new words of each line, in order: split on whitespace, strip dandas, pipes and tildes at either
 -- end, keep a token only if it holds a Gurmukhi letter or vowel sign (lib/tokenizer.ts).
-create temp table fix_tokens_078 as
+create temp table fix_tokens_079 as
 select f.line_id, (row_number() over (partition by f.line_id order by t.n) - 1)::int as position, t.token
-from fix_lines_078 f,
+from fix_lines_079 f,
 lateral (
   select n, btrim(regexp_replace(regexp_replace(raw, '[।॥|~]+$', ''), '^[।॥|~]+', '')) as token
   from regexp_split_to_table(f.new_g, '\s+') with ordinality as s(raw, n)
@@ -83,22 +83,22 @@ do $$
 declare missing text;
 begin
   select string_agg(distinct t.token, ', ') into missing
-  from fix_tokens_078 t where not exists (select 1 from words w where w.gurmukhi = t.token);
+  from fix_tokens_079 t where not exists (select 1 from words w where w.gurmukhi = t.token);
   if missing is not null then
-    raise exception '078: token(s) with no word: %', missing;
+    raise exception '079: token(s) with no word: %', missing;
   end if;
 end $$;
 
 -- Every word these lines used before or use now.
-create temp table fix_words_078 as
-select distinct o.word_id from word_occurrences o join fix_lines_078 f on f.line_id = o.line_id
+create temp table fix_words_079 as
+select distinct o.word_id from word_occurrences o join fix_lines_079 f on f.line_id = o.line_id
 union
-select distinct w.id from fix_tokens_078 t join words w on w.gurmukhi = t.token;
+select distinct w.id from fix_tokens_079 t join words w on w.gurmukhi = t.token;
 
-delete from word_occurrences o using fix_lines_078 f where o.line_id = f.line_id;
+delete from word_occurrences o using fix_lines_079 f where o.line_id = f.line_id;
 
 insert into word_occurrences (word_id, line_id, position)
-select w.id, t.line_id, t.position from fix_tokens_078 t join words w on w.gurmukhi = t.token;
+select w.id, t.line_id, t.position from fix_tokens_079 t join words w on w.gurmukhi = t.token;
 
 -- Numerals after the first changed character move by the change in length.
 update number_occurrences n
@@ -109,18 +109,18 @@ from (
          coalesce((select min(i) - 1 from generate_series(1, least(char_length(f.old_g), char_length(f.new_g))) i
                    where substr(f.old_g, i, 1) <> substr(f.new_g, i, 1)),
                   least(char_length(f.old_g), char_length(f.new_g))) as at
-  from fix_lines_078 f
+  from fix_lines_079 f
 ) d
 where n.line_id = d.line_id and d.delta <> 0 and n.char_start >= d.at;
 
 update lines l set gurmukhi = f.new_g, transliteration_en = f.new_t
-from fix_lines_078 f where l.id = f.line_id;
+from fix_lines_079 f where l.id = f.line_id;
 
 update lines l set first_letters = k.letters
 from (
   select o.line_id, first_letter_fold(string_agg(left(w.gurmukhi, 1), '' order by o.position)) as letters
   from word_occurrences o join words w on w.id = o.word_id
-  where o.line_id in (select line_id from fix_lines_078)
+  where o.line_id in (select line_id from fix_lines_079)
   group by o.line_id
 ) k
 where l.id = k.line_id;
@@ -130,20 +130,20 @@ where l.id = k.line_id;
 update words w
 set frequency = (select count(*) from word_occurrences o join lines l on l.id = o.line_id
                  where o.word_id = w.id and l.is_public)
-where w.id in (select word_id from fix_words_078);
+where w.id in (select word_id from fix_words_079);
 
-delete from word_corpus_stats where word_id in (select word_id from fix_words_078);
+delete from word_corpus_stats where word_id in (select word_id from fix_words_079);
 insert into word_corpus_stats (word_id, source_fk, frequency)
 select o.word_id, l.source_fk, count(*)
 from word_occurrences o join lines l on l.id = o.line_id
-where o.word_id in (select word_id from fix_words_078)
+where o.word_id in (select word_id from fix_words_079)
 group by o.word_id, l.source_fk;
 
-delete from word_corpus_writer_stats where word_id in (select word_id from fix_words_078);
+delete from word_corpus_writer_stats where word_id in (select word_id from fix_words_079);
 insert into word_corpus_writer_stats (word_id, source_fk, writer_english, frequency)
 select o.word_id, l.source_fk, s.writer_english, count(*)
 from word_occurrences o join lines l on l.id = o.line_id left join shabads s on s.id = l.shabad_id
-where o.word_id in (select word_id from fix_words_078)
+where o.word_id in (select word_id from fix_words_079)
 group by o.word_id, l.source_fk, s.writer_english;
 
 -- A misspelling now unused, with nothing attached to it, goes. "Attached" is any row in a table with a
@@ -156,7 +156,7 @@ declare
   used boolean;
 begin
   for w in
-    select f.word_id from fix_words_078 f
+    select f.word_id from fix_words_079 f
     where not exists (select 1 from word_occurrences o where o.word_id = f.word_id)
   loop
     used := false;
@@ -178,7 +178,7 @@ begin
   end loop;
 end $$;
 
-drop table fix_lines_078, fix_tokens_078, fix_words_078;
+drop table fix_lines_079, fix_tokens_079, fix_words_079;
 
 -- The word total changed: refresh the totals the health page reads (075), as an ingest does.
 select refresh_health_stats();

@@ -1,6 +1,6 @@
 /**
  * BaniDB lines we know are mistyped (pipeline/sggs/corrections.ts): the ingest swaps in the
- * corrected line, and migrations 073 (typos), 076 and 077 (ਾਂ after a vowel sign) and 078 (follow-ups)
+ * corrected line, and migrations 073 (typos), 076 and 077 (ਾਂ after a vowel sign) and 079 (follow-ups)
  * fix the copy already loaded.
  */
 import { describe, it, expect } from "vitest";
@@ -64,7 +64,7 @@ describe("BaniDB line corrections", () => {
     expect(dasam).toEqual([...TYPOS, ...NASAL, ...NASAL_HI, ...FOLLOW_UPS]);
   });
 
-  for (const [file, list] of [["073_dasam_banidb_corrections.sql", TYPOS], ["076_dasam_kanna_nasal.sql", NASAL], ["077_dasam_hi_nasal.sql", NASAL_HI], ["078_mark_order.sql", FOLLOW_UPS]] as const) {
+  for (const [file, list] of [["073_dasam_banidb_corrections.sql", TYPOS], ["076_dasam_kanna_nasal.sql", NASAL], ["077_dasam_hi_nasal.sql", NASAL_HI], ["079_mark_order.sql", FOLLOW_UPS]] as const) {
     it(`is what migration ${file.slice(0, 3)} applies to the loaded copy`, () => {
       const migration = sql(file);
       for (const c of list) {
