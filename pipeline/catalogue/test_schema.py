@@ -230,6 +230,24 @@ class ParseDate(unittest.TestCase):
         self.assertEqual(parse_date("1900 (Samvat Nanakshahi 431)")["from"], 1900)
         self.assertEqual(parse_date("Khalsa Samvat 302, Jeth sudi; 5 June 2000 (as printed)")["from"], 2000)
 
+    def test_gurmukhi_bi_abbreviation_after_the_year(self):
+        self.assertEqual(parse_date("ਸੰਮਤ ੧੮੩੫ ਬਿ:")["from"], 1778)
+        self.assertEqual(parse_date("੧੮੯੭ ਬਿ.")["from"], 1840)
+
+    def test_bikrami_century(self):
+        d = parse_date("੧੯ਵੀਂ ਸਦੀ ਬਿ:")  # Bk 1801-1900
+        self.assertEqual((d["from"], d["to"], d["approx"]), (1744, 1843, True))
+        d = parse_date("18th century Bk")
+        self.assertEqual((d["from"], d["to"]), (1644, 1743))
+
+    def test_gurmukhi_ce_century(self):
+        d = parse_date("੧੯ਵੀਂ ਸਦੀ")
+        self.assertEqual((d["from"], d["to"]), (1801, 1900))
+
+    def test_ocr_noise_year_is_not_read(self):
+        # five digits: an OCR slip ("੧੯੩੯੮" for "੧੯੩੯"), so no year is claimed
+        self.assertEqual(parse_date("ਸੰਮਤ ੧੯੩੯੮ ਬਿ:"), {"text": "ਸੰਮਤ ੧੯੩੯੮ ਬਿ:", "approx": True})
+
     def test_devanagari_samvat(self):
         self.assertEqual(parse_date("संवत् १८७६")["from"], 1819)
 

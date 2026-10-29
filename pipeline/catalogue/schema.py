@@ -49,7 +49,7 @@ def slug(text: str, prefix: str) -> str:
 
 # ---------------------------------------------------------------- dates
 
-_YEAR = r"(1[0-9]{3}|20[0-9]{2})"
+_YEAR = r"(?<!\d)(1[0-9]{3}|20[0-9]{2})(?!\d)"  # exactly four digits: a fifth is OCR noise
 BIKRAMI_OFFSET = 57  # CE = Bikrami (Vikram Samvat) − 57; −56 for dates late in the CE year
 
 # Gurmukhi and Devanagari digits read as ASCII.
@@ -57,8 +57,10 @@ _DIGITS = str.maketrans("੦੧੨੩੪੫੬੭੮੯०१२३४५६७�
 # Markers that say a year is Bikrami. Some come before the year (Sammat 1884), some after
 # (1884 Bk); a word like "Samvat" after a year belongs to the next year, not that one.
 _BK_BEFORE = (r"(?:sammat|samvat|sambat|bikrami|bikram|vikrami|vikram|bk|bs|vs|v\.s|b\.s"
-              r"|ਸੰਮਤ|ਸੰਬਤ|ਸੰਮਤਿ|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|संवत्?|सम्वत्?|विक्रमी)\.?")
-_BK_AFTER = r"(?:bikrami|vikrami|bk|bs|vs|v\.s|b\.s|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|विक्रमी)\.?"
+              r"|ਸ[ੰੌੇਂ]*ਮਤਿ?|ਸੰਬਤ|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|संवत्?|सम्वत्?|विक्रमी)\.?")  # ਸੰਮਤ and its OCR slips
+# After the year: also the Gurmukhi abbreviation ਬਿ: / ਬਿ. ("੧੮੩੫ ਬਿ:").
+_BK_AFTER = r"(?:bikrami|vikrami|bk|bs|vs|v\.s|b\.s|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|ਬਿ(?=[:.\s]|$)|विक्रमी)\.?:?"
+_CENTURY = r"(?<!\d)(1[0-9]|20)\s*(?:st|nd|rd|th|ਵੀਂ|ਵੀ)['’`]?\s*(?:century|c\.|ਸਦੀ)"
 _CE = r"(?:ad|a\.d\.|ce|c\.e\.|ਈ\.?|ईस्वी|ई\.)"
 _NOT_BK = r"(?:nanakshahi|nanak\s*shahi|khalsa|ਨਾਨਕਸ਼ਾਹੀ|ਖ਼ਾਲਸਾ|ਖਾਲਸਾ)"
 
@@ -127,10 +129,11 @@ def parse_date(text):
         a, b = int(m.group(1)) - shift, int(m.group(2)) - shift
         return result(min(a, b), max(a, b), bool(bk))
 
-    m = re.search(r"\b(1[0-9]|20)(?:st|nd|rd|th)\s+c(?:entury|\.)", t)
+    m = re.search(_CENTURY, t)
     if m and not bk:
         c = int(m.group(1))
-        return {"text": text, "from": (c - 1) * 100 + 1, "to": c * 100, "approx": True}
+        cshift = BIKRAMI_OFFSET if re.match(rf"\s*{_BK_AFTER}", t[m.end():]) else 0  # "੧੯ਵੀਂ ਸਦੀ ਬਿ:"
+        return {"text": text, "from": (c - 1) * 100 + 1 - cshift, "to": c * 100 - cshift, "approx": True}
 
     y = bk[0] if bk else (int(m.group(1)) if (m := re.search(_YEAR, t)) else None)
     if y is not None:

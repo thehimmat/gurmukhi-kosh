@@ -167,6 +167,12 @@ class Rows(unittest.TestCase):
         self.assertEqual(rows["v-padam"]["Drive"], "https://drive.google.com/file/d/Dpadam/view")
         self.assertEqual(rows["v-ghazal-ed"]["Pages"], 71)
 
+    def test_version_notes_join_entry_notes(self):
+        cat = {"version": 1, "works": [work("a")], "versions": [
+            version("x", ["a"], "catalogue-record", "catalogue-only", notes="Written at Amritsar.")]}
+        cat["versions"][0]["contains"][0]["note"] = "ff. 1-9"
+        self.assertEqual(version_rows(cat)[0]["Notes"], "ff. 1-9 | Written at Amritsar.")
+
 
 class Outputs(unittest.TestCase):
     def test_markdown_has_counts_and_sections(self):

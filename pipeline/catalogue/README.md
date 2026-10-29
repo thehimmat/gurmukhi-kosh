@@ -56,6 +56,26 @@ historic is on the wanted list.
 
 It was a one-off; from here `catalogue.json` is edited directly.
 
+## Ashok's manuscript catalogues (2026-10-29)
+
+Shamsher Singh Ashok's *Sikh Reference Library manuscript catalogue* (SGPC 1968) and *Panjabi
+Hath Likhtan di Suchi* vol. 2 (Bhasha Vibhag 1963) describe hundreds of manuscripts, many of them
+lost since (most of the Sikh Reference Library in 1984). Both were OCR'd (tesseract, Panjabi,
+300 dpi); the text sits beside each PDF in Drive as `<PDF name> - OCR text.txt`.
+
+`ashok.py parse` reads each entry: title, MS number, holder (vol. 2), author, translator,
+folios, composition date (ਰਚਨਾ ਕਾਲ), copy date (ਨਕਲ, or a lone ਸਮਾਂ), place, scribe, and the
+texts in a multi-text MS. `data/ashok/*.jsonl` keeps one entry per line; the catalogues' prose
+and incipit/explicit quotations are not kept. `ashok.py import` adds each entry as a
+`catalogue-record` candidate version; its texts are matched to known works by title skeleton
+(`match_key`), else proposed as new works with Gurmukhi and roman titles.
+
+OCR caveats, handled conservatively: a tippi misread in a title is restored only where the
+Gurbani lexicon knows the corrected word (`fix_title`); a five-digit year is OCR noise, so its
+date goes into a note; vol. 2's holder abbreviations come from its key (`HOLDERS`), and six from
+vol. 1's key, not in Drive, are inferred and say so in their notes (`HOLDERS_INFERRED`). The
+label keeps the OCR'd title and every note gives the PDF page, so any reading can be checked.
+
 ## Curating
 
 Curation is a list of operations in `data/curation/<date>-<topic>.json`, applied all or
@@ -84,6 +104,8 @@ python3 pipeline/catalogue/test_build.py
 python3 pipeline/catalogue/test_candidates.py
 python3 pipeline/catalogue/test_sweep_plan.py
 python3 pipeline/catalogue/test_curate.py
+python3 pipeline/catalogue/test_ashok.py
 ```
 
 `build.py --xlsx` and `seed.py` need openpyxl (`pip install openpyxl`); seeding also needs PyYAML.
+`test_ashok.py` needs gurmukhi-transliterate (`pip install git+https://github.com/thehimmat/gurmukhi-transliterate`).
