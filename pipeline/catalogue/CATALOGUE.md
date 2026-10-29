@@ -2,9 +2,9 @@
 
 Generated from `catalogue.json` by `build.py`; don't edit by hand. See README.md.
 
-232 works, 474 versions (309 in Drive).
+232 works, 477 versions (309 in Drive).
 
-Holding: 95 historic, 93 edition, 37 extracts, 2 online-only, 0 known-only, 5 nothing.
+Holding: 95 historic, 93 edition, 37 extracts, 2 online-only, 5 known-only, 0 nothing.
 
 ## Wanted
 
@@ -13,6 +13,9 @@ copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first w
 
 | Work | Authors | Era | Holding | Best lead |
 |---|---|---|---|---|
+| Singh Sagar | Vir Singh Bal | pre-1850 | known-only |  |
+| Gur Kirat Prakash | Vir Singh Bal | pre-1850 | known-only |  |
+| Bansavalinama Dasan Patshahian Ka | Kesar Singh Chhibbar | pre-1850 | known-only |  |
 | Sabha Parab | Amrit Rai | pre-1850 | edition |  |
 | Salya Parva (Shalya Parab) | Mangal (Mangal Rai) | pre-1850 | edition |  |
 | Karna Parva (Karan Parab) | Hans Ram Bajpeyi | pre-1850 | edition | [P.C. Roy / K.M. Ganguli English translation, Karna Parva (Calcutta 1889)](https://archive.org/download/in.ernet.dli.2015.46689/2015.46689.The-Mahabharata---Karna-Parva.pdf) |
@@ -22,7 +25,9 @@ copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first w
 | Mahabharat | Various court poets (e.g., Kunvaresh, Drona Parv; Mangal Rai, Shalya Parv; Amrit Rai) | pre-1850 | edition | [Gurinder Singh Mann, 'The Kavi Durbar of Guru Gobind Singh'](https://www.bhainandlal.com/website/ebooks/kavidurbar.pdf) |
 | Yagvalak (Yajnavalkya Smriti) |  | pre-1850 | edition | [Yajnavalkya Smriti, tr. Srisa Chandra Vidyarnava](https://archive.org/download/in.ernet.dli.2015.284019/2015.284019.Yajnavalkya-Smriti.pdf) |
 | Mahabharata |  | pre-1850 | edition | [Gurinder Singh Mann, 'The Kavi Durbar of Guru Gobind Singh'](https://www.bhainandlal.com/website/ebooks/kavidurbar.pdf) |
+| Gurpranali (anonymous, Motibagh MS) |  | undated | known-only |  |
 | Suan Nama (ਸੁਆਨ ਨਾਮਾ) | Anonymous | undated | online-only | [Encyclopaedia of Sikhism, 'Bavanja Kavi' (by Piara Singh Padam)](https://eos.learnpunjabi.org/BAVANJA%20KAVI.html) |
+| Sri Guru Dasam Panchasika | Sahib Singh Mrigind | 1850-1899 | known-only |  |
 | Karna Parva | Chand (Chanda), goldsmith | 1850-1899 | edition | [P.C. Roy / K.M. Ganguli English translation, Karna Parva (Calcutta 1889)](https://archive.org/download/in.ernet.dli.2015.46689/2015.46689.The-Mahabharata---Karna-Parva.pdf) |
 | Udyoga Parva (Udyog Parab) | Chand (Chanda) | 1850-1899 | edition | [P.C. Roy / K.M. Ganguli English translation, Udyoga Parva (Calcutta 1886)](https://archive.org/download/in.ernet.dli.2015.46690/2015.46690.The-Mahabharata---Udyoga-Parva.pdf) |
 | Manu (Manusmriti) |  | 1850-1899 | edition | [Manu Smriti in Panjabi (Unicode)](https://archive.org/download/manu_smriti_punjabi/manu_smriti_punjabi.pdf) |
@@ -200,21 +205,21 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Bachitar Natak (Bachittar Natak) | Guru Gobind Singh (traditional); contested by some modern scholars (court poets) | historic | 5 | 4 | 1688 |
 | Bahar-e Danish | Inayat Allah Kamboh (Persian original, 1651); Bhasha version made via Bhai Nand Chand per TGK | historic | 4 | 3 | 1799 |
 | Balmiki (Valmiki) Ramayana |  | historic | 5 | 2 | 1834 |
-| Bansavalinama Dasan Patshahian Ka | Kesar Singh Chhibbar | nothing | 2 | 0 | 1972 |
+| Bansavalinama Dasan Patshahian Ka | Kesar Singh Chhibbar | known-only | 2 | 0 | 1972 |
 | Barahmaha Sri Ram Chandar | Bhai Gurdas Singh ('Gurdas II') (the book; Wikipedia) — said to be written soon after 1708; not Bhai Gurdas Bhalla | edition | 2 | 2 | 1959 |
-| Bhagwata Purana |  | historic | 5 | 4 | 1840 |
+| Bhagwata Purana |  | historic | 6 | 4 | 1840 |
 | Bhasha Bhushan (commentary) | Harcharandas as commentator (the book); original Bhasha Bhushan by Maharaja Jaswant Singh of Marwar | historic | 6 | 5 | 1866 |
 | Bhasha Gita Sara |  | historic | 1 | 1 |  |
 | Bhav Panchashika (Bhava Panchasika) | Vrind (Brind) | edition | 3 | 2 | 1971 |
 | Bhavishya Purana |  | historic | 3 | 1 | 1869 |
 | Bhavrasamrit |  | edition | 1 | 1 |  |
 | Bhoj Prabandh |  | historic | 4 | 3 | 1881 |
-| Bishnu Bhagvat da Dasam [Skandh] |  | historic | 5 | 4 | 1701 |
+| Bishnu Bhagvat da Dasam [Skandh] |  | historic | 6 | 4 | 1701 |
 | Braham Kavach | unknown; the closing dohra reads 'ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ' (attributing it to Guru Hargobind) | edition | 1 | 1 |  |
 | Brahma Purana |  | historic | 2 | 1 | 1895 |
 | Brahma Vaivarta Purana |  | historic | 3 | 2 | 1888 |
 | Brahmanda Purana |  | historic | 4 | 3 |  |
-| Bāz-nāma | Anonymous | edition | 4 | 2 | 1900 |
+| Bāz-nāma | Anonymous | edition | 5 | 2 | 1900 |
 | Būstān | Sa'di Shirazi | historic | 5 | 2 | 1877 |
 | Chanakya (Chanakya Niti / Chanakya Rajniti) | Sainapati as translator (secondary sources); Twarikh Guru Khalsa names no translator | historic | 5 | 3 | 1921 |
 | Chanakya Niti | Chandra Sain Sainapati | edition | 3 | 2 | 1976 |
@@ -238,7 +243,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Gitasara-muktipada |  | historic | 1 | 1 |  |
 | Gobind Gita |  | historic | 1 | 1 |  |
 | Gulistān | Sa'di Shirazi | historic | 5 | 2 | 1851 |
-| Gur Kirat Prakash | Vir Singh Bal | nothing | 3 | 0 | 1986 |
+| Gur Kirat Prakash | Vir Singh Bal | known-only | 3 | 0 | 1986 |
 | Gur Mahima | Brahm Bhatt | extracts | 1 | 1 | 1976 |
 | Gur Shabad Sidhi | Attributed on the title page to 'Sri Man Bhai Mani Singh ji wala' (traditional attribution, unverified) | edition | 1 | 1 | 2006 |
 | Gurbani Arth Bhandar |  | edition | 1 | 1 |  |
@@ -246,7 +251,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Gurbilas Patshahi 10 |  | historic | 2 | 2 |  |
 | Gurbilas Patshahi 6 |  | historic | 1 | 1 |  |
 | Gurparnali |  | historic | 1 | 1 |  |
-| Gurpranali (anonymous, Motibagh MS) |  | nothing | 1 | 0 |  |
+| Gurpranali (anonymous, Motibagh MS) |  | known-only | 1 | 0 |  |
 | Guru Gita; Khasat Shastr; (Shastrodip?) Suraj |  | historic | 3 | 3 | 1886 |
 | Guru Granth Sahib |  | historic | 9 | 9 |  |
 | Gutka |  | edition | 1 | 1 |  |
@@ -362,7 +367,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Shukar Niti (Shukraniti) |  | historic | 3 | 1 | 1882 |
 | Shāhnāma | Abu'l-Qasim Firdawsi | historic | 4 | 1 | 1829 |
 | Sikhan di Bhagatmala (Sikkhan di Bhagat-mal) | Bhai Mani Singh (d. 1734; traditional); Giani Surat Singh of the Gianian Bunga, from Mani Singh's oral teaching (Padam); unnamed author (most modern scholars). Note: no source found that separates two different Mani Singhs; worth checking in print | historic | 6 | 4 | 1845 |
-| Singh Sagar | Vir Singh Bal | nothing | 2 | 0 | 1986 |
+| Singh Sagar | Vir Singh Bal | known-only | 2 | 0 | 1986 |
 | Singh-Gau ki Katha | Devi Das Pandit (Chhibbar) | historic | 3 | 2 | 1976 |
 | Six darshanas: Vedanta, Nyay, Vaisheshik, Sankhya, Yog, Uttar Mimansa |  | historic | 5 | 2 | 1890 |
 | Skanda Purana |  | historic | 4 | 2 | 1877 |
@@ -372,7 +377,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Sri Diwali Path Mahatam – revised/expanded edition | Compilation | edition | 1 | 1 | 2019 |
 | Sri Gur Panth Prakash |  | historic | 1 | 1 |  |
 | Sri Gur Sobha | Sainapati (Chandra Sain) | historic | 6 | 2 | 1925 |
-| Sri Guru Dasam Panchasika | Sahib Singh Mrigind | nothing | 1 | 0 |  |
+| Sri Guru Dasam Panchasika | Sahib Singh Mrigind | known-only | 1 | 0 |  |
 | Sri Guru Granth Sahib Darpan |  | edition | 1 | 1 |  |
 | Sri Nanak Prakash Gur Partap Suraj Granth |  | historic | 1 | 1 |  |
 | Srī Gurū Granth Prayāy (similar title) | Bhai Kirat Singh (the book, via Padam); anonymous (Encyclopaedia of Sikhism, for 'Sri Guru Granth Prayay'); later paryai compilers, e.g. Chanda Singh (1848) | extracts | 3 | 1 | 1976 |
