@@ -5,9 +5,25 @@ import {
   computePMI,
   filterCollocationsByPMI,
   publicOccurrences,
+  staleIds,
 } from '../pipeline/compute/collocations';
 
 describe('collocations', () => {
+  describe('staleIds', () => {
+    it('picks the stored rows this run no longer produces', () => {
+      const stored = [
+        { id: 1, key: '10:20' }, // still counted: kept
+        { id: 2, key: '10:30' }, // gone (its line was corrected, or it fell under the threshold)
+        { id: 3, key: '40:50' },
+      ];
+      expect(staleIds(stored, new Set(['10:20', '40:50', '60:70']))).toEqual([2]);
+    });
+
+    it('is empty when nothing changed', () => {
+      expect(staleIds([{ id: 1, key: '10:20' }], new Set(['10:20']))).toEqual([]);
+    });
+  });
+
   describe('extractBigrams', () => {
     it('extracts ordered consecutive pairs from line positions', () => {
       // Line: word1, word2, word3 at positions 1, 2, 3

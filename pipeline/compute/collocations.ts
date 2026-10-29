@@ -125,6 +125,37 @@ export function publicOccurrences(supabase: any) {
     .order('position', { ascending: true });
 }
 
+/** The ids of stored rows whose pair (`key`, "a:b") this run didn't produce. */
+export function staleIds(stored: { id: number; key: string }[], kept: Set<string>): number[] {
+  return stored.filter((r) => !kept.has(r.key)).map((r) => r.id);
+}
+
+/**
+ * Delete the rows of `table` this run no longer produces: pairs from a line since corrected, or now
+ * under the threshold. Upserts alone would leave them with their old counts. Runs after the upsert,
+ * so the table is never empty mid-run.
+ */
+async function deleteStale(
+  supabase: any,
+  table: 'bigrams' | 'collocations',
+  kept: Set<string>,
+  chunk = 500
+): Promise<number> {
+  // An empty run means the read failed, not that every pair is gone: never empty the table on it.
+  if (kept.size === 0) throw new Error(`deleteStale(${table}): this run kept no pairs; not deleting`);
+  const cols = table === 'bigrams' ? 'id, a:w1_id, b:w2_id' : 'id, a:word_a_id, b:word_b_id';
+  const stored = await fetchAllRows<{ id: number; a: number; b: number }>(table, () => {
+    const q = supabase.from(table).select(cols).order('id', { ascending: true });
+    return table === 'collocations' ? q.eq('window_size', 3) : q;
+  });
+  const ids = staleIds(stored.map((r) => ({ id: r.id, key: `${r.a}:${r.b}` })), kept);
+  for (let i = 0; i < ids.length; i += chunk) {
+    const { error } = await supabase.from(table).delete().in('id', ids.slice(i, i + chunk));
+    if (error) throw error;
+  }
+  return ids.length;
+}
+
 /** Upsert in bounded chunks so a single request never exceeds payload limits. */
 async function upsertInChunks(
   supabase: any,
@@ -145,7 +176,8 @@ async function upsertInChunks(
  * Main job: compute bigrams + collocations for the public corpus.
  * Fetches every word occurrence on a public line (paginated), groups by line, tallies pairs and
  * per-word frequencies in one pass, then upserts bigrams (count ≥ 3) and the
- * top collocations (PMI, count ≥ 5). Lazy-loads the Supabase client.
+ * top collocations (PMI, count ≥ 5) and deletes the stored pairs that no longer qualify.
+ * Lazy-loads the Supabase client.
  */
 export async function computeCollocationsCorpusWide() {
   const { createClient } = await import('@supabase/supabase-js');
@@ -210,6 +242,11 @@ export async function computeCollocationsCorpusWide() {
 
   console.log(`Upserting ${filtered.length} collocations...`);
   await upsertInChunks(supabase, 'collocations', filtered, 'word_a_id,word_b_id,window_size');
+
+  const keptBigrams = new Set(bigramBatch.map((b) => `${b.w1_id}:${b.w2_id}`));
+  console.log(`Deleted ${await deleteStale(supabase, 'bigrams', keptBigrams)} bigrams no longer counted.`);
+  const keptCollocations = new Set(filtered.map((c) => `${c.word_a_id}:${c.word_b_id}`));
+  console.log(`Deleted ${await deleteStale(supabase, 'collocations', keptCollocations)} collocations no longer counted.`);
 
   console.log('Refreshing computed stats...');
   const { error: refreshError } = await supabase.rpc('refresh_computed_stats');
