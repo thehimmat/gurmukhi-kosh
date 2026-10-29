@@ -445,7 +445,7 @@ stay, used elsewhere); the only Dasam lines left with ਾਂ after a vowel sign 
 `bigrams` and `collocations` catch up on the next `pipeline/compute` run.
 
 **077_dasam_hi_nasal** — run 2026-10-28 on the self-hosted server, the same way as 076 (psql, one transaction).
-Kosh `077_dasam_hi_nasal.sql`, as in the repo (#326). Not the only 077: `077_gurdas_singh_vaar_source.sql` (#307)
+Kosh `077_dasam_hi_nasal.sql`, as in the repo (#326). Not the only 077: `077_gurdas_singh_vaar_source.sql` (#307, since renumbered 078)
 merged the same day under the same number. The two touch different objects, so the replay's order (dasam, then
 gurdas) gives the same schema whichever ran first. The last seven Dasam lines of #312, a nasal after ਹਿ (bindi in
 106630, 113536, 118908, 118909 and 129315; tippi in 126247 and 126395; `NASAL_HI` in
@@ -462,5 +462,7 @@ number 077, which #326 had also taken; renumbered 078 here, matching the server'
 Drive `1bK_ozg_3Fy_e4EytWhm65vwuFxLc5pn5` (`pipeline/gurdas-singh-vaar/`): 351 lines, 28 shabads, 2,238 tokens,
 1,049 distinct, 0 problems, as in the PR; the combined file was dry-run on the PGlite replay first (same counts,
 re-run a no-op). psql read back source 8 `gurdas_singh_vaar_2008`, `curator`, 351 lines, 0 public, 28 shabads,
-2,238 occurrences. New words have no `ipa_display` or `search_fold` until `npm run pronounce` and
-`npm run searchfold` run against the server.
+2,238 occurrences. The corpus is curator-only (`source_rights`), so the public API shows neither the source nor its
+lines. `npm run pronounce` and `npm run searchfold` were then run against the server for the new words (the live IPA
+check, us-001, failed on 105 words without `ipa_display` until they did). #328 recorded the same run as 077 before
+this renumbering.

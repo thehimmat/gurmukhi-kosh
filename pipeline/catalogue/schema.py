@@ -50,45 +50,105 @@ def slug(text: str, prefix: str) -> str:
 # ---------------------------------------------------------------- dates
 
 _YEAR = r"(1[0-9]{3}|20[0-9]{2})"
+BIKRAMI_OFFSET = 57  # CE = Bikrami (Vikram Samvat) − 57; −56 for dates late in the CE year
+
+# Gurmukhi and Devanagari digits read as ASCII.
+_DIGITS = str.maketrans("੦੧੨੩੪੫੬੭੮੯०१२३४५६७८९", "01234567890123456789")
+# Markers that say a year is Bikrami. Some come before the year (Sammat 1884), some after
+# (1884 Bk); a word like "Samvat" after a year belongs to the next year, not that one.
+_BK_BEFORE = (r"(?:sammat|samvat|sambat|bikrami|bikram|vikrami|vikram|bk|bs|vs|v\.s|b\.s"
+              r"|ਸੰਮਤ|ਸੰਬਤ|ਸੰਮਤਿ|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|संवत्?|सम्वत्?|विक्रमी)\.?")
+_BK_AFTER = r"(?:bikrami|vikrami|bk|bs|vs|v\.s|b\.s|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|विक्रमी)\.?"
+_CE = r"(?:ad|a\.d\.|ce|c\.e\.|ਈ\.?|ईस्वी|ई\.)"
+_NOT_BK = r"(?:nanakshahi|nanak\s*shahi|khalsa|ਨਾਨਕਸ਼ਾਹੀ|ਖ਼ਾਲਸਾ|ਖਾਲਸਾ)"
+
+
+def _norm(text) -> str:
+    return str(text).translate(_DIGITS).lower()
+
+
+def bikrami_years(text) -> list[int]:
+    """Four-digit years written next to a Bikrami marker ('Sammat 1884', '1884 Bk',
+    'Samvat 1950 Bikrami'). A Nanakshahi or Khalsa Samvat year is not one."""
+    t = _norm(text)
+    years = []
+    for m in re.finditer(rf"(?<![a-z]){_BK_BEFORE}[\s:.(]{{0,4}}{_YEAR}|{_YEAR}[\s:.(]{{0,4}}{_BK_AFTER}(?![a-z])", t):
+        start = m.start()
+        if re.search(rf"{_NOT_BK}\W{{0,3}}$", t[max(0, start - 15):start]):
+            continue
+        years.append(int(m.group(1) or m.group(2)))
+    return years
+
+
+def is_bikrami(text) -> bool:
+    return bool(text and bikrami_years(text))
+
+
+def _ce_years(t: str) -> list[int]:
+    """Years explicitly marked CE/AD in the text."""
+    return [int(m.group(1) or m.group(2)) for m in
+            re.finditer(rf"(?<![a-z]){_CE}\s*{_YEAR}|{_YEAR}\s*{_CE}(?![a-z])", t)]
 
 
 def parse_date(text):
-    """A free-text date → {text, from?, to?, approx}. Years are CE; Bikrami
-    (Sammat/Samvat/BS/VS) years are converted (−57, approx since the year
-    boundaries differ). Returns None for empty input."""
+    """A free-text date → {text, from?, to?, approx}, years in CE.
+
+    Bikrami years (Sammat/Samvat/Bk/BS/VS, ਸੰਮਤ, संवत्) are converted (−57) and marked
+    approx, since the two calendars' years don't start together, unless the text also
+    gives the CE year, which then wins: marked ("1884 Bk/AD 1827") or a bare year that
+    matches the conversion ("1894 (Samvat 1951)"). Nanakshahi and Khalsa Samvat years are
+    left alone. Gurmukhi and Devanagari numerals are read. Returns None for empty input."""
     if text is None:
         return None
     text = str(text).strip()
     if not text:
         return None
-    t = text.lower()
+    t = _norm(text)
+    bk = bikrami_years(t)
+    circa = bool(re.search(r"(?<![a-z])(?:c\.|ca\.|circa|about|~)\s*\d", t))
 
-    m = re.search(r"\b(?:sammat|samvat|sambat|bs|vs|bikrami)\.?\s*" + _YEAR, t)
+    def result(lo, hi, approx):
+        if circa and lo == hi:
+            lo, hi, approx = lo - 10, hi + 10, True
+        return {"text": text, "from": lo, "to": hi, "approx": approx}
+
+    if bk:
+        marked = _ce_years(t)
+        if marked:  # "Dec 1898/Jan 1899 CE": the last-named year
+            return result(marked[-1], marked[-1], False)
+        bare = [int(y) for y in re.findall(_YEAR, t) if int(y) not in bk]
+        matching = [y for y in bare if any(abs(b - BIKRAMI_OFFSET - y) <= 1 for b in bk)]
+        if matching:
+            return result(matching[0], matching[0], False)
+
+    shift = BIKRAMI_OFFSET if bk else 0
+    m = re.search(_YEAR + r"\s*[-–—]\s*" + _YEAR, t)
     if m:
-        ce = int(m.group(1)) - 57
-        return {"text": text, "from": ce, "to": ce, "approx": True}
+        a, b = int(m.group(1)) - shift, int(m.group(2)) - shift
+        return result(min(a, b), max(a, b), bool(bk))
 
     m = re.search(r"\b(1[0-9]|20)(?:st|nd|rd|th)\s+c(?:entury|\.)", t)
-    if m:
+    if m and not bk:
         c = int(m.group(1))
         return {"text": text, "from": (c - 1) * 100 + 1, "to": c * 100, "approx": True}
 
-    m = re.search(_YEAR + r"\s*[-–—]\s*" + _YEAR, t)
-    if m:
-        a, b = int(m.group(1)), int(m.group(2))
-        return {"text": text, "from": min(a, b), "to": max(a, b), "approx": False}
-
-    m = re.search(r"\b(?:c\.|ca\.|circa|about|~)\s*" + _YEAR, t)
-    if m:
-        y = int(m.group(1))
-        return {"text": text, "from": y - 10, "to": y + 10, "approx": True}
-
-    m = re.search(_YEAR, t)
-    if m:
-        y = int(m.group(1))
-        return {"text": text, "from": y, "to": y, "approx": "?" in t}
+    y = bk[0] if bk else (int(m.group(1)) if (m := re.search(_YEAR, t)) else None)
+    if y is not None:
+        return result(y - shift, y - shift, bool(bk) or "?" in t)
 
     return {"text": text, "approx": True}
+
+
+ERAS = ["pre-1850", "1850-1899", "1900+", "undated"]
+
+
+def era(date) -> str:
+    """Which interest tier a date falls in: pre-1850 (prime), 1850-1899 (strong), 1900+.
+    A range is placed by its midpoint."""
+    if not date or date.get("from") is None:
+        return "undated"
+    mid = (date["from"] + date["to"]) / 2
+    return "pre-1850" if mid < 1850 else "1850-1899" if mid < 1900 else "1900+"
 
 
 # ---------------------------------------------------------------- validation
@@ -100,6 +160,11 @@ def _check_date(where, date, errs):
         errs.append(f"{where}: date must be an object with text")
         return
     lo, hi = date.get("from"), date.get("to")
+    raw = set(bikrami_years(date["text"])) - set(_ce_years(_norm(date["text"])))
+    if raw & {lo, hi}:
+        expect = parse_date(date["text"])
+        errs.append(f"{where}: date {date['text']!r} is Bikrami; from/to look unconverted. CE is "
+                    f"{expect.get('from')}–{expect.get('to')} (Bikrami − 57), not {lo}–{hi}")
     if (lo is None) != (hi is None):
         errs.append(f"{where}: date needs both from and to, or neither")
     elif lo is not None and lo > hi:

@@ -24,7 +24,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from schema import HISTORIC_TYPES, load  # noqa: E402
+from schema import HISTORIC_TYPES, era, load  # noqa: E402
 
 EDITION_TYPES = {"edition", "e-text", "translation", "commentary", "compilation"}
 LEVELS = ["nothing", "known-only", "online-only", "extracts", "edition", "historic"]
@@ -66,6 +66,21 @@ def best_lead(versions: list[dict]):
     return avail[0] if avail else None
 
 
+# Search order: composed (or first copied) before 1850 is prime interest, 1850–1899 strong,
+# 1900+ later. Undated works sit after pre-1850: most are Anandpur-era texts not yet dated.
+ERA_RANK = {"pre-1850": 0, "undated": 1, "1850-1899": 2, "1900+": 3}
+
+
+def composed_by(work: dict, versions: list[dict]):
+    """The work's composition date, or failing that the earliest dated copy of it (it was
+    composed by then). None if neither is known."""
+    if (work.get("date") or {}).get("from") is not None:
+        return work["date"]
+    dated = [v["date"] for v in versions if v.get("status") in LIVE | {"candidate"}
+             and (v.get("date") or {}).get("from") is not None]
+    return min(dated, key=lambda d: d["from"]) if dated else None
+
+
 MODERN_FROM = 1947  # works composed after this have no "historic" copy to find
 
 
@@ -80,9 +95,10 @@ def wanted(cat: dict):
         h = holding(vbw[w["id"]])
         modern = ((w.get("date") or {}).get("from") or 0) >= MODERN_FROM
         if LEVELS.index(h) < LEVELS.index("edition" if modern else "historic"):
-            out.append((LEVELS.index(h), i, w, best_lead(vbw[w["id"]])))
-    out.sort(key=lambda t: (t[0], t[1]))
-    return [(w, lead) for _, _, w, lead in out]
+            rank = ERA_RANK[era(composed_by(w, vbw[w["id"]]))]
+            out.append((rank, LEVELS.index(h), i, w, best_lead(vbw[w["id"]])))
+    out.sort(key=lambda t: t[:3])
+    return [(w, lead) for *_, w, lead in out]
 
 
 def _authors(w):
@@ -102,7 +118,8 @@ def work_rows(cat: dict) -> list[dict]:
         rows.append({
             "ID": w["id"], "Title": w["title"]["roman"], "Gurmukhi": w["title"].get("gurmukhi", ""),
             "Other titles": "; ".join(w["title"].get("variants", [])), "Authors": _authors(w),
-            "Date": (w.get("date") or {}).get("text", ""), "Status": w["status"],
+            "Date": (w.get("date") or {}).get("text", ""), "Era": era(composed_by(w, vs)),
+            "Status": w["status"],
             "Holding": holding(vs), "Versions": len(vs),
             "In Drive": sum(v["status"] == "in-drive" for v in vs),
             "Earliest dated version": min(years) if years else "",
@@ -113,12 +130,15 @@ def work_rows(cat: dict) -> list[dict]:
 
 def version_rows(cat: dict) -> list[dict]:
     titles = {w["id"]: w["title"]["roman"] for w in cat["works"]}
+    composed = {w["id"]: (w.get("date") or {}).get("text", "") for w in cat["works"]}
     rows = []
     for v in cat["versions"]:
         d = v.get("date") or {}
         rows.append({
             "ID": v["id"], "Works": "; ".join(titles[c["work_id"]] for c in v["contains"]),
             "Version": v["label"], "Type": v["type"], "Status": v["status"],
+            "Composed": "; ".join(x for x in dict.fromkeys(composed[c["work_id"]] for c in v["contains"]) if x),
+            "Copy era": era(v.get("date")),
             "Script": ", ".join(v.get("scripts", [])), "Language": ", ".join(v.get("languages", [])),
             "Date": d.get("text", ""), "Year from": d.get("from", ""), "Year to": d.get("to", ""),
             "Approx.": "yes" if d.get("approx") else "",
@@ -160,16 +180,17 @@ def render_markdown(cat: dict) -> str:
         "",
         "## Wanted",
         "",
-        "Works with no historic copy (manuscript, lithograph or early print) in Drive, neediest first.",
+        "Works with no historic copy (manuscript, lithograph or early print) in Drive: composed (or first",
+        "copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first within each.",
         "",
     ]
     wrows = []
     for w, lead in wanted(cat):
         r = next(x for x in rows if x["ID"] == w["id"])
-        wrows.append({"Work": r["Title"], "Authors": r["Authors"], "Holding": r["Holding"],
+        wrows.append({"Work": r["Title"], "Authors": r["Authors"], "Era": r["Era"], "Holding": r["Holding"],
                       "Best lead": f"[{lead['label']}]({lead.get('file_url') or lead.get('item_url')})"
                       if lead and (lead.get("file_url") or lead.get("item_url")) else ""})
-    lines += _md_table(["Work", "Authors", "Holding", "Best lead"], wrows)
+    lines += _md_table(["Work", "Authors", "Era", "Holding", "Best lead"], wrows)
     lines += ["", "## Needs curation", "",
               "Seeded from Drive file names; check the title, merge duplicates, then set status to catalogued.", ""]
     lines += _md_table(["ID", "Title", "Versions"], [r for r in rows if r["Status"] == "needs-curation"])
@@ -189,12 +210,13 @@ README_SHEET = [
     "Needs curation — works seeded from Drive file names that still need a proper title or merging.",
     "",
     "Holding: historic > edition > extracts > online-only > known-only > nothing.",
+    "Era: pre-1850 (prime interest), 1850-1899 (strong), 1900+; from the composition date, else the earliest copy.",
 ]
 
 
 def wanted_rows(cat: dict) -> list[dict]:
     by_id = {r["ID"]: r for r in work_rows(cat)}
-    return [{**{k: by_id[w["id"]][k] for k in ("ID", "Title", "Authors", "Holding", "Known from")},
+    return [{**{k: by_id[w["id"]][k] for k in ("ID", "Title", "Authors", "Era", "Holding", "Known from")},
              "Best lead": lead["label"] if lead else "",
              "Lead link": (lead.get("file_url") or lead.get("item_url") or "") if lead else ""}
             for w, lead in wanted(cat)]
@@ -239,7 +261,7 @@ def write_xlsx(cat: dict, path: str) -> None:
     wrows = work_rows(cat)
     tab("Works", wrows)
     tab("Versions", version_rows(cat))
-    tab("Wanted", wanted_rows(cat), ["ID", "Title", "Authors", "Holding", "Known from", "Best lead", "Lead link"])
+    tab("Wanted", wanted_rows(cat), ["ID", "Title", "Authors", "Era", "Holding", "Known from", "Best lead", "Lead link"])
     tab("Needs curation", [r for r in wrows if r["Status"] == "needs-curation"],
         ["ID", "Title", "Gurmukhi", "Authors", "Versions", "In Drive"])
     wb.save(path)

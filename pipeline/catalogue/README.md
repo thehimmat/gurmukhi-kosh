@@ -26,9 +26,14 @@ and also records copies that are not in Drive yet.
 - `type`: manuscript, lithograph, early-print (pre-1947), edition, e-text, translation,
   commentary, compilation (gutka, nitnem), anthology (carries extracts), study,
   catalogue-record (known only from a catalogue), reference (a catalogue or encyclopaedia).
-- `date`: `{text, from, to, approx}` in CE. `text` keeps what the source says;
-  `schema.parse_date` reads years, ranges, "c. 1800", "18th century" and Bikrami
-  (Sammat/Samvat, −57, approx).
+- Dates are `{text, from, to, approx}` in CE; `text` keeps what the source says. A work's
+  `date` is when it was composed; a version's `date` is when that copy was made or printed.
+  `schema.parse_date` reads years, ranges, "c. 1800", "18th century", Gurmukhi and
+  Devanagari numerals, and Bikrami (Sammat/Samvat/Bk/BS/VS, ਸੰਮਤ, संवत्: −57, approx unless
+  the CE year is also given). Nanakshahi and Khalsa Samvat years are left alone. Validation
+  refuses a Bikrami date stored unconverted.
+- **Era** (computed): pre-1850 (prime interest), 1850-1899 (strong), 1900+, undated; from the
+  composition date, else the earliest copy. The wanted list and the sweeps go in that order.
 - `scripts`: Gurmukhi, Devanagari, Perso-Arabic, Roman, Sharada, Takri, Landa, Other.
 - Work `status`: catalogued, needs-curation, candidate, rejected.
   Version `status`: in-drive (has `drive_id`), available, catalogue-only, candidate, rejected.
