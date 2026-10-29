@@ -92,11 +92,21 @@ def _ce_years(t: str) -> list[int]:
             re.finditer(rf"(?<![a-z]){_CE}\s*{_YEAR}|{_YEAR}\s*{_CE}(?![a-z])", t)]
 
 
+_HIJRI = re.compile(rf"{_YEAR}\s*(?:ਹਿਜਰੀ|ਹਿ\.|hijri|a\.?h\.?)(?![a-z])")
+
+
+def hijri_to_ce(year: int) -> tuple[int, int]:
+    """The CE years a Hijri (AH) year falls across: a lunar year straddles two."""
+    start = int(year * 0.970229 + 621.5643)
+    return start, start + 1
+
+
 def parse_date(text):
     """A free-text date → {text, from?, to?, approx}, years in CE.
 
     Bikrami years (Sammat/Samvat/Bk/BS/VS, ਸੰਮਤ, संवत्) are converted (−57) and marked
-    approx, since the two calendars' years don't start together, unless the text also
+    approx, since the two calendars' years don't start together (Hijri years, ਹਿਜਰੀ/ਹਿ./AH,
+    are converted too, as the two CE years they straddle), unless the text also
     gives the CE year, which then wins: marked ("1884 Bk/AD 1827") or a bare year that
     matches the conversion ("1894 (Samvat 1951)"). Nanakshahi and Khalsa Samvat years are
     left alone. Gurmukhi and Devanagari numerals are read. Returns None for empty input."""
@@ -106,6 +116,14 @@ def parse_date(text):
     if not text:
         return None
     t = _norm(text)
+    hj = _HIJRI.search(t)
+    if hj:  # Hijri: a CE year given alongside wins, else convert
+        marked = _ce_years(t)
+        if marked:
+            ce = marked[-1]
+            return {"text": text, "from": ce, "to": ce, "approx": False}
+        lo, hi = hijri_to_ce(int(hj.group(1)))
+        return {"text": text, "from": lo, "to": hi, "approx": True}
     bk = bikrami_years(t)
     circa = bool(re.search(r"(?<![a-z])(?:c\.|ca\.|circa|about|~)\s*\d", t))
 
@@ -163,6 +181,10 @@ def _check_date(where, date, errs):
         errs.append(f"{where}: date must be an object with text")
         return
     lo, hi = date.get("from"), date.get("to")
+    hj = _HIJRI.search(_norm(date["text"]))
+    if hj and int(hj.group(1)) in {lo, hi} and not _ce_years(_norm(date["text"])):
+        errs.append(f"{where}: date {date['text']!r} is Hijri; from/to look unconverted "
+                    f"(CE {hijri_to_ce(int(hj.group(1)))[0]}, not {lo})")
     raw = set(bikrami_years(date["text"])) - set(_ce_years(_norm(date["text"])))
     if raw & {lo, hi}:
         expect = parse_date(date["text"])

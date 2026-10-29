@@ -202,6 +202,10 @@ class Dates(unittest.TestCase):
         self.assertEqual(split_dates("ਸੰਮਤ ੧੮੯੭ ਬਿ: ।"), (None, "ਸੰਮਤ ੧੮੯੭ ਬਿ."))
         self.assertEqual(split_dates("ਨਾ ਮਾਲੂਮ"), (None, None))
 
+    def test_bikrami_marker_ocr_slips(self):
+        self.assertEqual(split_dates("੧੬ਵੀਂ ਸਦੀ ਬਿਕ੍ਮੀ"), (None, "੧੬ਵੀਂ ਸਦੀ ਬਿਕ੍ਰਮੀ"))
+        self.assertEqual(split_dates("੧੬ਵੀਂ ਸਦੀ ਭਿ. । _"), (None, "੧੬ਵੀਂ ਸਦੀ ਬਿ."))
+
 
 class Roman(unittest.TestCase):
     def test_plain_ascii_with_schwa_deleted(self):

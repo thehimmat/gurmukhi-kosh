@@ -150,7 +150,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Akal Takht hukamnama on Amrit sanchar |  | edition | 1 | 1 | 1877 |
 | Akal Usatat |  | nothing | 1 | 0 |  |
 | Akal Usatati |  | nothing | 1 | 0 | 1701 |
-| Akal Ustit |  | nothing | 1 | 0 | 1501 |
+| Akal Ustit |  | nothing | 1 | 0 | 1444 |
 | Alaukar Kalanidhi |  | nothing | 1 | 0 | 1844 |
 | Amarakakosh Bhakha (Ratan Dam) | ਅਮਰ ਸਿੰਘ | nothing | 1 | 0 |  |
 | Ammrit Nad Upnikhad |  | nothing | 1 | 0 | 1829 |
@@ -279,14 +279,14 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Būstān | Sa'di Shirazi | historic | 5 | 2 | 1877 |
 | Calitr Joti Joti Samavne |  | nothing | 1 | 0 | 1887 |
 | Candal Nar (Shubh Ashubh Karam Adi) | ਭਾਈ ਪੋਜਾਬ ਸਿੰਘ, ਬਹਿਲੇ ਕਾ | nothing | 1 | 0 | 1744 |
-| Candi Caritr (Duja) |  | nothing | 2 | 0 | 1501 |
+| Candi Caritr (Duja) |  | nothing | 2 | 0 | 1444 |
 | Candi Caritr Ukti Bilas |  | nothing | 1 | 0 |  |
 | Caritoopakhyan (Tiya Caritr) |  | nothing | 1 | 0 | 1723 |
 | Caritr |  | nothing | 1 | 0 |  |
 | Caturadas Ling Mahatam | ਕਵੀ ਮੇਘ ਸਿੰਘ | nothing | 1 | 0 | 1823 |
 | Caubis Autar (Bishnu De) 7 |  | nothing | 1 | 0 |  |
 | Caubis Autar, Macch Avtar (Katha) |  | nothing | 1 | 0 | 1701 |
-| Caubis Avtar (Bishnu De) |  | nothing | 2 | 0 | 1501 |
+| Caubis Avtar (Bishnu De) |  | nothing | 2 | 0 | 1444 |
 | Caubis Avtar Bilas (Dev Nagri) | ਕਵੀ ਨਰਹਰਿ ਦਾਸ, ਬਾਰਹਟ | nothing | 1 | 0 | 1787 |
 | Caudi Caritr (Duja) |  | nothing | 1 | 0 |  |
 | Caupi Patsahi 10 (Puni Rachas Ka Kata Sisa...) |  | nothing | 1 | 0 | 1834 |
@@ -306,7 +306,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Cikitsa Sar | ਕਵੀ ਧੀਰਜ ਰਾਮ, ਮਿਸ਼੍ਰ | nothing | 2 | 0 | 1844 |
 | Citr Bilas Dev Nagri) | ਕਵੀ ਅਮਿ੍ਤ ਰਾਇ | nothing | 1 | 0 | 1679 |
 | Coautka Upnikhad |  | nothing | 1 | 0 | 1829 |
-| Codi Caritrokti Bilas |  | nothing | 2 | 0 | 1501 |
+| Codi Caritrokti Bilas |  | nothing | 2 | 0 | 1444 |
 | Dadu Prakash (Gian Samund Adi Sane) | ਸੈਤ ਦਾਦੂ ਦਿਆਲ | nothing | 1 | 0 |  |
 | Dakkhani Oankar Satik | ਸ਼ੀ ਗੁਰੂ ਨਾਨਕ ਦੇਵ ਜੀ | nothing | 1 | 0 | 1796 |
 | Das Avtar Guru Usatati | ਕਵਿ ਸੌਂਧਾ, ਕਾਲਾ (ਅਮਿ੍ਤਸਰ) ਨਿਵਾਸੀ | nothing | 1 | 0 | 1801 |
@@ -328,7 +328,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Dhian Bind |  | nothing | 1 | 0 | 1829 |
 | Diuudhan |  | nothing | 1 | 0 |  |
 | Diwan-i-Goya | Bhai Nand Lal Goya | edition | 7 | 6 | 1963 |
-| Do Avtar (Rudr De) |  | nothing | 3 | 0 | 1501 |
+| Do Avtar (Rudr De) |  | nothing | 3 | 0 | 1444 |
 | Dohe, Kabitt, Pingal Adi | ਕਵੀਂ ਸਾਧੂ ਵਜ਼ੀਰ ਸਿੰਘ | nothing | 1 | 0 | 1880 |
 | Dohre Asphutakal |  | nothing | 1 | 0 |  |
 | Dohre Te Coaupian |  | nothing | 1 | 0 |  |
@@ -466,7 +466,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Janamsakhi Bhai Bala |  | historic | 2 | 2 |  |
 | Jang Nama "patshahi 10 (Khadhura) |  | nothing | 1 | 0 |  |
 | Jang Nama Hasan Husain | ਕਵੀ ਮੁਕਬਲ | nothing | 1 | 0 |  |
-| Jang Nama Imam Hunain (Farsi Akkhar) | ਕਵੀ ਹਾਮਿਦ | nothing | 1 | 0 | 1279 |
+| Jang Nama Imam Hunain (Farsi Akkhar) | ਕਵੀ ਹਾਮਿਦ | nothing | 1 | 0 | 1862 |
 | Jang Nama Jahanabad | ਕਵੀ ਖ਼ਜ਼ਾਨ ਸਿੰਘ | nothing | 1 | 0 |  |
 | Jang Nama Lahaur (Farsi Akkhar) | ਭਾਈ ਕਾਨ੍ਹ ਸਿੰਘ, ਬੈਗਾ | nothing | 1 | 0 | 1848 |
 | Jangnama Guru Gobind Singh Ji Ka | Ani Rai | edition | 5 | 4 | 1950 |
@@ -476,7 +476,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Japanji Sahibr | ਗੁਰੂ ਨਾਨਕ ਨੀ ਆਦਿ | nothing | 1 | 0 | 1864 |
 | Japji Sahib steek (anonymous Udasi teeka) |  | historic | 1 | 1 |  |
 | Japji Sahib teeka (Anandghan) | Anandghan (Udasi) | historic | 1 | 1 |  |
-| Japu (Guru Nanak) Pattare |  | nothing | 2 | 0 | 1501 |
+| Japu (Guru Nanak) Pattare |  | nothing | 2 | 0 | 1444 |
 | Japu Arath Prakashni Tika |  | nothing | 1 | 0 | 1883 |
 | Japu Gudharath Dipika Tika (Panjabi-Saisakrit) | ਸਤੁ ਨਿਹਾਲ ਸਿਘ, ਥੋਹਾ (ਰਵਲ ਪਿੰਡੀ) | nothing | 1 | 0 | 1839 |
 | Japu Ji Gita Adi Samet) | ਸ਼੍ਰੀ ਗੁਰੂ ਨਾਨਕ ੮ਵ ਜੀ ਅਪੰਦ | nothing | 1 | 0 | 1801 |
@@ -642,7 +642,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Paidal Fauj (Palatanan Am) . Pattare |  | nothing | 1 | 0 | 1744 |
 | Paitins Aiaukkhari | ਸ੍ਰੀ ਗੁਰੂ ਨਾਨਕ ਦੇਵ ਜੀ | nothing | 1 | 0 | 1859 |
 | Pakhayan Carit | ਕਵਿ ਰਾਮਸਸ਼ਯਾਮ | nothing | 2 | 0 | 1795 |
-| Pakhian Caritr 7 |  | nothing | 2 | 0 | 1501 |
+| Pakhian Caritr 7 |  | nothing | 2 | 0 | 1444 |
 | Pakhyan Caritr (Tiya Caritr ) |  | nothing | 1 | 0 |  |
 | Pakistan Vic Guradavare | ਭਾਈ ਰਣਧੀਰ ਸਿੰਘ, ਗੁਰਦੁਆਰਾ ਇਨਸਪੈਕਟਰ | nothing | 1 | 0 | 1947 |
 | Palatanan Khas |  | nothing | 1 | 0 | 1744 |
@@ -695,7 +695,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Parida Guru Arajan Ji Ki |  | nothing | 1 | 0 |  |
 | Parsuram Sanvad | Pandit Kashi Ram | historic | 2 | 2 | 1899 |
 | Paucadashi Saigh | ਫ਼ਤੇ ਸਿੰਘ | nothing | 1 | 0 | 1856 |
-| Pauj Garanthi |  | nothing | 1 | 0 | 1501 |
+| Pauj Garanthi |  | nothing | 1 | 0 | 1444 |
 | Pauj Gauothi, Dasham Bani Adi | ਸ਼੍ਰੀ ਗੁਰੂ ਨਾਨਕ ਦੇਵ ਜੀ ਆਦਿ | nothing | 1 | 0 | 1843 |
 | Pauj Ribi |  | nothing | 1 | 0 |  |
 | Pauoj Gaunthi | ਸ਼੍ਰੀ ਗੁਰੂ ਨਾਨਕ ਦੇਵ ਜੀ ਆਦਿ | nothing | 1 | 0 | 1744 |
@@ -798,16 +798,16 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Ramashhamodh Bhakha | ਗਿਆਨੀ ਸੈਤ ਸਿੰਘ, ਅੰਮਿ੍ਤਸਰੀ | nothing | 1 | 0 | 1850 |
 | Ramashramodh | ਭਾਈ ਸੇਤ ਸਿੰਘ ਗਿਆਨੀ, ਅਮਿ੍ਤਸਰੀ ਰ | nothing | 1 | 0 | 1820 |
 | Ramayana |  | historic | 5 | 3 | 1688 |
-| Ramaz-Ul-Ishak Farsi Akkhar) | ਸਾਈਂ ਕਾਦਰੀ | nothing | 1 | 0 | 1288 |
+| Ramaz-Ul-Ishak Farsi Akkhar) | ਸਾਈਂ ਕਾਦਰੀ | nothing | 1 | 0 | 1871 |
 | Ras Bilas | ਕਵਿ ਦੇਵ | nothing | 1 | 0 | 1933 |
 | Ras Pec Bar Nidhi |  | nothing | 1 | 0 | 1833 |
-| Ras Prabodh |  | nothing | 3 | 0 | 1154 |
+| Ras Prabodh |  | nothing | 3 | 0 | 1741 |
 | Ras Raj |  | nothing | 1 | 0 | 1883 |
 | Ras Raz | ਕਵੀ ਮਤੀ ਰਮ | nothing | 1 | 0 | 1871 |
 | Ras Tarangni (Ras Ratanakar) | ਕਵੀ ਭਾਨ ਦੱਤ | nothing | 1 | 0 | 1871 |
 | Ras Taregini Bhakha | ਕਵਿ ਹਰਿਨਾਮ ਰਾਇ | nothing | 1 | 0 | 1744 |
 | Rasajik Priya | ਕਵਿ ਕੇਸ਼ਵ ਦਾਸ | nothing | 1 | 0 | 1591 |
-| Rasala Kharait Maragrab-Ul-Kari (Farsi Akkhar) | ਮੀਆਂ ਫ਼ਤਿਹ ਮੁਹੰਮਦ | nothing | 1 | 0 | 1127 |
+| Rasala Kharait Maragrab-Ul-Kari (Farsi Akkhar) | ਮੀਆਂ ਫ਼ਤਿਹ ਮੁਹੰਮਦ | nothing | 1 | 0 | 1715 |
 | Rasik Latashrit Kalapadram (Phulsi Satasi Par Tika) | ਬੈਜ ਨਾਥ | nothing | 1 | 0 |  |
 | Rasik Miya | ਕਵੀ ਕੇਸ਼ਵ ਦਾਸ | nothing | 1 | 0 |  |
 | Rasik Piya (Sacit) | ਕਵਿ ਕੇਸ਼ਵ ਦਾਸ | nothing | 1 | 0 | 1591 |
@@ -822,7 +822,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Rigved Di Tantri Upnikhad |  | nothing | 0 | 0 |  |
 | Roopdeep Pingal | Jaikrishan (Jai Kishan) Das Kavi | edition | 1 | 1 |  |
 | Ros Raj Satik | ਕਵਿ ਮਤਿ ਰਾਮ | nothing | 1 | 0 | 1844 |
-| Ruh-Ul-Tanazil (Farsi Akkhar) | ਮੀਆਂ ਗ਼ੁਲਾਮ ਰਸੂਲ, ਆਲਿਮ ਪੂਰੀ | nothing | 1 | 0 | 1285 |
+| Ruh-Ul-Tanazil (Farsi Akkhar) | ਮੀਆਂ ਗ਼ੁਲਾਮ ਰਸੂਲ, ਆਲਿਮ ਪੂਰੀ | nothing | 1 | 0 | 1868 |
 | Rup Dip Pingal Bhakha |  | nothing | 1 | 0 | 1895 |
 | Sabha Khukash (Dev Nagri) | ਕਵੀ ਹਰਿ ਚਰਣ ਦਾਸ | nothing | 1 | 0 | 1757 |
 | Sabha Mandan | ਸਾਧੂ ਅਮੀਰ ਦਾਸ, ਉਦਾਸੀ | nothing | 1 | 0 | 1883 |
@@ -874,7 +874,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Sassi Sultan Atamad Ki (Giharafi) | ਕਵੀ ਸੁਲਤਾਨ ਅਹਮਦ | nothing | 1 | 0 | 1801 |
 | Satigur Nirban Mahima |  | nothing | 0 | 0 |  |
 | Satt Avtar (Bahuma De) |  | nothing | 1 | 0 |  |
-| Satt Up Avtar (Baha De) |  | nothing | 1 | 0 | 1501 |
+| Satt Up Avtar (Baha De) |  | nothing | 1 | 0 | 1444 |
 | Saupatak Parab |  | nothing | 1 | 0 | 1857 |
 | Savaiye Patshahi 10 (32) |  | nothing | 1 | 0 |  |
 | Savaiye Sri Mukhvak Pa: 10 Pattare |  | nothing | 1 | 0 | 1701 |
@@ -894,7 +894,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Sharadha Purak Shabad-Saugh |  | nothing | 1 | 0 |  |
 | Sharadha Puran |  | nothing | 2 | 0 | 1744 |
 | Sharangadhar Bhakha (Na-Mukemal) | ਸ਼੍ਰੀ ਸ਼ਾਰੇਗਧਰ ਵੈਦਗ | nothing | 1 | 0 | 1832 |
-| Shasatr Nam Mala Puran |  | nothing | 1 | 0 | 1501 |
+| Shasatr Nam Mala Puran |  | nothing | 1 | 0 | 1444 |
 | Shatat Nam Mala Puran | ਪ ਤਸ਼ਾਹੀ ੧੦ | nothing | 2 | 0 |  |
 | Sher Singh Pukash | ਸਾਧੂ ਅਮੀਰ ਦਾਸ | nothing | 1 | 0 |  |
 | Shhararagarohan Parab \|\| |  | nothing | 1 | 0 | 1857 |
@@ -964,7 +964,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Siharafi Gurdial Ki |  | nothing | 1 | 0 |  |
 | Siharafi Ki |  | nothing | 1 | 0 |  |
 | Siharafi Mangal Das Ji Ki | ਮੰਗਲ ਦਾਸ | nothing | 1 | 0 | 1905 |
-| Siharafi Sauyad Miran.bhikh (Farsi Akkhar) | ਸ਼ਾਹ ਮੀਰਾਂ ਭੀਖ | nothing | 1 | 0 | 1249 |
+| Siharafi Sauyad Miran.bhikh (Farsi Akkhar) | ਸ਼ਾਹ ਮੀਰਾਂ ਭੀਖ | nothing | 1 | 0 | 1833 |
 | Siharafian Puran Bhagat Kian | ਕਵੀ ਕ੍ਰਾਦਰ ਯਾਰ | nothing | 1 | 0 |  |
 | Sikh Reference Library manuscript catalogue | Shamsher Singh Ashok | extracts | 1 | 1 |  |
 | Sikhan di Bhagatmala (Sikkhan di Bhagat-mal) | Bhai Mani Singh (d. 1734; traditional); Giani Surat Singh of the Gianian Bunga, from Mani Singh's oral teaching (Padam); unnamed author (most modern scholars). Note: no source found that separates two different Mani Singhs; worth checking in print | historic | 7 | 4 | 1744 |
@@ -1041,7 +1041,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Top Khana |  | nothing | 1 | 0 | 1744 |
 | Tritia Prakaran |  | nothing | 1 | 0 | 1843 |
 | Triya Charitra | Chand (pen-name in the manuscript; Padam; the book); relation to the Dasam Granth Charitropakhyan unclear — that text's own authorship is debated (Guru Gobind Singh / court poets) | historic | 5 | 5 | 1800 |
-| Tuhafatul Momnin (Arbi Akkhar) | ਸ਼ਫ਼ੀਅ ਮੁਹੰਮਦ | nothing | 1 | 0 | 1160 |
+| Tuhafatul Momnin (Arbi Akkhar) | ਸ਼ਫ਼ੀਅ ਮੁਹੰਮਦ | nothing | 1 | 0 | 1747 |
 | U) Shirin Farahad (Sacitr) (Sohni Mahi'val, Sassi Pannu Adi) |  | nothing | 1 | 0 |  |
 | Udyoga Parva (Udyog Parab) | Chand (Chanda) | edition | 6 | 4 | 1886 |
 | Ugardanti | attributed to Guru Gobind Singh (disputed) | historic | 1 | 1 | 1801 |
@@ -1073,7 +1073,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Vaky Sudha |  | nothing | 0 | 0 |  |
 | Vamana Purana |  | historic | 3 | 1 | 1909 |
 | Var Asa Mahala 1 1 |  | nothing | 1 | 0 | 1834 |
-| Var Sri Bhagauti Ji Ki (Chandi di Var) | Guru Gobind Singh (Dasam Granth) | historic | 3 | 1 | 1501 |
+| Var Sri Bhagauti Ji Ki (Chandi di Var) | Guru Gobind Singh (Dasam Granth) | historic | 3 | 1 | 1444 |
 | Var Tilang Ki |  | nothing | 1 | 0 |  |
 | Varaha Purana |  | historic | 3 | 1 | 1887 |
 | Varan Bhai Gurdas Ji: Gurmukhi, Roman and English translation (2 vols, 2009) |  | edition | 2 | 2 | 2009 |
@@ -1110,7 +1110,7 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Yog Vasishat (Maha Ramain) | ਸ੍ਰਾਮੀ ਰਾਮ ਪ੍ਰਸਾਦ, ਨਿਰੇ ਰਨੀ | nothing | 2 | 0 |  |
 | Yog Vasishat Bhakha | ਸ੍ਰਾਮੀ ਰਾਮ ਪ੍ਸਾਦ, ਨਿਰੰਜਨੀ | nothing | 1 | 0 | 1800 |
 | Yog Vasishat: Saravan Simti Bhakha | ਸ੍ਰਾਮੀ ਰਾਮ ਪ੍ਰਸਾਦ, ਨਿਰੇਜਨੀ | nothing | 1 | 0 | 1866 |
-| Zafar Nama Patshahi 10 7 |  | nothing | 1 | 0 | 1501 |
+| Zafar Nama Patshahi 10 7 |  | nothing | 1 | 0 | 1444 |
 | Zafar Nama Satik | ਸ਼੍ਰ ਗੁਰੂ ਗੋਬਿੰਦ ਸਿੰਘ ਜੀ ਆਦਿ | nothing | 6 | 0 | 1744 |
 | Zafar Nama Tippanian Sahit (Ashacaraj Audher Prakash) |  | nothing | 1 | 0 | 1861 |
 | Zafar Namah Patshahi 10 | ਸ਼੍ਰੀ ਗੁਰੂ ਗੋਬਿੰਦ ਸਿੰਘ ਜੀ ਆਦਿ | nothing | 1 | 0 |  |

@@ -55,10 +55,12 @@ def _clean(s):
 def _norm_date(s):
     s = re.sub(r"(?:ਸ਼|ਸ਼|ਸ)[ੰੌੇਂੋੈ]*ਮਤ", "ਸੰਮਤ", s)  # ਸ਼ੰੌਮਤ, ਸੇਮਤ, ਸੋਮਤ, ਸੈਮਤ → ਸੰਮਤ
     s = re.sub(r"([੦-੯0-9]{4})\s*(?:ਕਿ|੪)\s*(?=[:.।\s]|$)", r"\1 ਬਿ", s)  # ਬਿ read as ਕਿ or ੪
+    s = re.sub(r"ਬਿਕ੍?ਰ?ਮੀ", "ਬਿਕ੍ਰਮੀ", s)  # ਬਿਕ੍ਮੀ: the ਰ lost
+    s = re.sub(r"(ਸਦੀ|[੦-੯0-9]{4})\s*ਭਿ(?=[:.\s]|$)", r"\1 ਬਿ", s)  # ਭਿ. read for ਬਿ.
     s = re.sub(r"ਬਿ(?!ਕ)\s*[:.]?", "ਬਿ.", s)  # ਬਿ: → ਬਿ., leaving ਬਿਕ੍ਰਮੀ whole
     s = re.sub(r"([੦-੯]{2})\s*ਵ[^\s]*\s*(?:ਸਦੀ|ਕਦੀ)", r"\1ਵੀਂ ਸਦੀ", s)  # ੧੯ ਵੀ. ਸਦੀ → ੧੯ਵੀਂ ਸਦੀ
     s = re.sub(r"ਸਦੀ\s+ਬਿ\.", "ਸਦੀ ਬਿ.", s)
-    s = s.strip(" \t।|!,;:-")
+    s = s.strip(" \t।|!,;:-_")
     return None if not s or UNKNOWN.match(s) else s
 
 
