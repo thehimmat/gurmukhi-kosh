@@ -18270,6 +18270,86 @@
    "found_on": "2026-10-28",
    "found_by": "sweep-catalogue-mining",
    "id": "v-bansavalinama-dasan-patshahian-ka-ed-rattan-singh-jaggi-para"
+  },
+  {
+   "label": "Gurmukhi Bhagvat Puran manuscript (Internet Archive, sikhparcharworldwide), ends at the 9th dhiai",
+   "type": "manuscript",
+   "contains": [
+    {
+     "work_id": "w-bhagwata-purana",
+     "note": "Handwritten Gurmukhi pothi, 872 pages. The uploader's description says it ends at the 9th dhiai (chapter); the page gives no scribe, date or holding library."
+    }
+   ],
+   "scripts": [
+    "Gurmukhi"
+   ],
+   "languages": [
+    "Panjabi"
+   ],
+   "host": "Internet Archive",
+   "availability": "free-download",
+   "item_url": "https://archive.org/details/bhagvat_puran",
+   "notes": "Undated. Marked Public Domain Mark 1.0. Uploaded to the Archive in Feb 2024 with no repository or shelfmark.",
+   "status": "candidate",
+   "found_on": "2026-10-29",
+   "found_by": "sweep-archive-org",
+   "id": "v-gurmukhi-bhagvat-puran-manuscript-internet-archive-sikhparch"
+  },
+  {
+   "label": "Gurmukhi Bhagvat Puran manuscript, 10th Sakhandh (Internet Archive, sikhparcharworldwide)",
+   "type": "manuscript",
+   "contains": [
+    {
+     "work_id": "w-bishnu-bhagvat-da-dasam-skandh",
+     "note": "Handwritten Gurmukhi pothi of the tenth skandha."
+    }
+   ],
+   "scripts": [
+    "Gurmukhi"
+   ],
+   "languages": [
+    "Panjabi"
+   ],
+   "host": "Internet Archive",
+   "availability": "free-download",
+   "item_url": "https://archive.org/details/puratan_pothi",
+   "notes": "Undated on the page; the uploader only guesses 'seems to be from 1800s', so the copy is left undated. No scribe, repository or shelfmark. Public Domain Mark 1.0.",
+   "status": "candidate",
+   "found_on": "2026-10-29",
+   "found_by": "sweep-archive-org",
+   "id": "v-gurmukhi-bhagvat-puran-manuscript-10th-sakhandh-internet-arc"
+  },
+  {
+   "label": "SOAS Archives MS 36445, 'Baz Nama in Gurmukhi' (hunting birds), English translation by L. Hukam Chand",
+   "type": "catalogue-record",
+   "contains": [
+    {
+     "work_id": "w-b-z-n-ma",
+     "note": "Treatise on the names, haunts and capture of hunting birds, a hawking manual in the same family as the court animal manuals. The record names Maharaja Fatteh Singh as author and L. Hukam Chand as translator into English."
+    }
+   ],
+   "scripts": [
+    "Gurmukhi"
+   ],
+   "languages": [
+    "English"
+   ],
+   "date": {
+    "text": "1900",
+    "from": 1900,
+    "to": 1900,
+    "approx": false
+   },
+   "repository": "SOAS Archives, University of London",
+   "shelfmark": "GB 102 MS 36445",
+   "host": "SOAS Archives (via Archives Hub)",
+   "availability": "none",
+   "item_url": "https://archiveshub.ac.uk/search/archives/adf38ff9-ac7f-35b7-a997-31da223a1094",
+   "notes": "167 ff. The record gives language as English and dates the item 1900; it does not say whether the leaves are the Gurmukhi original or the translation. Not related to the wanted Suan Nama (that is about dogs, this one about hawks).",
+   "status": "candidate",
+   "found_on": "2026-10-29",
+   "found_by": "sweep-archive-org",
+   "id": "v-soas-archives-ms-36445-baz-nama-in-gurmukhi-hunting-birds-en"
   }
  ]
 }
