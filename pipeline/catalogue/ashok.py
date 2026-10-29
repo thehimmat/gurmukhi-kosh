@@ -328,6 +328,17 @@ def fix_title(title: str) -> str:
     t = unicodedata.normalize("NFC", title)
     t = re.sub(r"[\s\u0A4D\u200c\u200d“”\"'`.,;:!|_\-–—]+$", "", t).strip()
     t = re.sub(r"\s+", " ", t)
+    # A leftover item marker, its brackets often mangled: (9ਉ), (9੪), 0ਉਂ), (0(ਉ) … )
+    m = re.match(r"^\(?[0-9੦-੯]*\(?\s*(?:[ਉੳਅਓ][ੰਂ]?|[0-9੦-੯]{1,2})\s*\)\s*", t)
+    if m and (t.startswith("(") or re.match(r"^[0-9੦-੯]", t)):
+        wrapped = t.startswith("(") and t.count("(") > 1
+        t = t[m.end():]
+        if wrapped and t.endswith(")") and t.count(")") > t.count("("):
+            t = t[:-1]
+    for _ in range(2):  # trailing page numbers with ASCII digits (3੭, 33) and lone letters (ਰ)
+        t = re.sub(r"\s+(?:\S*[0-9]\S*|[\u0A05-\u0A39\u0A59-\u0A5E])$", "", t)
+    if t.count("(") > t.count(")"):
+        t += ")"
     t = re.sub(r"^ਸੀ ", "ਸ੍ਰੀ ", t)
 
     def fix_word(m):
@@ -339,6 +350,17 @@ def fix_title(title: str) -> str:
         return max(cands, key=lambda c: lex.get(c, 0)) if cands else w
 
     return re.sub(r"[\u0A00-\u0A7F]+", fix_word, t)
+
+
+def _clean_name(name):
+    """Drop OCR debris from a person's name: anything but Gurmukhi letters, spaces, commas,
+    full stops and balanced brackets."""
+    if not name:
+        return name
+    n = re.sub(r"[^\u0A00-\u0A7F\s,.()]", "", name)
+    if n.count(")") > n.count("("):
+        n = n.replace(")", "")
+    return re.sub(r"\s+", " ", n).strip(" ,.") or None
 
 
 def _work_title(title: str) -> str:
@@ -368,8 +390,8 @@ def to_finds(entries: list[dict], cat: dict) -> dict:
         if len(k) >= MIN_KEY and k in known:
             return {"work_id": known[k]}
         c = {"work_title": new_titles.setdefault(k, r) if len(k) >= MIN_KEY else r, "gurmukhi": g}
-        if author:
-            c["authors"] = [author]
+        if _clean_name(author):
+            c["authors"] = [_clean_name(author)]
         if composed:
             c["composed"] = composed
         return c

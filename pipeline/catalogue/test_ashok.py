@@ -238,6 +238,19 @@ class FixTitle(unittest.TestCase):
     def test_leading_sri(self):
         self.assertEqual(fix_title("ਸੀ ਨਾਨਕ ਰਮਾਇਣ"), "ਸ੍ਰੀ ਨਾਨਕ ਰਮਾਇਣ")
 
+    def test_leftover_item_markers_page_numbers_and_lone_letters(self):
+        self.assertEqual(fix_title("(9ਉ) ਨਿਰਵਾਣ ਪ੍ਰਕਰਣ ਦੀਆਂ ਕਥਾਂ"), "ਨਿਰਵਾਣ ਪ੍ਰਕਰਣ ਦੀਆਂ ਕਥਾਂ")
+        self.assertEqual(fix_title("(9੪) ਸਇਕਾਦਸ਼ੀ ਮਹਾਤਮ"), "ਸਇਕਾਦਸ਼ੀ ਮਹਾਤਮ")
+        self.assertEqual(fix_title("0ਉਂ) ਪਰਚੀ ਹਿੰਦਾਲ ਕੀ"), "ਪਰਚੀ ਹਿੰਦਾਲ ਕੀ")
+        self.assertEqual(fix_title("09ਉ) ਪ੍ਰਾਣ ਸੰਗਲੀ"), "ਪ੍ਰਾਣ ਸੰਗਲੀ")
+        self.assertEqual(fix_title("(0(ਉ) ਤਿਲ ਸ਼ਤ ਭਾਖਾ)"), "ਤਿਲ ਸ਼ਤ ਭਾਖਾ")
+        self.assertEqual(fix_title("ਸੋਨਿਕ ਉਪਨਿਖਦ 3੭"), "ਸੋਨਿਕ ਉਪਨਿਖਦ")
+        self.assertEqual(fix_title("ਭਾਗਵਤ ਇਕਾਦਸ਼ ਸਕੰਧ ਰ"), "ਭਾਗਵਤ ਇਕਾਦਸ਼ ਸਕੰਧ")
+        self.assertEqual(fix_title("ਪਖਿਆਨ ਚਰਿਤ੍ਰ ੭"), "ਪਖਿਆਨ ਚਰਿਤ੍ਰ ੭")  # a Gurmukhi numeral can be part of the title
+
+    def test_unclosed_bracket_is_closed(self):
+        self.assertEqual(fix_title("ਯੋਗ ਵਸਿਸ਼ਟ (ਮਹਾ ਰਾਮਾਇਣ"), "ਯੋਗ ਵਸਿਸ਼ਟ (ਮਹਾ ਰਾਮਾਇਣ)")
+
     def test_stray_marks_trimmed(self):
         self.assertEqual(fix_title("ਸ਼੍ਰੀ ਰਾਮ ਚਰਿਤ ਮਾਨਸ ੍"), "ਸ਼੍ਰੀ ਰਾਮ ਚਰਿਤ ਮਾਨਸ")
         self.assertEqual(fix_title("ਰਾਮਾਸ਼੍ਰਮੋਧ . ,- --“"), "ਰਾਮਾਸ਼੍ਰਮੋਧ")
@@ -289,6 +302,10 @@ class ToFinds(unittest.TestCase):
         a, b = (v["contains"][0] for v in finds["versions"])
         self.assertEqual((a["gurmukhi"], b["gurmukhi"]), ("ਗੁਰ ਬਿਲਾਸ ਪਾਤਸ਼ਾਹੀ ੬", "ਸ੍ਰੀ ਮਦ ਭਗਵਤ ਗੀਤਾ"))
         self.assertIn("(ਅਧੂਰਾ)", finds["versions"][0]["label"])
+
+    def test_author_junk_cleaned(self):
+        c = to_finds([entry(title="ਪਾਰਸ ਭਾਗ ਨਵਾਂ", author="ਸਾ£)' ਅੱਡਣ ਸ਼ਾਹ")], CAT)["versions"][0]["contains"][0]
+        self.assertEqual(c["authors"], ["ਸਾ ਅੱਡਣ ਸ਼ਾਹ"])
 
     def test_ocr_doubt_drops_the_date_into_a_note(self):
         v = to_finds([entry(copied="ਸੰਮਤ ੧੯੩੯੮ ਬਿ.", ocr_doubt=True)], CAT)["versions"][0]
