@@ -23,6 +23,7 @@ import { tokenize } from "../../lib/tokenizer";
 import { sleep, parseArgs, progress } from "../shared/utils";
 import { shabadUpsertRow } from "./shabad-meta";
 import { correctLine } from "./corrections";
+import { fixMarkOrder } from "./mark-order";
 
 // Registry: our sources.code → the BaniDB SourceID and the source's page
 // count ("ang" = the source's own page unit; for Bhai Gurdas, the vaar).
@@ -99,6 +100,8 @@ async function processAng(
     if (line.status === "stale") {
       console.warn(`\nCorrection for verse ${verse.verseId} no longer matches BaniDB's line; kept BaniDB's. Check pipeline/sggs/corrections.ts.`);
     }
+    // Nasal marks BaniDB stores before the aunkar or dulainkar (ਨੰੂ for ਨੂੰ), put in Unicode order (mark-order.ts).
+    const ordered = fixMarkOrder(line.gurmukhi, line.transliteration);
 
     const { data: lineData, error: lineErr } = await db
       .from("lines")
@@ -109,9 +112,9 @@ async function processAng(
           shabad_id: verse.shabadId,
           ang: verse.pageNo,
           line_no: verse.lineNo,
-          gurmukhi: line.gurmukhi,
+          gurmukhi: ordered.gurmukhi,
           translation_en: verse.translation?.en?.bdb ?? verse.translation?.en?.ms ?? null,
-          transliteration_en: line.transliteration,
+          transliteration_en: ordered.transliteration,
         },
         { onConflict: "source_fk,verse_id" }
       )
@@ -124,7 +127,7 @@ async function processAng(
     }
 
     const lineId = lineData.id;
-    const tokens = tokenize(line.gurmukhi);
+    const tokens = tokenize(ordered.gurmukhi);
     if (tokens.length === 0) continue;
 
     const { error: wordErr } = await db.from("words").upsert(

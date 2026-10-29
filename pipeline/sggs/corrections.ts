@@ -1,7 +1,8 @@
 /**
  * BaniDB lines we know are mistyped, checked against printed sources. The ingest swaps the
- * corrected line in for BaniDB's, so a re-ingest keeps the fix; migrations 073 (TYPOS), 076 (NASAL)
- * and 077 (NASAL_HI, both in nasal-corrections.ts) fixed the copy already loaded. Each entry matches BaniDB's whole line: once BaniDB corrects a line itself,
+ * corrected line in for BaniDB's, so a re-ingest keeps the fix; migrations 073 (TYPOS), 076 (NASAL),
+ * 077 (NASAL_HI, both in nasal-corrections.ts) and 079 (FOLLOW_UPS) fixed the copy already loaded.
+ * A verse can have more than one entry: each applies to what the one before it produced. Each entry matches BaniDB's whole line: once BaniDB corrects a line itself,
  * the entry stops matching and the ingest takes BaniDB's text and reports the entry as stale.
  *
  * Reported upstream: thehimmat/inbox#91. Sources and page images are indexed in the Drive doc
@@ -130,8 +131,20 @@ export const TYPOS: LineCorrection[] = [
   },
 ];
 
+// Second corrections of lines already corrected above; `from` is the earlier entry's `to`.
+export const FOLLOW_UPS: LineCorrection[] = [
+  {
+    verseId: 130267, ang: 1198,
+    from: "ਤੈ ਮੂਜੀ ਪੀ ਭਾਂਗ ਕਹੋ ਕਾ ਕਾਜ ਸਵਰਿ ਹੈਂ ॥",
+    to: "ਤੈਂ ਮੂਜੀ ਪੀ ਭਾਂਗ ਕਹੋ ਕਾ ਕਾਜ ਸਵਰਿ ਹੈਂ ॥",
+    translitFrom: "tai moojee pee bhaa(n)g kaho kaa kaaj savar hai(n) ||",
+    translitTo: "tai(n) moojee pee bhaa(n)g kaho kaa kaaj savar hai(n) ||",
+    evidence: "ਤੈ → ਤੈਂ: Hazur Sahib p.1202 and 1912 p.1181 (leaf 1204) both have the bindi (#310)",
+  },
+];
+
 export const CORRECTIONS: Record<string, LineCorrection[]> = {
-  dasam_banidb_v2: [...TYPOS, ...NASAL, ...NASAL_HI],
+  dasam_banidb_v2: [...TYPOS, ...NASAL, ...NASAL_HI, ...FOLLOW_UPS],
 };
 
 export type CorrectedLine = {
@@ -147,8 +160,12 @@ export function correctLine(
   gurmukhi: string,
   transliteration: string | null,
 ): CorrectedLine {
-  const c = CORRECTIONS[sourceCode]?.find((x) => x.verseId === verseId);
-  if (!c) return { gurmukhi, transliteration, status: "none" };
-  if (gurmukhi !== c.from) return { gurmukhi, transliteration, status: "stale" };
-  return { gurmukhi: c.to, transliteration: c.translitTo, status: "corrected" };
+  const entries = CORRECTIONS[sourceCode]?.filter((x) => x.verseId === verseId) ?? [];
+  if (!entries.length) return { gurmukhi, transliteration, status: "none" };
+  if (gurmukhi !== entries[0].from) return { gurmukhi, transliteration, status: "stale" };
+  let line = { gurmukhi, transliteration };
+  for (const c of entries) {
+    if (line.gurmukhi === c.from) line = { gurmukhi: c.to, transliteration: c.translitTo };
+  }
+  return { ...line, status: "corrected" };
 }
