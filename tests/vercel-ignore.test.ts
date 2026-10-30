@@ -1,6 +1,6 @@
 /**
  * Vercel's Ignored Build Step (vercel.json ignoreCommand, scripts/vercel-ignore.mjs): a push whose
- * changes can't affect the deployed app (migrations, pipelines, catalogue sweeps, docs, tests) is not
+ * changes can't affect the deployed app (migrations, pipelines, docs, tests) is not
  * deployed. Every production deployment starts a fresh ISR cache, so the ~80% of merges that are
  * data-only were re-rendering pages for nothing (Oct 2026 Hobby overage).
  * Run: npm test
@@ -17,7 +17,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 describe("shouldBuild", () => {
   it("skips a push that only touches data, pipelines, docs or tests", () => {
     expect(shouldBuild(["supabase/migrations/079_mark_order.sql", "supabase/APPLIED.md"])).toBe(false);
-    expect(shouldBuild(["pipeline/catalogue/sweeps/2026-10-29.json", "pipeline/catalogue/README.md"])).toBe(false);
+    expect(shouldBuild(["pipeline/scans/collate.ts", "pipeline/sarbloh/README.md"])).toBe(false);
     expect(shouldBuild(["docs/local-rehearsal.md", "tests/mark-order.test.ts", "user-stories/INDEX.md"])).toBe(false);
     expect(shouldBuild(["selfhost/Caddyfile", ".github/workflows/ci.yml", "README.md"])).toBe(false);
   });
