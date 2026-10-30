@@ -262,6 +262,23 @@ def parse_senses(description: str) -> list[dict]:
     return senses
 
 
+def build_record(word: str, entry: dict | None) -> dict:
+    """One entries.jsonl line for `word`: the fields ingest.ts reads."""
+    if not (entry and entry.get("description")):
+        return {"gurmukhi": word, "found": False}
+    return {
+        "gurmukhi": word,
+        "found": True,
+        "entry_gurmukhi": entry["word"],
+        "mk_id": entry.get("ID"),
+        "source_url": (
+            f"https://www.searchgurbani.com/mahan-kosh/view"
+            f"?word={requests.utils.quote(word)}"
+        ),
+        "senses": parse_senses(entry["description"]),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Checkpoint helpers
 # ---------------------------------------------------------------------------
@@ -339,21 +356,10 @@ def main():
                 time.sleep(DELAY_S)
                 continue
 
-            if entry and entry.get("description"):
-                record = {
-                    "gurmukhi": word,
-                    "found": True,
-                    "entry_gurmukhi": entry["word"],
-                    "mk_id": entry.get("ID"),
-                    "source_url": (
-                        f"https://www.searchgurbani.com/mahan-kosh/view"
-                        f"?word={requests.utils.quote(word)}"
-                    ),
-                    "senses": parse_senses(entry["description"]),
-                }
+            record = build_record(word, entry)
+            if record["found"]:
                 found += 1
             else:
-                record = {"gurmukhi": word, "found": False}
                 not_found += 1
 
             out.write(json.dumps(record, ensure_ascii=False) + "\n")
