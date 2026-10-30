@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Vercel's Ignored Build Step (vercel.json "ignoreCommand"). Exit 0 skips the deployment, exit 1
-// builds it. A push that only touches migrations, pipelines, catalogue sweeps, docs or tests can't
+// builds it. A push that only touches migrations, pipelines, docs or tests can't
 // change what the app serves, and every production deployment starts with an empty ISR cache, so
 // deploying those merges only made crawlers re-render pages (the Oct 2026 Hobby overage). When in
 // doubt it builds: an unknown path, an empty diff or a git error all deploy.

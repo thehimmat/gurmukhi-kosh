@@ -12,7 +12,7 @@ from a typed GurbaniLipi text. Curator-only.
   full, page 4 in full, and the first lines of page 5.
 - BaniDB has the same text as its source S (41000-41027), with the same line count. It differs in
   about 30 lines, mostly spelling (ਸਚੇ/ਸੱਚੇ, ਮਹਿ/ਮੈਂ, nuktas). BaniDB also adds a heading line,
-  ਬੋਲਣਾ ਭਾਈ ਗੁਰਦਾਸ ਕਾ. The triage (`pipeline/scans/manifest.yaml`) called the file a minor witness
+  ਬੋਲਣਾ ਭਾਈ ਗੁਰਦਾਸ ਕਾ. The triage (`scans/manifest.yaml` in the private granth-catalogue repo) called the file a minor witness
   to BaniDB S. BaniDB S is not loaded here, so this is the first copy of the vaar in the kosh.
 
 ## Decisions
