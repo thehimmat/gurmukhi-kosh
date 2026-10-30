@@ -54,6 +54,9 @@ type HealthStats = {
   translation_sources_registered: number;
 
   lines_per_source: { source_code: string; rows: number; lines: number }[];
+  // Commentaries cover Guru Granth Sahib only, so these two count its lines alone (080). sggs_lines
+  // is absent until 080 is applied.
+  sggs_lines?: number;
   lines_with_no_commentary: number;
   empty_bodies: number;
 
@@ -238,15 +241,16 @@ export async function computeHealth(): Promise<HealthReport> {
       key: "lines_per_source",
       label: "Lines per commentary source",
       group: "Commentaries",
+      note: "Coverage is of Guru Granth Sahib lines, the only corpus with commentaries.",
       value: s.lines_per_source.map((r) => ({
         source: r.source_code,
         lines: r.lines,
-        coverage: pct(r.lines, s.total_lines),
+        coverage: pct(r.lines, s.sggs_lines ?? s.total_lines),
       })),
     },
     {
       key: "lines_with_no_commentary",
-      label: "Lines with zero commentary",
+      label: "Guru Granth Sahib lines with zero commentary",
       group: "Commentaries",
       value: s.lines_with_no_commentary,
       status: s.lines_with_no_commentary > 60 ? "warn" : "info",
