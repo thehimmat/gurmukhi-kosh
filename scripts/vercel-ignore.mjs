@@ -24,6 +24,7 @@ const NON_APP = [
   /^[^/]+\.md$/,
   /^\.gitignore$/,
   /^env\.example$/,
+  /^requirements\.txt$/,
   /^vitest\.config\.ts$/,
 ];
 

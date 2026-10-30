@@ -20,6 +20,7 @@ describe("shouldBuild", () => {
     expect(shouldBuild(["pipeline/scans/collate.ts", "pipeline/sarbloh/README.md"])).toBe(false);
     expect(shouldBuild(["docs/local-rehearsal.md", "tests/mark-order.test.ts", "user-stories/INDEX.md"])).toBe(false);
     expect(shouldBuild(["selfhost/Caddyfile", ".github/workflows/ci.yml", "README.md"])).toBe(false);
+    expect(shouldBuild(["requirements.txt"])).toBe(false);
   });
 
   it("builds when any app file changes", () => {
