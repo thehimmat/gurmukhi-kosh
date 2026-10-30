@@ -36,6 +36,11 @@ class CheckEntry(unittest.TestCase):
         self.assertIsNone(check({"id": 1, "headword": "kirati", "gurmukhi": ""}, "ਕਿਰਤਿ"))
         self.assertIsNone(check({"id": 1, "headword": "kirati"}, "ਕਿਰਤਿ"))
 
+    def test_whitespace_only_gurmukhi_is_an_appendix_entry(self):
+        # Same rule as reverse_appendix.py and ingest.ts (gurmukhi.trim()): blank is not printed.
+        self.assertIsNone(check({"id": 1, "headword": "kirati", "gurmukhi": "  "}, "ਕਿਰਤਿ"))
+        self.assertIsNone(check({"id": 1, "headword": "kirati", "gurmukhi": "\n"}, "ਕਿਰਤਿ"))
+
     def test_exact_has_no_row(self):
         self.assertEqual(check({"id": 1, "headword": "nānaku", "gurmukhi": "ਨਾਨਕੁ"}, "ਨਾਨਕੁ"), ("exact", None))
 
