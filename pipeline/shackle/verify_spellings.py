@@ -41,7 +41,7 @@ nfc = lambda s: unicodedata.normalize("NFC", s or "")
 def check_entry(e, reverse=reverse_transliterate, candidates=candidate_spellings):
     """(match, row) for a main-glossary entry, row None when exact; None for an appendix entry."""
     printed = nfc(e.get("gurmukhi"))
-    if not printed:  # appendix (no printed Gurmukhi) — not an OCR check
+    if not printed.strip():  # appendix (no printed Gurmukhi; ingest.ts uses trim() too) — not an OCR check
         return None
     result = reverse(e.get("headword", ""))
     cands = [nfc(c) for c in candidates(result)]
