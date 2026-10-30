@@ -466,3 +466,19 @@ re-run a no-op). psql read back source 8 `gurdas_singh_vaar_2008`, `curator`, 35
 lines. `npm run pronounce` and `npm run searchfold` were then run against the server for the new words (the live IPA
 check, us-001, failed on 105 words without `ipa_display` until they did). #328 recorded the same run as 077 before
 this renumbering.
+
+**079_mark_order** — run 2026-10-29 on the self-hosted server, the same way as 076 (psql, one transaction). Kosh
+`079_mark_order.sql`, as in the repo (#332, closing #310). Nasal marks BaniDB stores before the aunkar or dulainkar
+(ਨੰੂ for ਨੂੰ) put in Unicode order in every loaded line, by the rule the ingest now applies
+(`pipeline/sggs/mark-order.ts`): 17 lines, 13 Dasam and 4 Bhai Gurdas. And ਤੈ → ਤੈਂ in Dasam 130267 (`FOLLOW_UPS` in
+`pipeline/sggs/corrections.ts`), which both prints read. Checked after through the API: all 17 lines and their
+transliterations match the TypeScript rule; 130267 reads ਤੈਂ (`tai(n)`); no public line still has ੰ or ਂ before ੁ or
+ੂ; the 12 corrected spellings have a `search_fold` and a frequency above 0, and the old forms are gone; after
+`npm run pronounce`, no word lacks an `ipa_display`.
+
+**080_health_commentary_sggs** — run 2026-10-30 on the self-hosted server, the same way as 078 (psql, one
+transaction). Kosh `080_health_commentary_sggs.sql`, as in the repo (#339): `refresh_health_stats()` counts
+`lines_with_no_commentary` over Guru Granth Sahib lines only and adds `sggs_lines`, which `lib/health.ts` divides
+commentary coverage by. psql reported CREATE FUNCTION, REVOKE, GRANT and the closing `refresh_health_stats()`.
+Checked after on /api/health: totals recomputed 15:20 UTC; Guru Granth Sahib lines with zero commentary 28 (was
+112,229 across every corpus); coverage 82.9% (ss_padarth) to 99.6% (ssk_en), was 29-35%.
