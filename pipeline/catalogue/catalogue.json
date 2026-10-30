@@ -682,7 +682,8 @@
    "title": {
     "roman": "Panj Sau Sakhi (Sau Sakhi)",
     "variants": [
-     "Panj Sau Sakhi"
+     "Panj Sau Sakhi",
+     "Sau Sakhi"
     ]
    },
    "authors": [
@@ -1913,7 +1914,8 @@
    "title": {
     "roman": "Sar Gita (ਸਾਰ ਗੀਤਾ)",
     "variants": [
-     "Sargita"
+     "Sargita",
+     "Bhasha Gita Sara"
     ]
    },
    "authors": [
@@ -1928,7 +1930,10 @@
    "refs": {
     "anandpur": 90
    },
-   "notes": "Sar Gita: anonymous Bhakha prose; Gurmukhi MS (UPSS 4151) and Devanagari MS (Jammu 957-gha) saved, plus the Sanskrit source."
+   "notes": "Sar Gita: anonymous Bhakha prose; Gurmukhi MS (UPSS 4151) and Devanagari MS (Jammu 957-gha) saved, plus the Sanskrit source.",
+   "based_on": [
+    "w-gitasara-muktipada"
+   ]
   },
   {
    "id": "w-pothi-salihotar-ki",
@@ -2835,7 +2840,8 @@
    "title": {
     "roman": "Ikadas = probably Bhagavat Ekadash Skandh Bhasha (ਇਕਾਦਸ)",
     "variants": [
-     "Ikadas"
+     "Ikadas",
+     "Ekadash Skandh Bhasha"
     ]
    },
    "authors": [
@@ -2863,7 +2869,8 @@
    "title": {
     "roman": "Prabodh Chandar Natak (Prabodhachandra Natak)",
     "variants": [
-     "Prabodh Chandar Natak"
+     "Prabodh Chandar Natak",
+     "Prabodh Chandrodaya Natak"
     ]
    },
    "authors": [
@@ -2955,185 +2962,176 @@
   {
    "id": "w-rajniti",
    "title": {
-    "roman": "Rajniti"
+    "roman": "Rajniti (Rajneeti)",
+    "gurmukhi": "ਰਾਜਨੀਤਿ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-sau-sakhi",
-   "title": {
-    "roman": "Sau Sakhi"
-   },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   ],
+   "notes": "Anonymous Gurmukhi MS filed beside Devi Das's Rajniti Ra Kabit (Anandpur no. 2); not confirmed to be the same text."
   },
   {
    "id": "w-var-sri-bhagauti-ji-ki",
    "title": {
-    "roman": "Var Sri Bhagauti Ji Ki"
+    "roman": "Var Sri Bhagauti Ji Ki (Chandi di Var)",
+    "gurmukhi": "ਵਾਰ ਸ੍ਰੀ ਭਗਉਤੀ ਜੀ ਕੀ",
+    "variants": [
+     "Chandi di Var"
+    ]
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Guru Gobind Singh (Dasam Granth)"
+    }
+   ],
+   "notes": "Filed under Anandpur no. 64, which is Gurdas II's Var on the Khalsa; this pothi is labelled Chandi di Var, the Dasam Granth var of the same name."
   },
   {
    "id": "w-adi-granth-commentary",
    "title": {
-    "roman": "Adi Granth commentary"
+    "roman": "Adi Granth steek praya (Trumpp collection MSS)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-bhasha-gita-sara",
-   "title": {
-    "roman": "Bhasha Gita Sara"
-   },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "notes": "Two MS glossaries/commentaries on the Adi Granth, BSB Cod.panj. 4 and 5, filed beside the Pryaye (Anandpur no. 66); not confirmed to be that work, nor that the two are one text."
   },
   {
    "id": "w-gitasara-muktipada",
    "title": {
-    "roman": "Gitasara-muktipada"
+    "roman": "Gitasara (Gitasara-muktipada), Sanskrit"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Sanskrit source text of the Sar Gita."
   },
   {
    "id": "w-niti-shatak",
    "title": {
-    "roman": "Niti Shatak"
+    "roman": "Niti Shatak (Bhartrihari), Gurmukhi rendering",
+    "gurmukhi": "ਨੀਤਿ ਸ਼ਤਕ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-ekadash-skandh-bhasha",
-   "title": {
-    "roman": "Ekadash Skandh Bhasha"
-   },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
-  },
-  {
-   "id": "w-zafarnama-hikayat",
-   "title": {
-    "roman": "Zafarnama & Hikayat"
-   },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Bhartrihari (Sanskrit original)"
+    }
+   ],
+   "notes": "Filed under Anandpur no. 103 (Niti Shakat); possibly that work, not confirmed."
   },
   {
    "id": "w-ashok",
    "title": {
     "roman": "Ashok"
    },
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-vaaran-gyan-ratanavali-bhai-gurdas-ji",
-   "title": {
-    "roman": "Vaaran Gyan Ratanavali Bhai Gurdas Ji",
-    "gurmukhi": "ਵਾਰਾਂ ਗਿਆਨ ਰਤਨਾਵਲੀ ਭਾਈ ਗੁਰਦਾਸ ਜੀ — ਕਠਨ ਸ਼ਬਦਾਂ ਆਦਿ ਦੀ ਟਿੱਪਣੀ ਤੇ ਪ੍ਰਯਾਵਾਂ ਸਹਿਤ"
-   },
-   "authors": [
-    {
-     "name": "Bhai Gurdas (Bhalla); Vaar 41 by Bhai Gurdas II (Bhai Gurdas Singh)"
-    }
    ],
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   "notes": "Rejected: placeholder split into the two Ashok catalogues"
   },
   {
    "id": "w-vaaran-bhai-gurudas-ji-bhai-vir-singh-punjabi",
    "title": {
-    "roman": "Vaaran Bhai Gurudas Ji-Bhai Vir Singh Punjabi"
+    "roman": "Vaaran Bhai Gurdas steek (Bhai Vir Singh)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Bhai Vir Singh"
+    }
+   ],
+   "based_on": [
+    "w-v-r-bhai-gurdas-ji"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-v-r-bhai-gurdas-ji",
    "title": {
-    "roman": "Vārāṅ Bhai Gurdas Ji",
-    "gurmukhi": "ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ (ਭਾਗ ੧)"
+    "roman": "Vaaran Bhai Gurdas",
+    "gurmukhi": "ਵਾਰਾਂ ਭਾਈ ਗੁਰਦਾਸ ਜੀ",
+    "variants": [
+     "Varan Gian Ratnavali",
+     "Vaaran Gyan Ratanavali Bhai Gurdas Ji"
+    ]
    },
    "authors": [
     {
      "name": "Bhai Gurdas (Bhalla)"
+    },
+    {
+     "name": "Bhai Gurdas (Bhalla); Vaar 41 by Bhai Gurdas II (Bhai Gurdas Singh)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Var 41 is by Bhai Gurdas II (Gurdas Singh)."
   },
   {
    "id": "w-tankhahnama",
    "title": {
-    "roman": "Tankhahnama"
+    "roman": "Tankhahnama",
+    "gurmukhi": "ਤਨਖਾਹਨਾਮਾ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-chandi-charitar-2",
-   "title": {
-    "roman": "Chandi Charitar 2",
-    "gurmukhi": "ਚੰਡੀ ਚਰਿਤ੍ਰ-੨"
-   },
+   ],
    "authors": [
     {
-     "name": "Sri Dasam Granth (Chandi Charitar II)"
+     "name": "Bhai Nand Lal (attributed)"
     }
-   ],
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
    ]
   },
   {
    "id": "w-chritro-pakhyaan",
    "title": {
-    "roman": "Chritro Pakhyaan"
+    "roman": "Chritro Pakhyaan: Tales of Male-Female Tricky Deceptions, vol. I (English translation, 2002)"
    },
    "authors": [
     {
      "name": "Sri Dasam Granth (Charitropakhyan) source text"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-dasam-granth"
+   ],
+   "date": {
+    "text": "2002",
+    "from": 2002,
+    "to": 2002,
+    "approx": false
+   },
+   "notes": "On Charitropakhyan (Dasam Granth)."
   },
   {
    "id": "w-jaap-sahib-arth-prabodh",
@@ -3143,26 +3141,39 @@
    },
    "authors": [
     {
-     "name": "Guru Gobind Singh (Jaap Sahib, mool)"
+     "name": "Sant Kartar Singh"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-dasam-granth"
+   ],
+   "date": {
+    "text": "2010",
+    "from": 2010,
+    "to": 2010,
+    "approx": false
+   },
+   "notes": "On Jaap Sahib (Dasam Granth)."
   },
   {
    "id": "w-uggardanti",
    "title": {
-    "roman": "Uggardanti",
-    "gurmukhi": "ਉਗ੍ਰਦੰਤੀ"
+    "roman": "Ugardanti",
+    "gurmukhi": "ਉਗ੍ਰਦੰਤੀ",
+    "variants": [
+     "Uggardanti"
+    ]
    },
    "authors": [
     {
-     "name": "attributed in the PDF to Guru Gobind Singh (Ugardanti / Bhagauti Chhand, six chhakkas)"
+     "name": "attributed to Guru Gobind Singh (disputed)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3171,14 +3182,17 @@
    "id": "w-zafarnama",
    "title": {
     "roman": "Zafarnama",
-    "gurmukhi": "ਜ਼ਫ਼ਰਨਾਮਾ"
+    "gurmukhi": "ਜ਼ਫ਼ਰਨਾਮਾ",
+    "variants": [
+     "Zafarnama & Hikayat"
+    ]
    },
    "authors": [
     {
      "name": "Guru Gobind Singh"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3186,41 +3200,65 @@
   {
    "id": "w-das-granthi",
    "title": {
-    "roman": "Das Granthi"
+    "roman": "Das Granthi",
+    "gurmukhi": "ਦਸ ਗ੍ਰੰਥੀ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Compilation of Dasam Granth banis."
   },
   {
    "id": "w-dasam-granth",
    "title": {
-    "roman": "Dasam Granth"
+    "roman": "Dasam Granth",
+    "gurmukhi": "ਦਸਮ ਗ੍ਰੰਥ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
+   ],
+   "authors": [
+    {
+     "name": "Guru Gobind Singh (traditional attribution)"
+    },
+    {
+     "name": "Sri Dasam Granth (Chandi Charitar II)"
+    }
    ]
   },
   {
    "id": "w-jaap-sahib-teeka-chakradhar-charitra-charu-chandrika",
    "title": {
-    "roman": "Jaap Sahib teeka Chakradhar Charitra Charu Chandrika"
+    "roman": "Chakradhar Charitra Charu Chandrika (Jaap Sahib teeka)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-dasam-granth"
+   ],
+   "notes": "On Jaap Sahib (Dasam Granth)."
   },
   {
    "id": "w-report-of-the-sodhak-committee-on-the-dasam-granth",
    "title": {
     "roman": "Report of the Sodhak Committee on the Dasam Granth"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
+   ],
+   "date": {
+    "text": "1897",
+    "from": 1897,
+    "to": 1897,
+    "approx": false
+   },
+   "based_on": [
+    "w-dasam-granth"
    ]
   },
   {
@@ -3234,23 +3272,29 @@
      "name": "Bhai Avtar Singh and Bhai Gurcharan Singh, Hazuri Ragis, Gurdwara Sis Ganj Sahib, Delhi"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-vichar-sagar",
    "title": {
     "roman": "Vichar Sagar",
-    "gurmukhi": "ਵਿਚਾਰ ਸਾਗਰ (ਪਹਿਲੀ ਤਰੰਗ)"
+    "gurmukhi": "ਵਿਚਾਰ ਸਾਗਰ"
    },
    "authors": [
     {
      "name": "Sadhu Nischal Das"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3266,23 +3310,35 @@
      "name": "Guru Gobind Singh (all items are Dasam Granth extracts)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   },
+   "based_on": [
+    "w-dasam-granth"
    ]
   },
   {
    "id": "w-gur-shabad-sidhi",
    "title": {
-    "roman": "Gur Shabad Sidhi",
-    "gurmukhi": "ਗੁਰ ਸ਼ਬਦ ਸਿੱਧੀ ਅਰਥਾਤ ਸ਼ਰਧਾ ਪੂਰਨ ਗ੍ਰੰਥ"
+    "roman": "Gur Shabad Sidhi (Shardha Puran Granth)",
+    "gurmukhi": "ਗੁਰ ਸ਼ਬਦ ਸਿੱਧੀ ਅਰਥਾਤ ਸ਼ਰਧਾ ਪੂਰਨ ਗ੍ਰੰਥ",
+    "variants": [
+     "Shardha Puran Granth"
+    ]
    },
    "authors": [
     {
-     "name": "Attributed on the title page to 'Sri Man Bhai Mani Singh ji wala' (traditional attribution, unverified)"
+     "name": "attributed to Bhai Mani Singh (traditional)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3298,10 +3354,14 @@
      "name": "Anthology; excerpts by Rattan Singh Bhangu, Santokh Singh, Giani Gian Singh, Baba Sumer Singh and (attrib.) Bhai Daya Singh"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "date": {
+    "text": "21st century",
+    "approx": true
+   }
   },
   {
    "id": "w-santan-di-mahima",
@@ -3314,10 +3374,16 @@
      "name": "Bhai Gurjant Singh Bainka, Hazuri kavishar of the Sampardai Dal Baba Bidhi Chand (kavishri jatha)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-shaheed-bilas-bhai-mani-singh",
@@ -3327,13 +3393,14 @@
    },
    "authors": [
     {
-     "name": "Kavi Seva Singh (early 19th c.)"
+     "name": "Kavi Seva Singh"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Early 19th century per the edition; first printed 1961."
   },
   {
    "id": "w-sankhep-bibek",
@@ -3346,7 +3413,7 @@
      "name": "unknown. The verses carry the chhap 'ਕਹੇ ਜਗਦੀਸ਼ ਹਰੀ', so the verse author may be the same Jagdish named as reviser, but this is unconfirmed"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3354,22 +3421,47 @@
   {
    "id": "w-sri-nanak-prakash-gur-partap-suraj-granth",
    "title": {
-    "roman": "Sri Nanak Prakash Gur Partap Suraj Granth"
+    "roman": "Sri Gur Nanak Prakash",
+    "gurmukhi": "ਸ੍ਰੀ ਗੁਰ ਨਾਨਕ ਪ੍ਰਕਾਸ਼",
+    "variants": [
+     "Sri Nanak Prakash Gur Partap Suraj Granth"
+    ]
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Kavi Santokh Singh"
+    }
+   ],
+   "date": {
+    "text": "1880 Bk/AD 1823",
+    "from": 1823,
+    "to": 1823,
+    "approx": false
+   }
   },
   {
    "id": "w-asa-di-vaar-translation",
    "title": {
     "roman": "Asa di Vaar translation"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   },
+   "notes": "On Asa di Vaar (Guru Granth Sahib)."
   },
   {
    "id": "w-braham-kavach",
@@ -3382,7 +3474,7 @@
      "name": "unknown; the closing dohra reads 'ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ' (attributing it to Guru Hargobind)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3391,9 +3483,12 @@
    "id": "w-nitnem-gutka",
    "title": {
     "roman": "Nitnem gutka",
-    "gurmukhi": "ਗੁਟਕਾ ਸਾਹਿਬ (ਨਿਤਨੇਮ)"
+    "gurmukhi": "ਗੁਟਕਾ ਸਾਹਿਬ (ਨਿਤਨੇਮ)",
+    "variants": [
+     "Gutka"
+    ]
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3408,10 +3503,11 @@
      "name": "Guru Tegh Bahadur (SGGS bani)"
     }
    ],
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: looks like a self-made bani compilation (file 'v3 ... v2'); reinstate if it is a published gutka"
   },
   {
    "id": "w-sandhia-nitnem",
@@ -3419,17 +3515,7 @@
     "roman": "Sandhia Nitnem",
     "gurmukhi": "ਸੰਧਿਆ ਨਿਤਨੇਮ"
    },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
-  },
-  {
-   "id": "w-gutka",
-   "title": {
-    "roman": "Gutka"
-   },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3437,9 +3523,10 @@
   {
    "id": "w-sundar-gutka",
    "title": {
-    "roman": "Sundar Gutka"
+    "roman": "Sundar Gutka",
+    "gurmukhi": "ਸੁੰਦਰ ਗੁਟਕਾ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3449,17 +3536,23 @@
    "title": {
     "roman": "Akal Takht hukamnama on Amrit sanchar"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "date": {
+    "text": "1877",
+    "from": 1877,
+    "to": 1877,
+    "approx": false
+   }
   },
   {
    "id": "w-bhavrasamrit",
    "title": {
     "roman": "Bhavrasamrit"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3467,9 +3560,10 @@
   {
    "id": "w-gobind-gita",
    "title": {
-    "roman": "Gobind Gita"
+    "roman": "Gobind Gita",
+    "gurmukhi": "ਗੋਬਿੰਦ ਗੀਤਾ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3477,19 +3571,32 @@
   {
    "id": "w-gurbilas-patshahi-10",
    "title": {
-    "roman": "Gurbilas Patshahi 10"
+    "roman": "Gurbilas Patshahi 10 (Sukha Singh)",
+    "gurmukhi": "ਗੁਰਬਿਲਾਸ ਪਾਤਸ਼ਾਹੀ ੧੦"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Kavi Sukha Singh"
+    }
+   ],
+   "date": {
+    "text": "1854 Bk/AD 1797",
+    "from": 1797,
+    "to": 1797,
+    "approx": false
+   }
   },
   {
    "id": "w-gurbilas-patshahi-6",
    "title": {
-    "roman": "Gurbilas Patshahi 6"
+    "roman": "Gurbilas Patshahi 6",
+    "gurmukhi": "ਗੁਰਬਿਲਾਸ ਪਾਤਸ਼ਾਹੀ ੬"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3497,29 +3604,21 @@
   {
    "id": "w-gurparnali",
    "title": {
-    "roman": "Gurparnali"
+    "roman": "Gurparnali (Guru-vansavali)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "PU Chandigarh MS 96. Gurpranali is a genre; kept apart from the anonymous Motibagh Gurpranali."
   },
   {
    "id": "w-janamsakhi-bhai-bala",
    "title": {
-    "roman": "Janamsakhi Bhai Bala"
+    "roman": "Janamsakhi Bhai Bala",
+    "gurmukhi": "ਜਨਮਸਾਖੀ ਭਾਈ ਬਾਲਾ"
    },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
-  },
-  {
-   "id": "w-janamsakhi-guru-nanak",
-   "title": {
-    "roman": "Janamsakhi Guru Nanak"
-   },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3527,39 +3626,65 @@
   {
    "id": "w-japji-sahib-teeka",
    "title": {
-    "roman": "Japji Sahib Teeka"
+    "roman": "Japji Sahib teeka (Anandghan)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Anandghan (Udasi)"
+    }
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "notes": "On Japji Sahib (Guru Granth Sahib)."
   },
   {
    "id": "w-japji-sahib-steek",
    "title": {
-    "roman": "Japji Sahib steek"
+    "roman": "Japji Sahib steek (anonymous Udasi teeka)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "notes": "Could be Anandghan's teeka; not compared. On Japji Sahib (Guru Granth Sahib)."
   },
   {
    "id": "w-mahima-prakash",
    "title": {
-    "roman": "Mahima Prakash"
+    "roman": "Mahima Prakash (verse)",
+    "gurmukhi": "ਮਹਿਮਾ ਪ੍ਰਕਾਸ਼"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Sarup Das Bhalla (likely)"
+    }
+   ],
+   "date": {
+    "text": "1833 Bk/AD 1776",
+    "from": 1776,
+    "to": 1776,
+    "approx": false
+   }
   },
   {
    "id": "w-paras-bhag",
    "title": {
-    "roman": "Paras Bhag"
+    "roman": "Paras Bhag",
+    "gurmukhi": "ਪਾਰਸ ਭਾਗ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3567,9 +3692,10 @@
   {
    "id": "w-parchian-bhai-seva-das",
    "title": {
-    "roman": "Parchian Bhai Seva Das"
+    "roman": "Parchian Bhai Seva Das",
+    "gurmukhi": "ਪਰਚੀਆਂ ਭਾਈ ਸੇਵਾ ਦਾਸ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3577,19 +3703,13 @@
   {
    "id": "w-pothi-bhai-mohan-ji",
    "title": {
-    "roman": "Pothi Bhai Mohan Ji"
+    "roman": "Goindval Pothi (Pothi Bhai Mohan Ji)",
+    "variants": [
+     "Pothi Bhai Mohan Ji",
+     "Mohan Pothi"
+    ]
    },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
-  },
-  {
-   "id": "w-prabodh-chandrodaya-natak",
-   "title": {
-    "roman": "Prabodh Chandrodaya Natak"
-   },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3597,9 +3717,10 @@
   {
    "id": "w-prem-sumarag-granth-sakhis-of-the-ten-gurus",
    "title": {
-    "roman": "Prem Sumarag Granth + Sakhis of the ten Gurus"
+    "roman": "Prem Sumarag Granth",
+    "gurmukhi": "ਪ੍ਰੇਮ ਸੁਮਾਰਗ ਗ੍ਰੰਥ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3607,9 +3728,13 @@
   {
    "id": "w-puratan-janamsakhi",
    "title": {
-    "roman": "Puratan Janamsakhi"
+    "roman": "Puratan Janamsakhi",
+    "variants": [
+     "Janamsakhi Guru Nanak"
+    ],
+    "gurmukhi": "ਪੁਰਾਤਨ ਜਨਮਸਾਖੀ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3617,17 +3742,19 @@
   {
    "id": "w-sri-gur-panth-prakash",
    "title": {
-    "roman": "Sri Gur Panth Prakash"
+    "roman": "Sri Gur Panth Prakash",
+    "gurmukhi": "ਸ੍ਰੀ ਗੁਰ ਪੰਥ ਪ੍ਰਕਾਸ਼"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "1880 lithograph: Rattan Singh Bhangu's or Giani Gian Singh's Panth Prakash, not yet checked."
   },
   {
    "id": "w-complete-steek-of-sri-sarbloh-granth-sahib-ji",
    "title": {
-    "roman": "Complete Steek of Sri Sarbloh Granth Sahib Ji",
+    "roman": "Sri Sarbloh Granth Sahib steek (Budha Dal, 2000)",
     "gurmukhi": "ਸੰਪੂਰਨ ਸਟੀਕ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ (ਸ੍ਰੀ ਮੰਗਲਾ ਚਰਨ ਜੀ) ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦"
    },
    "authors": [
@@ -3635,90 +3762,70 @@
      "name": "Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) as printed"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-sri-diwali-path-mahatam-revised-expanded-edition",
-   "title": {
-    "roman": "Sri Diwali Path Mahatam – revised/expanded edition",
-    "gurmukhi": "ਸ੍ਰੀ ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ (ਦੀਪਮਾਲਾ ਅਥਵਾ ਬੰਦੀਛੋੜ ਦਿਵਸ ਤੇ ਪੜੇ ਜਾਣ ਵਾਲੇ ਸ਼ਬਦਾਂ ਦਾ ਸੰਗ੍ਰਹਿ ਮਰਿਆਦਾ ਸਹਿਤ)"
-   },
-   "authors": [
-    {
-     "name": "Compilation"
-    }
    ],
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   "based_on": [
+    "w-sarbloh-granth"
+   ],
+   "date": {
+    "text": "2000",
+    "from": 2000,
+    "to": 2000,
+    "approx": false
+   }
   },
   {
    "id": "w-sri-diwali-path-mahatam",
    "title": {
     "roman": "Sri Diwali Path Mahatam",
-    "gurmukhi": "ਸ੍ਰੀ ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ (ਮਰਿਆਦਾ ਸਹਿਤ) – ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ ਜੀ ਸ੍ਰੀ ਮੁਖਿਵਾਕ ਪਾਤਿਸਾਹੀ ੧੦"
+    "gurmukhi": "ਸ੍ਰੀ ਦੀਵਾਲੀ ਪਾਠ ਮਹਾਤਮ (ਮਰਿਆਦਾ ਸਹਿਤ) – ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ ਜੀ ਸ੍ਰੀ ਮੁਖਿਵਾਕ ਪਾਤਿਸਾਹੀ ੧੦",
+    "variants": [
+     "Sri Diwali Path Mahatam – revised/expanded edition"
+    ]
    },
    "authors": [
     {
      "name": "Compilation"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-sarbloh-granth-manglacharan-ustat-sri-maya-lachhmi-ji-ki",
-   "title": {
-    "roman": "Sarbloh Granth Manglacharan – Ustat Sri Maya Lachhmi Ji ki",
-    "gurmukhi": "ਉਸਤਤਿ ਸ੍ਰੀ ਮਾਯਾ ਲਛਮੀ ਜੀ ਕੀ (ਸ੍ਰੀ ਮੰਗਲਾਚਰਨ)"
-   },
-   "authors": [
-    {
-     "name": "Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)"
-    }
    ],
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
+   "date": {
+    "text": "2019",
+    "from": 2019,
+    "to": 2019,
+    "approx": false
+   },
+   "based_on": [
+    "w-sarbloh-granth"
    ]
   },
   {
    "id": "w-sampooran-sri-sarbloh-granth-sahib-ji",
    "title": {
-    "roman": "Sampooran Sri Sarbloh Granth Sahib Ji",
-    "gurmukhi": "ਸੰਪੂਰਨ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ – ਪੋਥੀ ਭਾਗ ਪਹਿਲਾ ਤੇ ਦੂਜਾ – ਸ੍ਰੀ ਮੁਖ ਵਾਕ ਪਾ: ੧੦"
+    "roman": "Sarbloh Granth santhya (pothi bhag 1)",
+    "gurmukhi": "ਸਰਬਲੋਹ ਸੰਥਿਆ"
    },
    "authors": [
     {
      "name": "Attributed to Guru Gobind Singh (as printed)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-sri-bhavani-ustat",
-   "title": {
-    "roman": "Sri Bhavani Ustat",
-    "gurmukhi": "ਸ੍ਰੀ ਭਵਾਨੀ ਉਸਤਤਿ + ੩. ਸਰਬ ਲੋਹ ਕਵਚ"
-   },
-   "authors": [
-    {
-     "name": "Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)"
-    }
    ],
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
-   ]
+   "based_on": [
+    "w-sarbloh-granth"
+   ],
+   "date": {
+    "text": "21st century",
+    "approx": true
+   }
   },
   {
    "id": "w-sahaj-paath-maryada-of-sri-sarbloh-prakash-granth-sahib",
@@ -3728,40 +3835,50 @@
    },
    "authors": [
     {
-     "name": "Sangreh karta: Giani Gurvinder Singh Ji Nangli"
+     "name": "Giani Gurvinder Singh Nangli (compiler)"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-sarbloh-granth"
+   ],
+   "date": {
+    "text": "21st century",
+    "approx": true
+   }
   },
   {
    "id": "w-sarbloh-granth",
    "title": {
-    "roman": "Sarbloh Granth"
+    "roman": "Sarbloh Granth",
+    "gurmukhi": "ਸਰਬਲੋਹ ਗ੍ਰੰਥ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
-  },
-  {
-   "id": "w-adi-granth-guru-granth-sahib",
-   "title": {
-    "roman": "Adi Granth Guru Granth Sahib"
-   },
-   "status": "needs-curation",
-   "known_from": [
-    "Drive"
+   ],
+   "authors": [
+    {
+     "name": "attributed to Guru Gobind Singh (disputed)"
+    },
+    {
+     "name": "Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10)"
+    }
    ]
   },
   {
    "id": "w-guru-granth-sahib",
    "title": {
-    "roman": "Guru Granth Sahib"
+    "roman": "Guru Granth Sahib (Adi Granth)",
+    "variants": [
+     "Adi Granth Guru Granth Sahib"
+    ],
+    "gurmukhi": "ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3777,10 +3894,11 @@
      "name": "unknown (no byline; probably the same English translation project as 'The Path to Learning Gurbani Pronunciation')"
     }
    ],
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: teaching material"
   },
   {
    "id": "w-lesson-2",
@@ -3793,10 +3911,11 @@
      "name": "unknown (no byline; same series as Lesson 1)"
     }
    ],
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: teaching material"
   },
   {
    "id": "w-roopdeep-pingal",
@@ -3809,7 +3928,7 @@
      "name": "Jaikrishan (Jai Kishan) Das Kavi"
     }
    ],
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
    ]
@@ -3824,80 +3943,150 @@
      "name": "Vidiā Gurū Gianī Gurwinder Singh Nangalī, Ustād Gurmat Vidiālā, Chabbā, Nangalī"
     }
    ],
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: ucharan guide"
   },
   {
    "id": "w-untitled",
    "title": {
     "roman": "ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ"
    },
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: vyakaran and ucharan guides (Sahib Singh's Gurbani Viakaran, review notes, Sampradai Gurbani Ucharan Bodh)"
   },
   {
    "id": "w-fareedkot-teeka",
    "title": {
-    "roman": "Fareedkot Teeka"
+    "roman": "Faridkot Teeka (Faridkot wala Teeka)",
+    "gurmukhi": "ਫ਼ਰੀਦਕੋਟ ਵਾਲਾ ਟੀਕਾ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-gurbani-arth-bhandar",
    "title": {
     "roman": "Gurbani Arth Bhandar"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Sant Hari Singh"
+    }
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-manmohan-singh-complete-translation",
    "title": {
-    "roman": "Manmohan Singh Complete Translation"
+    "roman": "Sri Guru Granth Sahib, English and Panjabi translation (Manmohan Singh)"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Manmohan Singh"
+    }
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-sri-amir-bhandar-teeka",
    "title": {
     "roman": "Sri Amir Bhandar Teeka"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Giani Kirpal Singh"
+    }
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-sri-guru-granth-sahib-darpan",
    "title": {
-    "roman": "Sri Guru Granth Sahib Darpan"
+    "roman": "Sri Guru Granth Sahib Darpan",
+    "gurmukhi": "ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਦਰਪਣ"
    },
-   "status": "needs-curation",
+   "status": "catalogued",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "authors": [
+    {
+     "name": "Prof. Sahib Singh"
+    }
+   ],
+   "based_on": [
+    "w-guru-granth-sahib"
+   ],
+   "date": {
+    "text": "20th century",
+    "from": 1901,
+    "to": 2000,
+    "approx": true
+   }
   },
   {
    "id": "w-pdf",
    "title": {
     "roman": "ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf"
    },
-   "status": "needs-curation",
+   "status": "rejected",
    "known_from": [
     "Drive"
-   ]
+   ],
+   "notes": "Rejected: ucharan guide (Sampradai Gurbani Ucharan Bodh, duplicate file)"
   },
   {
    "id": "w-singh-sagar",
@@ -4007,6 +4196,141 @@
    "known_from": [
     "Encyclopaedia of Sikhism, 'Gurpranali' (Dharam Singh)"
    ]
+  },
+  {
+   "id": "w-sakhee-book-attar-singh",
+   "title": {
+    "roman": "The Sakhee Book (English translation of the Sau Sakhi)"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Attar Singh (translator)"
+    }
+   ],
+   "based_on": [
+    "w-panj-sau-sakhi-sau-sakhi"
+   ]
+  },
+  {
+   "id": "w-hikayat",
+   "title": {
+    "roman": "Hikayat (Hikayatan)",
+    "gurmukhi": "ਹਿਕਾਇਤਾਂ"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Guru Gobind Singh (Dasam Granth)"
+    }
+   ]
+  },
+  {
+   "id": "w-panjabi-hath-likhtan-di-suchi",
+   "title": {
+    "roman": "Panjabi Hath Likhtan di Suchi (manuscript catalogue)"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Shamsher Singh Ashok"
+    }
+   ],
+   "date": {
+    "text": "1961-1963",
+    "from": 1961,
+    "to": 1963,
+    "approx": false
+   },
+   "notes": "Catalogue of Panjabi manuscripts, Bhasha Vibhag; vol. 2 is 1963. A source for the wanted list."
+  },
+  {
+   "id": "w-sikh-reference-library-ms-catalogue",
+   "title": {
+    "roman": "Sikh Reference Library manuscript catalogue"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Shamsher Singh Ashok"
+    }
+   ],
+   "date": {
+    "text": "1968",
+    "from": 1968,
+    "to": 1968,
+    "approx": false
+   },
+   "notes": "SGPC, Amritsar. Most of the library's manuscripts were lost in 1984, so this is often the only record of them."
+  },
+  {
+   "id": "w-varan-bhai-gurdas-english-2009",
+   "title": {
+    "roman": "Varan Bhai Gurdas Ji: Gurmukhi, Roman and English translation (2 vols, 2009)"
+   },
+   "status": "catalogued",
+   "based_on": [
+    "w-v-r-bhai-gurdas-ji"
+   ],
+   "date": {
+    "text": "2009",
+    "from": 2009,
+    "to": 2009,
+    "approx": false
+   }
+  },
+  {
+   "id": "w-ugardanti-dal-singh-translation",
+   "title": {
+    "roman": "Ugardanti, Panjabi and English translation (Dal Singh)"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Dal Singh"
+    }
+   ],
+   "based_on": [
+    "w-uggardanti"
+   ],
+   "date": {
+    "text": "21st century",
+    "approx": true
+   }
+  },
+  {
+   "id": "w-vichar-sagar-ocean-of-inquiry",
+   "title": {
+    "roman": "Vichar Sagar: The Ocean of Inquiry (English translation, ch. 1)"
+   },
+   "status": "catalogued",
+   "based_on": [
+    "w-vichar-sagar"
+   ],
+   "date": {
+    "text": "21st century",
+    "approx": true
+   }
+  },
+  {
+   "id": "w-gurbilas-patshahi-10-sumer-singh",
+   "title": {
+    "roman": "Gurbilas Patshahi 10 (Sumer Singh)"
+   },
+   "status": "catalogued",
+   "authors": [
+    {
+     "name": "Baba Sumer Singh"
+    }
+   ]
+  },
+  {
+   "id": "w-sakhis-of-the-ten-gurus-trumpp",
+   "title": {
+    "roman": "Sakhis of the ten Gurus (Trumpp MS)"
+   },
+   "status": "catalogued",
+   "notes": "Bound with the Prem Sumarag in a Trumpp MS; not identified further."
   }
  ],
  "versions": [
@@ -15289,27 +15613,33 @@
    "label": "Sau Sakhi (English translation The Sakhee Book) (Benares 1873)",
    "contains": [
     {
-     "work_id": "w-sau-sakhi"
+     "work_id": "w-sakhee-book-attar-singh"
     }
    ],
    "status": "in-drive",
    "drive_id": "1UWnA43p-FTJf8bwH0yvu2X7yrAMbx2xC",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "early-print",
    "pages": 62,
    "drive_title": "Sau Sakhi (English translation The Sakhee Book) (Benares 1873).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Anandpur Library / 032 Panj Sau Sakhi",
    "text_layer": "latin",
    "scripts": [
     "Roman"
-   ]
+   ],
+   "date": {
+    "text": "1873",
+    "from": 1873,
+    "to": 1873,
+    "approx": false
+   }
   },
   {
    "id": "v-sau-sakhi-gur-ratan-mal-gurmukhi-ms-collected-by-ernst-trump",
    "label": "Sau Sakhi (Gur Ratan Mal) - Gurmukhi MS collected by Ernst Trumpp, BSB (mid-19th c.)",
    "contains": [
     {
-     "work_id": "w-sau-sakhi"
+     "work_id": "w-panj-sau-sakhi-sau-sakhi"
     }
    ],
    "status": "in-drive",
@@ -15348,7 +15678,7 @@
    "status": "in-drive",
    "drive_id": "1hzKf9D6FoMz_bORXZETbrsbqoA1yXwOg",
    "found_by": "drive-inventory",
-   "type": "compilation",
+   "type": "manuscript",
    "pages": 50,
    "drive_title": "Var Sri Bhagauti Ji Ki (Chandi di Var) - Gurmukhi MS pothi, 50 leaves, Sialkoti paper (undated).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Anandpur Library / 064 Var Patshahi Dasvin Ki",
@@ -15368,7 +15698,7 @@
    "status": "in-drive",
    "drive_id": "1VEoMb7X5DusFMfhIysiR05OFx2PCVQiN",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "manuscript",
    "drive_title": "Adi Granth commentary (steek praya) - Gurmukhi MS commentary on the Adi Granth collected by Trumpp, BSB Cod.panj. 4, 37 ff. (1871 (Lahore)).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Anandpur Library / 066 Praya Sri Guru Granth Sahib Ji Ke",
    "text_layer": "unindexed"
@@ -15384,7 +15714,7 @@
    "status": "in-drive",
    "drive_id": "1XDSLt1QkwtYyAQStLuyNpQuIIUxPrZLJ",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "manuscript",
    "drive_title": "Adi Granth commentary (steek praya) - Gurmukhi MS commentary on the Adi Granth collected by Trumpp, BSB Cod.panj. 5, 66 ff. (1871 (Lahore)).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Anandpur Library / 066 Praya Sri Guru Granth Sahib Ji Ke",
    "text_layer": "unindexed"
@@ -15427,7 +15757,7 @@
    "label": "MS - Bhasha Gita Sara, Devanagari MS (Raghunath Temple Jammu 957-gha)",
    "contains": [
     {
-     "work_id": "w-bhasha-gita-sara"
+     "work_id": "w-sar-gita"
     }
    ],
    "status": "in-drive",
@@ -15511,7 +15841,7 @@
    "label": "Early print - Ekadash Skandh Bhasha, Chatur Das (Calcutta, 1927)",
    "contains": [
     {
-     "work_id": "w-ekadash-skandh-bhasha"
+     "work_id": "w-ikadas-probably-bhagavat-ekadash-skandh-bhasha"
     }
    ],
    "status": "in-drive",
@@ -15531,7 +15861,7 @@
    "label": "Early print - Ekadash Skandh Bhasha, Chatur Das (Venkateshwar Press, 1926)",
    "contains": [
     {
-     "work_id": "w-ekadash-skandh-bhasha"
+     "work_id": "w-ikadas-probably-bhagavat-ekadash-skandh-bhasha"
     }
    ],
    "status": "in-drive",
@@ -15551,13 +15881,16 @@
    "label": "Zafarnama & Hikayat - Zafarnama & Hikayat with word-glosses, dated 1882 CE (1882 (file name))",
    "contains": [
     {
-     "work_id": "w-zafarnama-hikayat"
+     "work_id": "w-zafarnama"
+    },
+    {
+     "work_id": "w-hikayat"
     }
    ],
    "status": "in-drive",
    "drive_id": "1LunN4hO4uuioCshGevtQnPmLvEHI8NBj",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "pages": 92,
    "drive_title": "Zafarnama & Hikayat - Zafarnama & Hikayat with word-glosses, dated 1882 CE (1882 (file name)).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Anandpur Library / 147 Tasnif Bhai Nand Lal Ji",
@@ -15568,7 +15901,7 @@
    "label": "Catalogue - Ashok, Panjabi Hath Likhtan di Suchi vol 2 (Bhasha Vibhag 1963)",
    "contains": [
     {
-     "work_id": "w-ashok"
+     "work_id": "w-panjabi-hath-likhtan-di-suchi"
     }
    ],
    "status": "in-drive",
@@ -15587,7 +15920,7 @@
    "label": "Catalogue - Ashok, Sikh Reference Library manuscript catalogue (SGPC 1968)",
    "contains": [
     {
-     "work_id": "w-ashok"
+     "work_id": "w-sikh-reference-library-ms-catalogue"
     }
    ],
    "status": "in-drive",
@@ -15632,7 +15965,7 @@
    "label": "Vaaran Bhai Gurdaas Ji - SGPC",
    "contains": [
     {
-     "work_id": "w-vaaran-gyan-ratanavali-bhai-gurdas-ji"
+     "work_id": "w-v-r-bhai-gurdas-ji"
     }
    ],
    "status": "in-drive",
@@ -15681,13 +16014,13 @@
    "label": "VaranBhaiGurdasJi-VolumeI",
    "contains": [
     {
-     "work_id": "w-v-r-bhai-gurdas-ji"
+     "work_id": "w-varan-bhai-gurdas-english-2009"
     }
    ],
    "status": "in-drive",
    "drive_id": "10NMBg0eRUcnQUG1woErQtxfuyR7Xh54P",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "translation",
    "pages": 990,
    "drive_title": "VaranBhaiGurdasJi-VolumeI.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Bhai Gurdas Vaaran",
@@ -15711,13 +16044,13 @@
    "label": "VaranBhaiGurdasJi-VolumeII",
    "contains": [
     {
-     "work_id": "w-v-r-bhai-gurdas-ji"
+     "work_id": "w-varan-bhai-gurdas-english-2009"
     }
    ],
    "status": "in-drive",
    "drive_id": "1Lz7U8AKN711EMC4QMFd9uV6ffYo8p7zU",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "translation",
    "pages": 900,
    "drive_title": "VaranBhaiGurdasJi-VolumeII.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Bhai Gurdas Vaaran",
@@ -15934,7 +16267,8 @@
    "label": "Chandi_Charitar_Part_2",
    "contains": [
     {
-     "work_id": "w-chandi-charitar-2"
+     "work_id": "w-dasam-granth",
+     "locator": "Chandi Charitar II"
     }
    ],
    "status": "in-drive",
@@ -15965,7 +16299,7 @@
    "status": "in-drive",
    "drive_id": "1BEDCX8HQTGcgvarBhr_K1uhi8N8Q1AsM",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "translation",
    "pages": 399,
    "drive_title": "Chritropakhyaan Vol I.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Dasam Granth",
@@ -16019,13 +16353,13 @@
    "label": "Uggardanti-Punjabi-and-English-Translation-Dalsingh-veerji",
    "contains": [
     {
-     "work_id": "w-uggardanti"
+     "work_id": "w-ugardanti-dal-singh-translation"
     }
    ],
    "status": "in-drive",
    "drive_id": "1Pvr6MIJnUqrGGn2s0gtOr1GlmFQVoFw8",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "translation",
    "pages": 31,
    "drive_title": "Uggardanti-Punjabi-and-English-Translation-Dalsingh-veerji.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Dasam Granth",
@@ -16163,10 +16497,16 @@
    "status": "in-drive",
    "drive_id": "1f9UlD8EecRRuHyAdKJ3aSaCrJjrBqb3-",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "early-print",
    "drive_title": "Jaap Sahib teeka Chakradhar Charitra Charu Chandrika - First print, Lahore, Sammat 1955 Bk (= 1898).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Dasam Granth / Early witnesses",
-   "text_layer": "unindexed"
+   "text_layer": "unindexed",
+   "date": {
+    "text": "Sammat 1955 Bk",
+    "from": 1898,
+    "to": 1898,
+    "approx": true
+   }
   },
   {
    "id": "v-report-of-the-sodhak-committee-on-the-dasam-granth-original",
@@ -16179,11 +16519,17 @@
    "status": "in-drive",
    "drive_id": "1Sjm6GCz6vy4gegeyA4CKivEIzQDUZPOj",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "pages": 32,
    "drive_title": "Report of the Sodhak Committee on the Dasam Granth - Original print, Amritsar (1897).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Dasam Granth / Early witnesses",
-   "text_layer": "none"
+   "text_layer": "none",
+   "date": {
+    "text": "1897",
+    "from": 1897,
+    "to": 1897,
+    "approx": false
+   }
   },
   {
    "id": "v-ugardanti-ugardanti-pothi-163-pp-19th-c",
@@ -16196,18 +16542,27 @@
    "status": "in-drive",
    "drive_id": "1eJjxP6e7-teSn2JOy6PNNUf4ldH3FD_Y",
    "found_by": "drive-inventory",
-   "type": "compilation",
+   "type": "manuscript",
    "pages": 163,
    "drive_title": "Ugardanti - Ugardanti pothi, 163 pp. (19th c.).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Dasam Granth / Early witnesses",
-   "text_layer": "none"
+   "text_layer": "none",
+   "date": {
+    "text": "19th century",
+    "from": 1801,
+    "to": 1900,
+    "approx": true
+   }
   },
   {
    "id": "v-zafarnama-and-hikayat-gurmukhi-and-persian-scripts-1827-ce-b",
    "label": "Zafarnama and Hikayat - Gurmukhi and Persian scripts, 1827 CE, Butasinghwala saroop",
    "contains": [
     {
-     "work_id": "w-zafarnama-hikayat"
+     "work_id": "w-zafarnama"
+    },
+    {
+     "work_id": "w-hikayat"
     }
    ],
    "status": "in-drive",
@@ -16279,13 +16634,13 @@
    "label": "VicharSagarC1",
    "contains": [
     {
-     "work_id": "w-vichar-sagar"
+     "work_id": "w-vichar-sagar-ocean-of-inquiry"
     }
    ],
    "status": "in-drive",
    "drive_id": "1qGj8KwQJ7daHEMLFk_spdwb1VwuL-ECQ",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "translation",
    "pages": 15,
    "drive_title": "VicharSagarC1.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Hanuman Natak, Vichar Sagar & Other Granths",
@@ -16318,7 +16673,7 @@
    "status": "in-drive",
    "drive_id": "1f33LrNIf6_0AWsIjGyufgeYx_w2uYsz9",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "pages": 450,
    "drive_title": "ਵੀਚਾਰ ਸਾਗਰ(ਸਾਧੂ ਸ੍ਰੀ ਨਿਸਚਲ ਦਾਸ ਜੀ).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Hanuman Natak, Vichar Sagar & Other Granths",
@@ -16433,10 +16788,16 @@
    "status": "in-drive",
    "drive_id": "1o-iURDkCiRSZ8Xd0ej5XKkh8lmshRTMA",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "drive_title": "Vichar Sagar - Gurmukhi printed, Namdhari eLibrary (1893).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Hanuman Natak, Vichar Sagar & Other Granths / Early witnesses",
-   "text_layer": "unindexed"
+   "text_layer": "unindexed",
+   "date": {
+    "text": "1893",
+    "from": 1893,
+    "to": 1893,
+    "approx": false
+   }
   },
   {
    "id": "v-dushera-mahatam-pothi",
@@ -16739,7 +17100,7 @@
    "status": "in-drive",
    "drive_id": "0B1qPJbSH0BqiV1hCTXBnVjB6Z1U",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "translation",
    "pages": 65,
    "drive_title": "Asa di Vaar translation",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Nitnem, Gutkas & Bani Sheets",
@@ -16903,16 +17264,22 @@
    "label": "Gutka (Nitnem bani gutka) - Hand-written gutka attributed to Shaheed Baba Deep Singh (mid-18th c.)",
    "contains": [
     {
-     "work_id": "w-gutka"
+     "work_id": "w-nitnem-gutka"
     }
    ],
    "status": "in-drive",
    "drive_id": "1ZFpS7MvD7pf2rbMoBO_OBseJpcgrYGvD",
    "found_by": "drive-inventory",
-   "type": "compilation",
+   "type": "manuscript",
    "drive_title": "Gutka (Nitnem bani gutka) - Hand-written gutka attributed to Shaheed Baba Deep Singh (mid-18th c.).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Nitnem, Gutkas & Bani Sheets / Early witnesses",
-   "text_layer": "unindexed"
+   "text_layer": "unindexed",
+   "date": {
+    "text": "mid-18th century",
+    "from": 1701,
+    "to": 1800,
+    "approx": true
+   }
   },
   {
    "id": "v-sundar-gutka-1800s-puratan-sundar-gutka-ms-770-pp-1800s-uplo",
@@ -16925,7 +17292,7 @@
    "status": "in-drive",
    "drive_id": "11KLKsthTipycha4GVbGw967-YKhyqg0l",
    "found_by": "drive-inventory",
-   "type": "compilation",
+   "type": "manuscript",
    "drive_title": "Sundar Gutka - 1800s Puratan Sundar Gutka MS, 770 pp. (1800s (uploader)).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Nitnem, Gutkas & Bani Sheets / Early witnesses",
    "text_layer": "unindexed"
@@ -16944,7 +17311,13 @@
    "type": "edition",
    "drive_title": "Akal Takht hukamnama on Amrit sanchar, 1877 - Scan of 1877 Akal Takht hukamnama (4 images).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Akal Takht hukamnama on Amrit sanchar, 1877",
-   "text_layer": "unindexed"
+   "text_layer": "unindexed",
+   "date": {
+    "text": "1877",
+    "from": 1877,
+    "to": 1877,
+    "approx": false
+   }
   },
   {
    "id": "v-bhavrasamrit-gurmukhi-print-1881-ia-metadata",
@@ -16957,14 +17330,20 @@
    "status": "in-drive",
    "drive_id": "1HW2Pkk6eD99Aw2QIzKZMZ64S2GP_hBTq",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "drive_title": "Bhavrasamrit - Gurmukhi print (1881 (IA metadata)).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Bhavrasamrit",
    "text_layer": "unicode",
    "scripts": [
     "Gurmukhi",
     "Roman"
-   ]
+   ],
+   "date": {
+    "text": "1881",
+    "from": 1881,
+    "to": 1881,
+    "approx": false
+   }
   },
   {
    "id": "v-gobind-gita-gurmukhi-ms-said-to-be-written-by-shaheed-baba-d",
@@ -16988,7 +17367,7 @@
    "label": "Gurbilas Patshahi 10 (Sumer Singh) - Gurmukhi MS, Panjab University Chandigarh MS 1175 (undated)",
    "contains": [
     {
-     "work_id": "w-gurbilas-patshahi-10"
+     "work_id": "w-gurbilas-patshahi-10-sumer-singh"
     }
    ],
    "status": "in-drive",
@@ -17084,7 +17463,7 @@
    "label": "Janamsakhi Guru Nanak - Puratan Janam Sakhi Guru Nanak, Gurmukhi MS (PDL scan, MS no. 431), 60 pp. (undated)",
    "contains": [
     {
-     "work_id": "w-janamsakhi-guru-nanak"
+     "work_id": "w-puratan-janamsakhi"
     }
    ],
    "status": "in-drive",
@@ -17107,7 +17486,7 @@
    "status": "in-drive",
    "drive_id": "1cL3VfG8ruRbHZgnSjVGAslITGnlLJbkl",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "manuscript",
    "drive_title": "Japji Sahib Teeka (Anandghan) - Gurmukhi MS of Anandghan Udasi's Japji teeka, 216 pp (undated).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Japji Sahib Teeka (Anandghan)",
    "text_layer": "unindexed"
@@ -17123,7 +17502,7 @@
    "status": "in-drive",
    "drive_id": "1BNawYomxG19eVft5npDIlz3hem85m4Ay",
    "found_by": "drive-inventory",
-   "type": "commentary",
+   "type": "manuscript",
    "drive_title": "Japji Sahib steek (Udasi teeka) - Gurmukhi MS, PDL (undated (19th c. inferred).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Japji Sahib steek (Udasi teeka)",
    "text_layer": "unindexed"
@@ -17188,7 +17567,7 @@
    "status": "in-drive",
    "drive_id": "1agBxKuEOITwsYmekO0L3USWSlORoxHQN",
    "found_by": "drive-inventory",
-   "type": "compilation",
+   "type": "manuscript",
    "drive_title": "Pothi Bhai Mohan Ji - Gurmukhi MS, Panjab University Chandigarh MS no. 425 (eGangotri scan) (undated (pre-1900 inferre).pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Pothi Bhai Mohan Ji",
    "text_layer": "unindexed"
@@ -17198,20 +17577,26 @@
    "label": "Prabodh Chandrodaya Natak (Anathdas's Gurmukhi version rende - Lucknow Munshi Nawal Kishor, 1883; 124 pp. - title states Brajbasidas's Braj natak, plus a",
    "contains": [
     {
-     "work_id": "w-prabodh-chandrodaya-natak"
+     "work_id": "w-prabodh-chandar-natak-prabodhachandra-natak"
     }
    ],
    "status": "in-drive",
    "drive_id": "1SVt4-8bCTZfgDJuz3Wv3ayVrOfUovdf4",
    "found_by": "drive-inventory",
-   "type": "edition",
+   "type": "early-print",
    "pages": 135,
    "drive_title": "Prabodh Chandrodaya Natak (Anathdas's Gurmukhi version rende - Lucknow Munshi Nawal Kishor, 1883; 124 pp. - title states Brajbasidas's Braj natak, plus a.pdf",
    "drive_folder": "06 Sikhi & Gurbani / Texts & Granths (PDFs & Scans) / Pre-1900 Texts (new finds) / Prabodh Chandrodaya Natak (Anathdas's Gurmukhi ver",
    "text_layer": "none",
    "scripts": [
     "Roman"
-   ]
+   ],
+   "date": {
+    "text": "1883",
+    "from": 1883,
+    "to": 1883,
+    "approx": false
+   }
   },
   {
    "id": "v-prem-sumarag-granth-sakhis-of-the-ten-gurus-gurmukhi-ms-coll",
@@ -17219,6 +17604,9 @@
    "contains": [
     {
      "work_id": "w-prem-sumarag-granth-sakhis-of-the-ten-gurus"
+    },
+    {
+     "work_id": "w-sakhis-of-the-ten-gurus-trumpp"
     }
    ],
    "status": "in-drive",
@@ -17300,7 +17688,7 @@
    "label": "Sarbloh Granth Managal 33333",
    "contains": [
     {
-     "work_id": "w-sri-diwali-path-mahatam-revised-expanded-edition"
+     "work_id": "w-sri-diwali-path-mahatam"
     }
    ],
    "status": "in-drive",
@@ -17366,7 +17754,8 @@
    "label": "Sarbloh Granth Manglacharan",
    "contains": [
     {
-     "work_id": "w-sarbloh-granth-manglacharan-ustat-sri-maya-lachhmi-ji-ki"
+     "work_id": "w-sarbloh-granth",
+     "locator": "Manglacharan (Ustat Sri Maya Lachhmi Ji Ki)"
     }
    ],
    "status": "in-drive",
@@ -17431,7 +17820,8 @@
    "label": "sarbloh-1-1",
    "contains": [
     {
-     "work_id": "w-sri-bhavani-ustat"
+     "work_id": "w-sarbloh-granth",
+     "locator": "Sri Bhavani Ustat; Sarab Loh Kavach"
     }
    ],
    "status": "in-drive",
@@ -17534,7 +17924,7 @@
    "label": "Adi Granth Guru Granth Sahib - Gurmukhi MS (Ram Rai recension) dated Sammat 1752 1695 CE, 634 folios, with Punjabi descri (1695 (Sammat 1752, in tat)",
    "contains": [
     {
-     "work_id": "w-adi-granth-guru-granth-sahib"
+     "work_id": "w-guru-granth-sahib"
     }
    ],
    "status": "in-drive",
@@ -17889,7 +18279,7 @@
    "label": "ਸੰਪੂਰਨ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ - Sampuran Sri Sarbloh Granth Sahib Ji (Budha Dal, Baba Santa Singh; PDL scan, 1118 pp)",
    "contains": [
     {
-     "work_id": "w-sampooran-sri-sarbloh-granth-sahib-ji"
+     "work_id": "w-sarbloh-granth"
     }
    ],
    "status": "in-drive",

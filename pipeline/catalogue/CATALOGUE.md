@@ -2,9 +2,9 @@
 
 Generated from `catalogue.json` by `build.py`; don't edit by hand. See README.md.
 
-232 works, 477 versions (309 in Drive).
+221 works (7 rejected), 477 versions (309 in Drive).
 
-Holding: 95 historic, 93 edition, 37 extracts, 2 online-only, 5 known-only, 0 nothing.
+Holding: 107 historic, 70 edition, 38 extracts, 1 online-only, 5 known-only, 0 nothing.
 
 ## Wanted
 
@@ -27,6 +27,10 @@ copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first w
 | Mahabharata |  | pre-1850 | edition | [Gurinder Singh Mann, 'The Kavi Durbar of Guru Gobind Singh'](https://www.bhainandlal.com/website/ebooks/kavidurbar.pdf) |
 | Gurpranali (anonymous, Motibagh MS) |  | undated | known-only |  |
 | Suan Nama (ਸੁਆਨ ਨਾਮਾ) | Anonymous | undated | online-only | [Encyclopaedia of Sikhism, 'Bavanja Kavi' (by Piara Singh Padam)](https://eos.learnpunjabi.org/BAVANJA%20KAVI.html) |
+| Sankhep Bibek | unknown. The verses carry the chhap 'ਕਹੇ ਜਗਦੀਸ਼ ਹਰੀ', so the verse author may be the same Jagdish named as reviser, but this is unconfirmed | undated | edition |  |
+| Braham Kavach | unknown; the closing dohra reads 'ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ' (attributing it to Guru Hargobind) | undated | edition |  |
+| Roopdeep Pingal | Jaikrishan (Jai Kishan) Das Kavi | undated | edition |  |
+| Ugardanti, Panjabi and English translation (Dal Singh) | Dal Singh | undated | edition |  |
 | Sri Guru Dasam Panchasika | Sahib Singh Mrigind | 1850-1899 | known-only |  |
 | Karna Parva | Chand (Chanda), goldsmith | 1850-1899 | edition | [P.C. Roy / K.M. Ganguli English translation, Karna Parva (Calcutta 1889)](https://archive.org/download/in.ernet.dli.2015.46689/2015.46689.The-Mahabharata---Karna-Parva.pdf) |
 | Udyoga Parva (Udyog Parab) | Chand (Chanda) | 1850-1899 | edition | [P.C. Roy / K.M. Ganguli English translation, Udyoga Parva (Calcutta 1886)](https://archive.org/download/in.ernet.dli.2015.46690/2015.46690.The-Mahabharata---Udyoga-Parva.pdf) |
@@ -34,7 +38,7 @@ copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first w
 | Yajur Veda |  | 1850-1899 | edition | [Keith, The Veda of the Black Yajus School (Taittirīya Saṃhitā), HOS 18 (1914)](https://archive.org/download/vedablackyajuss01keitgoog/vedablackyajuss01keitgoog.pdf) |
 | Shiva Purana |  | 1850-1899 | edition | [Śiva Purāṇa, Sanskrit Wikisource](https://sa.wikisource.org/wiki/%E0%A4%B6%E0%A4%BF%E0%A4%B5%E0%A4%AA%E0%A5%81%E0%A4%B0%E0%A4%BE%E0%A4%A3%E0%A4%AE%E0%A5%8D) |
 | Manu Simriti |  | 1850-1899 | edition | [W. Doniger & B.K. Smith, The Laws of Manu (Penguin 1991)](https://archive.org/details/lawsofmanu0000manu) |
-| Ikadas = probably Bhagavat Ekadash Skandh Bhasha (ਇਕਾਦਸ) | If Chatur Das's Bhagavat Ekadash Skandh Bhasha: Sadhu Chatur Das, disciple of Sant Das (prints of 1926/1927; PU MS 1370); if an Ekadashi-mahatam: e.g. Bal Chand ('Balu Das') of Lahore, court poet (Padam); the book names no author | 1900+ | online-only | [Ekadash Skandh Bhasha, Chatur Das (Venkateshwar Press, 1926)](https://archive.org/download/in.ernet.dli.2015.345470/2015.345470.Ekadash-Skandh.pdf) |
+| Akal Takht hukamnama on Amrit sanchar |  | 1850-1899 | edition |  |
 | Lav Kus di Var | Pandit Devi Das (Padam; Encyclopaedia of Sikhism); listed only as 'attributed' on bhainandlal.com | 1900+ | extracts |  |
 | Karkhe Patshah Dasvin Ke (Kadkhe Patshah Dasvin Ke) | Sainapati (Padam; the book); poet signing 'Sain' — identification with Sainapati is made by some scholars only | 1900+ | extracts |  |
 | Kanak Manjri | Pandit Kashi Ram | 1900+ | extracts |  |
@@ -99,6 +103,13 @@ copied) before 1850 first, then undated, 1850–1899 and 1900+; neediest first w
 | Aspnama | Anonymous | 1900+ | edition | [Faras-nama-e Rangin, tr. D.C. Phillott (1911)](https://archive.org/download/farasnamaerangin00saaduoft/farasnamaerangin00saaduoft.pdf) |
 | Atharva Veda |  | 1900+ | edition |  |
 | Garuda Purana |  | 1900+ | edition |  |
+| Gur Shabad Sidhi (Shardha Puran Granth) | attributed to Bhai Mani Singh (traditional) | 1900+ | edition |  |
+| Nihangnama | Anthology; excerpts by Rattan Singh Bhangu, Santokh Singh, Giani Gian Singh, Baba Sumer Singh and (attrib.) Bhai Daya Singh | 1900+ | edition |  |
+| Shaheed Bilas Bhai Mani Singh | Kavi Seva Singh | 1900+ | edition |  |
+| Sandhia Nitnem |  | 1900+ | edition |  |
+| Sarbloh Granth santhya (pothi bhag 1) | Attributed to Guru Gobind Singh (as printed) | 1900+ | edition |  |
+| Sahaj Paath Maryada of Sri Sarbloh Prakash Granth Sahib | Giani Gurvinder Singh Nangli (compiler) | 1900+ | edition |  |
+| Vichar Sagar: The Ocean of Inquiry (English translation, ch. 1) |  | 1900+ | edition |  |
 
 ## Needs curation
 
@@ -106,84 +117,6 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 
 | ID | Title | Versions |
 |---|---|---|
-| w-rajniti | Rajniti | 1 |
-| w-sau-sakhi | Sau Sakhi | 2 |
-| w-var-sri-bhagauti-ji-ki | Var Sri Bhagauti Ji Ki | 1 |
-| w-adi-granth-commentary | Adi Granth commentary | 2 |
-| w-bhasha-gita-sara | Bhasha Gita Sara | 1 |
-| w-gitasara-muktipada | Gitasara-muktipada | 1 |
-| w-niti-shatak | Niti Shatak | 1 |
-| w-ekadash-skandh-bhasha | Ekadash Skandh Bhasha | 2 |
-| w-zafarnama-hikayat | Zafarnama & Hikayat | 2 |
-| w-ashok | Ashok | 2 |
-| w-vaaran-gyan-ratanavali-bhai-gurdas-ji | Vaaran Gyan Ratanavali Bhai Gurdas Ji | 1 |
-| w-vaaran-bhai-gurudas-ji-bhai-vir-singh-punjabi | Vaaran Bhai Gurudas Ji-Bhai Vir Singh Punjabi | 1 |
-| w-v-r-bhai-gurdas-ji | Vārāṅ Bhai Gurdas Ji | 3 |
-| w-tankhahnama | Tankhahnama | 1 |
-| w-chandi-charitar-2 | Chandi Charitar 2 | 1 |
-| w-chritro-pakhyaan | Chritro Pakhyaan | 1 |
-| w-jaap-sahib-arth-prabodh | Jaap Sahib Arth Prabodh | 1 |
-| w-uggardanti | Uggardanti | 2 |
-| w-zafarnama | Zafarnama | 1 |
-| w-das-granthi | Das Granthi | 1 |
-| w-dasam-granth | Dasam Granth | 4 |
-| w-jaap-sahib-teeka-chakradhar-charitra-charu-chandrika | Jaap Sahib teeka Chakradhar Charitra Charu Chandrika | 1 |
-| w-report-of-the-sodhak-committee-on-the-dasam-granth | Report of the Sodhak Committee on the Dasam Granth | 1 |
-| w-gurbani-sangeet-prachin-reet-ratnavali | Gurbani Sangeet Prachin Reet Ratnavali | 2 |
-| w-vichar-sagar | Vichar Sagar | 3 |
-| w-pothi-sri-dasehra-mahatam | Pothi Sri Dasehra Mahatam | 2 |
-| w-gur-shabad-sidhi | Gur Shabad Sidhi | 1 |
-| w-nihangnama | Nihangnama | 1 |
-| w-santan-di-mahima | Santan di Mahima | 1 |
-| w-shaheed-bilas-bhai-mani-singh | Shaheed Bilas Bhai Mani Singh | 1 |
-| w-sankhep-bibek | Sankhep Bibek | 1 |
-| w-sri-nanak-prakash-gur-partap-suraj-granth | Sri Nanak Prakash Gur Partap Suraj Granth | 1 |
-| w-asa-di-vaar-translation | Asa di Vaar translation | 1 |
-| w-braham-kavach | Braham Kavach | 1 |
-| w-nitnem-gutka | Nitnem gutka | 1 |
-| w-dhan-guru-teg-bahadar-sahib | Dhan Guru Teg Bahadar Sahib | 1 |
-| w-sandhia-nitnem | Sandhia Nitnem | 1 |
-| w-gutka | Gutka | 1 |
-| w-sundar-gutka | Sundar Gutka | 1 |
-| w-akal-takht-hukamnama-on-amrit-sanchar | Akal Takht hukamnama on Amrit sanchar | 1 |
-| w-bhavrasamrit | Bhavrasamrit | 1 |
-| w-gobind-gita | Gobind Gita | 1 |
-| w-gurbilas-patshahi-10 | Gurbilas Patshahi 10 | 2 |
-| w-gurbilas-patshahi-6 | Gurbilas Patshahi 6 | 1 |
-| w-gurparnali | Gurparnali | 1 |
-| w-janamsakhi-bhai-bala | Janamsakhi Bhai Bala | 2 |
-| w-janamsakhi-guru-nanak | Janamsakhi Guru Nanak | 1 |
-| w-japji-sahib-teeka | Japji Sahib Teeka | 1 |
-| w-japji-sahib-steek | Japji Sahib steek | 1 |
-| w-mahima-prakash | Mahima Prakash | 1 |
-| w-paras-bhag | Paras Bhag | 1 |
-| w-parchian-bhai-seva-das | Parchian Bhai Seva Das | 1 |
-| w-pothi-bhai-mohan-ji | Pothi Bhai Mohan Ji | 1 |
-| w-prabodh-chandrodaya-natak | Prabodh Chandrodaya Natak | 1 |
-| w-prem-sumarag-granth-sakhis-of-the-ten-gurus | Prem Sumarag Granth + Sakhis of the ten Gurus | 1 |
-| w-puratan-janamsakhi | Puratan Janamsakhi | 1 |
-| w-sri-gur-panth-prakash | Sri Gur Panth Prakash | 1 |
-| w-complete-steek-of-sri-sarbloh-granth-sahib-ji | Complete Steek of Sri Sarbloh Granth Sahib Ji | 1 |
-| w-sri-diwali-path-mahatam-revised-expanded-edition | Sri Diwali Path Mahatam – revised/expanded edition | 1 |
-| w-sri-diwali-path-mahatam | Sri Diwali Path Mahatam | 1 |
-| w-sarbloh-granth-manglacharan-ustat-sri-maya-lachhmi-ji-ki | Sarbloh Granth Manglacharan – Ustat Sri Maya Lachhmi Ji ki | 1 |
-| w-sampooran-sri-sarbloh-granth-sahib-ji | Sampooran Sri Sarbloh Granth Sahib Ji | 2 |
-| w-sri-bhavani-ustat | Sri Bhavani Ustat | 1 |
-| w-sahaj-paath-maryada-of-sri-sarbloh-prakash-granth-sahib | Sahaj Paath Maryada of Sri Sarbloh Prakash Granth Sahib | 1 |
-| w-sarbloh-granth | Sarbloh Granth | 3 |
-| w-adi-granth-guru-granth-sahib | Adi Granth Guru Granth Sahib | 1 |
-| w-guru-granth-sahib | Guru Granth Sahib | 9 |
-| w-lesson-1 | Lesson 1 | 1 |
-| w-lesson-2 | Lesson 2 | 1 |
-| w-roopdeep-pingal | Roopdeep Pingal | 1 |
-| w-the-path-to-learning-gurb-n-pronunciation | The Path to Learning Gurbānī Pronunciation | 1 |
-| w-untitled | ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ | 3 |
-| w-fareedkot-teeka | Fareedkot Teeka | 1 |
-| w-gurbani-arth-bhandar | Gurbani Arth Bhandar | 1 |
-| w-manmohan-singh-complete-translation | Manmohan Singh Complete Translation | 1 |
-| w-sri-amir-bhandar-teeka | Sri Amir Bhandar Teeka | 1 |
-| w-sri-guru-granth-sahib-darpan | Sri Guru Granth Sahib Darpan | 1 |
-| w-pdf | ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf | 1 |
 
 ## All works
 
@@ -192,13 +125,11 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | 50 Upanishads (Bhakha translation); MS titled 'Upanishad Atharvan Bhakha' | Prahilad Rai (Prahlad Rai) | historic | 5 | 2 | 1801 |
 | Adhyatam Prakash | Sukhdev (Sukhdev Mishra, Kanyakubja Brahman, b. Kapilnagar) | historic | 5 | 4 | 1857 |
 | Adhyatam Ramayan (Adhiatam Ramain) | Pandit Gulab Singh (Nirmala) | historic | 5 | 5 | 1903 |
-| Adi Granth commentary |  | edition | 2 | 2 |  |
-| Adi Granth Guru Granth Sahib |  | historic | 1 | 1 |  |
+| Adi Granth steek praya (Trumpp collection MSS) |  | historic | 2 | 2 |  |
 | Agni Purana |  | historic | 3 | 1 | 1876 |
-| Akal Takht hukamnama on Amrit sanchar |  | edition | 1 | 1 |  |
+| Akal Takht hukamnama on Amrit sanchar |  | edition | 1 | 1 | 1877 |
 | Arz ul-Alfaz | Bhai Nand Lal Goya | edition | 5 | 3 | 1963 |
 | Asa di Vaar translation |  | edition | 1 | 1 |  |
-| Ashok |  | extracts | 2 | 2 |  |
 | Aspnama | Anonymous | edition | 4 | 2 | 1910 |
 | Asvamedha Parva | Tahikan / Tahkan (Tehkin, Tehkan of Gujrat) | edition | 6 | 4 | 1696 |
 | Atharva Veda |  | edition | 3 | 2 | 1905 |
@@ -209,10 +140,9 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Barahmaha Sri Ram Chandar | Bhai Gurdas Singh ('Gurdas II') (the book; Wikipedia) — said to be written soon after 1708; not Bhai Gurdas Bhalla | edition | 2 | 2 | 1959 |
 | Bhagwata Purana |  | historic | 6 | 4 | 1840 |
 | Bhasha Bhushan (commentary) | Harcharandas as commentator (the book); original Bhasha Bhushan by Maharaja Jaswant Singh of Marwar | historic | 6 | 5 | 1866 |
-| Bhasha Gita Sara |  | historic | 1 | 1 |  |
 | Bhav Panchashika (Bhava Panchasika) | Vrind (Brind) | edition | 3 | 2 | 1971 |
 | Bhavishya Purana |  | historic | 3 | 1 | 1869 |
-| Bhavrasamrit |  | edition | 1 | 1 |  |
+| Bhavrasamrit |  | historic | 1 | 1 | 1881 |
 | Bhoj Prabandh |  | historic | 4 | 3 | 1881 |
 | Bishnu Bhagvat da Dasam [Skandh] |  | historic | 6 | 4 | 1701 |
 | Braham Kavach | unknown; the closing dohra reads 'ਇਹ ਬੋਲਾ ਹਰਿਗੋਬਿੰਦ ਕਾ ਸੁਣੋ ਖਾਲਸਾ ਬੀਰ' (attributing it to Guru Hargobind) | edition | 1 | 1 |  |
@@ -221,55 +151,52 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Brahmanda Purana |  | historic | 4 | 3 |  |
 | Bāz-nāma | Anonymous | edition | 5 | 2 | 1900 |
 | Būstān | Sa'di Shirazi | historic | 5 | 2 | 1877 |
+| Chakradhar Charitra Charu Chandrika (Jaap Sahib teeka) |  | historic | 1 | 1 | 1898 |
 | Chanakya (Chanakya Niti / Chanakya Rajniti) | Sainapati as translator (secondary sources); Twarikh Guru Khalsa names no translator | historic | 5 | 3 | 1921 |
 | Chanakya Niti | Chandra Sain Sainapati | edition | 3 | 2 | 1976 |
-| Chandi Charitar 2 | Sri Dasam Granth (Chandi Charitar II) | edition | 1 | 1 |  |
 | Chhand Vichar Pingal | Sukhdev (Sukhdev Mishra) | extracts | 3 | 2 | 1976 |
-| Chritro Pakhyaan | Sri Dasam Granth (Charitropakhyan) source text | edition | 1 | 1 | 2002 |
-| Complete Steek of Sri Sarbloh Granth Sahib Ji | Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) as printed | edition | 1 | 1 | 2000 |
+| Chritro Pakhyaan: Tales of Male-Female Tricky Deceptions, vol. I (English translation, 2002) | Sri Dasam Granth (Charitropakhyan) source text | edition | 1 | 1 | 2002 |
 | Das Granthi |  | historic | 1 | 1 |  |
-| Dasam Granth |  | historic | 4 | 4 |  |
+| Dasam Granth | Guru Gobind Singh (traditional attribution); Sri Dasam Granth (Chandi Charitar II) | historic | 5 | 5 |  |
 | Dastur-ul-Insha | Bhai Nand Lal Goya | edition | 2 | 2 | 1968 |
 | Devi Bhagvat (Devi Bhagavata Purana) |  | historic | 4 | 2 | 1922 |
-| Dhan Guru Teg Bahadar Sahib | Guru Tegh Bahadur (SGGS bani) | edition | 1 | 1 |  |
 | Diwan-i-Goya | Bhai Nand Lal Goya | edition | 7 | 6 | 1963 |
 | Drona Parva (Dron Parab) | Kunvaresh (Kuveresh, Kubresh) | edition | 6 | 4 | 1695 |
-| Ekadash Skandh Bhasha |  | historic | 2 | 2 |  |
-| Fareedkot Teeka |  | edition | 1 | 1 |  |
+| Faridkot Teeka (Faridkot wala Teeka) |  | edition | 1 | 1 |  |
 | Filnama | Anonymous | edition | 3 | 2 | 1910 |
 | Futkal Chands | Tahikan / Tahkan | extracts | 2 | 2 | 1976 |
 | Ganjnama | Bhai Nand Lal Goya | edition | 7 | 5 | 1914 |
 | Garuda Purana |  | edition | 2 | 2 | 1908 |
-| Gitasara-muktipada |  | historic | 1 | 1 |  |
+| Gitasara (Gitasara-muktipada), Sanskrit |  | historic | 1 | 1 |  |
 | Gobind Gita |  | historic | 1 | 1 |  |
+| Goindval Pothi (Pothi Bhai Mohan Ji) |  | historic | 1 | 1 |  |
 | Gulistān | Sa'di Shirazi | historic | 5 | 2 | 1851 |
 | Gur Kirat Prakash | Vir Singh Bal | known-only | 3 | 0 | 1986 |
 | Gur Mahima | Brahm Bhatt | extracts | 1 | 1 | 1976 |
-| Gur Shabad Sidhi | Attributed on the title page to 'Sri Man Bhai Mani Singh ji wala' (traditional attribution, unverified) | edition | 1 | 1 | 2006 |
-| Gurbani Arth Bhandar |  | edition | 1 | 1 |  |
+| Gur Shabad Sidhi (Shardha Puran Granth) | attributed to Bhai Mani Singh (traditional) | edition | 1 | 1 | 2006 |
+| Gurbani Arth Bhandar | Sant Hari Singh | edition | 1 | 1 |  |
 | Gurbani Sangeet Prachin Reet Ratnavali | Bhai Avtar Singh and Bhai Gurcharan Singh, Hazuri Ragis, Gurdwara Sis Ganj Sahib, Delhi | edition | 2 | 2 | 1995 |
-| Gurbilas Patshahi 10 |  | historic | 2 | 2 |  |
+| Gurbilas Patshahi 10 (Sukha Singh) | Kavi Sukha Singh | historic | 1 | 1 |  |
+| Gurbilas Patshahi 10 (Sumer Singh) | Baba Sumer Singh | historic | 1 | 1 |  |
 | Gurbilas Patshahi 6 |  | historic | 1 | 1 |  |
-| Gurparnali |  | historic | 1 | 1 |  |
+| Gurparnali (Guru-vansavali) |  | historic | 1 | 1 |  |
 | Gurpranali (anonymous, Motibagh MS) |  | known-only | 1 | 0 |  |
 | Guru Gita; Khasat Shastr; (Shastrodip?) Suraj |  | historic | 3 | 3 | 1886 |
-| Guru Granth Sahib |  | historic | 9 | 9 |  |
-| Gutka |  | edition | 1 | 1 |  |
+| Guru Granth Sahib (Adi Granth) |  | historic | 10 | 10 |  |
 | Gyan Ratanavali (Mani Singh Janam Sakhi) | Bhai Mani Singh (traditional); Giani Surat Singh (Padam and others); an Udasi writer, early 19th c. (Surjit Hans). Note: the text refers to Mani Singh in the third person | historic | 3 | 2 | 1890 |
 | Hanuman Natak | Anonymous (Padam 2000; the book); Hirday Ram Bhalla, c. 1620s (Braj Hanuman Natak); Sanskrit original (Mahanataka) traditionally ascribed to Damodara Mishra | historic | 10 | 8 | 1883 |
+| Hikayat (Hikayatan) | Guru Gobind Singh (Dasam Granth) | historic | 2 | 2 |  |
 | Hitopadesa (Hindi verse translation) | Lakkhan Rai | edition | 3 | 2 | 1976 |
 | Hitopadesh Natak (per Wikipedia) | Vrind | edition | 4 | 2 | 1971 |
 | Hitopadesha |  | historic | 5 | 1 | 1880 |
-| Ikadas = probably Bhagavat Ekadash Skandh Bhasha (ਇਕਾਦਸ) | If Chatur Das's Bhagavat Ekadash Skandh Bhasha: Sadhu Chatur Das, disciple of Sant Das (prints of 1926/1927; PU MS 1370); if an Ekadashi-mahatam: e.g. Bal Chand ('Balu Das') of Lahore, court poet (Padam); the book names no author | online-only | 3 | 0 | 1926 |
+| Ikadas = probably Bhagavat Ekadash Skandh Bhasha (ਇਕਾਦਸ) | If Chatur Das's Bhagavat Ekadash Skandh Bhasha: Sadhu Chatur Das, disciple of Sant Das (prints of 1926/1927; PU MS 1370); if an Ekadashi-mahatam: e.g. Bal Chand ('Balu Das') of Lahore, court poet (Padam); the book names no author | historic | 5 | 2 | 1926 |
 | Ikadash Skand (Bhagavata Purana, 11th skandha) |  | historic | 5 | 4 |  |
-| Jaap Sahib Arth Prabodh | Guru Gobind Singh (Jaap Sahib, mool) | edition | 1 | 1 | 2010 |
-| Jaap Sahib teeka Chakradhar Charitra Charu Chandrika |  | edition | 1 | 1 |  |
+| Jaap Sahib Arth Prabodh | Sant Kartar Singh | edition | 1 | 1 | 2010 |
 | Jaimini [Ashvamedh] |  | historic | 4 | 3 | 1892 |
 | Janamsakhi Bhai Bala |  | historic | 2 | 2 |  |
-| Janamsakhi Guru Nanak |  | historic | 1 | 1 |  |
 | Jangnama Guru Gobind Singh Ji Ka | Ani Rai | edition | 5 | 4 | 1950 |
-| Japji Sahib steek |  | edition | 1 | 1 |  |
-| Japji Sahib Teeka |  | edition | 1 | 1 |  |
+| Japji Sahib steek (anonymous Udasi teeka) |  | historic | 1 | 1 |  |
+| Japji Sahib teeka (Anandghan) | Anandghan (Udasi) | historic | 1 | 1 |  |
 | Jhagra Heer Ranjhe Ka | Kallu (Kallū) | extracts | 3 | 1 | 1976 |
 | Joti Bigas (Persian) | Bhai Nand Lal Goya | edition | 5 | 5 | 1963 |
 | Joti Bigas (Punjabi/Bhakha version) | Bhai Nand Lal Goya | edition | 5 | 3 | 1963 |
@@ -283,14 +210,11 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Kok Sanvad | Dharam Singh | extracts | 1 | 1 | 1976 |
 | Kurma Purana |  | historic | 3 | 1 | 1890 |
 | Lav Kus di Var | Pandit Devi Das (Padam; Encyclopaedia of Sikhism); listed only as 'attributed' on bhainandlal.com | extracts | 2 | 2 | 1976 |
-| Lesson 1 | unknown (no byline; probably the same English translation project as 'The Path to Learning Gurbani Pronunciation') | edition | 1 | 1 |  |
-| Lesson 2 | unknown (no byline; same series as Lesson 1) | edition | 1 | 1 |  |
 | Linga Purana |  | historic | 3 | 2 | 1885 |
 | Love poetry in various ragas | Nanua Bairagi (Bhagat Nanua; Jamala Singh) | extracts | 3 | 2 | 1976 |
 | Mahabharat | Various court poets (e.g., Kunvaresh, Drona Parv; Mangal Rai, Shalya Parv; Amrit Rai) | edition | 5 | 2 | 1695 |
 | Mahabharata |  | edition | 5 | 2 | 1695 |
-| Mahima Prakash |  | historic | 1 | 1 |  |
-| Manmohan Singh Complete Translation |  | edition | 1 | 1 |  |
+| Mahima Prakash (verse) | Sarup Das Bhalla (likely) | historic | 1 | 1 |  |
 | Manu (Manusmriti) |  | edition | 5 | 4 | 1886 |
 | Manu Simriti |  | edition | 5 | 2 | 1886 |
 | Markandeya Purana |  | historic | 5 | 2 | 1688 |
@@ -300,13 +224,14 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Narayana Purana |  | historic | 2 | 1 |  |
 | Nihangnama | Anthology; excerpts by Rattan Singh Bhangu, Santokh Singh, Giani Gian Singh, Baba Sumer Singh and (attrib.) Bhai Daya Singh | edition | 1 | 1 | 2009 |
 | Niti Shakat |  | extracts | 2 | 2 | 1993 |
-| Niti Shatak |  | historic | 1 | 1 |  |
-| Nitnem gutka |  | edition | 1 | 1 | 2019 |
+| Niti Shatak (Bhartrihari), Gurmukhi rendering | Bhartrihari (Sanskrit original) | historic | 1 | 1 |  |
+| Nitnem gutka |  | historic | 2 | 2 | 1701 |
 | Padam Puran (Padma Purana) |  | historic | 4 | 3 | 1894 |
 | Padma Purana |  | historic | 5 | 4 | 1893 |
 | Panchatantra (Braj/Panjabi rendering) | Dharam Singh | edition | 4 | 3 | 1930 |
 | Pandava Gita | Kashi Ram | historic | 4 | 4 | 1976 |
-| Panj Sau Sakhi (Sau Sakhi) | Bhai Ram Kuir / Ram Kanwar, later Gurbakhsh Singh (traditional narrator), written down by Sahib Singh; Gurbux Singh Raindar (some); later interpolators (text surfaced only in 1815) | historic | 6 | 3 | 1800 |
+| Panj Sau Sakhi (Sau Sakhi) | Bhai Ram Kuir / Ram Kanwar, later Gurbakhsh Singh (traditional narrator), written down by Sahib Singh; Gurbux Singh Raindar (some); later interpolators (text surfaced only in 1815) | historic | 7 | 4 | 1800 |
+| Panjabi Hath Likhtan di Suchi (manuscript catalogue) | Shamsher Singh Ashok | extracts | 1 | 1 |  |
 | Paras Bhag |  | historic | 1 | 1 |  |
 | Parchian Bhai Seva Das |  | historic | 1 | 1 |  |
 | Parichha | Chand (Chanda) | historic | 4 | 3 | 1976 |
@@ -326,98 +251,109 @@ Seeded from Drive file names; check the title, merge duplicates, then set status
 | Poetry praising Guru Gobind Singh | Sundar | extracts | 1 | 1 | 1976 |
 | Poetry praising Guru Gobind Singh | Sharda (Sharda/Shārdā) | extracts | 1 | 1 | 1976 |
 | Poetry praising Guru Gobind Singh | Sudama | extracts | 1 | 1 | 1976 |
-| Pothi Bhai Mohan Ji |  | edition | 1 | 1 |  |
 | Pothi Salihotar Ki | Muhammad Akbar (Padam 2000; the book); not matched to the known works of the physician Muhammad Akbar Arzani | historic | 3 | 3 | 1788 |
 | Pothi Sri Dasehra Mahatam | Guru Gobind Singh (all items are Dasam Granth extracts) | edition | 2 | 2 | 1999 |
 | Pothi Vaidgi Ki | Muhammad Akbar (Padam 2000; the book); not matched to the known works of the physician Muhammad Akbar Arzani | historic | 1 | 1 |  |
-| Prabodh Chandar Natak (Prabodhachandra Natak) | Pandit Gulab Singh (Nirmala) | historic | 5 | 3 | 1872 |
-| Prabodh Chandrodaya Natak |  | edition | 1 | 1 |  |
+| Prabodh Chandar Natak (Prabodhachandra Natak) | Pandit Gulab Singh (Nirmala) | historic | 6 | 4 | 1872 |
 | Prashan Uttar (Rahitnama Bhai Nand Lal) | Bhai Nand Lal Goya (traditional; the book); an early copy circulates untitled as 'Nasihatnama' (GNDU MS 440, c. 1718–19, per G.S. Mann) | edition | 6 | 4 | 1968 |
 | Prem Ambodh Pothi (Prem Abodh) | Hari Das (Padam; the book); Kevaldas (R.S. Jaggi); Guru Gobind Singh (Encyclopaedia of Sikhism; SikhiWiki); unknown (Hawley & Mann) | historic | 6 | 3 | 1976 |
-| Prem Sumarag Granth + Sakhis of the ten Gurus |  | historic | 1 | 1 |  |
+| Prem Sumarag Granth |  | historic | 1 | 1 |  |
 | Pryaye Sri Guru Granth Sahib Ji / Sri Guru Granth Prayay | Bhai Gurdas Singh ('Gurdas II') (the book; Wikipedia citing 'Sri Dasam Granth: Facts Beyond Doubt', 2021); anonymous, late 18th/early 19th c. (Encyclopaedia of Sikhism, for 'Sri Guru Granth Prayay') | extracts | 3 | 1 | 1963 |
-| Puratan Janamsakhi |  | historic | 1 | 1 |  |
+| Puratan Janamsakhi |  | historic | 2 | 2 |  |
 | Rahitnama Chaupa Singh (Hazuri Rahitnama) | Bhai Chaupa Singh (d. 1724; family tradition, Padam); composite text compiled from several sources c. 1740–65 (McLeod) | edition | 6 | 3 | 1987 |
-| Rajniti |  | historic | 1 | 1 |  |
+| Rajniti (Rajneeti) |  | historic | 1 | 1 |  |
 | Rajniti Granth | Tansukh Lahori (re-versification); based on Lakhan Rai's Hitopadesha translation sent from Anandpur | edition | 2 | 2 | 1976 |
 | Rajniti Ra Kabit (also Rajniti) | Devi Das Pandit (Chhibbar) | historic | 2 | 2 | 1976 |
 | Ramayana |  | historic | 5 | 3 | 1688 |
 | Ratan Dam (Amar Kosh Bhakha) | Tahikan / Tahkan | historic | 5 | 3 | 1857 |
 | Rati Rahasya Kos | Kunvaresh | edition | 4 | 3 | 1965 |
-| Report of the Sodhak Committee on the Dasam Granth |  | edition | 1 | 1 |  |
+| Report of the Sodhak Committee on the Dasam Granth |  | historic | 1 | 1 | 1897 |
 | Rig Veda |  | historic | 3 | 1 | 1849 |
 | Roopdeep Pingal | Jaikrishan (Jai Kishan) Das Kavi | edition | 1 | 1 |  |
 | Sabha Parab | Amrit Rai | edition | 3 | 2 | 1696 |
-| Sahaj Paath Maryada of Sri Sarbloh Prakash Granth Sahib | Sangreh karta: Giani Gurvinder Singh Ji Nangli | edition | 1 | 1 | 2020 |
+| Sahaj Paath Maryada of Sri Sarbloh Prakash Granth Sahib | Giani Gurvinder Singh Nangli (compiler) | edition | 1 | 1 | 2020 |
 | Sakhi Rahit Ki | Bhai Nand Lal (the book; bhainandlal.com); anonymous, mid-1730s (McLeod's material names no author) | edition | 4 | 2 | 2003 |
+| Sakhis of the ten Gurus (Trumpp MS) |  | historic | 1 | 1 |  |
 | Salya Parva (Shalya Parab) | Mangal (Mangal Rai) | edition | 3 | 2 | 1697 |
 | Sama Veda |  | historic | 4 | 1 | 1842 |
-| Sampooran Sri Sarbloh Granth Sahib Ji | Attributed to Guru Gobind Singh (as printed) | edition | 2 | 2 | 2000 |
 | Samudrik | Kunvaresh | edition | 4 | 3 | 1696 |
 | Sandhia Nitnem |  | edition | 1 | 1 | 2018 |
 | Sankhep Bibek | unknown. The verses carry the chhap 'ਕਹੇ ਜਗਦੀਸ਼ ਹਰੀ', so the verse author may be the same Jagdish named as reviser, but this is unconfirmed | edition | 1 | 1 |  |
 | Santan di Mahima | Bhai Gurjant Singh Bainka, Hazuri kavishar of the Sampardai Dal Baba Bidhi Chand (kavishri jatha) | edition | 1 | 1 |  |
-| Sar Gita (ਸਾਰ ਗੀਤਾ) | Anonymous | historic | 4 | 1 |  |
-| Sarbloh Granth |  | historic | 3 | 3 |  |
-| Sarbloh Granth Manglacharan – Ustat Sri Maya Lachhmi Ji ki | Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) | edition | 1 | 1 | 2012 |
-| Sau Sakhi |  | historic | 2 | 2 |  |
-| Shaheed Bilas Bhai Mani Singh | Kavi Seva Singh (early 19th c.) | edition | 1 | 1 | 1961 |
+| Sar Gita (ਸਾਰ ਗੀਤਾ) | Anonymous | historic | 5 | 2 |  |
+| Sarbloh Granth | attributed to Guru Gobind Singh (disputed); Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) | historic | 6 | 6 | 2000 |
+| Sarbloh Granth santhya (pothi bhag 1) | Attributed to Guru Gobind Singh (as printed) | edition | 1 | 1 | 2000 |
+| Shaheed Bilas Bhai Mani Singh | Kavi Seva Singh | edition | 1 | 1 | 1961 |
 | Shiva Purana |  | edition | 4 | 2 | 1870 |
 | Shringar Shiksha | Vrind (Brind) | edition | 3 | 2 | 1971 |
 | Shukar Niti (Shukraniti) |  | historic | 3 | 1 | 1882 |
 | Shāhnāma | Abu'l-Qasim Firdawsi | historic | 4 | 1 | 1829 |
+| Sikh Reference Library manuscript catalogue | Shamsher Singh Ashok | extracts | 1 | 1 |  |
 | Sikhan di Bhagatmala (Sikkhan di Bhagat-mal) | Bhai Mani Singh (d. 1734; traditional); Giani Surat Singh of the Gianian Bunga, from Mani Singh's oral teaching (Padam); unnamed author (most modern scholars). Note: no source found that separates two different Mani Singhs; worth checking in print | historic | 6 | 4 | 1845 |
 | Singh Sagar | Vir Singh Bal | known-only | 2 | 0 | 1986 |
 | Singh-Gau ki Katha | Devi Das Pandit (Chhibbar) | historic | 3 | 2 | 1976 |
 | Six darshanas: Vedanta, Nyay, Vaisheshik, Sankhya, Yog, Uttar Mimansa |  | historic | 5 | 2 | 1890 |
 | Skanda Purana |  | historic | 4 | 2 | 1877 |
-| Sri Amir Bhandar Teeka |  | edition | 1 | 1 |  |
-| Sri Bhavani Ustat | Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) | edition | 1 | 1 |  |
-| Sri Diwali Path Mahatam | Compilation | edition | 1 | 1 | 2019 |
-| Sri Diwali Path Mahatam – revised/expanded edition | Compilation | edition | 1 | 1 | 2019 |
+| Sri Amir Bhandar Teeka | Giani Kirpal Singh | edition | 1 | 1 |  |
+| Sri Diwali Path Mahatam | Compilation | edition | 2 | 2 | 2019 |
+| Sri Gur Nanak Prakash | Kavi Santokh Singh | historic | 1 | 1 |  |
 | Sri Gur Panth Prakash |  | historic | 1 | 1 |  |
 | Sri Gur Sobha | Sainapati (Chandra Sain) | historic | 6 | 2 | 1925 |
 | Sri Guru Dasam Panchasika | Sahib Singh Mrigind | known-only | 1 | 0 |  |
-| Sri Guru Granth Sahib Darpan |  | edition | 1 | 1 |  |
-| Sri Nanak Prakash Gur Partap Suraj Granth |  | historic | 1 | 1 |  |
+| Sri Guru Granth Sahib Darpan | Prof. Sahib Singh | edition | 1 | 1 |  |
+| Sri Guru Granth Sahib, English and Panjabi translation (Manmohan Singh) | Manmohan Singh | edition | 1 | 1 |  |
+| Sri Sarbloh Granth Sahib steek (Budha Dal, 2000) | Attributed to Guru Gobind Singh (Sri Mukhvak Patshahi 10) as printed | edition | 1 | 1 | 2000 |
 | Srī Gurū Granth Prayāy (similar title) | Bhai Kirat Singh (the book, via Padam); anonymous (Encyclopaedia of Sikhism, for 'Sri Guru Granth Prayay'); later paryai compilers, e.g. Chanda Singh (1848) | extracts | 3 | 1 | 1976 |
 | Stanza praising the Guru's generosity; also Shyam Sanehi, Sudama Charitar, Alim Keli (1696) | Alim / Alam (Alim Shah) | extracts | 2 | 1 | 1976 |
 | Suan Nama (ਸੁਆਨ ਨਾਮਾ) | Anonymous | online-only | 1 | 0 |  |
-| Sundar Gutka |  | edition | 1 | 1 |  |
+| Sundar Gutka |  | historic | 1 | 1 |  |
 | Sur Sagar | Anonymous (Padam 2000; the book); Surdas (the standard Sur Sagar) | historic | 5 | 3 | 1907 |
-| Tankhahnama |  | historic | 1 | 1 |  |
+| Tankhahnama | Bhai Nand Lal (attributed) | historic | 1 | 1 |  |
 | Tasnif (collected works) of Bhai Nand Lal | Bhai Nand Lal Goya; Guru Gobind Singh (Zafarnama, Hikayats) | historic | 5 | 5 | 1915 |
 | Tausif-o-Sana | Bhai Nand Lal Goya | edition | 5 | 5 | 1963 |
-| The Path to Learning Gurbānī Pronunciation | Vidiā Gurū Gianī Gurwinder Singh Nangalī, Ustād Gurmat Vidiālā, Chabbā, Nangalī | edition | 1 | 1 |  |
+| The Sakhee Book (English translation of the Sau Sakhi) | Attar Singh (translator) | historic | 1 | 1 | 1873 |
 | Triya Charitra | Chand (pen-name in the manuscript; Padam; the book); relation to the Dasam Granth Charitropakhyan unclear — that text's own authorship is debated (Guru Gobind Singh / court poets) | historic | 5 | 5 | 1800 |
 | Udyoga Parva (Udyog Parab) | Chand (Chanda) | edition | 6 | 4 | 1886 |
-| Uggardanti | attributed in the PDF to Guru Gobind Singh (Ugardanti / Bhagauti Chhand, six chhakkas) | edition | 2 | 2 |  |
+| Ugardanti | attributed to Guru Gobind Singh (disputed) | historic | 1 | 1 | 1801 |
+| Ugardanti, Panjabi and English translation (Dal Singh) | Dal Singh | edition | 1 | 1 |  |
 | Upanishads |  | historic | 5 | 1 | 1900 |
 | Ustati Sri Amritsar Ji Ki | Saundha Singh (Kavi Saundha) | extracts | 3 | 1 | 1981 |
 | Uthanka Sri Guru Granth Sahib Ji Ki | Mahant Sadhu Singh of Patiala (arranger, 1898/99 Lahore print); the text's own preface: set down by Bhai Gurdas at Guru Arjan Dev's direction (traditional claim); manuscript cited in the book names no author | historic | 4 | 2 | 1898 |
 | Vaar Sri Bhagauti Ji Ki Patshahi Dasvin Ki (41st Var) | Bhai Gurdas Singh ('Gurdas II'), Kavi Darbar poet, brother of Alam Singh Nachna (the book; Wikipedia); a later 18th-c. Gurdas, c. mid-1780s (McLeod; dating by Fenech & Vir Singh); Bhai Gurdas Bhalla (d. 1636) by manuscript title 'Vaar Bhai Gurdas Ji Ki' and its placement as the 41st Var — though its 1699 subject postdates him; separately, an anonymous 'Var Patshahi Dasvin Ki' on the Nirmohgarh battle (published by Padam, 1967) | historic | 8 | 5 | 1707 |
-| Vaaran Bhai Gurudas Ji-Bhai Vir Singh Punjabi |  | edition | 1 | 1 |  |
-| Vaaran Gyan Ratanavali Bhai Gurdas Ji | Bhai Gurdas (Bhalla); Vaar 41 by Bhai Gurdas II (Bhai Gurdas Singh) | edition | 1 | 1 | 2011 |
+| Vaaran Bhai Gurdas | Bhai Gurdas (Bhalla); Bhai Gurdas (Bhalla); Vaar 41 by Bhai Gurdas II (Bhai Gurdas Singh) | historic | 2 | 2 | 2011 |
+| Vaaran Bhai Gurdas steek (Bhai Vir Singh) | Bhai Vir Singh | edition | 1 | 1 |  |
 | Vamana Purana |  | historic | 3 | 1 | 1909 |
-| Var Sri Bhagauti Ji Ki |  | edition | 1 | 1 |  |
+| Var Sri Bhagauti Ji Ki (Chandi di Var) | Guru Gobind Singh (Dasam Granth) | historic | 1 | 1 |  |
 | Varaha Purana |  | historic | 3 | 1 | 1887 |
+| Varan Bhai Gurdas Ji: Gurmukhi, Roman and English translation (2 vols, 2009) |  | edition | 2 | 2 | 2009 |
 | Various poems about love | Nand Ram | extracts | 1 | 1 | 1976 |
 | Various poetry | Hans Ram | extracts | 2 | 2 | 1976 |
 | Various poetry | Chand (Chandan) | extracts | 1 | 1 | 1976 |
 | Various poetry | Dhanna Singh | extracts | 1 | 1 | 1976 |
 | Various poetry | Ram Das | extracts | 3 | 1 | 1976 |
 | Vashisht (Vasishtha) |  | historic | 5 | 2 | 1891 |
-| Vichar Sagar | Sadhu Nischal Das | edition | 3 | 3 | 1893 |
+| Vichar Sagar | Sadhu Nischal Das | historic | 2 | 2 | 1893 |
+| Vichar Sagar: The Ocean of Inquiry (English translation, ch. 1) |  | edition | 1 | 1 | 2009 |
 | Visan Puran (Vishnu Purana) |  | historic | 5 | 3 | 1895 |
 | Vishnu Purana |  | historic | 4 | 2 | 1864 |
 | Vrind Satsai (Vrinda Satasai) | Vrind (1643–1723) | historic | 5 | 4 | 1971 |
-| Vārāṅ Bhai Gurdas Ji | Bhai Gurdas (Bhalla) | historic | 3 | 3 | 2009 |
 | Warrior poetry challenging the enemies | Hir Bhatt / Heer | extracts | 1 | 1 | 1976 |
 | Yagvalak (Yajnavalkya Smriti) |  | edition | 4 | 2 | 1849 |
 | Yajur Veda |  | edition | 4 | 2 | 1899 |
 | Yamkalankar | Vrind | edition | 3 | 2 | 1971 |
-| Zafarnama | Guru Gobind Singh | edition | 1 | 1 | 2005 |
-| Zafarnama & Hikayat |  | historic | 2 | 2 |  |
+| Zafarnama | Guru Gobind Singh | historic | 3 | 3 | 2005 |
 | Zindaginama (Bandginama) | Bhai Nand Lal Goya | historic | 6 | 6 | 1963 |
-| ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ |  | edition | 3 | 3 |  |
-| ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf |  | edition | 1 | 1 |  |
+
+## Rejected
+
+Kept so sweeps never propose them again; their Drive files stay linked.
+
+| ID | Title | Notes |
+|---|---|---|
+| w-ashok | Ashok | Rejected: placeholder split into the two Ashok catalogues |
+| w-dhan-guru-teg-bahadar-sahib | Dhan Guru Teg Bahadar Sahib | Rejected: looks like a self-made bani compilation (file 'v3 ... v2'); reinstate if it is a published gutka |
+| w-lesson-1 | Lesson 1 | Rejected: teaching material |
+| w-lesson-2 | Lesson 2 | Rejected: teaching material |
+| w-the-path-to-learning-gurb-n-pronunciation | The Path to Learning Gurbānī Pronunciation | Rejected: ucharan guide |
+| w-untitled | ਗੁਰਬਾਣੀ ਵਿਆਕਰਣ | Rejected: vyakaran and ucharan guides (Sahib Singh's Gurbani Viakaran, review notes, Sampradai Gurbani Ucharan Bodh) |
+| w-pdf | ਸੰਪ੍ਰਦਾਈ ਗੁਰਬਾਣੀ ਉਚਾਰਣ ਬੋਧ.pdf | Rejected: ucharan guide (Sampradai Gurbani Ucharan Bodh, duplicate file) |

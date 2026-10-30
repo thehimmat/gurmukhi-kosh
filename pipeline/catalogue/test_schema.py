@@ -154,6 +154,18 @@ class Versions(unittest.TestCase):
         self.assertTrue(any("found_on" in e for e in errs), errs)
 
 
+class BasedOn(unittest.TestCase):
+    def test_based_on_must_name_known_works(self):
+        errs = errors_for(lambda c: c["works"][1].update(based_on=["w-sri-gur-sobha"]))
+        self.assertEqual(errs, [])
+        errs = errors_for(lambda c: c["works"][1].update(based_on=["w-missing"]))
+        self.assertTrue(any("based_on" in e and "w-missing" in e for e in errs), errs)
+
+    def test_not_based_on_itself(self):
+        errs = errors_for(lambda c: c["works"][1].update(based_on=["w-lav-kus-di-var"]))
+        self.assertTrue(any("itself" in e for e in errs), errs)
+
+
 class ParseDate(unittest.TestCase):
     def test_plain_year(self):
         self.assertEqual(parse_date("1886"), {"text": "1886", "from": 1886, "to": 1886, "approx": False})
