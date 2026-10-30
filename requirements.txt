@@ -1,0 +1,7 @@
+# Python pipeline dependencies (the app itself is Node; see package.json).
+# Legacy Gurmukhi font conversion: gur-sobha, gurdas-singh-vaar, shackle
+gurmukhi-transliterate @ git+https://github.com/thehimmat/gurmukhi-transliterate
+# PDF text extraction: gur-sobha, gurdas-singh-vaar
+pdfminer.six
+# Scraping: mahan-kosh, shackle
+requests

@@ -24,6 +24,26 @@ jobs:
       - name: Check migrations enable RLS on every created table
         run: node scripts/check-migrations-rls.mjs
 
+  # The ingestion pipeline's Python modules have their own unittest files
+  # (pipeline/**/test_*.py), run as plain scripts. Any new test_*.py is picked up.
+  python-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: Pipeline unit tests
+        run: |
+          status=0
+          for t in $(git ls-files 'pipeline/**/test_*.py'); do
+            echo "== $t"
+            python3 "$t" || status=1
+          done
+          exit $status
+
   tests:
     runs-on: ubuntu-latest
     env:
