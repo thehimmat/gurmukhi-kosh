@@ -2,7 +2,7 @@
 // (delivered). Criteria: user-stories/US-003-trust-data-through-source-citations-provenance.md
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb, PROD_BASE } from "./helpers";
+import { anonDb, prodFetch } from "./helpers";
 import { buildGrammarView } from "../../lib/grammar-view";
 import type { WordGrammarWithRule } from "../../lib/supabase";
 
@@ -37,7 +37,7 @@ describe("US-003: every datum carries provenance", () => {
   });
 
   it("US-003: the JSON API ships grammar caveats alongside grammar rows", async () => {
-    const res = await fetch(`${PROD_BASE}/api/word/${encodeURIComponent("ਨਾਨਕ")}`);
+    const res = await prodFetch(`/api/word/${encodeURIComponent("ਨਾਨਕ")}`);
     expect(res.status).toBe(200);
     const data = (await res.json()) as { grammar: unknown[]; grammar_caveats: unknown[] };
     expect(Array.isArray(data.grammar)).toBe(true);

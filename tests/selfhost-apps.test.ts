@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import nextConfig from "../next.config";
 import { supabaseAnonKey, supabaseUrl } from "../lib/supabase";
-import { prodBase } from "./stories/helpers";
+import { cloudflareBlock, prodBase } from "./stories/helpers";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p: string) => readFileSync(join(root, p), "utf8");
@@ -87,6 +87,23 @@ describe("production checks", () => {
   it("can point at another origin (a Vercel deployment during a rollback)", () => {
     vi.stubEnv("PROD_BASE_URL", "https://gurmukhi-kosh.vercel.app/");
     expect(prodBase()).toBe("https://gurmukhi-kosh.vercel.app");
+  });
+});
+
+describe("production checks through Cloudflare", () => {
+  it("name Cloudflare's reason when it blocks or challenges the check, not just a 403", async () => {
+    const challenged = new Response("<html><title>Just a moment...</title></html>", {
+      status: 403,
+      headers: { server: "cloudflare", "cf-mitigated": "challenge", "cf-ray": "abc-IAD" },
+    });
+    expect(await cloudflareBlock(challenged)).toBe(
+      'Cloudflare answered 403 (cf-mitigated: challenge, ray abc-IAD, "Just a moment..."), so the check never reached the app'
+    );
+  });
+
+  it("let the app's own responses through, including its 4xx", async () => {
+    expect(await cloudflareBlock(new Response("{}", { status: 400, headers: { server: "cloudflare" } }))).toBeNull();
+    expect(await cloudflareBlock(new Response("ok", { status: 200 }))).toBeNull();
   });
 });
 

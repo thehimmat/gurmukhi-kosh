@@ -6,11 +6,11 @@
 // insert. Prod data stays clean.
 
 import { describe, it, expect } from "vitest";
-import { PROD_BASE } from "./helpers";
+import { prodFetch } from "./helpers";
 
 describe("US-006: flagging and data-quality monitoring", () => {
   it("US-006: a bot-like flag submission (honeypot filled) is silently swallowed", async () => {
-    const res = await fetch(`${PROD_BASE}/api/flags`, {
+    const res = await prodFetch("/api/flags", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -24,7 +24,7 @@ describe("US-006: flagging and data-quality monitoring", () => {
   });
 
   it("US-006: a flag without details is rejected before insert", async () => {
-    const res = await fetch(`${PROD_BASE}/api/flags`, {
+    const res = await prodFetch("/api/flags", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -36,7 +36,7 @@ describe("US-006: flagging and data-quality monitoring", () => {
   });
 
   it("US-006: /api/health reports curation and grammar-quality metrics", async () => {
-    const res = await fetch(`${PROD_BASE}/api/health`);
+    const res = await prodFetch("/api/health");
     expect(res.status).toBe(200);
     const data = (await res.json()) as { metrics: Array<{ key: string; value: unknown }> };
     const byKey = new Map(data.metrics.map((m) => [m.key, m.value]));

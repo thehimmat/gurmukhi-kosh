@@ -18,6 +18,26 @@ export function prodBase() {
 
 export const PROD_BASE = prodBase();
 
+/**
+ * Why Cloudflare, not the app, answered: a challenge or block (cf-mitigated, or one of its own
+ * error pages). null for anything the app sent, its 4xx included.
+ */
+export async function cloudflareBlock(res: Response): Promise<string | null> {
+  const mitigated = res.headers.get("cf-mitigated");
+  const title = /<title>([^<]*)<\/title>/i.exec(await res.clone().text())?.[1]?.trim() ?? "";
+  if (!mitigated && !(res.status >= 403 && /cloudflare|just a moment|attention required/i.test(title))) return null;
+  const why = [mitigated && `cf-mitigated: ${mitigated}`, `ray ${res.headers.get("cf-ray") ?? "?"}`, title && `"${title}"`];
+  return `Cloudflare answered ${res.status} (${why.filter(Boolean).join(", ")}), so the check never reached the app`;
+}
+
+/** fetch for production checks: fails with Cloudflare's reason when it stops the request. */
+export async function prodFetch(path: string, init?: RequestInit): Promise<Response> {
+  const res = await fetch(`${PROD_BASE}${path}`, init);
+  const blocked = await cloudflareBlock(res);
+  if (blocked) throw new Error(`${path}: ${blocked}`);
+  return res;
+}
+
 export function anonDb() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

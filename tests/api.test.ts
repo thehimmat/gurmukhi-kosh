@@ -11,7 +11,7 @@ config({ path: ".env.local" });
 import { describe, it, expect, beforeAll } from "vitest";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest } from "next/server";
-import { prodBase } from "./stories/helpers";
+import { prodFetch } from "./stories/helpers";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -175,10 +175,9 @@ describe("production", () => {
   // The public site, which serves this app's paths from the VM (selfhost/README.md). This app's own
   // / and /api/search aren't public there (the shell has its own), so those are checked in-process
   // below. PROD_BASE_URL points these elsewhere (tests/stories/helpers.ts).
-  const BASE = prodBase();
 
   it("/browse responds 200", async () => {
-    const res = await fetch(`${BASE}/browse`);
+    const res = await prodFetch("/browse");
     expect(res.status).toBe(200);
   }, 10000);
 
@@ -192,7 +191,7 @@ describe("production", () => {
   }, 10000);
 
   it("/api/word returns data for ਨਾਨਕ", async () => {
-    const res = await fetch(`${BASE}/api/word/${encodeURIComponent("ਨਾਨਕ")}`);
+    const res = await prodFetch(`/api/word/${encodeURIComponent("ਨਾਨਕ")}`);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.word.gurmukhi).toBe("ਨਾਨਕ");
