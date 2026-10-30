@@ -112,17 +112,78 @@ interface Occurrence {
 }
 
 /**
- * The occurrences pairs are counted from: on public lines only (migration 069). The job runs with
- * the service-role key, which RLS doesn't limit, so a private source must be filtered here or its
- * text would feed the public bigrams and collocations.
+ * One page of the occurrences pairs are counted from: on public lines only (migration 069), the
+ * `limit` after id `afterId`. The job runs with the service-role key, which RLS doesn't limit, so a
+ * private source must be filtered here or its text would feed the public bigrams and collocations.
+ * Paging by id, not offset, keeps every page as cheap as the first.
  */
-export function publicOccurrences(supabase: any) {
+export function publicOccurrences(supabase: any, afterId: number, limit: number) {
   return supabase
     .from('word_occurrences')
-    .select('word_id, line_id, position, lines!inner(is_public)')
+    .select('id, word_id, line_id, position, lines!inner(is_public)')
     .eq('lines.is_public', true)
-    .order('line_id', { ascending: true })
-    .order('position', { ascending: true });
+    .gt('id', afterId)
+    .order('id', { ascending: true })
+    .limit(limit);
+}
+
+/** Every public occurrence, a page at a time, printing progress. */
+async function fetchPublicOccurrences(supabase: any, pageSize = 1000): Promise<Occurrence[]> {
+  const all: Occurrence[] = [];
+  for (let after = 0; ; ) {
+    const { data, error } = await publicOccurrences(supabase, after, pageSize);
+    if (error) throw new Error(`word_occurrences after id ${after}: ${error.message}`);
+    const page = (data ?? []) as (Occurrence & { id: number })[];
+    for (const o of page) all.push({ word_id: o.word_id, line_id: o.line_id, position: o.position });
+    if (all.length % 100_000 < page.length) console.log(`  ${all.length.toLocaleString('en')} occurrences...`);
+    if (page.length < pageSize) return all;
+    after = page[page.length - 1].id;
+  }
+}
+
+/** Occurrences grouped by line, positions in order, with each word's total count. */
+export function groupByLine(occs: Occurrence[]) {
+  const byLine = new Map<number, WordPosition[]>();
+  const wordFreqs = new Map<number, number>();
+  for (const o of occs) {
+    let arr = byLine.get(o.line_id);
+    if (!arr) { arr = []; byLine.set(o.line_id, arr); }
+    arr.push({ word_id: o.word_id, position: o.position });
+    wordFreqs.set(o.word_id, (wordFreqs.get(o.word_id) || 0) + 1);
+  }
+  for (const arr of byLine.values()) arr.sort((a, b) => a.position - b.position);
+  return { byLine, wordFreqs };
+}
+
+/** The ids of stored rows whose pair (`key`, "a:b") this run didn't produce. */
+export function staleIds(stored: { id: number; key: string }[], kept: Set<string>): number[] {
+  return stored.filter((r) => !kept.has(r.key)).map((r) => r.id);
+}
+
+/**
+ * Delete the rows of `table` this run no longer produces: pairs from a line since corrected, or now
+ * under the threshold. Upserts alone would leave them with their old counts. Runs after the upsert,
+ * so the table is never empty mid-run.
+ */
+async function deleteStale(
+  supabase: any,
+  table: 'bigrams' | 'collocations',
+  kept: Set<string>,
+  chunk = 500
+): Promise<number> {
+  // An empty run means the read failed, not that every pair is gone: never empty the table on it.
+  if (kept.size === 0) throw new Error(`deleteStale(${table}): this run kept no pairs; not deleting`);
+  const cols = table === 'bigrams' ? 'id, a:w1_id, b:w2_id' : 'id, a:word_a_id, b:word_b_id';
+  const stored = await fetchAllRows<{ id: number; a: number; b: number }>(table, () => {
+    const q = supabase.from(table).select(cols).order('id', { ascending: true });
+    return table === 'collocations' ? q.eq('window_size', 3) : q;
+  });
+  const ids = staleIds(stored.map((r) => ({ id: r.id, key: `${r.a}:${r.b}` })), kept);
+  for (let i = 0; i < ids.length; i += chunk) {
+    const { error } = await supabase.from(table).delete().in('id', ids.slice(i, i + chunk));
+    if (error) throw error;
+  }
+  return ids.length;
 }
 
 /** Upsert in bounded chunks so a single request never exceeds payload limits. */
@@ -145,7 +206,8 @@ async function upsertInChunks(
  * Main job: compute bigrams + collocations for the public corpus.
  * Fetches every word occurrence on a public line (paginated), groups by line, tallies pairs and
  * per-word frequencies in one pass, then upserts bigrams (count ≥ 3) and the
- * top collocations (PMI, count ≥ 5). Lazy-loads the Supabase client.
+ * top collocations (PMI, count ≥ 5) and deletes the stored pairs that no longer qualify.
+ * Lazy-loads the Supabase client.
  */
 export async function computeCollocationsCorpusWide() {
   const { createClient } = await import('@supabase/supabase-js');
@@ -154,20 +216,11 @@ export async function computeCollocationsCorpusWide() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  console.log('Fetching word occurrences on public lines (paginated)...');
-  const occs = await fetchAllRows<Occurrence>('word_occurrences', () => publicOccurrences(supabase));
+  console.log('Fetching word occurrences on public lines (by id, 1,000 a page)...');
+  const occs = await fetchPublicOccurrences(supabase);
   console.log(`Fetched ${occs.length} occurrences across the corpus.`);
 
-  // Group by line (rows arrive ordered by line_id, position) and tally per-word
-  // frequencies + total token count in the same pass.
-  const byLine = new Map<number, WordPosition[]>();
-  const wordFreqs = new Map<number, number>();
-  for (const o of occs) {
-    let arr = byLine.get(o.line_id);
-    if (!arr) { arr = []; byLine.set(o.line_id, arr); }
-    arr.push({ word_id: o.word_id, position: o.position });
-    wordFreqs.set(o.word_id, (wordFreqs.get(o.word_id) || 0) + 1);
-  }
+  const { byLine, wordFreqs } = groupByLine(occs);
   const totalTokens = occs.length;
 
   const bigramCounts = new Map<string, number>();
@@ -210,6 +263,11 @@ export async function computeCollocationsCorpusWide() {
 
   console.log(`Upserting ${filtered.length} collocations...`);
   await upsertInChunks(supabase, 'collocations', filtered, 'word_a_id,word_b_id,window_size');
+
+  const keptBigrams = new Set(bigramBatch.map((b) => `${b.w1_id}:${b.w2_id}`));
+  console.log(`Deleted ${await deleteStale(supabase, 'bigrams', keptBigrams)} bigrams no longer counted.`);
+  const keptCollocations = new Set(filtered.map((c) => `${c.word_a_id}:${c.word_b_id}`));
+  console.log(`Deleted ${await deleteStale(supabase, 'collocations', keptCollocations)} collocations no longer counted.`);
 
   console.log('Refreshing computed stats...');
   const { error: refreshError } = await supabase.rpc('refresh_computed_stats');
