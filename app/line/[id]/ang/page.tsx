@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { lineMetadata, linePage } from "@/components/line/linePage";
 
 // A line in its whole ang (#146: scope "Ang"); /line/<id> is its shabad.
-export const revalidate = 86400;
+export const revalidate = 604800;
 export function generateStaticParams() {
   return [];
 }
