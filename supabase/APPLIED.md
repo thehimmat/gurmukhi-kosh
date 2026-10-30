@@ -475,3 +475,10 @@ this renumbering.
 transliterations match the TypeScript rule; 130267 reads ਤੈਂ (`tai(n)`); no public line still has ੰ or ਂ before ੁ or
 ੂ; the 12 corrected spellings have a `search_fold` and a frequency above 0, and the old forms are gone; after
 `npm run pronounce`, no word lacks an `ipa_display`.
+
+**080_health_commentary_sggs** — run 2026-10-30 on the self-hosted server, the same way as 078 (psql, one
+transaction). Kosh `080_health_commentary_sggs.sql`, as in the repo (#339): `refresh_health_stats()` counts
+`lines_with_no_commentary` over Guru Granth Sahib lines only and adds `sggs_lines`, which `lib/health.ts` divides
+commentary coverage by. psql reported CREATE FUNCTION, REVOKE, GRANT and the closing `refresh_health_stats()`.
+Checked after on /api/health: totals recomputed 15:20 UTC; Guru Granth Sahib lines with zero commentary 28 (was
+112,229 across every corpus); coverage 82.9% (ss_padarth) to 99.6% (ssk_en), was 29-35%.

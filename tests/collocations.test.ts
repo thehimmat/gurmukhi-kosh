@@ -4,10 +4,27 @@ import {
   extractCollocations,
   computePMI,
   filterCollocationsByPMI,
+  groupByLine,
   publicOccurrences,
+  staleIds,
 } from '../pipeline/compute/collocations';
 
 describe('collocations', () => {
+  describe('staleIds', () => {
+    it('picks the stored rows this run no longer produces', () => {
+      const stored = [
+        { id: 1, key: '10:20' }, // still counted: kept
+        { id: 2, key: '10:30' }, // gone (its line was corrected, or it fell under the threshold)
+        { id: 3, key: '40:50' },
+      ];
+      expect(staleIds(stored, new Set(['10:20', '40:50', '60:70']))).toEqual([2]);
+    });
+
+    it('is empty when nothing changed', () => {
+      expect(staleIds([{ id: 1, key: '10:20' }], new Set(['10:20']))).toEqual([]);
+    });
+  });
+
   describe('extractBigrams', () => {
     it('extracts ordered consecutive pairs from line positions', () => {
       // Line: word1, word2, word3 at positions 1, 2, 3
@@ -152,7 +169,7 @@ describe('collocations', () => {
   });
 
   describe('publicOccurrences', () => {
-    it('reads only occurrences on public lines: a private source never feeds the public pairs', () => {
+    const record = () => {
       const calls: Array<[string, unknown[]]> = [];
       const chain: any = new Proxy({}, {
         get: (_t, name: string) => (...args: unknown[]) => {
@@ -160,10 +177,37 @@ describe('collocations', () => {
           return chain;
         },
       });
-      publicOccurrences({ from: (t: string) => { calls.push(['from', [t]]); return chain; } });
+      return { calls, db: { from: (t: string) => { calls.push(['from', [t]]); return chain; } } };
+    };
+
+    it('reads only occurrences on public lines: a private source never feeds the public pairs', () => {
+      const { calls, db } = record();
+      publicOccurrences(db, 0, 1000);
       expect(calls[0]).toEqual(['from', ['word_occurrences']]);
-      expect(calls).toContainEqual(['select', ['word_id, line_id, position, lines!inner(is_public)']]);
+      expect(calls).toContainEqual(['select', ['id, word_id, line_id, position, lines!inner(is_public)']]);
       expect(calls).toContainEqual(['eq', ['lines.is_public', true]]);
+    });
+
+    it('pages by id after the last one read, so every page costs the same', () => {
+      const { calls, db } = record();
+      publicOccurrences(db, 5000, 1000);
+      expect(calls).toContainEqual(['gt', ['id', 5000]]);
+      expect(calls).toContainEqual(['order', ['id', { ascending: true }]]);
+      expect(calls).toContainEqual(['limit', [1000]]);
+    });
+  });
+
+  describe('groupByLine', () => {
+    it('groups by line with positions in order, whatever order the rows came in', () => {
+      const { byLine, wordFreqs } = groupByLine([
+        { word_id: 30, line_id: 1, position: 2 },
+        { word_id: 10, line_id: 1, position: 0 },
+        { word_id: 10, line_id: 2, position: 0 },
+        { word_id: 20, line_id: 1, position: 1 },
+      ]);
+      expect(byLine.get(1)!.map((w) => w.word_id)).toEqual([10, 20, 30]);
+      expect(byLine.get(2)!.map((w) => w.word_id)).toEqual([10]);
+      expect(wordFreqs.get(10)).toBe(2);
     });
   });
 });
