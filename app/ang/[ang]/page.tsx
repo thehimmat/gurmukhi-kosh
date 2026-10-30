@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
 
 // The page depends only on its path and the corpus changes only on an
-// ingest, so each ang is rendered once and refreshed daily (#200).
-export const revalidate = 86400;
+// ingest, so each ang is rendered once and refreshed weekly (#200).
+export const revalidate = 604800;
 
 // None at build time: each ang is rendered on its first request, then cached.
 // Declaring the (empty) list is what makes the route ISR rather than dynamic.

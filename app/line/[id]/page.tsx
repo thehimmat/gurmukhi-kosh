@@ -3,8 +3,8 @@ import { lineMetadata, linePage } from "@/components/line/linePage";
 
 // A line in its passage, the shabad or bani passage holding it (#146, #220); /line/<id>/ang shows its whole ang. A line's
 // context changes only on an ingest, so each page is rendered on its first
-// request and refreshed daily.
-export const revalidate = 86400;
+// request and refreshed weekly.
+export const revalidate = 604800;
 export function generateStaticParams() {
   return [];
 }

@@ -21,6 +21,20 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["search.atthebunga.com", "kosh.atthebunga.com"],
     },
   },
+
+  // /word/<w> is dynamic (it reads ?tab, ?page and the curator ?key), so it can't be ISR; let the
+  // CDN cache each public URL instead. An entry changes only when an ingest runs, so a day fresh
+  // and a week stale-while-revalidate matches /api/word. Next overwrites Cache-Control on dynamic
+  // pages, but the CDN reads CDN-Cache-Control first. Curator URLs (?key=) are never cached.
+  async headers() {
+    return [
+      {
+        source: "/word/:path*",
+        missing: [{ type: "query", key: "key" }],
+        headers: [{ key: "CDN-Cache-Control", value: "max-age=86400, stale-while-revalidate=604800" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
