@@ -1,13 +1,22 @@
 // Shared setup for story-tagged acceptance tests (user-stories/*.md).
 // Same conventions as tests/api.test.ts: live Supabase via .env.local, and
-// the production deployment for route-level checks.
+// the production site (prodBase) for route-level checks.
 
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 
-export const PROD_BASE = "https://gurmukhi-kosh.vercel.app";
+/**
+ * The public site, which serves this app's paths (/word, /api/word, /api/flags, /api/health, ...)
+ * from the VM (selfhost/README.md). PROD_BASE_URL points the checks elsewhere, e.g. at
+ * https://gurmukhi-kosh.vercel.app during a rollback.
+ */
+export function prodBase() {
+  return (process.env.PROD_BASE_URL || "https://search.atthebunga.com").replace(/\/+$/, "");
+}
+
+export const PROD_BASE = prodBase();
 
 export function anonDb() {
   return createClient(

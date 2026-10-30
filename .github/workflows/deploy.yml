@@ -1,0 +1,103 @@
+name: Deploy
+
+# After CI passes on main: build the app's arm64 image, push it to GHCR, and deploy it on the VM
+# (selfhost/README.md, "The apps"). A push that only touches data, pipelines, docs or tests
+# (scripts/vercel-ignore.mjs, judged since the last successful deploy) builds nothing and only
+# applies selfhost/ config. A new image ends with a Cloudflare purge of the site, since cached pages
+# name the old build's /_next and /kosh-static chunks, which the new image doesn't have.
+#
+# Turned on by the repository variable DEPLOY_HOST (ubuntu@141.148.39.45) and the secrets
+# DEPLOY_SSH_KEY and DEPLOY_KNOWN_HOSTS; the purge by CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_TOKEN.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build:
+        description: Build and deploy the image even if no app file changed
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  image:
+    if: ${{ vars.DEPLOY_HOST != '' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')) }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+    outputs:
+      built: ${{ steps.changed.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - name: Did an app file change since the last deploy?
+        id: changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE: ${{ inputs.build }}
+        run: |
+          if [ "$FORCE" = true ]; then echo build=true >> "$GITHUB_OUTPUT"; exit 0; fi
+          last=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow deploy.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          if VERCEL_GIT_PREVIOUS_SHA=$last node scripts/vercel-ignore.mjs; then build=false; else build=true; fi
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+      - if: steps.changed.outputs.build == 'true'
+        uses: docker/setup-buildx-action@v3
+      - if: steps.changed.outputs.build == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - if: steps.changed.outputs.build == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.head_sha || github.sha }}
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CF_ZONE: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+    steps:
+      - name: Deploy on the VM
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          # The deploy key's forced command (selfhost/scripts/deploy.sh) reads the target from this.
+          TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'selfhost' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          (umask 077 && printf '%s\n' "$KEY" > ~/.ssh/id_ed25519)
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -o BatchMode=yes "$HOST" "$TARGET"
+      - name: Purge the site from Cloudflare's cache
+        if: ${{ needs.image.outputs.built == 'true' && env.CF_ZONE != '' }}
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE/purge_cache" \
+            -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            --data '{"hosts":["search.atthebunga.com"]}' -o /dev/null -w "purge: %{http_code}\n"

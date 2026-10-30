@@ -1,0 +1,14 @@
+# search.atthebunga.com (the gurmukhi-search shell, which hands the dictionary paths to the kosh app
+# over Docker's network) and kosh.atthebunga.com (the shell 308s it to search). Cloudflare proxies
+# both, in Full (strict) mode. The certificate is a Cloudflare Origin CA one, and every connection
+# must present Cloudflare's client certificate (Authenticated Origin Pulls), so nobody reaches the
+# apps around Cloudflare's cache and bot rules. Files in /certs: selfhost/README.md, "The apps".
+search.atthebunga.com, kosh.atthebunga.com {
+	tls /certs/origin.pem /certs/origin.key {
+		client_auth {
+			mode require_and_verify
+			trusted_ca_cert_file /certs/cloudflare-origin-pull-ca.pem
+		}
+	}
+	reverse_proxy search:3000
+}

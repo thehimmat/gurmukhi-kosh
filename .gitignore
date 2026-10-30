@@ -60,3 +60,6 @@ pipeline/scans/data/
 # Self-hosted stack: backups and the passphrase that encrypts them (selfhost/README.md)
 selfhost/backups/
 selfhost/backup.pass
+
+# The apps: Cloudflare Origin CA certificate and key (selfhost/README.md, "The apps")
+selfhost/certs/

@@ -1,6 +1,3 @@
 {
-  "ignoreCommand": "node scripts/vercel-ignore.mjs",
-  "crons": [
-    { "path": "/api/health", "schedule": "0 8 * * *" }
-  ]
+  "ignoreCommand": "node scripts/vercel-ignore.mjs"
 }

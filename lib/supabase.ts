@@ -1,17 +1,23 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-function getUrl() {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+/**
+ * The API's address. SUPABASE_URL is read at runtime, so on the VM the server reaches the gateway
+ * over Docker's network (selfhost/docker-compose.apps.yml); NEXT_PUBLIC_SUPABASE_URL is inlined at
+ * build time and stays the fallback (Vercel, CI, local dev). Only server code queries the database.
+ */
+export function supabaseUrl() {
+  return process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 }
-function getAnonKey() {
-  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+/** The anon key, likewise: runtime SUPABASE_ANON_KEY first, so a rotated key needs no rebuild. */
+export function supabaseAnonKey() {
+  return process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 }
 
 // Lazy singleton — avoids throwing at module-load time during Next.js build
 let _client: SupabaseClient | null = null;
 export const supabase = new Proxy({} as SupabaseClient, {
   get(_, prop) {
-    if (!_client) _client = createClient(getUrl(), getAnonKey());
+    if (!_client) _client = createClient(supabaseUrl(), supabaseAnonKey());
     return (_client as unknown as Record<string | symbol, unknown>)[prop];
   },
 });
@@ -19,7 +25,7 @@ export const supabase = new Proxy({} as SupabaseClient, {
 export function supabaseAdmin() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY not set");
-  return createClient(getUrl(), serviceKey, {
+  return createClient(supabaseUrl(), serviceKey, {
     auth: { persistSession: false },
   });
 }
