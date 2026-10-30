@@ -38,6 +38,26 @@ OUT_PATH = os.path.join(DATA_DIR, "spelling-check.jsonl")
 nfc = lambda s: unicodedata.normalize("NFC", s or "")
 
 
+def check_entry(e, reverse=reverse_transliterate, candidates=candidate_spellings):
+    """(match, row) for a main-glossary entry, row None when exact; None for an appendix entry."""
+    printed = nfc(e.get("gurmukhi"))
+    if not printed:  # appendix (no printed Gurmukhi) — not an OCR check
+        return None
+    result = reverse(e.get("headword", ""))
+    cands = [nfc(c) for c in candidates(result)]
+    if printed == nfc(result.gurmukhi):
+        return "exact", None
+    match = "candidate" if printed in cands else "divergent"
+    return match, {
+        "id": e["id"],
+        "gurmukhi": printed,
+        "headword": e.get("headword", ""),
+        "suggested": result.gurmukhi,
+        "candidates": cands,
+        "match": match,
+    }
+
+
 def main():
     if not os.path.exists(IN_PATH):
         sys.exit(f"Not found: {IN_PATH}")
@@ -49,31 +69,14 @@ def main():
             line = line.strip()
             if not line:
                 continue
-            e = json.loads(line)
-            printed = nfc(e.get("gurmukhi"))
-            if not printed:  # appendix (no printed Gurmukhi) — not an OCR check
+            checked = check_entry(json.loads(line))
+            if checked is None:
                 continue
             main_total += 1
-
-            result = reverse_transliterate(e.get("headword", ""))
-            cands = [nfc(c) for c in candidate_spellings(result)]
-            if printed == nfc(result.gurmukhi):
-                match = "exact"
-            elif printed in cands:
-                match = "candidate"
-            else:
-                match = "divergent"
+            match, row = checked
             counts[match] += 1
-
-            if match != "exact":
-                fout.write(json.dumps({
-                    "id": e["id"],
-                    "gurmukhi": printed,
-                    "headword": e.get("headword", ""),
-                    "suggested": result.gurmukhi,
-                    "candidates": cands,
-                    "match": match,
-                }, ensure_ascii=False) + "\n")
+            if row:
+                fout.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     pct = lambda n: f"{100 * n / main_total:.1f}%"
     print(f"Main-glossary entries checked: {main_total}")

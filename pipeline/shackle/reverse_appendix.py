@@ -48,6 +48,22 @@ def ambiguity_to_dict(a):
     return {k: getattr(a, k, None) for k in ("kind", "chosen", "alternatives", "note", "source", "start")}
 
 
+def derive_entry(e, reverse=reverse_transliterate):
+    """The derived record for an appendix entry, or None if `e` has printed Gurmukhi."""
+    # Appendix entries are exactly those with no Gurmukhi in the source.
+    if (e.get("gurmukhi") or "").strip():
+        return None
+    result = reverse(e.get("headword", ""))
+    derived = result.gurmukhi
+    return {
+        **e,
+        "gurmukhi": derived,
+        "gurmukhiNormalized": derived,
+        "_derived": True,
+        "_ambiguities": [ambiguity_to_dict(a) for a in (result.ambiguities or [])],
+    }
+
+
 def main():
     if not os.path.exists(IN_PATH):
         sys.exit(f"Not found: {IN_PATH}. Copy the handoff bundle into {DATA_DIR}/.")
@@ -61,24 +77,13 @@ def main():
             if not line:
                 continue
             total += 1
-            e = json.loads(line)
-            # Appendix entries are exactly those with no Gurmukhi in the source.
-            if (e.get("gurmukhi") or "").strip():
+            out = derive_entry(json.loads(line))
+            if out is None:
                 continue
             appendix += 1
-
-            headword = e.get("headword", "")
-            result = reverse_transliterate(headword)
-            derived = result.gurmukhi
-            ambs = [ambiguity_to_dict(a) for a in (result.ambiguities or [])]
-            if ambs:
+            if out["_ambiguities"]:
                 with_amb += 1
-
-            e["gurmukhi"] = derived
-            e["gurmukhiNormalized"] = derived
-            e["_derived"] = True
-            e["_ambiguities"] = ambs
-            fout.write(json.dumps(e, ensure_ascii=False) + "\n")
+            fout.write(json.dumps(out, ensure_ascii=False) + "\n")
 
     print(f"Read {total} entries | appendix (no Gurmukhi): {appendix}")
     print(f"Reverse-transliterated {appendix} head-words ({with_amb} carry >=1 ambiguity).")
