@@ -140,6 +140,11 @@ class Versions(unittest.TestCase):
             "text": "Poh Sammat 1955 (Bikrami) = c. Dec 1898/Jan 1899 CE", "from": 1898, "to": 1898, "approx": True}))
         self.assertEqual(errs, [])
 
+    def test_unconverted_hijri_date_is_an_error(self):
+        errs = errors_for(lambda c: c["versions"][1].update(
+            date={"text": "ਸੰਨ ੧੧੫੪ ਹਿ.", "from": 1154, "to": 1154, "approx": True}))
+        self.assertTrue(any("Hijri" in e for e in errs), errs)
+
     def test_converted_bikrami_date_is_fine(self):
         errs = errors_for(lambda c: c["versions"][1].update(
             date={"text": "1884 Bk/AD 1827", "from": 1827, "to": 1827, "approx": False}))
@@ -229,6 +234,34 @@ class ParseDate(unittest.TestCase):
     def test_nanakshahi_and_khalsa_samvat_are_not_bikrami(self):
         self.assertEqual(parse_date("1900 (Samvat Nanakshahi 431)")["from"], 1900)
         self.assertEqual(parse_date("Khalsa Samvat 302, Jeth sudi; 5 June 2000 (as printed)")["from"], 2000)
+
+    def test_gurmukhi_bi_abbreviation_after_the_year(self):
+        self.assertEqual(parse_date("ਸੰਮਤ ੧੮੩੫ ਬਿ:")["from"], 1778)
+        self.assertEqual(parse_date("੧੮੯੭ ਬਿ.")["from"], 1840)
+
+    def test_bikrami_century(self):
+        d = parse_date("੧੯ਵੀਂ ਸਦੀ ਬਿ:")  # Bk 1801-1900
+        self.assertEqual((d["from"], d["to"], d["approx"]), (1744, 1843, True))
+        d = parse_date("18th century Bk")
+        self.assertEqual((d["from"], d["to"]), (1644, 1743))
+
+    def test_gurmukhi_ce_century(self):
+        d = parse_date("੧੯ਵੀਂ ਸਦੀ")
+        self.assertEqual((d["from"], d["to"]), (1801, 1900))
+
+    def test_ocr_noise_year_is_not_read(self):
+        # five digits: an OCR slip ("੧੯੩੯੮" for "੧੯੩੯"), so no year is claimed
+        self.assertEqual(parse_date("ਸੰਮਤ ੧੯੩੯੮ ਬਿ:"), {"text": "ਸੰਮਤ ੧੯੩੯੮ ਬਿ:", "approx": True})
+
+    def test_hijri_years_converted(self):
+        d = parse_date("ਸੰਨ ੧੧੫੪ ਹਿ.")
+        self.assertEqual((d["from"], d["to"], d["approx"]), (1741, 1742, True))
+        self.assertEqual(parse_date("1288 AH")["from"], 1871)
+        self.assertEqual(parse_date("ਸੈਨ ੧੨੪੯ ਹਿਜਰੀ")["from"], 1833)
+
+    def test_hijri_with_ce_given(self):
+        d = parse_date("ਸੈਨ ੧੧੬੦ ਹਿਜਰੀ, ਮੁਤਾਬਿਕ ਸੈਨ ੧੭੪੭ ਈ.")
+        self.assertEqual((d["from"], d["approx"]), (1747, False))
 
     def test_devanagari_samvat(self):
         self.assertEqual(parse_date("संवत् १८७६")["from"], 1819)

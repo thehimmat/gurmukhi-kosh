@@ -150,7 +150,7 @@ def version_rows(cat: dict) -> list[dict]:
             "Direct file": v.get("file_url", ""), "Drive": _drive(v),
             "Drive folder": v.get("drive_folder", ""), "Text layer": v.get("text_layer", ""),
             "Found": v.get("found_on", ""), "Found by": v.get("found_by", ""),
-            "Notes": " | ".join(c["note"] for c in v["contains"] if c.get("note")),
+            "Notes": " | ".join([c["note"] for c in v["contains"] if c.get("note")] + ([v["notes"]] if v.get("notes") else [])),
             "My notes": v.get("user_notes", ""),
         })
     return rows

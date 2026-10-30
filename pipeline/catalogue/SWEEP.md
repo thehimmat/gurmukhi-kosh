@@ -81,9 +81,14 @@ account there that must not get flagged.
      shelfmark, item page, direct file, availability. Never guess a date or shelfmark.
    - Search result snippets are not evidence. A lead you can't open goes in the report, not the
      catalogue.
-   - Catalogue-mining day: read the reference works (their versions have `type: reference`,
-     download through the Drive connector by `drive_id`) and record works they name that the
-     catalogue lacks, each as a `catalogue-record` version citing the reference and page.
+   - Catalogue-mining day: read the reference works (their versions have `type: reference`)
+     and record works they name that the catalogue lacks, each as a `catalogue-record`
+     version citing the reference and page. Scanned references are too big for the Drive
+     connector, so read their OCR text instead: a file named `<PDF name> - OCR text.txt`
+     beside the PDF (search Drive for "OCR text"), with `==== PDF page N ====` markers.
+     The two Ashok manuscript catalogues are already imported in full (`ashok.py`, entries
+     in `data/ashok/`): don't re-add their entries. On those, spend the day finding scans or
+     surviving copies of the manuscripts they record (start with pre-1850 entries).
 
 4. **Record.** Write the finds to a scratch JSON (format: `candidates.py` docstring) and run
    `python3 pipeline/catalogue/candidates.py add finds.json --date <today> --by sweep-<slice key>`.

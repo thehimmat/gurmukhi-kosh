@@ -41,8 +41,9 @@ SLICES = [
      "where": ["SikhBookClub", "DiscoverSikhism", "Gurmat Veechar", "bhainandlal.com", "SearchGurbani granths",
                "Sikh Heritage / private manuscript collections that publish scans"]},
     {"key": "catalogue-mining", "name": "Mine reference works for unknown texts",
-     "where": ["the catalogue's own reference versions (type reference, e.g. Ashok's manuscript catalogues) "
-               "and the Encyclopaedia of Sikhism: list works named there that the catalogue lacks"]},
+     "where": ["the catalogue's own reference versions (type reference); read scanned ones through their "
+               "'- OCR text.txt' files in Drive", "the Encyclopaedia of Sikhism: works it names that the catalogue lacks",
+               "for works known only from Ashok's catalogues: scans or surviving copies of those manuscripts"]},
 ]
 
 

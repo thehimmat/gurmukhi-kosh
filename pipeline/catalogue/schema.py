@@ -49,7 +49,7 @@ def slug(text: str, prefix: str) -> str:
 
 # ---------------------------------------------------------------- dates
 
-_YEAR = r"(1[0-9]{3}|20[0-9]{2})"
+_YEAR = r"(?<!\d)(1[0-9]{3}|20[0-9]{2})(?!\d)"  # exactly four digits: a fifth is OCR noise
 BIKRAMI_OFFSET = 57  # CE = Bikrami (Vikram Samvat) − 57; −56 for dates late in the CE year
 
 # Gurmukhi and Devanagari digits read as ASCII.
@@ -57,8 +57,10 @@ _DIGITS = str.maketrans("੦੧੨੩੪੫੬੭੮੯०१२३४५६७�
 # Markers that say a year is Bikrami. Some come before the year (Sammat 1884), some after
 # (1884 Bk); a word like "Samvat" after a year belongs to the next year, not that one.
 _BK_BEFORE = (r"(?:sammat|samvat|sambat|bikrami|bikram|vikrami|vikram|bk|bs|vs|v\.s|b\.s"
-              r"|ਸੰਮਤ|ਸੰਬਤ|ਸੰਮਤਿ|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|संवत्?|सम्वत्?|विक्रमी)\.?")
-_BK_AFTER = r"(?:bikrami|vikrami|bk|bs|vs|v\.s|b\.s|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|विक्रमी)\.?"
+              r"|ਸ[ੰੌੇਂ]*ਮਤਿ?|ਸੰਬਤ|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|संवत्?|सम्वत्?|विक्रमी)\.?")  # ਸੰਮਤ and its OCR slips
+# After the year: also the Gurmukhi abbreviation ਬਿ: / ਬਿ. ("੧੮੩੫ ਬਿ:").
+_BK_AFTER = r"(?:bikrami|vikrami|bk|bs|vs|v\.s|b\.s|ਬਿਕ੍ਰਮੀ|ਬਿਕਰਮੀ|ਬਿ(?=[:.\s]|$)|विक्रमी)\.?:?"
+_CENTURY = r"(?<!\d)(1[0-9]|20)\s*(?:st|nd|rd|th|ਵੀਂ|ਵੀ)['’`]?\s*(?:century|c\.|ਸਦੀ)"
 _CE = r"(?:ad|a\.d\.|ce|c\.e\.|ਈ\.?|ईस्वी|ई\.)"
 _NOT_BK = r"(?:nanakshahi|nanak\s*shahi|khalsa|ਨਾਨਕਸ਼ਾਹੀ|ਖ਼ਾਲਸਾ|ਖਾਲਸਾ)"
 
@@ -90,11 +92,21 @@ def _ce_years(t: str) -> list[int]:
             re.finditer(rf"(?<![a-z]){_CE}\s*{_YEAR}|{_YEAR}\s*{_CE}(?![a-z])", t)]
 
 
+_HIJRI = re.compile(rf"{_YEAR}\s*(?:ਹਿਜਰੀ|ਹਿ\.|hijri|a\.?h\.?)(?![a-z])")
+
+
+def hijri_to_ce(year: int) -> tuple[int, int]:
+    """The CE years a Hijri (AH) year falls across: a lunar year straddles two."""
+    start = int(year * 0.970229 + 621.5643)
+    return start, start + 1
+
+
 def parse_date(text):
     """A free-text date → {text, from?, to?, approx}, years in CE.
 
     Bikrami years (Sammat/Samvat/Bk/BS/VS, ਸੰਮਤ, संवत्) are converted (−57) and marked
-    approx, since the two calendars' years don't start together, unless the text also
+    approx, since the two calendars' years don't start together (Hijri years, ਹਿਜਰੀ/ਹਿ./AH,
+    are converted too, as the two CE years they straddle), unless the text also
     gives the CE year, which then wins: marked ("1884 Bk/AD 1827") or a bare year that
     matches the conversion ("1894 (Samvat 1951)"). Nanakshahi and Khalsa Samvat years are
     left alone. Gurmukhi and Devanagari numerals are read. Returns None for empty input."""
@@ -104,6 +116,14 @@ def parse_date(text):
     if not text:
         return None
     t = _norm(text)
+    hj = _HIJRI.search(t)
+    if hj:  # Hijri: a CE year given alongside wins, else convert
+        marked = _ce_years(t)
+        if marked:
+            ce = marked[-1]
+            return {"text": text, "from": ce, "to": ce, "approx": False}
+        lo, hi = hijri_to_ce(int(hj.group(1)))
+        return {"text": text, "from": lo, "to": hi, "approx": True}
     bk = bikrami_years(t)
     circa = bool(re.search(r"(?<![a-z])(?:c\.|ca\.|circa|about|~)\s*\d", t))
 
@@ -127,10 +147,11 @@ def parse_date(text):
         a, b = int(m.group(1)) - shift, int(m.group(2)) - shift
         return result(min(a, b), max(a, b), bool(bk))
 
-    m = re.search(r"\b(1[0-9]|20)(?:st|nd|rd|th)\s+c(?:entury|\.)", t)
+    m = re.search(_CENTURY, t)
     if m and not bk:
         c = int(m.group(1))
-        return {"text": text, "from": (c - 1) * 100 + 1, "to": c * 100, "approx": True}
+        cshift = BIKRAMI_OFFSET if re.match(rf"\s*{_BK_AFTER}", t[m.end():]) else 0  # "੧੯ਵੀਂ ਸਦੀ ਬਿ:"
+        return {"text": text, "from": (c - 1) * 100 + 1 - cshift, "to": c * 100 - cshift, "approx": True}
 
     y = bk[0] if bk else (int(m.group(1)) if (m := re.search(_YEAR, t)) else None)
     if y is not None:
@@ -160,6 +181,10 @@ def _check_date(where, date, errs):
         errs.append(f"{where}: date must be an object with text")
         return
     lo, hi = date.get("from"), date.get("to")
+    hj = _HIJRI.search(_norm(date["text"]))
+    if hj and int(hj.group(1)) in {lo, hi} and not _ce_years(_norm(date["text"])):
+        errs.append(f"{where}: date {date['text']!r} is Hijri; from/to look unconverted "
+                    f"(CE {hijri_to_ce(int(hj.group(1)))[0]}, not {lo})")
     raw = set(bikrami_years(date["text"])) - set(_ce_years(_norm(date["text"])))
     if raw & {lo, hi}:
         expect = parse_date(date["text"])
