@@ -217,6 +217,12 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
       `s-maxage` otherwise (/line, /ang).
    2. *Curator URLs*: `http.host eq "search.atthebunga.com" and http.request.uri.query contains "key="`
       → Bypass cache. (They also send `private, no-store`, so this is the second guard.)
+   **Bot Fight Mode stays off** (Security → Bots). On the Free plan no rule can exempt anything from
+   it, and it challenged GitHub's runners, so CI's production checks and the uptime checks never
+   reached the site. The cache rules above take crawler load off the VM instead; the AI-crawler
+   block and robots.txt stay on. In its place, the Free plan's one rate-limiting rule (Security →
+   WAF → Rate limiting rules): `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/"))`,
+   counted per IP, more than 100 requests in 10 seconds → Block for 10 seconds.
 8. **Cut over:** Cloudflare DNS, `search` and `kosh`: change each to an **A record `141.148.39.45`,
    proxied** (note the old CNAME targets for the rollback). Leave the domains on the Vercel projects.
 9. **Check:**
