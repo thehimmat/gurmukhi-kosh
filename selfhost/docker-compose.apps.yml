@@ -1,0 +1,45 @@
+# On the server, the two Next apps behind search.atthebunga.com, added through COMPOSE_FILE in
+# selfhost/.env (selfhost/README.md, "The apps"). Cloudflare → Caddy (sites/search.caddy) → search,
+# whose rewrites hand the dictionary paths to kosh. Both reach the API on the gateway's internal
+# listener (:8080), so database traffic never leaves the box. Images come from GHCR, built by each
+# repo's deploy workflow; *_TAG pins an older build (rollback on the VM).
+
+x-app: &app
+  restart: unless-stopped
+  depends_on: [gateway]
+  # Postgres keeps most of the 12 GB (PG_SHARED_BUFFERS); each app stays well under a gigabyte.
+  mem_limit: 768m
+  logging:
+    driver: json-file
+    options: { max-size: 10m, max-file: "3" }
+  healthcheck:
+    test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1),()=>process.exit(1))"]
+    interval: 30s
+    timeout: 10s
+    start_period: 20s
+    retries: 3
+
+services:
+  gateway:
+    volumes:
+      - ./sites:/etc/caddy/sites:ro
+      - ./certs:/certs:ro
+
+  kosh:
+    <<: *app
+    image: ghcr.io/thehimmat/gurmukhi-kosh:${KOSH_TAG:-latest}
+    environment:
+      SUPABASE_URL: http://gateway:8080
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_KEY}
+      ADMIN_KEY: ${ADMIN_KEY:?set in selfhost/.env (the curator key, as in Vercel)}
+      NODE_OPTIONS: --max-old-space-size=512
+
+  search:
+    <<: *app
+    image: ghcr.io/thehimmat/gurmukhi-search:${SEARCH_TAG:-latest}
+    depends_on: [gateway, kosh]
+    environment:
+      SUPABASE_URL: http://gateway:8080
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      NODE_OPTIONS: --max-old-space-size=512

@@ -1,13 +1,42 @@
 // Shared setup for story-tagged acceptance tests (user-stories/*.md).
 // Same conventions as tests/api.test.ts: live Supabase via .env.local, and
-// the production deployment for route-level checks.
+// the production site (prodBase) for route-level checks.
 
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 
-export const PROD_BASE = "https://gurmukhi-kosh.vercel.app";
+/**
+ * The public site, which serves this app's paths (/word, /api/word, /api/flags, /api/health, ...)
+ * from the VM (selfhost/README.md). PROD_BASE_URL points the checks elsewhere, e.g. at
+ * https://gurmukhi-kosh.vercel.app during a rollback.
+ */
+export function prodBase() {
+  return (process.env.PROD_BASE_URL || "https://search.atthebunga.com").replace(/\/+$/, "");
+}
+
+export const PROD_BASE = prodBase();
+
+/**
+ * Why Cloudflare, not the app, answered: a challenge or block (cf-mitigated, or one of its own
+ * error pages). null for anything the app sent, its 4xx included.
+ */
+export async function cloudflareBlock(res: Response): Promise<string | null> {
+  const mitigated = res.headers.get("cf-mitigated");
+  const title = /<title>([^<]*)<\/title>/i.exec(await res.clone().text())?.[1]?.trim() ?? "";
+  if (!mitigated && !(res.status >= 403 && /cloudflare|just a moment|attention required/i.test(title))) return null;
+  const why = [mitigated && `cf-mitigated: ${mitigated}`, `ray ${res.headers.get("cf-ray") ?? "?"}`, title && `"${title}"`];
+  return `Cloudflare answered ${res.status} (${why.filter(Boolean).join(", ")}), so the check never reached the app`;
+}
+
+/** fetch for production checks: fails with Cloudflare's reason when it stops the request. */
+export async function prodFetch(path: string, init?: RequestInit): Promise<Response> {
+  const res = await fetch(`${PROD_BASE}${path}`, init);
+  const blocked = await cloudflareBlock(res);
+  if (blocked) throw new Error(`${path}: ${blocked}`);
+  return res;
+}
 
 export function anonDb() {
   return createClient(

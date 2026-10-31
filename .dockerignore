@@ -1,0 +1,13 @@
+.git
+.github
+.next
+node_modules
+.env*
+selfhost
+supabase
+docs
+user-stories
+tests
+pipeline/**/output
+pipeline/**/data
+*.md

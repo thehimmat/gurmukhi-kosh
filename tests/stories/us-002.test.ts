@@ -2,7 +2,8 @@
 // Criteria: user-stories/US-002-browse-and-search-the-corpus.md
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { anonDb, PROD_BASE } from "./helpers";
+import { NextRequest } from "next/server";
+import { anonDb } from "./helpers";
 import { foldGurmukhi } from "../../lib/gurmukhi-fold";
 
 describe("US-002: browse and search reach any word", () => {
@@ -12,7 +13,9 @@ describe("US-002: browse and search reach any word", () => {
   });
 
   it("US-002: /api/search returns tiered hits for a Gurmukhi query", async () => {
-    const res = await fetch(`${PROD_BASE}/api/search?q=${encodeURIComponent("ਸਤਿ")}`);
+    // In-process: the public site's /api/search is the shell's (gurmukhi-search), not this one.
+    const { GET } = await import("../../app/api/search/route");
+    const res = await GET(new NextRequest(`http://localhost/api/search?q=${encodeURIComponent("ਸਤਿ")}`));
     expect(res.status).toBe(200);
     const data = (await res.json()) as { words: Array<{ gurmukhi: string; match: string }> };
     expect(data.words.length).toBeGreaterThan(0);

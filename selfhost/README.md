@@ -3,8 +3,8 @@
 The production database outgrew Supabase Free's 500 MB. Until the project can pay for Supabase Pro,
 it runs on a free Oracle Cloud VM as **Postgres 17 + PostgREST + Caddy**. That's the same REST server
 Supabase runs, behind a gateway that serves `/rest/v1` and checks the `apikey` header like
-Supabase's does. To the apps (this repo and gurmukhi-search on Vercel, gurmukhi-voice-search
-locally) only the URL and keys change. RLS, the search RPCs and `pg_trgm` work as they are.
+Supabase's does. To the apps (this repo and gurmukhi-search, now on this VM too, and
+gurmukhi-voice-search locally) only the URL and keys change. RLS, the search RPCs and `pg_trgm` work as they are.
 
 Not included, because none of the apps use them: Supabase Auth, Storage, Realtime, Edge Functions
 and the dashboard.
@@ -21,7 +21,9 @@ and the dashboard.
 |---|---|
 | `docker-compose.yml` | The three services. Postgres listens on localhost only. |
 | `docker-compose.server.yml` | On the server: Caddy on 80/443 with its own TLS certificate |
-| `Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token |
+| `Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token. The same API on `:8080` (HTTP, Docker network only) for the apps |
+| `docker-compose.apps.yml` | On the server: the two Next apps behind search.atthebunga.com ([The apps](#the-apps-searchatthebungacom)) |
+| `sites/search.caddy` | search.atthebunga.com → the search app, for Cloudflare only (Origin CA cert, Authenticated Origin Pulls) |
 | `sql/roles.sql` | Supabase's API roles and timeouts, plus `akhar_writer` (the annotation site); re-applied by setup |
 | `scripts/server-setup.sh` | One-time (re-runnable) VM setup: updates, firewall, Docker, swap, secrets, stack, backup timer |
 | `scripts/mint-keys.mjs` | A JWT secret plus anon and service keys signed with it |
@@ -29,6 +31,7 @@ and the dashboard.
 | `scripts/backup.sh` | Nightly encrypted dump, 14 days kept (`kosh-backup.timer`, 03:30 UTC) |
 | `scripts/compare.sh` | Row counts of every table, here vs another database |
 | `scripts/check.sh` | The test suite, run on the server against its own stack |
+| `scripts/deploy.sh` | Deploys one app (or only this folder's config); GitHub Actions' deploy key runs nothing else |
 | `scripts/replay-migrations.sh` | Rehearsal only: builds the schema from migrations instead of a dump |
 
 `tests/selfhost/gateway.test.ts` checks the stack behaves like Supabase. It runs only when
@@ -133,6 +136,146 @@ ssh ubuntu@141.148.39.45 'grep ^AKHAR_KEY= /opt/kosh/selfhost/.env | cut -d= -f2
 
 The gateway tests write an answer and have PostgREST roll it back (`PGRST_DB_TX_END`), so running
 them against the server leaves no rows.
+
+## The apps (search.atthebunga.com)
+
+Since Nov 2026 the VM also serves the site, off Vercel Hobby (Oct 2026: crawlers on /word, /line and
+/ang used the team's whole Fluid CPU allowance, and every request, cached or not, counts toward
+Vercel's 1M CDN requests).
+
+```
+visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) → search:3000
+                                                        search's rewrites → kosh:3000 (/word, /line, /ang, …)
+                               both apps → gateway:8080 → PostgREST → Postgres   (Docker network only)
+```
+
+- **Images:** `ghcr.io/thehimmat/gurmukhi-kosh` and `ghcr.io/thehimmat/gurmukhi-search`, standalone
+  Next servers built for arm64 by each repo's `.github/workflows/deploy.yml` (after CI on main here;
+  on every push to main in gurmukhi-search). Tags: `latest` and the commit SHA.
+- **Deploy:** the workflow SSHes in with a key whose only command is `scripts/deploy.sh`: update
+  /opt/kosh to main, pull the image, `docker compose up -d --wait`, reload Caddy. Then it purges
+  search.atthebunga.com from Cloudflare's cache, because cached pages name the old build's chunks.
+  A push that changes no app file (same rule as Vercel's, `scripts/vercel-ignore.mjs`) builds nothing
+  and only applies this folder's config.
+- **TLS:** Cloudflare in Full (strict) mode. Caddy holds a Cloudflare Origin CA certificate (15 years,
+  no renewals) and requires Cloudflare's client certificate (Authenticated Origin Pulls), so the
+  apps can't be reached around Cloudflare. The API on sslip.io keeps its Let's Encrypt certificate
+  and takes no client certificate (it's matched by name on the same port).
+- **Next's cache (ISR):** regenerated /line and /ang pages are written inside the container, next to
+  the build's own pages (a volume there would hide them). They survive restarts and reboots and
+  start over on each deploy, as on Vercel. Cloudflare's cache does most of the work anyway.
+- **Memory (12 GB):** Postgres `shared_buffers` 3 GB (`effective_cache_size` 8 GB is only a planner
+  hint); each app capped at 768 MB with a 512 MB heap (about 80 MB idle); PostgREST and Caddy about
+  100 MB; 2 GB swap. Check with `docker stats --no-stream`.
+
+### One-time setup
+
+1. **Cloudflare, zone atthebunga.com:**
+   - SSL/TLS → Overview: **Full (strict)**.
+   - SSL/TLS → Origin Server → Create Certificate: RSA, hostnames `*.atthebunga.com` and
+     `atthebunga.com`, 15 years. Copy the certificate, then:
+     ```sh
+     pbpaste | ssh ubuntu@141.148.39.45 'install -d -m 700 /opt/kosh/selfhost/certs && (umask 077 && cat > /opt/kosh/selfhost/certs/origin.pem)'
+     ```
+     Copy the private key and run the same with `origin.key`.
+   - SSL/TLS → Origin Server → **Authenticated Origin Pulls: on**. Then fetch Cloudflare's CA for it:
+     ```sh
+     ssh ubuntu@141.148.39.45 'curl -fsS https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem -o /opt/kosh/selfhost/certs/cloudflare-origin-pull-ca.pem && chmod -R a+rX /opt/kosh/selfhost/certs'
+     ```
+   - My Profile → API Tokens → Create: permission Zone → Cache Purge → Purge, this zone only.
+2. **The server:** the apps in `COMPOSE_FILE`, and the curator key (prompted, never echoed; the same
+   `ADMIN_KEY` as in Vercel):
+   ```sh
+   ssh -t ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && sed -i "s|^COMPOSE_FILE=.*|COMPOSE_FILE=docker-compose.yml:docker-compose.server.yml:docker-compose.apps.yml|" .env && read -rsp "ADMIN_KEY: " k && echo && echo "ADMIN_KEY=$k" >> .env'
+   ```
+3. **The deploy key** (on your Mac). It can run `deploy.sh` and nothing else:
+   ```sh
+   ssh-keygen -t ed25519 -N "" -C github-deploy -f ~/.ssh/kosh-deploy
+   ```
+   ```sh
+   echo "restrict,command=\"sh /opt/kosh/selfhost/scripts/deploy.sh\" $(cat ~/.ssh/kosh-deploy.pub)" | ssh ubuntu@141.148.39.45 'cat >> ~/.ssh/authorized_keys'
+   ```
+4. **GitHub, both repos** (Settings → Secrets and variables → Actions):
+   - Variables: `DEPLOY_HOST` = `ubuntu@141.148.39.45`, `NEXT_PUBLIC_SUPABASE_URL` =
+     `https://141-148-39-45.sslip.io`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` = the server's `ANON_KEY`.
+   - Secrets: `DEPLOY_SSH_KEY` (`pbcopy < ~/.ssh/kosh-deploy`), `DEPLOY_KNOWN_HOSTS`
+     (`ssh-keyscan 141.148.39.45 | pbcopy`), `CLOUDFLARE_ZONE_ID` (zone Overview page),
+     `CLOUDFLARE_API_TOKEN`.
+5. **First images:** run Deploy by hand in gurmukhi-kosh, then in gurmukhi-search (Actions → Deploy →
+   Run workflow). The first `docker compose pull` fails until both packages are public: GitHub →
+   your profile → Packages → each one → Package settings → Change visibility → Public. Then run both
+   again.
+6. **Check on the VM, before any DNS change** (each prints a status code; expect 200s):
+   ```sh
+   ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && for p in / /word/%E0%A8%B8%E0%A8%A4%E0%A8%BF /ang/1 /line/1 /api/health; do docker compose exec -T kosh node -e "fetch(\"http://search:3000$p\").then(r=>console.log(r.status,\"$p\"))"; done'
+   ```
+7. **Cloudflare cache rules** (Caching → Cache Rules). Later rules override earlier ones, so the
+   bypass goes last:
+   1. *Dictionary pages*: `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/word/"))`
+      → Eligible for cache; Edge TTL: use cache-control header if present, bypass cache if not;
+      Browser TTL: respect origin. Cloudflare reads `CDN-Cache-Control` first (/word) and
+      `s-maxage` otherwise (/line, /ang).
+   2. *Curator URLs*: `http.host eq "search.atthebunga.com" and http.request.uri.query contains "key="`
+      → Bypass cache. (They also send `private, no-store`, so this is the second guard.)
+   **Bot Fight Mode stays off** (Security → Bots). On the Free plan no rule can exempt anything from
+   it, and it challenged GitHub's runners, so CI's production checks and the uptime checks never
+   reached the site. The cache rules above take crawler load off the VM instead; the AI-crawler
+   block and robots.txt stay on. In its place, the Free plan's one rate-limiting rule (Security →
+   WAF → Rate limiting rules): `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/"))`,
+   counted per IP, more than 100 requests in 10 seconds → Block for 10 seconds.
+8. **Cut over:** Cloudflare DNS, `search` and `kosh`: change each to an **A record `141.148.39.45`,
+   proxied** (note the old CNAME targets for the rollback). Leave the domains on the Vercel projects.
+9. **Check:**
+   ```sh
+   for i in 1 2; do curl -sI https://search.atthebunga.com/word/%E0%A8%B8%E0%A8%A4%E0%A8%BF | grep -iE "^(cf-cache-status|x-vercel-cache)"; done
+   ```
+   The second line should say `cf-cache-status: HIT`, and no `x-vercel-cache` header should appear.
+   Then set the gurmukhi-kosh variable `SITE_URL` = `https://search.atthebunga.com` (uptime checks),
+   and re-run CI on main (its production checks use the public site).
+10. **After a stable week:** in Vercel, project gurmukhi-kosh, Production, set
+    `KOSH_REDIRECT_VERCEL_HOST=1` and redeploy, so crawlers that know gurmukhi-kosh.vercel.app go to
+    the public site through a routing redirect, which uses no function time. Also remove the Vercel
+    project's cron if Vercel still lists one (vercel.json no longer has it).
+
+### Rollback to Vercel
+
+Vercel keeps deploying main (now with nothing to serve), so it's a DNS switch:
+
+1. If `KOSH_REDIRECT_VERCEL_HOST` is set in Vercel, delete it and redeploy gurmukhi-kosh first; the
+   Vercel shell reaches the kosh zone through gurmukhi-kosh.vercel.app.
+2. Cloudflare DNS: `search` and `kosh` back to their old CNAMEs (`cname.vercel-dns.com`), still
+   proxied. Full (strict) and Authenticated Origin Pulls work with Vercel as they are.
+3. Purge the cache (Caching → Configuration → Custom Purge → Hostname `search.atthebunga.com`).
+
+**Roll back one app on the VM** to an earlier image (the commit SHAs are the image tags):
+`KOSH_TAG=<sha>` or `SEARCH_TAG=<sha>` in `.env`, then `docker compose up -d`. Remove the line to
+follow `latest` again.
+
+### Day to day
+
+```sh
+# Logs (Next prints errors here)
+ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && docker compose logs --tail 100 search kosh'
+
+# Deploy by hand (your own key isn't limited to deploy.sh): kosh, search, or selfhost (config only)
+ssh ubuntu@141.148.39.45 'sh /opt/kosh/selfhost/scripts/deploy.sh kosh'
+
+# Memory and health
+ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && docker stats --no-stream && docker compose ps'
+```
+
+`.github/workflows/uptime.yml` checks the API and the home page every 30 minutes, and `/api/health`
+daily at 08:00 UTC, which used to be the Vercel cron.
+
+### Oracle's idle-instance reclaim
+
+Oracle stops Always Free instances that it judges idle over 7 days. The criteria include low CPU,
+network and (on A1 shapes) memory use, and Oracle emails before stopping. With the site on it, the VM
+is less likely to look idle. A **Pay As You Go** upgrade takes the instance out of the reclaim and
+keeps the Always Free allowance at no charge. Confirm both points on Oracle's
+[Always Free Resources](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm)
+page before upgrading. After upgrading, set a budget alert (Billing → Budgets, $1) so anything
+outside the free tier is caught at once.
 
 ## Rehearsal results
 
