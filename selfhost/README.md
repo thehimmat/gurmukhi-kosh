@@ -180,8 +180,10 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
      Copy the private key and run the same with `origin.key`.
    - SSL/TLS → Origin Server → **Authenticated Origin Pulls: on**. Then fetch Cloudflare's CA for it:
      ```sh
-     ssh ubuntu@141.148.39.45 'curl -fsS https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem -o /opt/kosh/selfhost/certs/cloudflare-origin-pull-ca.pem && chmod -R a+rX /opt/kosh/selfhost/certs'
+     ssh ubuntu@141.148.39.45 'curl -fsS https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem -o /opt/kosh/selfhost/certs/cloudflare-origin-pull-ca.pem'
      ```
+     The folder stays private to `ubuntu` (mode 700): Caddy runs as root in its container, so it reads
+     the files without wider permissions.
    - My Profile → API Tokens → Create: permission Zone → Cache Purge → Purge, this zone only.
 2. **The server:** the apps in `COMPOSE_FILE`, and the curator key (prompted, never echoed; the same
    `ADMIN_KEY` as in Vercel):
