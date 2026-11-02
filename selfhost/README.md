@@ -178,7 +178,10 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
      pbpaste | ssh ubuntu@141.148.39.45 'install -d -m 700 /opt/kosh/selfhost/certs && (umask 077 && cat > /opt/kosh/selfhost/certs/origin.pem)'
      ```
      Copy the private key and run the same with `origin.key`.
-   - SSL/TLS → Origin Server → **Authenticated Origin Pulls: on**. Then fetch Cloudflare's CA for it:
+   - SSL/TLS → Origin Server → Authenticated Origin Pulls → **Global: on** (Cloudflare's shared
+     client certificate; Zone-level and Per-hostname are for a certificate of your own). Any
+     Cloudflare zone presents that certificate, so this keeps out everything but Cloudflare, not
+     other Cloudflare accounts. Then fetch Cloudflare's CA for it:
      ```sh
      ssh ubuntu@141.148.39.45 'curl -fsS https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem -o /opt/kosh/selfhost/certs/cloudflare-origin-pull-ca.pem'
      ```
@@ -201,12 +204,14 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
    - Variables: `DEPLOY_HOST` = `ubuntu@141.148.39.45`, `NEXT_PUBLIC_SUPABASE_URL` =
      `https://141-148-39-45.sslip.io`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` = the server's `ANON_KEY`.
    - Secrets: `DEPLOY_SSH_KEY` (`pbcopy < ~/.ssh/kosh-deploy`), `DEPLOY_KNOWN_HOSTS`
-     (`ssh-keyscan 141.148.39.45 | pbcopy`), `CLOUDFLARE_ZONE_ID` (zone Overview page),
+     (`ssh-keygen -F 141.148.39.45 | grep -v '^#' | pbcopy`: the VM's host key as your own logins
+     already trust it, rather than whatever answers a fresh `ssh-keyscan`), `CLOUDFLARE_ZONE_ID` (zone Overview page),
      `CLOUDFLARE_API_TOKEN`.
 5. **First images:** run Deploy by hand in gurmukhi-kosh, then in gurmukhi-search (Actions → Deploy →
-   Run workflow). The first `docker compose pull` fails until both packages are public: GitHub →
-   your profile → Packages → each one → Package settings → Change visibility → Public. Then run both
-   again.
+   Run workflow). The kosh run's deploy job fails, because the search image doesn't exist yet; the
+   search run then starts the whole stack. The packages come out public, like the repos. If a pull
+   is ever `denied`, check GitHub → your profile → Packages → the package → Package settings →
+   visibility.
 6. **Check on the VM, before any DNS change** (each prints a status code; expect 200s):
    ```sh
    ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && for p in / /word/%E0%A8%B8%E0%A8%A4%E0%A8%BF /ang/1 /line/1 /api/health; do docker compose exec -T kosh node -e "fetch(\"http://search:3000$p\").then(r=>console.log(r.status,\"$p\"))"; done'
@@ -225,8 +230,10 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
    block and robots.txt stay on. In its place, the Free plan's one rate-limiting rule (Security →
    WAF → Rate limiting rules): `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/"))`,
    counted per IP, more than 100 requests in 10 seconds → Block for 10 seconds.
-8. **Cut over:** Cloudflare DNS, `search` and `kosh`: change each to an **A record `141.148.39.45`,
-   proxied** (note the old CNAME targets for the rollback). Leave the domains on the Vercel projects.
+8. **Cut over:** Cloudflare DNS. `search` and `kosh` have no records of their own; the wildcard
+   `*.atthebunga.com` sends them to Vercel with the other subdomains. Add an **A record** for each,
+   `141.148.39.45`, **proxied**: a name's own record takes precedence over the wildcard, for that
+   name only. Leave the wildcard alone, and leave the domains on the Vercel projects.
 9. **Check:**
    ```sh
    for i in 1 2; do curl -sI https://search.atthebunga.com/word/%E0%A8%B8%E0%A8%A4%E0%A8%BF | grep -iE "^(cf-cache-status|x-vercel-cache)"; done
@@ -245,8 +252,9 @@ Vercel keeps deploying main (now with nothing to serve), so it's a DNS switch:
 
 1. If `KOSH_REDIRECT_VERCEL_HOST` is set in Vercel, delete it and redeploy gurmukhi-kosh first; the
    Vercel shell reaches the kosh zone through gurmukhi-kosh.vercel.app.
-2. Cloudflare DNS: `search` and `kosh` back to their old CNAMEs (`cname.vercel-dns.com`), still
-   proxied. Full (strict) and Authenticated Origin Pulls work with Vercel as they are.
+2. Cloudflare DNS: delete the `search` and `kosh` A records. Both fall back to the wildcard, which
+   still points at Vercel; proxied, so it takes effect in seconds. Full (strict) and Authenticated
+   Origin Pulls work with Vercel as they are.
 3. Purge the cache (Caching → Configuration → Custom Purge → Hostname `search.atthebunga.com`).
 
 **Roll back one app on the VM** to an earlier image (the commit SHAs are the image tags):
