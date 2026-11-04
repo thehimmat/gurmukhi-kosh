@@ -166,7 +166,11 @@ visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) �
   start over on each deploy, as on Vercel. Cloudflare's cache does most of the work anyway.
 - **Memory (12 GB):** Postgres `shared_buffers` 3 GB (`effective_cache_size` 8 GB is only a planner
   hint); each app capped at 768 MB with a 512 MB heap (about 80 MB idle); PostgREST and Caddy about
-  100 MB; 2 GB swap. Check with `docker stats --no-stream`.
+  100 MB; 2 GB swap. Check with `docker stats --no-stream`. The whole database fits in
+  `shared_buffers`; `pg_prewarm`'s autoprewarm worker (`shared_preload_libraries`) saves the list of
+  cached blocks every 5 minutes and loads it back when Postgres starts. Otherwise the first searches
+  after a restart read `lines` from disk and can pass anon's 3 s timeout (gurmukhi-search#50). After a
+  restart, `docker compose logs db | grep autoprewarm` says how many blocks it loaded.
 
 ### One-time setup
 

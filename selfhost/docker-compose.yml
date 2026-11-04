@@ -9,7 +9,9 @@ services:
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in selfhost/.env}
       AUTHENTICATOR_PASSWORD: ${AUTHENTICATOR_PASSWORD:?set in selfhost/.env}
-    command: ["postgres", "-c", "shared_buffers=${PG_SHARED_BUFFERS:-256MB}", "-c", "effective_cache_size=${PG_EFFECTIVE_CACHE_SIZE:-1GB}"]
+    # pg_prewarm's autoprewarm worker saves the list of cached blocks every 5 minutes and loads them
+    # back at startup, so the first searches after a restart don't read lines from disk (README, Memory).
+    command: ["postgres", "-c", "shared_buffers=${PG_SHARED_BUFFERS:-256MB}", "-c", "effective_cache_size=${PG_EFFECTIVE_CACHE_SIZE:-1GB}", "-c", "shared_preload_libraries=pg_prewarm"]
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d:ro
