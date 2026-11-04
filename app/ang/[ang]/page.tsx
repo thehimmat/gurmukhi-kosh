@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
+import { parseAng, SGGS_ANGS } from "@/lib/route-params";
 
 // The page depends only on its path and the corpus changes only on an
 // ingest, so each ang is rendered once and refreshed weekly (#200).
@@ -16,15 +17,14 @@ export function generateStaticParams() {
 type Props = { params: Promise<{ ang: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { ang } = await params;
-  return { title: pageTitle(`Ang ${ang}`) };
+  const ang = parseAng((await params).ang);
+  return { title: pageTitle(ang ? `Ang ${ang}` : "Ang") };
 }
 
 export default async function AngPage({ params }: Props) {
   const { ang: angParam } = await params;
-  const ang = parseInt(angParam);
-
-  if (isNaN(ang) || ang < 1 || ang > 1430) notFound();
+  const ang = parseAng(angParam);
+  if (ang === null) notFound();
 
   // This route is SGGS ang browsing specifically: with multiple corpora
   // ingested (#65), "ang N" exists per source (Bhai Gurdas vaar 1 is also
@@ -35,7 +35,8 @@ export default async function AngPage({ params }: Props) {
     .select("id, gurmukhi, translation_en, transliteration_en, shabads(raag_english, writer_english), sources!inner(slug)")
     .eq("ang", ang)
     .eq("sources.slug", "sggs")
-    .order("line_no", { ascending: true });
+    .order("line_no", { ascending: true })
+    .order("id", { ascending: true }); // a total order, so a tie can't reshuffle the ang (#226)
   // A failed query goes to the error page and its retry (#225), not "not indexed".
   if (error) throw new Error(`ang ${ang}: ${error.message}`);
 
@@ -66,7 +67,7 @@ export default async function AngPage({ params }: Props) {
           <a href="/" style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none" }}>
             search
           </a>
-          {ang < 1430 && (
+          {ang < SGGS_ANGS && (
             <a href={`/ang/${ang + 1}`} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--accent)", marginLeft: "auto" }}>
               Ang {ang + 1} →
             </a>
