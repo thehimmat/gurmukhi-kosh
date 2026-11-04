@@ -63,3 +63,6 @@ selfhost/backup.pass
 
 # The apps: Cloudflare Origin CA certificate and key (selfhost/README.md, "The apps")
 selfhost/certs/
+
+# Claude Code worktrees (a second checkout each)
+/.claude/worktrees/
