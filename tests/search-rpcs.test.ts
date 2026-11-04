@@ -84,3 +84,25 @@ describe.skipIf(!live)("search_words_filtered (anon)", () => {
     expect(data).toEqual([]);
   });
 });
+
+// gurmukhi-search#50: Contains for short, common queries ("sat" typed as ਸਤ,
+// ਹਰਿ) as the shell sends it: default scriptures, first page plus a capped
+// count, in parallel, under the anon role's 3 s statement timeout.
+describe.skipIf(!live)("search_lines_contains + count_lines_contains (anon)", () => {
+  const CAP = 1000; // gurmukhi-search lib/search.ts CONTAINS_COUNT_CAP
+
+  it.each(["ਸਤ", "ਹਰਿ", "ਗੁਰ", "ਕਰ"])("answers %s's first page and capped count within the timeout", async (q) => {
+    const db = anonDb();
+    const filters = { p_raags: null, p_writers: null, p_sources: [SGGS, DASAM], p_ang_min: null, p_ang_max: null };
+    const t0 = Date.now();
+    const [page, count] = await Promise.all([
+      db.rpc("search_lines_contains", { p_query: q, ...filters, p_limit: 21, p_offset: 0 }),
+      db.rpc("count_lines_contains", { p_query: q, ...filters, p_cap: CAP }),
+    ]);
+    expect(page.error).toBeNull();
+    expect(count.error).toBeNull();
+    expect(Date.now() - t0).toBeLessThan(3000);
+    expect(page.data as unknown[]).toHaveLength(21);
+    expect(Number(count.data)).toBe(CAP);
+  });
+});
