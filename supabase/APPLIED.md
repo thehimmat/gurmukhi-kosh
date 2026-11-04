@@ -331,6 +331,16 @@ delete from shabads sh where sh.id >= 900001
    and not exists (select 1 from lines l where l.shabad_id = sh.id);
 ```
 
+| — | 20261019150700 | mk_collation_review_tables | unfiled, now `migrations-imported/unfiled/20261019150700_mk_collation_review_tables.sql` (#253) |
+| — | 20261019150740 | mk_pa_entries_and_ingest_rpc | unfiled, now `migrations-imported/unfiled/20261019150740_mk_pa_entries_and_ingest_rpc.sql` (#253; the token hash in `mk_secrets` redacted) |
+| — | 20261019150837 | mk_revoke_ingest_rpc | unfiled, now `migrations-imported/unfiled/20261019150837_mk_revoke_ingest_rpc.sql` (#253) |
+
+The three `mk_*` entries are the Mahan Kosh collation staging (2026-10-19): `mk_runs`, `mk_alignments`,
+`mk_discrepancies`, `mk_pa_entries` and `mk_secrets`, all RLS on with no policies, and `mk_ingest()`, a SECURITY
+DEFINER bulk ingest revoked from every API role 57 s after it was created. Their SQL is filed from the server
+ledger and replays before 065 (`tests/db/replay.ts`). Rows 64 and 65 of this table were never numbered; these
+three are left unnumbered rather than renumber everything after them.
+
 | 66 | 20261019220132 | 065_data_driven_sources | kosh `065_data_driven_sources.sql` |
 
 Migration 065 makes sources describe themselves (#243): `sources` gains `slug`, `kind`, `tier`, `rank`, `page_unit`,
