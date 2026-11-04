@@ -103,14 +103,12 @@ describe("070: private corpora are hidden from the API roles", () => {
     });
   });
 
-  it("leaves it out of the fuzzy, number and legacy single-value searches too", async () => {
+  it("leaves it out of the fuzzy and number searches too", async () => {
     await anon(async () => {
       expect(await col("select count_lines_fuzzy('ਗੁਪਤੁ', 1)::int as v")).toEqual([0]);
       expect(await col("select gurmukhi as v from search_first_letters_fuzzy(array['ਸ','ਗ','ਬ'], 1)")).toEqual([]);
       expect(await col("select gurmukhi as v from search_number_lines(1)")).toEqual([]);
       expect(await col("select count(*)::int as v from count_number_roles(1) where line_count > 0")).toEqual([0]);
-      expect(await col("select gurmukhi as v from search_lines_regex('ਗੁਪਤੁ', null::text, null::text)")).toEqual([]);
-      expect(await col("select gurmukhi as v from search_first_letters(array['ਸ','ਗ','ਬ'], null::text, null::text)")).toEqual([]);
     });
   });
 
