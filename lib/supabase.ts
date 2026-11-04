@@ -66,7 +66,6 @@ export type Line = {
   gurmukhi: string;
   translation_en: string | null;
   transliteration_en: string | null;
-  source_id: string;
 };
 
 export type WordOccurrence = {
