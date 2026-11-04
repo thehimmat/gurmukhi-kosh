@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
+import { parsePageNumber } from "@/lib/route-params";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,8 @@ export default async function BrowsePage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const { page: pageParam } = await searchParams;
-  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const page = parsePageNumber(pageParam);
+  if (page === null) notFound();
   const pageSize = 50;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -64,7 +66,7 @@ export default async function BrowsePage({
         >
           Browse by Frequency
         </h1>
-        {count && (
+        {count ? (
           <p
             style={{
               fontFamily: '"Inter", sans-serif',
@@ -74,7 +76,7 @@ export default async function BrowsePage({
           >
             {count.toLocaleString()} unique words indexed · page {page} of {totalPages}
           </p>
-        )}
+        ) : null}
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
