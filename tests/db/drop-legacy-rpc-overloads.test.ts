@@ -4,24 +4,31 @@
  * wrappers so the deployed shell kept working mid-rollout. Every client now sends the array
  * parameters, so only those versions remain.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
+import type { PGlite } from "@electric-sql/pglite";
 import { applyFrom, freshDb } from "./replay";
 
 const M = "083_drop_legacy_rpc_overloads.sql";
 
-type Db = Awaited<ReturnType<typeof freshDb>>;
-const signatures = async (db: Db) =>
+const signatures = async (db: PGlite) =>
   (await db.query<{ sig: string }>(
     `select p.oid::regprocedure::text as sig from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.proname in ('search_lines_regex', 'search_first_letters', 'search_lines_by_word_ids')
       order by 1`,
   )).rows.map((r) => r.sig);
 
+// Built here, not in the tests: a replay takes longer than a test's 5 s timeout on a busy runner.
+let db: PGlite;
+let before: string[];
+beforeAll(async () => {
+  db = await freshDb({ before: M });
+  before = await signatures(db);
+  await applyFrom(db, M);
+}, 120_000);
+
 describe(M, () => {
   it("drops the three single-value overloads and keeps the array versions", async () => {
-    const db = await freshDb({ before: M });
-    expect(await signatures(db)).toHaveLength(6);
-    await applyFrom(db, M);
+    expect(before).toHaveLength(6);
     expect(await signatures(db)).toEqual([
       "search_first_letters(text[],text[],text[],bigint[],integer,integer,integer,integer)",
       "search_lines_by_word_ids(bigint[],text[],text[],bigint[],integer,integer,integer,integer)",
@@ -30,8 +37,6 @@ describe(M, () => {
   });
 
   it("still answers calls by name, as PostgREST makes them", async () => {
-    const db = await freshDb({ before: M });
-    await applyFrom(db, M);
     await expect(db.query("select * from search_first_letters(p_letters => array['ਸ'], p_raags => null, p_writers => null)")).resolves.toBeDefined();
     await expect(db.query("select * from search_lines_regex(p_regex => 'ਸਤਿ')")).resolves.toBeDefined();
   });

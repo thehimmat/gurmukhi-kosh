@@ -492,3 +492,12 @@ transaction). Kosh `080_health_commentary_sggs.sql`, as in the repo (#339): `ref
 commentary coverage by. psql reported CREATE FUNCTION, REVOKE, GRANT and the closing `refresh_health_stats()`.
 Checked after on /api/health: totals recomputed 15:20 UTC; Guru Granth Sahib lines with zero commentary 28 (was
 112,229 across every corpus); coverage 82.9% (ss_padarth) to 99.6% (ssk_en), was 29-35%.
+
+**081_drop_lines_source_id**, **082_revoke_refresh_execute**, **083_drop_legacy_rpc_overloads** — run 2026-11-04 on
+the self-hosted server, the same way as 080 (psql, one transaction each), as in the repo (#352, #353, #355).
+psql reported ALTER TABLE (081); REVOKE, GRANT, REVOKE, GRANT (082); DROP FUNCTION ×3 and NOTIFY (083). 081 drops
+`lines.source_id`, the constant 'G' (#162). 082 leaves `refresh_word_frequencies()` and `refresh_word_corpus_stats()`
+to service_role only (#194). 083 drops the single-value `search_lines_regex`, `search_first_letters` and
+`search_lines_by_word_ids` overloads (gurmukhi-search#15) and reloads PostgREST's schema cache. Checked after through
+the search shell: First Letter ਸਗ (417), Contains ਸਤਿ (1,000+) and Pattern ਸਤ_ (10,032) answer, the word page loads,
+and /health is 200.
