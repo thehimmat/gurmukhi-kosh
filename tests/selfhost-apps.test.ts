@@ -121,8 +121,8 @@ describe("selfhost/docker-compose.apps.yml", () => {
   });
 
   it("caps each app's memory so Postgres keeps its share of the 12 GB", () => {
-    expect(compose).toMatch(/^x-app: &app\n(?:  .*\n)*  mem_limit: \d+[mg]$/m);
-    expect(compose.match(/^    <<: \*app$/gm)).toHaveLength(2);
+    expect(compose).toMatch(/^x-app: &app\n(?: {2}.*\n)* {2}mem_limit: \d+[mg]$/m);
+    expect(compose.match(/^ {4}<<: \*app$/gm)).toHaveLength(2);
   });
 });
 

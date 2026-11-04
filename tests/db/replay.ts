@@ -73,7 +73,7 @@ async function run(db: PGlite, files: string[]): Promise<void> {
     try {
       await db.exec(readFileSync(file, "utf8"));
     } catch (e) {
-      throw new Error(`replaying ${file}: ${(e as Error).message}`);
+      throw new Error(`replaying ${file}: ${(e as Error).message}`, { cause: e });
     }
   }
 }

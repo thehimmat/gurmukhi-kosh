@@ -72,7 +72,6 @@ function alignWords(a: string[], b: string[]): { at: Array<string | null>; inser
  * skeleton drops), editions write ਛਤ੍ਰ/ਛਤਰ and ਪਰਬਤ/ਪ੍ਰਬਤ, and the OCR loses ra (ਪ੍ਜਾ).
  */
 const loose = (word: string) => skeleton(word).replace(/(?<=.)ਰ/gu, "");
-const joined = (words: string[]) => words.map(loose).join("");
 
 /**
  * Compare two half-lines letter by letter (by default on the loose skeleton), ignoring word division.
