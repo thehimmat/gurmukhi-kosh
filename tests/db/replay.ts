@@ -6,6 +6,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
+import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 
 const KOSH = "supabase/migrations";
 const SEARCH = "supabase/migrations-imported/gurmukhi-search";
@@ -38,6 +39,12 @@ const BEFORE: Record<string, string[]> = {
     `${SEARCH}/007_single_value_rpc_compat.sql`,
   ],
   "058_line_vishraam.sql": [`${DASHBOARD}/2026-10-16_drop_superseded_first_letters_indexes.sql`],
+  // Mahan Kosh collation staging (#253): applied 2026-10-19 between 064 and 065, never in a repo.
+  "065_data_driven_sources.sql": [
+    `${UNFILED}/20261019150700_mk_collation_review_tables.sql`,
+    `${UNFILED}/20261019150740_mk_pa_entries_and_ingest_rpc.sql`,
+    `${UNFILED}/20261019150837_mk_revoke_ingest_rpc.sql`,
+  ],
 };
 
 /** Every migration file, repo-relative, in the order the server applied them. */
@@ -72,7 +79,7 @@ async function run(db: PGlite, files: string[]): Promise<void> {
 }
 
 async function migrate(before?: string): Promise<PGlite> {
-  const db = await PGlite.create({ extensions: { pg_trgm } });
+  const db = await PGlite.create({ extensions: { pg_trgm, pgcrypto } });
   const files = allFiles();
   await run(db, before ? files.slice(0, indexOf(before)) : files);
   return db;

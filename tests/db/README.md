@@ -22,7 +22,7 @@ await db.exec("set role anon"); // test as the API role
 ```
 
 The first call builds the database (about 7 s); later calls in the same test file clone it.
-`pg_trgm` is loaded. Other extensions are not: add them from `@electric-sql/pglite/contrib/*` in
+`pg_trgm` and `pgcrypto` are loaded. Other extensions are not: add them from `@electric-sql/pglite/contrib/*` in
 `migrate()` when a migration needs one.
 
 ## A new migration
@@ -53,5 +53,9 @@ before the ledger:
   still declares it.
 - The `lines_source_fk` index exists only in the replay (001 creates it). Production has no
   such index, and no record says when it went.
+
+On 2026-11-04 (#253), after filing the three `mk_*` ledger entries, the replay up to 075 matched production
+(Supabase as restored to the VM) on functions (45) and on everything else apart from the same two legacy items:
+444 columns against 443 (`lines.source_id`, dropped by 081) and 132 indexes against 133 (`lines_source_fk`).
 
 Function bodies, constraints and RLS policies are not compared.
