@@ -14,6 +14,7 @@ import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
 import { FlagForm } from "@/components/word/FlagForm";
+import { wordSpan } from "@/lib/word-highlight";
 
 export const dynamic = "force-dynamic";
 
@@ -318,15 +319,16 @@ export default async function WordPage({ params, searchParams }: Props) {
   }
 
   function HighlightedLine({ text, target }: { text: string; target: string }) {
-    const idx = text.indexOf(target);
-    if (idx === -1) return <>{text}</>;
+    // Whole words only: a match inside a longer word would split it (#347).
+    const span = wordSpan(text, target);
+    if (!span) return <>{text}</>;
     return (
       <>
-        {text.slice(0, idx)}
+        {text.slice(0, span.start)}
         <mark style={{ background: "var(--accent-light, #f5e5d0)", borderRadius: "3px", padding: "0 2px" }}>
-          {target}
+          {text.slice(span.start, span.end)}
         </mark>
-        {text.slice(idx + target.length)}
+        {text.slice(span.end)}
       </>
     );
   }
