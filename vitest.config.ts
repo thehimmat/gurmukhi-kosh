@@ -10,7 +10,6 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
   test: {
     maxWorkers: 4,
-    minWorkers: 1,
     retry: 1,
   },
 });
