@@ -217,11 +217,21 @@ async function mkSenseSplitMetrics(): Promise<Metric[]> {
   ];
 }
 
+/** health_stats() gave no result: an RPC error, or null (it stops at its 20s statement timeout). */
+export class HealthStatsUnavailableError extends Error {
+  constructor(reason: string) {
+    super(`health_stats unavailable: ${reason}`);
+    this.name = "HealthStatsUnavailableError";
+  }
+}
+
 export async function computeHealth(): Promise<HealthReport> {
-  const [{ data: statsData }, grammarConflictM] = await Promise.all([
+  const [{ data: statsData, error: statsError }, grammarConflictM] = await Promise.all([
     supabase.rpc("health_stats"),
     grammarConflictMetrics(),
   ]);
+  if (statsError) throw new HealthStatsUnavailableError(statsError.message);
+  if (!statsData) throw new HealthStatsUnavailableError("no result");
   const s = statsData as HealthStats;
   const [mkParseM, mkSplitM] = await Promise.all([mkParseStalenessMetric(s), mkSenseSplitMetrics()]);
 
