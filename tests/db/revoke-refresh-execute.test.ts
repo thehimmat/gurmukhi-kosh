@@ -5,29 +5,34 @@
  * for refresh_health_stats. health_stats() stays public: /api/health reads it and, since 075, it
  * only reads the cached totals.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
+import type { PGlite } from "@electric-sql/pglite";
 import { applyFrom, freshDb } from "./replay";
 
 const M = "082_revoke_refresh_execute.sql";
 const REVOKED = ["refresh_word_frequencies()", "refresh_word_corpus_stats()"];
 
-type Db = Awaited<ReturnType<typeof freshDb>>;
-const canExecute = async (db: Db, role: string, fn: string) =>
+const canExecute = async (db: PGlite, role: string, fn: string) =>
   (await db.query<{ ok: boolean }>(`select has_function_privilege('${role}', '${fn}'::regprocedure, 'execute') as ok`)).rows[0].ok;
+
+// Built here, not in the tests: a replay takes longer than a test's 5 s timeout on a busy runner.
+let db: PGlite;
+const anonBefore: Record<string, boolean> = {};
+beforeAll(async () => {
+  db = await freshDb({ before: M });
+  for (const fn of REVOKED) anonBefore[fn] = await canExecute(db, "anon", fn);
+  await applyFrom(db, M);
+}, 120_000);
 
 describe(M, () => {
   it.each(REVOKED)("takes %s away from anon and authenticated, and leaves it to service_role", async (fn) => {
-    const db = await freshDb({ before: M });
-    expect(await canExecute(db, "anon", fn)).toBe(true);
-    await applyFrom(db, M);
+    expect(anonBefore[fn]).toBe(true);
     expect(await canExecute(db, "anon", fn)).toBe(false);
     expect(await canExecute(db, "authenticated", fn)).toBe(false);
     expect(await canExecute(db, "service_role", fn)).toBe(true);
   });
 
   it("keeps health_stats() and the search RPCs callable by anon", async () => {
-    const db = await freshDb({ before: M });
-    await applyFrom(db, M);
     expect(await canExecute(db, "anon", "health_stats()")).toBe(true);
     expect(await canExecute(db, "anon", "search_lines_contains(text, text[], text[], bigint[], integer, integer, integer, integer)")).toBe(true);
   });

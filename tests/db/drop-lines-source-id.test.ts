@@ -3,42 +3,44 @@
  * line of every scripture (a column default, never set by an ingest), so it claimed a provenance
  * Sri Sarbloh, Gur Sobha and the others don't have. Nothing reads it; the scripture is source_fk.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
+import type { PGlite } from "@electric-sql/pglite";
 import { applyFrom, freshDb } from "./replay";
 
 const M = "081_drop_lines_source_id.sql";
 
-// Production's initial_schema (2026-05-21) created the column; 001_schema.sql as it stands today
-// doesn't, so the replay adds it back as production has it.
-async function asProduction() {
-  const db = await freshDb({ before: M });
-  await db.exec("alter table public.lines add column source_id text not null default 'G'");
-  return db;
-}
-
-const columns = async (d: Awaited<ReturnType<typeof freshDb>>) =>
+const columns = async (d: PGlite) =>
   (await d.query<{ column_name: string }>(
     "select column_name from information_schema.columns where table_schema = 'public' and table_name = 'lines'",
   )).rows.map((r) => r.column_name);
 
+// Production's initial_schema (2026-05-21) created the column; 001_schema.sql as it stands today
+// doesn't, so the replay adds it back as production has it. The databases are built here, not in
+// the tests: a replay takes longer than a test's 5 s timeout on a busy runner.
+let prod: PGlite;
+let before: string[];
+let replayOwn: PGlite;
+beforeAll(async () => {
+  prod = await freshDb({ before: M });
+  await prod.exec("alter table public.lines add column source_id text not null default 'G'");
+  before = await columns(prod);
+  await applyFrom(prod, M);
+  replayOwn = await freshDb({ before: M });
+}, 120_000);
+
 describe(M, () => {
   it("drops lines.source_id and keeps source_fk", async () => {
-    const db = await asProduction();
-    expect(await columns(db)).toContain("source_id");
-    await applyFrom(db, M);
-    const after = await columns(db);
+    expect(before).toContain("source_id");
+    const after = await columns(prod);
     expect(after).not.toContain("source_id");
     expect(after).toContain("source_fk");
   });
 
   it("is a no-op where the column never existed (the replay's own schema)", async () => {
-    const db = await freshDb({ before: M });
-    await expect(applyFrom(db, M)).resolves.toBeUndefined();
+    await expect(applyFrom(replayOwn, M)).resolves.toBeUndefined();
   });
 
   it("leaves list_writers, which reports source_fk as source_ids, working", async () => {
-    const db = await asProduction();
-    await applyFrom(db, M);
-    await expect(db.query("select * from list_writers()")).resolves.toBeDefined();
+    await expect(prod.query("select * from list_writers()")).resolves.toBeDefined();
   });
 });
