@@ -68,6 +68,8 @@ jobs:
         run: node scripts/check-stories.mjs
       - name: Typecheck
         run: npm run typecheck
+      - name: Lint
+        run: npm run lint
       - name: Production build compiles
         run: npm run build
       - name: Test suite (unit + live-DB + prod integration)

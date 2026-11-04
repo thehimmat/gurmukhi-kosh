@@ -23,7 +23,7 @@ async function main() {
   const { data: shabadAngs, error } = await db.rpc("get_shabad_ang_map" as any);
 
   // Fallback: if RPC doesn't exist, use a raw query approach via paginated fetch
-  let shabadToAng = new Map<number, number>();
+  const shabadToAng = new Map<number, number>();
 
   if (error || !shabadAngs) {
     console.log("RPC not available, using paginated fetch...");

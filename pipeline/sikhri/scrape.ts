@@ -65,7 +65,7 @@ async function fetchText(url: string): Promise<string> {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.text();
     } catch (e) {
-      if (attempt === 3) throw new Error(`fetch failed for ${url}: ${(e as Error).message}`);
+      if (attempt === 3) throw new Error(`fetch failed for ${url}: ${(e as Error).message}`, { cause: e });
       await sleep(backoff);
       backoff *= 2;
     }

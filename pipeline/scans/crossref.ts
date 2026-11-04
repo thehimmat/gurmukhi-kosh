@@ -48,7 +48,7 @@ function lettersOnly(s: string): string {
 }
 
 function wordInitials(line: string, splitHyphens: boolean): string[] {
-  const sep = splitHyphens ? /[\s,;:!?।॥()"'“”‘’.\-]+/ : /[\s,;:!?।॥()"'“”‘’.]+/;
+  const sep = splitHyphens ? /[\s,;:!?।॥()"'“”‘’.-]+/ : /[\s,;:!?।॥()"'“”‘’.]+/;
   const out: string[] = [];
   for (const word of line.normalize("NFD").split(sep)) {
     const chars = [...word];

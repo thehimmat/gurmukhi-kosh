@@ -7,7 +7,6 @@ import {
   classifySection,
   searchBaniDB,
   crossReferenceSection,
-  type BaniDBVerse,
 } from "../pipeline/scans/crossref";
 
 describe("firstLetters", () => {
@@ -119,14 +118,6 @@ describe("classifySection", () => {
   it("is not_found for an empty sample", () => {
     expect(classifySection([])).toBe("not_found");
   });
-});
-
-const verse = (unicode: string, shabadId: number, sourceId = "N"): BaniDBVerse => ({
-  unicode,
-  sourceId,
-  shabadId,
-  verseId: shabadId * 10,
-  pageNo: 1,
 });
 
 function fakeFetch(byQuery: Record<string, unknown>) {

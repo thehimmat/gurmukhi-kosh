@@ -95,9 +95,15 @@ export function findSpan(words: OcrWord[], reading: string, minScore = 60): { st
   let j = end;
   let first = end;
   while (i > 0) {
-    if (j > 0 && D[i][j] === D[i - 1][j - 1] + (pat[i - 1] === page[j - 1].ch ? 0 : 1)) (first = j), i--, j--;
-    else if (D[i][j] === D[i - 1][j] + 1) i--;
-    else (first = j), j--;
+    if (j > 0 && D[i][j] === D[i - 1][j - 1] + (pat[i - 1] === page[j - 1].ch ? 0 : 1)) {
+      first = j;
+      i--;
+      j--;
+    } else if (D[i][j] === D[i - 1][j] + 1) i--;
+    else {
+      first = j;
+      j--;
+    }
   }
   return { start: page[first - 1].word, end: page[end - 1].word, score };
 }
