@@ -92,6 +92,8 @@ export type DraftInput = {
 export type PadarthCandidate = {
   kind: "padarth_gloss";
   glossId: number;
+  /** Its place in Sahib Singh's row: the stable key a saved pick keeps (084). */
+  ordinal: number;
   sourceCode: "ss_padarth";
   term: string;
   text: string;
@@ -103,6 +105,8 @@ export type PadarthCandidate = {
 export type DefinitionCandidate = {
   kind: "definition";
   definitionId: number;
+  /** The word the sense belongs to (the headword, for a via link): a saved pick's key. */
+  wordId: number;
   sourceCode: string;
   senseNumber: number | null;
   text: string;
@@ -152,6 +156,7 @@ function definitionCandidate(d: DraftDefinition, via: DefinitionCandidate["via"]
   return {
     kind: "definition",
     definitionId: d.id,
+    wordId: d.wordId,
     sourceCode: d.sourceCode,
     senseNumber: d.senseNumber,
     text: d.text,
@@ -166,6 +171,7 @@ function padarthCandidate(g: DraftPadarthGloss, position: number | null): Padart
   return {
     kind: "padarth_gloss",
     glossId: g.id,
+    ordinal: g.ordinal,
     sourceCode: "ss_padarth",
     term: g.term,
     text: g.gloss,
