@@ -70,4 +70,21 @@ describe("buildPreview", () => {
     expect(p.phrases).toEqual([expect.objectContaining({ surface: "ਨ ਹੋਵਈ", status: "picked", text: "ਨਹੀਂ ਹੋ ਸਕਦੀ" })]);
     expect(p.note).toBe("the strong bull of Dharam");
   });
+
+  it("states grammar from Shackle and Sahib Singh only, not Mahan Kosh's part of speech", () => {
+    const d = draftLine({
+      lineId: 6,
+      tokens: [{ position: 0, wordId: 1, gurmukhi: "ਸੋਚੈ" }],
+      definitions: [],
+      formLinks: [],
+      padarth: [],
+      grammar: [
+        { id: 1, wordId: 1, sourceCode: "mahan_kosh", provenance: "imported", sourceLineId: null, pos: "ਸੰਗ੍ਯਾ", gender: null, number: null, gramCase: null },
+        { id: 2, wordId: 1, sourceCode: "ss_padarth", provenance: "imported", sourceLineId: 6, pos: null, gender: null, number: "singular", gramCase: null },
+        { id: 3, wordId: 1, sourceCode: "shackle", provenance: "imported", sourceLineId: null, pos: "verb", gender: null, number: null, gramCase: null },
+      ],
+    });
+    const [q] = buildPreview([{ id: 6, verse_id: 6, gurmukhi: "ਸੋਚੈ" }], [d], [], new Map());
+    expect(q.rows[0].grammar).toEqual(["singular", "verb"]);
+  });
 });
