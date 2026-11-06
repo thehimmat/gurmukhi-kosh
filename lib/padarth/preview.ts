@@ -7,8 +7,10 @@
 //   picked     the picked glosses, in their saved order, joined with "; "
 //   draft      the top candidate, shown as not yet picked
 //   uncovered  nothing to show
-// Grammar: only what a scholar states (Shackle's label for a linked form, an imported row) is added
-// as a parenthetical. Hedged clues stay in the builder: a preview reads as settled text.
+// Grammar: only what Shackle or Sahib Singh states (Shackle's label for a linked form, an imported
+// row) is added as a parenthetical. Hedged clues stay in the builder: a preview reads as settled
+// text. Mahan Kosh's part of speech stays in the builder too: it is on nearly every word and reads
+// as noise in the finished pad-arth.
 
 import type { DraftLine, GrammarNote } from "./draft";
 import type { LineRow } from "./fetch";
@@ -20,10 +22,12 @@ export type PreviewRow = { surface: string; text: string | null; status: Preview
 
 export type PreviewLine = { lineId: number; gurmukhi: string; rows: PreviewRow[]; phrases: PreviewRow[]; note: string | null };
 
-/** "(3 sg. subj. of ਹੋਇ)", "(noun, singular)": the values a scholar states, as the document writes them. */
+const PREVIEW_GRAMMAR_SOURCES = new Set(["shackle", "ss_padarth"]);
+
+/** "(3 sg. subj. of ਹੋਇ)", "(noun, singular)": the values Shackle or Sahib Singh state, as the document writes them. */
 function statedGrammar(notes: GrammarNote[]): string[] {
   return notes.flatMap((n) => {
-    if (n.tier !== "stated") return [];
+    if (n.tier !== "stated" || !PREVIEW_GRAMMAR_SOURCES.has(n.sourceCode)) return [];
     if (n.kind === "form_label") return [`${n.text} of ${n.headword}`];
     return [n.facts.map((f) => f.value).join(", ")];
   });
