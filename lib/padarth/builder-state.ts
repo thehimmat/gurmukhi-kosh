@@ -74,6 +74,6 @@ export const isEmpty = (p: ItemPick) => p.refs.length === 0 && p.override === nu
 
 export const isChosen = (p: ItemPick | undefined, c: Candidate) => !!p?.refs.some((r) => same(r, choiceOf(c)));
 
-export function saveInput(key: string, item: Item, p: ItemPick): SavePickInput {
-  return { key, lineId: item.lineId, positions: item.positions, surface: item.surface, refs: p.refs, overrideText: p.override, noteText: p.note };
+export function saveInput(item: Item, p: ItemPick): SavePickInput {
+  return { lineId: item.lineId, positions: item.positions, surface: item.surface, refs: p.refs, overrideText: p.override, noteText: p.note };
 }

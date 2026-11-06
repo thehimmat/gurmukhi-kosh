@@ -37,13 +37,15 @@ function fakeDb() {
 
 vi.mock("@/lib/supabase", () => ({ supabaseAdmin: () => fakeDb() }));
 vi.mock("next/cache", () => ({ revalidatePath: () => {} }));
+// The request carries the admin cookie (lib/curator-session.ts).
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ name: "kosh_admin", value: "test-key" }) }) }));
 vi.mock("next/server", () => ({ after: (f: () => unknown) => { scheduled.push(f); } }));
 
 const { submitSpellingReview } = await import("../app/admin/spellings/actions");
 
 const form = (fields: Record<string, string>) => {
   const f = new FormData();
-  for (const [k, v] of Object.entries({ key: "test-key", wordId: "1", ...fields })) f.set(k, v);
+  for (const [k, v] of Object.entries({ wordId: "1", ...fields })) f.set(k, v);
   return f;
 };
 

@@ -1,18 +1,13 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireAdmin } from "@/lib/curator-session";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { refreshHealthStats } from "@/pipeline/shared/health-stats";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
-function checkKey(formData: FormData): void {
-  const key = formData.get("key");
-  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
-    throw new Error("Unauthorized");
-  }
-}
 
 /**
  * Merge off-corpus word `fromId` into existing word `toId` (used when a
@@ -66,7 +61,7 @@ async function mergeWordInto(db: DB, fromId: number, toId: number) {
  * spelling, or mark the printed form correct. The row then leaves the queue.
  */
 export async function submitSpellingReview(formData: FormData) {
-  checkKey(formData);
+  await requireAdmin();
 
   const wordId = Number(formData.get("wordId"));
   const decision = formData.get("decision"); // "correct" | "keep"

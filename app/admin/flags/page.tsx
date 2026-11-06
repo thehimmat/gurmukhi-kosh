@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { adminKey } from "@/lib/curator-session";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { Flag } from "@/lib/supabase";
 import { resolveFlag } from "./actions";
@@ -66,9 +67,8 @@ async function fetchAllOpenFlags(db: ReturnType<typeof supabaseAdmin>): Promise<
   return rows;
 }
 
-function FilterTabs({ current, flagKey, counts }: {
+function FilterTabs({ current, counts }: {
   current: FilterView;
-  flagKey: string;
   counts: Record<FilterView, number>;
 }) {
   const tabs: { view: FilterView; label: string }[] = [
@@ -83,7 +83,7 @@ function FilterTabs({ current, flagKey, counts }: {
         return (
           <a
             key={view}
-            href={`/admin/flags?key=${encodeURIComponent(flagKey)}&filter=${view}`}
+            href={`/admin/flags?filter=${view}`}
             style={{
               fontFamily: '"Inter", sans-serif',
               fontSize: "0.8rem",
@@ -104,7 +104,7 @@ function FilterTabs({ current, flagKey, counts }: {
   );
 }
 
-function FlagCard({ flag, flagKey }: { flag: FlagWithWord; flagKey: string }) {
+function FlagCard({ flag }: { flag: FlagWithWord }) {
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: "8px", padding: "0.85rem 1.1rem", background: "white" }}>
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "baseline", flexWrap: "wrap", marginBottom: "0.5rem" }}>
@@ -135,7 +135,6 @@ function FlagCard({ flag, flagKey }: { flag: FlagWithWord; flagKey: string }) {
       )}
 
       <form action={resolveFlag} style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
-        <input type="hidden" name="key" value={flagKey} />
         <input type="hidden" name="flagId" value={flag.id} />
         {flag.target_table && <input type="hidden" name="targetTable" value={flag.target_table} />}
         {flag.target_id && <input type="hidden" name="targetId" value={flag.target_id} />}
@@ -190,9 +189,7 @@ export default async function FlagQueuePage({
   searchParams: Promise<{ key?: string; filter?: string }>;
 }) {
   const { key, filter: filterParam } = await searchParams;
-  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
-    notFound();
-  }
+  if (!(await adminKey(key))) notFound();
   const filter: FilterView = filterParam === "doubt" ? "doubt" : filterParam === "all" ? "all" : "review";
 
   const db = supabaseAdmin();
@@ -235,7 +232,7 @@ export default async function FlagQueuePage({
         {shown.length.toLocaleString()} flag{shown.length === 1 ? "" : "s"} in this view across {allGroups.length.toLocaleString()} word{allGroups.length === 1 ? "" : "s"}, sorted by corpus frequency
       </p>
 
-      <FilterTabs current={filter} flagKey={key!} counts={counts} />
+      <FilterTabs current={filter} counts={counts} />
 
       {filter === "doubt" && (
         <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.82rem", color: "var(--text-secondary)", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: "6px", padding: "0.6rem 0.85rem", marginBottom: "1.25rem" }}>
@@ -273,7 +270,7 @@ export default async function FlagQueuePage({
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {group.flags.map((flag) => (
-                <FlagCard key={flag.id} flag={flag} flagKey={key!} />
+                <FlagCard key={flag.id} flag={flag} />
               ))}
             </div>
           </div>

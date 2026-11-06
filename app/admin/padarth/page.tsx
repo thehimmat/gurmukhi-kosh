@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { curatorDb, isCurator } from "@/lib/curator";
+import { curatorDb } from "@/lib/curator";
+import { adminKey } from "@/lib/curator-session";
 import { fetchDraft } from "@/lib/padarth/fetch";
 import { parseScope, scopeHref } from "@/lib/padarth/scope";
 import { PadarthDraftView } from "@/components/padarth/DraftView";
@@ -10,7 +11,8 @@ import { PadarthPreview } from "@/components/padarth/Preview";
 // The pad-arth builder (#23): pick an ang, a shabad or a bani paragraph, see every word of every
 // line with every gloss the database holds, and tick the ones that fit. &view=preview shows the
 // saved picks in the shape of the finished pad-arth. Reads through the service role, since Sahib
-// Singh's pad-arth and Shackle are curator-only (069). Needs ?key=ADMIN_KEY.
+// Singh's pad-arth and Shackle are curator-only (069). Needs the admin cookie (proxy.ts swaps a
+// ?key=ADMIN_KEY for it).
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Pad-arth builder", robots: { index: false, follow: false } };
 
@@ -18,8 +20,8 @@ type Params = Record<string, string | string[] | undefined>;
 
 export default async function PadarthBuilderPage({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
-  const key = typeof params.key === "string" ? params.key : undefined;
-  if (!isCurator(key)) notFound();
+  const key = await adminKey(params.key);
+  if (!key) notFound();
 
   const db = curatorDb(true);
   const scope = parseScope(params);
@@ -37,7 +39,7 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
 
   const preview = params.view === "preview";
   // Links keep the view; the Builder | Preview switch flips it.
-  const href = (s: NonNullable<typeof scope>, view = preview) => scopeHref(s, key!) + (view ? "&view=preview" : "");
+  const href = (s: NonNullable<typeof scope>, view = preview) => scopeHref(s) + (view ? "&view=preview" : "");
 
   const current = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : "");
   const bani = scope?.kind === "paragraph" ? banis.find((b) => b.id === scope.baniId) : undefined;
@@ -59,7 +61,6 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
       <h1>Pad-arth builder</h1>
       <div className="padarth-scope">
         <form method="get" action="/admin/padarth">
-          <input type="hidden" name="key" value={key} />
           {preview && <input type="hidden" name="view" value="preview" />}
           <label>
             Bani{" "}
@@ -77,7 +78,6 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
           <button type="submit">Open</button>
         </form>
         <form method="get" action="/admin/padarth">
-          <input type="hidden" name="key" value={key} />
           {preview && <input type="hidden" name="view" value="preview" />}
           <label>
             Ang <input name="ang" type="number" min={1} defaultValue={current("ang")} className="padarth-number" required />
@@ -95,7 +95,6 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
           <button type="submit">Open</button>
         </form>
         <form method="get" action="/admin/padarth">
-          <input type="hidden" name="key" value={key} />
           {preview && <input type="hidden" name="view" value="preview" />}
           <label>
             Shabad <input name="shabad" type="number" min={1} defaultValue={current("shabad")} className="padarth-number" required />
@@ -130,7 +129,7 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
               key={lineIds.join(",")}
               lines={draft.lines}
               drafts={draft.drafts}
-              curatorKey={key!}
+              curatorKey={key}
               picks={saved?.picks ?? []}
               lineNotes={[...(saved?.lineNotes ?? new Map<number, string>())]}
               hints={hints}

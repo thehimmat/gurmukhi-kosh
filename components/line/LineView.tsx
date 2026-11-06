@@ -17,9 +17,10 @@ import { VishraamPicker } from "./VishraamPicker";
 const META: React.CSSProperties = { fontFamily: '"Inter", sans-serif', fontSize: "0.85rem", color: "var(--text-secondary)" };
 const NAV: React.CSSProperties = { fontFamily: '"Inter", sans-serif', fontSize: "0.875rem", color: "var(--accent)" };
 
-// curatorKey: the page is an admin line page (/admin/line/…), whose links keep to the admin pages.
+// curatorKey: the page is an admin line page (/admin/line/…), whose links keep to the admin pages
+// (the cookie carries the key there) and open word pages in curator mode (?key, never cached).
 export function LineView({ ctx, curatorKey = null }: { ctx: LineContext; curatorKey?: string | null }) {
-  const scopePath = (id: number, scope: LineContext["scope"]) => linePath(id, scope, curatorKey);
+  const scopePath = (id: number, scope: LineContext["scope"]) => linePath(id, scope, curatorKey !== null);
   const first = ctx.lines[0];
   const sggs = isSggs(ctx.source);
   const angs = [...new Set(ctx.lines.map((l) => l.ang))];

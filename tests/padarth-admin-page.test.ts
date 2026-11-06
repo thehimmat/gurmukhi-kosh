@@ -1,10 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 
-// /admin/padarth is the curator's: without ?key=ADMIN_KEY it is a 404, and it never reads data.
+// /admin/padarth is the curator's: without the admin cookie (or ?key=ADMIN_KEY) it is a 404, and it never reads data.
 const notFound = vi.fn(() => {
   throw new Error("NEXT_NOT_FOUND");
 });
 vi.mock("next/navigation", () => ({ notFound: () => notFound() }));
+// No admin cookie on these requests.
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 const curatorDb = vi.fn();
 vi.mock("../lib/curator", async (orig) => ({
   ...(await orig<typeof import("../lib/curator")>()),

@@ -32,9 +32,9 @@ describe("parseScope", () => {
 
 describe("scopeHref", () => {
   it("builds the page link for a scope, carrying the key", () => {
-    expect(scopeHref({ kind: "paragraph", baniId: 2, ordinal: 5 }, "k y")).toBe("/admin/padarth?bani=2&p=5&key=k+y");
-    expect(scopeHref({ kind: "ang", sourceCode: "sggs_banidb_v2", ang: 2 }, null)).toBe("/admin/padarth?ang=2");
-    expect(scopeHref({ kind: "ang", sourceCode: "dasam_banidb_v2", ang: 2 }, null)).toBe("/admin/padarth?ang=2&source=dasam_banidb_v2");
-    expect(scopeHref({ kind: "shabad", shabadId: 9 }, null)).toBe("/admin/padarth?shabad=9");
+    expect(scopeHref({ kind: "paragraph", baniId: 2, ordinal: 5 })).toBe("/admin/padarth?bani=2&p=5");
+    expect(scopeHref({ kind: "ang", sourceCode: "sggs_banidb_v2", ang: 2 })).toBe("/admin/padarth?ang=2");
+    expect(scopeHref({ kind: "ang", sourceCode: "dasam_banidb_v2", ang: 2 })).toBe("/admin/padarth?ang=2&source=dasam_banidb_v2");
+    expect(scopeHref({ kind: "shabad", shabadId: 9 })).toBe("/admin/padarth?shabad=9");
   });
 });

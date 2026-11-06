@@ -379,7 +379,7 @@ export default async function WordPage({ params, searchParams }: Props) {
       {curator && (
         <div style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--text-secondary)", border: "1px dashed var(--border)", borderRadius: "6px", padding: "0.5rem 0.75rem", marginBottom: "1.5rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
           <strong style={{ color: "var(--text-primary)" }}>Curator mode</strong>
-          <a href={withCuratorKey("/admin/flags", curatorKey)}>Flag queue</a>
+          <a href="/admin/flags">Flag queue</a>
           <a href="/health">Data health</a>
           <a href={`/word/${encodeURIComponent(word)}?tab=${tab}`}>View as public</a>
         </div>
@@ -966,7 +966,7 @@ export default async function WordPage({ params, searchParams }: Props) {
                     {/* Opens the line in its shabad (the viewer, #146), for
                         every corpus; each pages in its own unit (Bhai Gurdas:
                         the vaar; Dasam Bani: its own angs). */}
-                    <a href={lineHref(line.id, curatorKey)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
+                    <a href={lineHref(line.id, curator)} style={{ fontFamily: '"Inter", sans-serif', fontSize: "0.8rem", color: "var(--accent)", fontWeight: 500 }}>
                       {placeLabel(line.sources, line.ang)}
                       {line.sources && !isSggs(line.sources) && <>{" · "}{line.sources.name}</>}
                     </a>

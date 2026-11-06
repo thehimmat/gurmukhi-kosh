@@ -1,17 +1,12 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireAdmin } from "@/lib/curator-session";
 import { revalidatePath } from "next/cache";
 
 const REVIEW_STATUSES = ["approved", "needs_work", "rejected"] as const;
 const TARGET_TABLES = ["word_grammar", "definitions", "etymology"] as const;
 
-function checkKey(formData: FormData): void {
-  const key = formData.get("key");
-  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
-    throw new Error("Unauthorized");
-  }
-}
 
 /**
  * Resolves or dismisses a flag, optionally routing the decision into the
@@ -19,7 +14,7 @@ function checkKey(formData: FormData): void {
  * flag's outcome joins the same provenance trail every other datum carries.
  */
 export async function resolveFlag(formData: FormData) {
-  checkKey(formData);
+  await requireAdmin();
 
   const flagId = Number(formData.get("flagId"));
   const decision = formData.get("decision");

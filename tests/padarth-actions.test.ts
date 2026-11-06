@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// The builder's server actions: key-checked, input-checked, then one call each.
+// The builder's server actions: checked against the admin cookie (never an argument), input-checked,
+// then one call each.
 const calls: { op: string; args: unknown[] }[] = [];
 const fakeDb = {
   rpc: (...args: unknown[]) => {
@@ -20,6 +21,9 @@ const fakeDb = {
     }),
   }),
 };
+// The admin cookie the request carries.
+let cookie: string | undefined;
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => (cookie === undefined ? undefined : { name: "kosh_admin", value: cookie }) }) }));
 vi.mock("../lib/curator", async (orig) => ({
   ...(await orig<typeof import("../lib/curator")>()),
   curatorDb: () => fakeDb,
@@ -27,10 +31,11 @@ vi.mock("../lib/curator", async (orig) => ({
 
 beforeEach(() => {
   calls.length = 0;
+  cookie = "secret";
   vi.stubEnv("ADMIN_KEY", "secret");
 });
 
-const good = { key: "secret", lineId: 9, positions: [4, 6], surface: "ਕੂੜੈ … ਪਾਲਿ", refs: [{ kind: "padarth_gloss" as const, id: 61 }], overrideText: null, noteText: "a note" };
+const good = { lineId: 9, positions: [4, 6], surface: "ਕੂੜੈ … ਪਾਲਿ", refs: [{ kind: "padarth_gloss" as const, id: 61 }], overrideText: null, noteText: "a note" };
 
 describe("savePick", () => {
   it("saves through padarth_save_pick, as the curator", async () => {
@@ -48,8 +53,6 @@ describe("savePick", () => {
   });
 
   it.each([
-    ["a wrong key", { key: "nope" }],
-    ["no key", { key: undefined }],
     ["a non-integer line", { lineId: 9.5 }],
     ["unsorted positions", { positions: [6, 4] }],
     ["no positions", { positions: [] }],
@@ -61,22 +64,30 @@ describe("savePick", () => {
     await expect(savePick({ ...good, ...(patch as object) } as typeof good)).rejects.toThrow();
     expect(calls).toEqual([]);
   });
+
+  it.each([["a wrong cookie", "nope"], ["no cookie", undefined]])("refuses %s, whatever the arguments", async (_label, value) => {
+    cookie = value;
+    const { savePick } = await import("../app/admin/padarth/actions");
+    await expect(savePick({ ...good, key: "secret" } as typeof good)).rejects.toThrow(/Unauthorized/);
+    expect(calls).toEqual([]);
+  });
 });
 
 describe("saveLineNote", () => {
   it("writes a note, and removes it when cleared", async () => {
     const { saveLineNote } = await import("../app/admin/padarth/actions");
-    await saveLineNote({ key: "secret", lineId: 9, text: "  the strong bull of Dharam  " });
-    await saveLineNote({ key: "secret", lineId: 9, text: "   " });
+    await saveLineNote({ lineId: 9, text: "  the strong bull of Dharam  " });
+    await saveLineNote({ lineId: 9, text: "   " });
     expect(calls).toEqual([
       { op: "upsert padarth_line_notes", args: [{ line_id: 9, note_text: "the strong bull of Dharam", chosen_by: "curator" }, { onConflict: "line_id" }] },
       { op: "delete padarth_line_notes", args: ["line_id", 9] },
     ]);
   });
 
-  it("refuses a wrong key", async () => {
+  it.each([["a wrong cookie", "nope"], ["no cookie", undefined]])("refuses %s", async (_label, value) => {
+    cookie = value;
     const { saveLineNote } = await import("../app/admin/padarth/actions");
-    await expect(saveLineNote({ key: "nope", lineId: 9, text: "x" })).rejects.toThrow(/Unauthorized/);
+    await expect(saveLineNote({ lineId: 9, text: "x" })).rejects.toThrow(/Unauthorized/);
     expect(calls).toEqual([]);
   });
 });

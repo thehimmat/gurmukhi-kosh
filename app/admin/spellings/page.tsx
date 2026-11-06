@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { adminKey } from "@/lib/curator-session";
 import { supabaseAdmin } from "@/lib/supabase";
 import { submitSpellingReview } from "./actions";
 
@@ -37,9 +38,7 @@ export default async function SpellingReviewPage({
   searchParams: Promise<{ key?: string }>;
 }) {
   const { key } = await searchParams;
-  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
-    notFound();
-  }
+  if (!(await adminKey(key))) notFound();
 
   const db = supabaseAdmin();
   const [{ data: queueData }, { count: reviewedCount }] = await Promise.all([
@@ -122,7 +121,6 @@ export default async function SpellingReviewPage({
             </a>
 
             <form action={submitSpellingReview} style={{ marginTop: "0.9rem", display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
-              <input type="hidden" name="key" value={key} />
               <input type="hidden" name="wordId" value={w.id} />
               <label style={{ ...LABEL, marginBottom: 0 }}>Corrected spelling</label>
               <input
