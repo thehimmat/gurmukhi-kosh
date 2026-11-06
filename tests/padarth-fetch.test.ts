@@ -18,6 +18,7 @@ const rows = (extra: Partial<DraftRows> = {}): DraftRows => ({
   definitions: [],
   formLinks: [],
   headwords: [],
+  pointerTargets: [],
   padarth: [],
   grammar: [],
   ...extra,
@@ -111,5 +112,22 @@ describe("buildDraftInputs", () => {
       { id: 4, wordId: 12, sourceCode: "mahan_kosh", provenance: "scraped", sourceLineId: null, pos: "verb", gender: null, number: null, gramCase: null, person: null, verbForm: null },
     ]);
     expect(inputs[0].grammar).toEqual([]);
+  });
+
+  it("brings in the entries Mahan Kosh pointer rows name, on the lines whose words point at them", () => {
+    const inputs = buildDraftInputs(
+      rows({
+        definitions: [
+          { id: 1, word_id: 12, sense_number: 1, definition_text: "ਦੇਖੋ, ਤੁਟਣਾ.", definition_en: null, notes: null, dict_sources: { code: "mahan_kosh" } },
+          { id: 2, word_id: 850, sense_number: 1, definition_text: "ਟੁੱਟਣਾ", definition_en: null, notes: null, dict_sources: { code: "mahan_kosh" } },
+        ],
+        pointerTargets: [{ id: 850, gurmukhi: "ਤੁਟਣਾ" }],
+      })
+    );
+    const [l5, l9] = inputs;
+    expect(l9.definitions.map((d) => d.id)).toEqual([1, 2]);
+    expect(l9.mkPointerTargets).toEqual([{ target: "ਤੁਟਣਾ", wordId: 850 }]);
+    expect(l5.definitions).toEqual([]);
+    expect(l5.mkPointerTargets).toEqual([]);
   });
 });

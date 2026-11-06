@@ -9,6 +9,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAllRows } from "../fetch-all-rows";
 import { draftLine, type DraftInput, type DraftLine } from "./draft";
+import { parseMkPointer } from "./mk-pointer";
 
 export type DraftScope =
   | { kind: "ang"; sourceCode: string; ang: number }
@@ -68,6 +69,8 @@ export type DraftRows = {
   formLinks: FormLinkRow[];
   /** The headword words the form links point at. */
   headwords: { id: number; gurmukhi: string }[];
+  /** The words Mahan Kosh "ਦੇਖੋ" rows on the scope's words name (definitions holds their senses). */
+  pointerTargets: { id: number; gurmukhi: string }[];
   padarth: PadarthRow[];
   grammar: GrammarRow[];
 };
@@ -92,6 +95,19 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
       },
     ];
   });
+  const targetId = new Map(rows.pointerTargets.map((w) => [w.gurmukhi, w.id]));
+  /** word id → the corpus words its Mahan Kosh pointer rows name. */
+  const pointsAt = new Map<number, { target: string; wordId: number }[]>();
+  for (const d of rows.definitions) {
+    if (d.dict_sources?.code !== "mahan_kosh") continue;
+    for (const p of parseMkPointer(d.definition_text) ?? []) {
+      const wordId = targetId.get(p.target);
+      if (wordId === undefined) continue;
+      const list = pointsAt.get(d.word_id) ?? [];
+      if (!list.some((t) => t.target === p.target)) list.push({ target: p.target, wordId });
+      pointsAt.set(d.word_id, list);
+    }
+  }
   const definitions = rows.definitions.map((d) => ({
     id: d.id,
     wordId: d.word_id,
@@ -124,7 +140,8 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
         .map((o) => ({ position: o.position, wordId: o.word_id, gurmukhi: o.words?.gurmukhi ?? "" }));
       const wordIds = new Set(tokens.map((t) => t.wordId));
       const links = formLinks.filter((f) => wordIds.has(f.wordId));
-      const defWords = new Set([...wordIds, ...links.map((f) => f.headwordWordId)]);
+      const mkPointerTargets = [...wordIds].flatMap((w) => pointsAt.get(w) ?? []);
+      const defWords = new Set([...wordIds, ...links.map((f) => f.headwordWordId), ...mkPointerTargets.map((t) => t.wordId)]);
       const padarth = rows.padarth
         .filter((g) => g.line_id === line.id)
         .map((g) => ({
@@ -153,6 +170,7 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
         formLinks: links,
         padarth,
         grammar: grammar.filter((g) => wordIds.has(g.wordId)),
+        mkPointerTargets,
       };
     });
 }
@@ -270,7 +288,34 @@ export async function fetchDraftRows(db: SupabaseClient, lines: LineRow[]): Prom
       db.from("words").select("id, gurmukhi").in("id", ids).order("id")
     ),
   ]);
-  return { lines, occurrences, definitions, formLinks, headwords, padarth, grammar };
+  // One hop through Mahan Kosh "ਦੇਖੋ" rows: the words they name, and those words' Mahan Kosh senses.
+  const targets = [
+    ...new Set(
+      definitions.flatMap((d) => (d.dict_sources?.code === "mahan_kosh" ? (parseMkPointer(d.definition_text) ?? []).map((p) => p.target) : []))
+    ),
+  ];
+  const pointerTargets = targets.length
+    ? (
+        await Promise.all(
+          chunks(targets).map((part) =>
+            fetchAllRows<{ id: number; gurmukhi: string }>("words", () => db.from("words").select("id, gurmukhi").in("gurmukhi", part).order("id"))
+          )
+        )
+      ).flat()
+    : [];
+  const known = new Set(definitions.map((d) => d.word_id));
+  const targetDefinitions = await inChunks<DefinitionRow>(
+    "definitions",
+    pointerTargets.map((w) => w.id).filter((id) => !known.has(id)),
+    (ids) =>
+      db
+        .from("definitions")
+        .select("id, word_id, sense_number, definition_text, definition_en, notes, dict_sources!inner(code)")
+        .in("word_id", ids)
+        .eq("dict_sources.code", "mahan_kosh")
+        .order("id")
+  );
+  return { lines, occurrences, definitions: [...definitions, ...targetDefinitions], formLinks, headwords, pointerTargets, padarth, grammar };
 }
 
 /** The draft for every line of a scope, in reading order. */

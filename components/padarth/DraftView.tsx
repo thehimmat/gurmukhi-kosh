@@ -83,7 +83,11 @@ function CandidateText({ c }: { c: Candidate }) {
       <span>{c.text}</span>
       {c.textEn && <span className="padarth-en"> — {c.textEn}</span>}{" "}
       <span className="padarth-source">
-        {c.via ? (
+        {c.via?.link === "mk_pointer" ? (
+          <>
+            <span className="gurmukhi">ਦੇਖੋ {c.via.headword}</span>, {sourceLabel(c.sourceCode)}
+          </>
+        ) : c.via ? (
           <>
             via <span className="gurmukhi">{c.via.headword}</span>, {sourceLabel(c.sourceCode)}
           </>
@@ -101,6 +105,8 @@ type ItemProps = {
   item: Item;
   grammar: GrammarNote[];
   emptyText: string | null;
+  /** Mahan Kosh "ਦੇਖੋ" targets the corpus has no word for. */
+  unfollowed: string[];
   pick: ItemPick | undefined;
   status: Status | undefined;
   hints: Hint[];
@@ -141,6 +147,11 @@ function ItemView(p: ItemProps) {
             <GrammarNoteView key={i} note={g} />
           ))}
         </ul>
+      )}
+      {p.unfollowed.length > 0 && (
+        <p className="padarth-caveat">
+          Mahan Kosh points to <span className="gurmukhi">{p.unfollowed.join(", ")}</span>, which isn&apos;t in the corpus.
+        </p>
       )}
       {pick?.override && p.editing !== "override" && (
         <p className="padarth-override">
@@ -340,13 +351,14 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
     return () => window.removeEventListener("keydown", onKey);
   }, [items, focus, toggle]);
 
-  const itemProps = (item: Item, grammar: GrammarNote[], emptyText: string | null): ItemProps => {
+  const itemProps = (item: Item, grammar: GrammarNote[], emptyText: string | null, unfollowed: string[] = []): ItemProps => {
     const key = itemKey(item.lineId, item.positions);
     const i = indexOf.get(key) ?? 0;
     return {
       item,
       grammar,
       emptyText,
+      unfollowed,
       pick: state.get(key),
       status: status.get(key),
       hints: item.kind === "word" ? (hintMap.get(item.surface) ?? []) : [],
@@ -388,7 +400,8 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
                   {...itemProps(
                     { lineId: d.lineId, kind: "word", positions: [w.position], surface: w.gurmukhi, candidates: w.candidates },
                     w.grammar,
-                    phrasePositions.has(w.position) ? "Glossed in a phrase below." : "No gloss in the database."
+                    phrasePositions.has(w.position) ? "Glossed in a phrase below." : "No gloss in the database.",
+                    w.pointers.filter((q) => !q.resolved).map((q) => q.target)
                   )}
                 />
               ))}
