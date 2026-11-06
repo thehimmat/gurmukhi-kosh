@@ -13,7 +13,9 @@ import { draftLine, type DraftInput, type DraftLine } from "./draft";
 export type DraftScope =
   | { kind: "ang"; sourceCode: string; ang: number }
   | { kind: "shabad"; shabadId: number }
-  | { kind: "passage"; passageId: number };
+  | { kind: "passage"; passageId: number }
+  /** Paragraph `ordinal` of a bani: every part of it (passages, migration 059). */
+  | { kind: "paragraph"; baniId: number; ordinal: number };
 
 export type LineRow = { id: number; verse_id: number; gurmukhi: string };
 type OccurrenceRow = { id: number; line_id: number; position: number; word_id: number; words: { gurmukhi: string } | null };
@@ -187,19 +189,34 @@ export async function fetchScopeLines(db: SupabaseClient, scope: DraftScope): Pr
       db.from("lines").select(LINE_COLUMNS).eq("source_fk", source.id).eq("ang", scope.ang).order("verse_id")
     );
   }
-  const p = await must<{ source_fk: number; first_verse_id: number; last_verse_id: number }>(
-    "passage",
-    db.from("passages").select("source_fk, first_verse_id, last_verse_id").eq("id", scope.passageId).single()
-  );
-  return fetchAllRows<LineRow>("lines", () =>
-    db
-      .from("lines")
-      .select(LINE_COLUMNS)
-      .eq("source_fk", p.source_fk)
-      .gte("verse_id", p.first_verse_id)
-      .lte("verse_id", p.last_verse_id)
-      .order("verse_id")
-  );
+  type Span = { source_fk: number; first_verse_id: number; last_verse_id: number };
+  const spans =
+    scope.kind === "passage"
+      ? [await must<Span>("passage", db.from("passages").select("source_fk, first_verse_id, last_verse_id").eq("id", scope.passageId).single())]
+      : await must<Span[]>(
+          "passages",
+          db
+            .from("passages")
+            .select("source_fk, first_verse_id, last_verse_id")
+            .eq("bani_id", scope.baniId)
+            .eq("ordinal", scope.ordinal)
+            .order("part")
+        );
+  const out: LineRow[] = [];
+  for (const p of spans) {
+    out.push(
+      ...(await fetchAllRows<LineRow>("lines", () =>
+        db
+          .from("lines")
+          .select(LINE_COLUMNS)
+          .eq("source_fk", p.source_fk)
+          .gte("verse_id", p.first_verse_id)
+          .lte("verse_id", p.last_verse_id)
+          .order("verse_id")
+      ))
+    );
+  }
+  return out;
 }
 
 export async function fetchDraftRows(db: SupabaseClient, lines: LineRow[]): Promise<DraftRows> {

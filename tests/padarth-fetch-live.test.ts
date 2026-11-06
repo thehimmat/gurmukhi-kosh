@@ -21,6 +21,11 @@ describe("pad-arth draft loader", () => {
     expect(words.filter((w) => !w.uncovered).length / words.length).toBeGreaterThan(0.5);
   });
 
+  it("loads a bani paragraph: Japji's paragraph 4 is Pauri 1, lines 5–10", async () => {
+    const lines = await fetchScopeLines(anonDb(), { kind: "paragraph", baniId: 2, ordinal: 4 });
+    expect(lines.map((l) => l.id)).toEqual([5, 6, 7, 8, 9, 10]);
+  });
+
   it("loads a shabad's lines", async () => {
     const lines = await fetchScopeLines(anonDb(), { kind: "shabad", shabadId: 1 });
     expect(lines.map((l) => l.id)).toEqual(expect.arrayContaining([5, 9]));
