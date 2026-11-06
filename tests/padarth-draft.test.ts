@@ -201,7 +201,7 @@ describe("draftLine", () => {
       })
     );
     expect(d.words[6].candidates).toEqual([
-      { kind: "padarth_gloss", glossId: 90, sourceCode: "ss_padarth", term: "ਪੁਰੀ", text: "ਲੋਕ, ਭਵਣ", notes: [], match: "via_base", lexemeId: 77 },
+      { kind: "padarth_gloss", glossId: 90, ordinal: 0, sourceCode: "ss_padarth", term: "ਪੁਰੀ", text: "ਲੋਕ, ਭਵਣ", notes: [], match: "via_base", lexemeId: 77 },
     ]);
     expect(d.unplaced.map((g) => g.term)).toEqual(["ਸਭੁ ਕੋ"]);
   });
