@@ -264,3 +264,73 @@ a:hover {
   margin-top: 0.75rem;
   font-size: 0.9rem;
 }
+/* Pad-arth builder picking (#23, 5b). */
+.padarth-help,
+.padarth-status,
+.padarth-hint,
+.padarth-actions,
+.padarth-orphans,
+.padarth-override,
+.padarth-note,
+.padarth-edit,
+.padarth-line-note {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.padarth-item-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.padarth-focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.padarth-candidate label {
+  cursor: pointer;
+}
+.padarth-n {
+  display: inline-block;
+  min-width: 1ch;
+  font-family: "Inter", sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.padarth-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.padarth-override,
+.padarth-note {
+  margin: 0.25rem 0;
+  color: var(--text-primary);
+}
+.padarth-orphans {
+  margin: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid var(--accent);
+}
+.padarth-edit input,
+.padarth-line-note textarea {
+  width: 100%;
+  max-width: 40rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+}
+.padarth-line-note {
+  display: block;
+  margin-top: 0.75rem;
+}
