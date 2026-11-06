@@ -28,6 +28,7 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { supabaseAdmin } from "../shared/db";
 import { refreshHealthStats } from "../shared/health-stats";
+import { relinkPadarthPicks } from "../shared/padarth-relink";
 import { sleep, progress, getArg } from "../shared/utils";
 
 const JSONL_PATH = getArg("in") ?? "pipeline/sikhri/output/entries.jsonl";
@@ -163,6 +164,7 @@ async function main() {
   console.log(`\n\nDone. ${done} sikhri definition rows / ${byWord.size} words.`);
 
   await refreshHealthStats(db); // the /health totals (075)
+  await relinkPadarthPicks(db); // saved pad-arth picks onto the re-created rows (084)
 }
 
 main().catch((err) => {

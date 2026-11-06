@@ -22,6 +22,7 @@ import { supabaseAdmin } from "../shared/db";
 import { getArg, progress, sleep } from "../shared/utils";
 import { fetchAllRows } from "../../lib/fetch-all-rows";
 import { planGlosses, type PlanToken } from "./plan-glosses";
+import { relinkPadarthPicks } from "../shared/padarth-relink";
 
 type DB = ReturnType<typeof supabaseAdmin>;
 
@@ -187,6 +188,7 @@ async function main() {
     "Cases   "
   );
   console.log(`Done. ${plan.glosses.length} glosses, ${s.links} links, ${s.caseEvidence} case-evidence rows.`);
+  await relinkPadarthPicks(db); // saved pad-arth picks onto the re-created rows (084)
 }
 
 main().catch((err) => {
