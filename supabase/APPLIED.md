@@ -501,3 +501,13 @@ to service_role only (#194). 083 drops the single-value `search_lines_regex`, `s
 `search_lines_by_word_ids` overloads (gurmukhi-search#15) and reloads PostgREST's schema cache. Checked after through
 the search shell: First Letter ਸਗ (417), Contains ਸਤਿ (1,000+) and Pattern ਸਤ_ (10,032) answer, the word page loads,
 and /health is 200.
+
+**084_padarth_picks**, **085_padarth_save_pick** — run 2026-11-06 on the self-hosted server in one transaction, the
+same way as 080 (`docker compose exec -T db psql -v ON_ERROR_STOP=1 -1`), followed by `notify pgrst, 'reload schema'`.
+Kosh `084_padarth_picks.sql` as merged (#363) and `085_padarth_save_pick.sql` as in #367 (#23): the pad-arth builder's
+`padarth_picks`, `padarth_pick_refs` and `padarth_line_notes` (RLS on, no policies, no API-role grants),
+`padarth_positions_ok()`, the `updated_at` triggers, `padarth_relink_refs()` and `padarth_save_pick()` (both
+service_role only). psql reported CREATE FUNCTION ×4 and CREATE TABLE ×3, the two indexes, triggers, ALTER TABLE ×3,
+REVOKE and GRANT, and NOTIFY; the two DROP TRIGGER IF EXISTS notices were expected on a first run. Read back after:
+tables `padarth_line_notes, padarth_pick_refs, padarth_picks`; functions `padarth_positions_ok, padarth_relink_refs,
+padarth_save_pick`.
