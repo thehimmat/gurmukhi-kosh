@@ -80,8 +80,8 @@ describe("withText, isEmpty and saveInput", () => {
   it("builds the server action's input for an item", () => {
     const item = flatItems([draft])[4];
     const p = toggleChoice(undefined, { kind: "padarth_gloss", id: 60 }, draft.phrases[0].candidates.map(choiceOf));
-    expect(saveInput("k", item, p)).toEqual({
-      key: "k", lineId: 9, positions: [1, 3], surface: "ਕੂੜੈ … ਪਾਲਿ",
+    expect(saveInput(item, p)).toEqual({
+      lineId: 9, positions: [1, 3], surface: "ਕੂੜੈ … ਪਾਲਿ",
       refs: [{ kind: "padarth_gloss", id: 60 }], overrideText: null, noteText: null,
     });
   });

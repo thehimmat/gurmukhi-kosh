@@ -1,15 +1,16 @@
 "use server";
 
-// The pad-arth builder's writes (#23). Key-checked like every /admin action, then one call each:
+// The pad-arth builder's writes (#23). Checked against the admin cookie (never an argument, so the
+// key stays out of action payloads), then one call each:
 // a pick goes through padarth_save_pick() (085), which builds each ref's snapshot and key from the
 // row itself, in one transaction.
 
-import { curatorDb, isCurator } from "@/lib/curator";
+import { curatorDb } from "@/lib/curator";
+import { requireAdmin } from "@/lib/curator-session";
 
 export type RefChoice = { kind: "padarth_gloss" | "definition"; id: number };
 
 export type SavePickInput = {
-  key: string | undefined;
   lineId: number;
   positions: number[];
   surface: string;
@@ -21,10 +22,6 @@ export type SavePickInput = {
 const CHOSEN_BY = "curator";
 const MAX_TEXT = 5000;
 
-function checkKey(key: unknown): void {
-  if (typeof key !== "string" || !isCurator(key)) throw new Error("Unauthorized");
-}
-
 const isId = (n: unknown): n is number => Number.isSafeInteger(n) && (n as number) > 0;
 
 function checkText(label: string, s: unknown): string | null {
@@ -34,7 +31,7 @@ function checkText(label: string, s: unknown): string | null {
 }
 
 export async function savePick(input: SavePickInput): Promise<{ pickId: number | null }> {
-  checkKey(input.key);
+  await requireAdmin();
   const { lineId, positions, surface, refs } = input;
   if (!isId(lineId)) throw new Error("Invalid line");
   if (
@@ -64,8 +61,8 @@ export async function savePick(input: SavePickInput): Promise<{ pickId: number |
   return { pickId: (data as number | null) ?? null };
 }
 
-export async function saveLineNote(input: { key: string | undefined; lineId: number; text: string }): Promise<void> {
-  checkKey(input.key);
+export async function saveLineNote(input: { lineId: number; text: string }): Promise<void> {
+  await requireAdmin();
   if (!isId(input.lineId)) throw new Error("Invalid line");
   const text = (checkText("note", input.text) ?? "").trim();
   const db = curatorDb(true);

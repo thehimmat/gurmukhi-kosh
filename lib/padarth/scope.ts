@@ -35,7 +35,8 @@ export function parseScope(params: Params): DraftScope | null {
   return null;
 }
 
-export function scopeHref(scope: DraftScope, key: string | null): string {
+/** The builder's URL for a scope. No key: /admin pages read it from the cookie (lib/curator.ts). */
+export function scopeHref(scope: DraftScope): string {
   const q = new URLSearchParams();
   if (scope.kind === "paragraph") {
     q.set("bani", String(scope.baniId));
@@ -48,6 +49,5 @@ export function scopeHref(scope: DraftScope, key: string | null): string {
   } else {
     throw new Error("scopeHref: passage ids are not a page URL; use the bani paragraph");
   }
-  if (key) q.set("key", key);
   return `/admin/padarth?${q}`;
 }

@@ -199,7 +199,7 @@ function ItemView(p: ItemProps) {
           {p.hints.map((h, i) => (
             <span key={h.lineId}>
               {i > 0 && "; "}
-              <a href={withCuratorKey(`/admin/line/${h.lineId}`, p.curatorKey)}>line {h.lineId}</a>: {h.text}
+              <a href={`/admin/line/${h.lineId}`}>line {h.lineId}</a>: {h.text}
             </span>
           ))}
         </p>
@@ -247,7 +247,7 @@ function TextEdit({ label, initial, onDone, onCancel }: { label: string; initial
   );
 }
 
-function LineNote({ lineId, initial, curatorKey }: { lineId: number; initial: string; curatorKey: string }) {
+function LineNote({ lineId, initial }: { lineId: number; initial: string }) {
   const [status, setStatus] = useState<Status | undefined>();
   const last = useRef(initial);
   return (
@@ -262,7 +262,7 @@ function LineNote({ lineId, initial, curatorKey }: { lineId: number; initial: st
           if (text.trim() === last.current.trim()) return;
           setStatus("saving");
           try {
-            await saveLineNote({ key: curatorKey, lineId, text });
+            await saveLineNote({ lineId, text });
             last.current = text;
             setStatus("saved");
           } catch (err) {
@@ -280,6 +280,7 @@ function LineNote({ lineId, initial, curatorKey }: { lineId: number; initial: st
 export type PadarthDraftViewProps = {
   lines: LineRow[];
   drafts: DraftLine[];
+  /** Opens word pages in curator mode (?key: /word is cached by URL, so the cookie doesn't reach it). */
   curatorKey: string;
   picks?: SavedPick[];
   lineNotes?: [number, string][];
@@ -305,7 +306,7 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
       setState((s) => new Map(s).set(key, next));
       setStatus((s) => new Map(s).set(key, "saving"));
       try {
-        await savePick(saveInput(curatorKey, item, next));
+        await savePick(saveInput(item, next));
         // A saved pick keeps no orphans: the save replaced its refs.
         setState((s) => new Map(s).set(key, { ...next, orphans: [] }));
         setStatus((s) => new Map(s).set(key, "saved"));
@@ -313,7 +314,7 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
         setStatus((s) => new Map(s).set(key, { error: (err as Error).message }));
       }
     },
-    [curatorKey]
+    []
   );
 
   const toggle = useCallback(
@@ -391,7 +392,7 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
         return (
           <section key={d.lineId} className="padarth-line card">
             <p className="gurmukhi-lg padarth-verse">
-              <a href={withCuratorKey(`/admin/line/${line.id}`, curatorKey)}>{line.gurmukhi}</a>
+              <a href={`/admin/line/${line.id}`}>{line.gurmukhi}</a>
             </p>
             <ol className="padarth-words">
               {d.words.map((w) => (
@@ -431,7 +432,7 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
                 </ul>
               </details>
             )}
-            <LineNote lineId={d.lineId} initial={notes.get(d.lineId) ?? ""} curatorKey={curatorKey} />
+            <LineNote lineId={d.lineId} initial={notes.get(d.lineId) ?? ""} />
           </section>
         );
       })}

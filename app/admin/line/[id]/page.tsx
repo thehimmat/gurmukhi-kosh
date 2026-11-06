@@ -1,7 +1,7 @@
 import { adminLinePage } from "@/components/line/linePage";
 
 // The curator's copy of /line/<id>: it reads through the service role, so a line of a
-// curator-only corpus (migration 070) shows here and nowhere public. Needs ?key=ADMIN_KEY.
+// curator-only corpus (migration 070) shows here and nowhere public. Needs the admin cookie (or ?key=ADMIN_KEY, which proxy.ts swaps for it).
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 

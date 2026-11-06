@@ -11,6 +11,39 @@ export function isCurator(key: string | null | undefined): boolean {
   return !!adminKey && key === adminKey;
 }
 
+// The admin key in a cookie (#23). /admin pages and their server actions read it from an httpOnly
+// cookie scoped to /admin, so it stays out of their URLs, the access logs and action arguments.
+// proxy.ts swaps a ?key=ADMIN_KEY for the cookie. Public pages (/word) keep curator mode in the
+// URL: the CDN caches them by URL (next.config.ts), so a curator render must never share a URL
+// with a public one.
+
+export const ADMIN_COOKIE = "kosh_admin";
+const ADMIN_COOKIE_DAYS = 30;
+
+export function adminCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/admin",
+    maxAge: ADMIN_COOKIE_DAYS * 86400,
+  };
+}
+
+/**
+ * What the proxy does with a request's ?key: set the cookie when it is the admin key, and on an
+ * /admin page also redirect to the same path and query without it.
+ */
+export function adminKeyExchange(pathname: string, search: URLSearchParams): { setCookie: boolean; redirectTo: string | null } {
+  const keys = search.getAll("key");
+  if (keys.length !== 1 || !isCurator(keys[0])) return { setCookie: false, redirectTo: null };
+  if (pathname !== "/admin" && !pathname.startsWith("/admin/")) return { setCookie: true, redirectTo: null };
+  const rest = new URLSearchParams(search);
+  rest.delete("key");
+  const query = rest.toString();
+  return { setCookie: true, redirectTo: query ? `${pathname}?${query}` : pathname };
+}
+
 /** Carry the curator key on an internal link so the mode survives navigation. */
 export function withCuratorKey(href: string, key: string | null): string {
   if (!key) return href;

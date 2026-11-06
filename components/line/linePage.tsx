@@ -2,7 +2,8 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { pageTitle } from "@/lib/site";
-import { curatorDb, isCurator } from "@/lib/curator";
+import { curatorDb } from "@/lib/curator";
+import { adminKey } from "@/lib/curator-session";
 import { fetchLineContext, type Scope } from "@/lib/line-context";
 import { LineView } from "./LineView";
 
@@ -30,13 +31,14 @@ export async function linePage(idParam: string, scope: Scope) {
 }
 
 /**
- * The curator's line page (/admin/line/<id>[/ang]?key=ADMIN_KEY): read through the service-role
+ * The curator's line page (/admin/line/<id>[/ang], with the admin cookie): read through the service-role
  * role, so it can show a curator-only corpus (migration 070). Rendered per request, never cached.
  */
-export async function adminLinePage(idParam: string, scope: Scope, key: string | undefined) {
+export async function adminLinePage(idParam: string, scope: Scope, keyParam: string | undefined) {
   const id = parseLineId(idParam);
-  if (!id || !isCurator(key)) notFound();
+  const key = await adminKey(keyParam);
+  if (!id || !key) notFound();
   const ctx = await fetchLineContext(id, scope, curatorDb(true));
   if (!ctx) notFound();
-  return <LineView ctx={ctx} curatorKey={key!} />;
+  return <LineView ctx={ctx} curatorKey={key} />;
 }
