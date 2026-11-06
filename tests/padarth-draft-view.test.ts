@@ -69,4 +69,31 @@ describe("PadarthDraftView", () => {
     expect(text).toContain("ਕੂੜੈ … ਪਾਲਿ");
     expect(text).toMatch(/Not placed on a word.*ਸਭੁ ਕੋ.*ਹਰੇਕ ਜੀਵ/);
   });
+
+  it("names the Mahan Kosh pointer a sense came through, and lists a pointer the corpus can't follow", () => {
+    const d = draftLine({
+      lineId: 2,
+      tokens: [
+        { position: 0, wordId: 1, gurmukhi: "ਮੰਞ" },
+        { position: 1, wordId: 2, gurmukhi: "ਕੁਚਜੀ" },
+      ],
+      definitions: [
+        { id: 1, wordId: 1, sourceCode: "mahan_kosh", senseNumber: 1, text: "ਦੇਖੋ, ਮੰਞੁ.", textEn: null, notes: null },
+        { id: 2, wordId: 50, sourceCode: "mahan_kosh", senseNumber: 1, text: "ਮੈਂ", textEn: null, notes: null },
+        { id: 3, wordId: 2, sourceCode: "mahan_kosh", senseNumber: 1, text: "ਦੇਖੋ, ਕੁਚੱਜੀ.", textEn: null, notes: null },
+      ],
+      formLinks: [],
+      padarth: [],
+      grammar: [],
+      mkPointerTargets: [{ target: "ਮੰਞੁ", wordId: 50 }],
+    });
+    const out = decode(
+      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 2, verse_id: 2, gurmukhi: "ਮੰਞ ਕੁਚਜੀ" }], drafts: [d], curatorKey: "k" }))
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+    );
+    expect(out).toMatch(/ਮੈਂ.*ਦੇਖੋ ਮੰਞੁ ?, Mahan Kosh/);
+    expect(out).not.toContain("ਦੇਖੋ, ਮੰਞੁ");
+    expect(out).toMatch(/Mahan Kosh points to ਕੁਚੱਜੀ ?, which isn't in the corpus/);
+  });
 });

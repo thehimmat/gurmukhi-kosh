@@ -8,7 +8,9 @@
 //       1. Sahib Singh's pad-arth gloss for this line (it is about this occurrence)
 //       2. the word's own dictionary senses, by source priority then sense number
 //       3. the senses of the headword Shackle links the form to, labelled with the link
-//     Cross-reference-only rows ("see ਦਰੁ") are dropped: they are not glosses. Entries whose
+//       4. the senses of the entry a Mahan Kosh pointer row ("ਦੇਖੋ, ਮੰਞੁ.") sends the reader to,
+//          one hop, only the sense it numbers if it numbers one, labelled with the pointer
+//     Cross-reference-only rows ("see ਦਰੁ", "ਦੇਖੋ, ਮੰਞੁ.") are dropped: they are not glosses. Entries whose
 //     Gurmukhi was reverse-transliterated from Shackle's romanisation rank last and are marked
 //     lowPriority, because they can collide with an unrelated word (ਦਰਿ "grind coarsely" against
 //     the locative of ਦਰੁ).
@@ -22,6 +24,7 @@
 //   - No inflection guessing, no spelling-similarity matching, no authored text.
 
 import type { CaseEvidence } from "./case-evidence";
+import { parseMkPointer } from "./mk-pointer";
 
 export type DraftToken = { position: number; wordId: number; gurmukhi: string };
 
@@ -87,6 +90,8 @@ export type DraftInput = {
   /** This line's pad-arth entries (kind 'entry'). */
   padarth: DraftPadarthGloss[];
   grammar: DraftGrammarRow[];
+  /** The words Mahan Kosh pointer rows name, where the corpus has them (definitions included above). */
+  mkPointerTargets?: { target: string; wordId: number }[];
 };
 
 export type PadarthCandidate = {
@@ -111,8 +116,11 @@ export type DefinitionCandidate = {
   senseNumber: number | null;
   text: string;
   textEn: string | null;
-  /** Set when the sense is the headword's, reached through a Shackle form link. */
-  via: { headword: string; headwordWordId: number; lexemeId: number } | null;
+  /**
+   * Set when the sense is another entry's: the headword a Shackle form link names (lexemeId set),
+   * or the entry a Mahan Kosh "ਦੇਖੋ" row points to (lexemeId null).
+   */
+  via: { headword: string; headwordWordId: number; lexemeId: number | null; link: "shackle_form" | "mk_pointer" } | null;
   lowPriority: boolean;
 };
 
@@ -125,7 +133,10 @@ export type GrammarNote =
   | { tier: "stated"; kind: "grammar"; sourceCode: string; grammarId: number; facts: { attribute: GrammarAttribute; value: string }[] }
   | { tier: "clue"; kind: "case"; sourceCode: "ss_padarth"; glossId: number; gramCase: string; marker: string; basis: string };
 
-export type DraftWord = DraftToken & { candidates: Candidate[]; grammar: GrammarNote[]; uncovered: boolean };
+/** A Mahan Kosh "ਦੇਖੋ" target of this word; resolved when the corpus has that word. */
+export type DraftPointer = { target: string; sense: number | null; resolved: boolean };
+
+export type DraftWord = DraftToken & { candidates: Candidate[]; grammar: GrammarNote[]; uncovered: boolean; pointers: DraftPointer[] };
 
 export type DraftPhrase = { positions: number[]; surface: string; candidates: PadarthCandidate[]; grammar: GrammarNote[] };
 
@@ -139,7 +150,9 @@ const sourceRank = (code: string) => {
 };
 
 const noteParts = (d: DraftDefinition) => (d.notes ?? "").split(" | ").map((s) => s.trim());
-const isCrossRefOnly = (d: DraftDefinition) => d.text === "(cross-reference)" || noteParts(d).includes("cross-reference-only");
+const mkPointers = (d: DraftDefinition) => (d.sourceCode === "mahan_kosh" ? parseMkPointer(d.text) : null);
+const isCrossRefOnly = (d: DraftDefinition) =>
+  d.text === "(cross-reference)" || noteParts(d).includes("cross-reference-only") || mkPointers(d) !== null;
 const isDerivedSpelling = (d: DraftDefinition) => noteParts(d).some((n) => n.startsWith("gurmukhi-derived"));
 
 function byPriority(a: DraftDefinition, b: DraftDefinition): number {
@@ -202,10 +215,14 @@ function statedGrammar(g: DraftGrammarRow, lineId: number): GrammarNote | null {
 export function draftLine(input: DraftInput): DraftLine {
   const tokens = [...input.tokens].sort((a, b) => a.position - b.position);
   const defsByWord = new Map<number, DraftDefinition[]>();
+  const pointersByWord = new Map<number, { target: string; sense: number | null }[]>();
   for (const d of input.definitions) {
+    const pointers = mkPointers(d);
+    if (pointers) pointersByWord.set(d.wordId, [...(pointersByWord.get(d.wordId) ?? []), ...pointers]);
     if (isCrossRefOnly(d)) continue;
     defsByWord.set(d.wordId, [...(defsByWord.get(d.wordId) ?? []), d]);
   }
+  const targetWord = new Map((input.mkPointerTargets ?? []).map((t) => [t.target, t.wordId]));
   const single = input.padarth.filter((g) => !g.isPhrase && g.links.length > 0);
 
   const words: DraftWord[] = tokens.map((t) => {
@@ -222,7 +239,24 @@ export function draftLine(input: DraftInput): DraftLine {
       for (const d of senses) {
         if (seen.has(d.id)) continue;
         seen.add(d.id);
-        viaBase.push(definitionCandidate(d, { headword: f.headword, headwordWordId: f.headwordWordId, lexemeId: f.lexemeId }));
+        viaBase.push(definitionCandidate(d, { headword: f.headword, headwordWordId: f.headwordWordId, lexemeId: f.lexemeId, link: "shackle_form" }));
+      }
+    }
+
+    // Mahan Kosh "ਦੇਖੋ" rows: the target entry's own Mahan Kosh senses, one hop.
+    const pointers: DraftPointer[] = [];
+    const viaPointer: DefinitionCandidate[] = [];
+    for (const p of pointersByWord.get(t.wordId) ?? []) {
+      if (pointers.some((q) => q.target === p.target && q.sense === p.sense)) continue;
+      const wordId = targetWord.get(p.target);
+      pointers.push({ ...p, resolved: wordId !== undefined });
+      if (wordId === undefined) continue;
+      const senses = (defsByWord.get(wordId) ?? []).filter((d) => d.sourceCode === "mahan_kosh");
+      const named = p.sense === null ? [] : senses.filter((d) => d.senseNumber === p.sense);
+      for (const d of (named.length ? named : senses).sort(byPriority)) {
+        if (seen.has(d.id)) continue;
+        seen.add(d.id);
+        viaPointer.push(definitionCandidate(d, { headword: p.target, headwordWordId: wordId, lexemeId: null, link: "mk_pointer" }));
       }
     }
 
@@ -234,8 +268,8 @@ export function draftLine(input: DraftInput): DraftLine {
       ...padarth.flatMap(caseClues),
     ];
 
-    const candidates: Candidate[] = [...padarth.map((g) => padarthCandidate(g, t.position)), ...own, ...viaBase];
-    return { ...t, candidates, grammar, uncovered: candidates.length === 0 };
+    const candidates: Candidate[] = [...padarth.map((g) => padarthCandidate(g, t.position)), ...own, ...viaBase, ...viaPointer];
+    return { ...t, candidates, grammar, uncovered: candidates.length === 0, pointers };
   });
 
   // Phrases a source defines, grouped by the words they cover, after the words.

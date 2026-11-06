@@ -88,7 +88,7 @@ describe("draftLine", () => {
     );
     const w = d.words[3];
     expect(w.candidates.map((c) => c.text)).toEqual(["become, happen, occur", "be, exist"]);
-    expect(w.candidates[0]).toMatchObject({ kind: "definition", via: { headword: "ਹੋਇ", headwordWordId: 900, lexemeId: 77 } });
+    expect(w.candidates[0]).toMatchObject({ kind: "definition", via: { headword: "ਹੋਇ", headwordWordId: 900, lexemeId: 77, link: "shackle_form" } });
     expect(w.grammar).toEqual([{ tier: "stated", kind: "form_label", sourceCode: "shackle", text: "3 sg. subj.", headword: "ਹੋਇ" }]);
   });
 
@@ -204,5 +204,51 @@ describe("draftLine", () => {
       { kind: "padarth_gloss", glossId: 90, ordinal: 0, sourceCode: "ss_padarth", term: "ਪੁਰੀ", text: "ਲੋਕ, ਭਵਣ", notes: [], match: "via_base", lexemeId: 77 },
     ]);
     expect(d.unplaced.map((g) => g.term)).toEqual(["ਸਭੁ ਕੋ"]);
+  });
+
+  it("follows a Mahan Kosh pointer row to the target's senses instead of offering it as a gloss", () => {
+    const d = draftLine(
+      input("ਮੰਞ ਕੁਚਜੀ", {
+        definitions: [
+          def(100, "mahan_kosh", "ਦੇਖੋ, ਮੰਞੁ."),
+          def(950, "mahan_kosh", "ਮੈਂ", { senseNumber: 1 }),
+          def(950, "mahan_kosh", "ਦੇਖੋ, ਮੈ."),
+        ],
+        mkPointerTargets: [{ target: "ਮੰਞੁ", wordId: 950 }],
+      })
+    );
+    const w = d.words[0];
+    expect(w.candidates).toMatchObject([
+      { kind: "definition", sourceCode: "mahan_kosh", text: "ਮੈਂ", wordId: 950, via: { headword: "ਮੰਞੁ", headwordWordId: 950, lexemeId: null, link: "mk_pointer" } },
+    ]);
+    expect(w.pointers).toEqual([{ target: "ਮੰਞੁ", sense: null, resolved: true }]);
+  });
+
+  it("keeps only the sense a Mahan Kosh pointer names (ਦੇਖੋ, ਕਰਣ ੧੧)", () => {
+    const d = draftLine(
+      input("ਕਰਨ", {
+        definitions: [
+          def(100, "mahan_kosh", "ਦੇਖੋ, ਕਰਣ ੧੧."),
+          def(951, "mahan_kosh", "ਕਾਰਣ", { senseNumber: 1 }),
+          def(951, "mahan_kosh", "ਅਦੁਤੀ", { senseNumber: 11 }),
+        ],
+        mkPointerTargets: [{ target: "ਕਰਣ", wordId: 951 }],
+      })
+    );
+    expect(d.words[0].candidates.map((c) => c.text)).toEqual(["ਅਦੁਤੀ"]);
+  });
+
+  it("drops an unresolved pointer from the candidates but still reports it", () => {
+    const d = draftLine(input("ਮੰਞ", { definitions: [def(100, "mahan_kosh", "ਦੇਖੋ, ਮੰਞੁ.")] }));
+    expect(d.words[0].candidates).toEqual([]);
+    expect(d.words[0].uncovered).toBe(true);
+    expect(d.words[0].pointers).toEqual([{ target: "ਮੰਞੁ", sense: null, resolved: false }]);
+  });
+
+  it("leaves a Mahan Kosh row with its own words after the pointer as a gloss", () => {
+    const text = 'ਦੇਖੋ, ਦੁਲਹ. "ਦੂਲਹ ਪ੍ਰਭੁ ਕੀ ਸਰਨਿ ਪਰਿਓ." (ਮਾਰੂ ਨਾਮਦੇਵ) ਦੂਲਹ ਤੋਂ ਭਾਵ ਜੀਵ ਅਥਵਾ ਜਿਗ੍ਯਾਸੂ ਹੈ.';
+    const d = draftLine(input("ਦੂਲਹ", { definitions: [def(100, "mahan_kosh", text)] }));
+    expect(d.words[0].candidates.map((c) => c.text)).toEqual([text]);
+    expect(d.words[0].pointers).toEqual([]);
   });
 });
