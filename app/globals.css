@@ -334,3 +334,27 @@ a:hover {
   display: block;
   margin-top: 0.75rem;
 }
+/* Pad-arth preview (#23, PR 6). */
+.padarth-tabs {
+  display: flex;
+  gap: 1rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+}
+.padarth-tabs [aria-current="page"] {
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+}
+.padarth-preview-line {
+  margin-bottom: 1.5rem;
+}
+.padarth-preview-line ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+.padarth-preview-row {
+  margin: 0.15rem 0;
+}
+.padarth-preview-draft {
+  color: var(--text-secondary);
+}
