@@ -21,6 +21,7 @@ x-app: &app
 
 services:
   gateway:
+    networks: [default, radio-edge]
     volumes:
       - ./sites:/etc/caddy/sites:ro
       - ./certs:/certs:ro
@@ -43,3 +44,9 @@ services:
       SUPABASE_URL: http://gateway:8080
       SUPABASE_ANON_KEY: ${ANON_KEY}
       NODE_OPTIONS: --max-old-space-size=512
+
+# The radio stack (sites/stream.caddy) joins this one network, so it reaches the gateway and not
+# Postgres, PostgREST or the apps.
+networks:
+  radio-edge:
+    name: radio-edge

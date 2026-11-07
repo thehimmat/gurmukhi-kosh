@@ -143,6 +143,22 @@ describe("selfhost/Caddyfile", () => {
     expect(site).toMatch(/mode require_and_verify/);
     expect(site).toMatch(/reverse_proxy search:3000/);
   });
+
+  it("serves the radio stack (a separate Compose project) to Cloudflare and on a test name, without buffering audio", () => {
+    const site = read("selfhost/sites/stream.caddy");
+    expect(site).toMatch(/^stream\.atthebunga\.com \{/m);
+    expect(site).toMatch(/mode require_and_verify/);
+    expect(site).toMatch(/^radio\.\{\$SITE_ADDRESS\} \{/m);
+    expect(site).toMatch(/reverse_proxy radio:3001/);
+    expect(site).toMatch(/flush_interval -1/);
+  });
+
+  it("shares only the gateway with the radio stack, on a network of their own", () => {
+    const compose = read("selfhost/docker-compose.apps.yml");
+    expect(compose).toMatch(/^ {2}gateway:\n {4}networks: \[default, radio-edge\]$/m);
+    expect(compose).toMatch(/^networks:\n {2}radio-edge:\n {4}name: radio-edge$/m);
+    expect(compose.match(/radio-edge/g)).toHaveLength(3);
+  });
 });
 
 describe("selfhost/scripts/deploy.sh", () => {
