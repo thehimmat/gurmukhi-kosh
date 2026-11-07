@@ -176,4 +176,12 @@ describe("planGlosses", () => {
     expect(plan.glosses).toMatchObject([{ lineId: 999, term: "ਸਚੁ", links: [] }]);
     expect(plan.stats.rows).toBe(1);
   });
+
+  it("links a compound Sahib Singh spaces differently from the line to every word it covers (#179)", () => {
+    // Shortened line and body around the #179 term.
+    const L = line(28417, "ਝਿਲਿ ਮਿਲਿ ਕਾਰੁ ਦਿਸੰਦਾ");
+    const { glosses } = planGlosses(input([{ line: L, body: "ਝਿਲਿਮਿਲਿਕਾਰੁ = ਚਮਕਾਰਾ। ਦਿਸੰਦਾ = ਦਿੱਸਦਾ ਹੈ।" }]));
+    expect(glosses[0]).toMatchObject({ term: "ਝਿਲਿਮਿਲਿਕਾਰੁ", isPhrase: false });
+    expect(glosses[0].links).toEqual([0, 1, 2].map((p) => ({ occurrenceId: 28417 * 100 + p, match: "compound", lexemeId: null })));
+  });
 });

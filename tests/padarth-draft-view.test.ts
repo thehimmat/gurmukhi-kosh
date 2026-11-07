@@ -168,4 +168,21 @@ describe("PadarthDraftView", () => {
     );
     expect(out).toMatch(/Phrases.*ਅੰਮ੍ਰਿਤ ਵੇਲਾ.*the hour before dawn \(m\.\) Shackle, compound ਅੰਮ੍ਰਿਤ ਵੇਲਾ/);
   });
+
+  it("says when Sahib Singh spaces a compound differently from the line", () => {
+    const d = draftLine({
+      lineId: 5,
+      tokens: [{ position: 0, wordId: 1, gurmukhi: "ਭਖਸਾਰ" }],
+      definitions: [],
+      formLinks: [],
+      padarth: [{ id: 81, ordinal: 0, term: "ਭਖ ਸਾਰ", gloss: "ਖਾਣ ਯੋਗ", notes: [], isPhrase: true, links: [{ position: 0, match: "compound", lexemeId: null }], caseEvidence: [] }],
+      grammar: [],
+    });
+    const out = decode(
+      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 5, verse_id: 5, gurmukhi: "ਭਖਸਾਰ" }], drafts: [d] }))
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+    );
+    expect(out).toMatch(/ਖਾਣ ਯੋਗ.*spaced differently in the line \(written ‘ਭਖ ਸਾਰ’\)/);
+  });
 });

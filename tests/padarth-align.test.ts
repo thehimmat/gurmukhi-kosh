@@ -71,4 +71,23 @@ describe("alignTerms", () => {
   it("returns an empty list for no terms", () => {
     expect(alignTerms(["ਸਚੁ"], [])).toEqual([]);
   });
+
+  // #179 item 4: the same letters, spaced differently. Exact apart from the spaces, 1–3 words.
+  // Terms as in #179; the lines are shortened around them.
+  it("matches a term written joined where the line splits it (line 28417)", () => {
+    expect(alignTerms("ਝਿਲਿ ਮਿਲਿ ਕਾਰੁ ਦਿਸੰਦਾ".split(" "), ["ਝਿਲਿਮਿਲਿਕਾਰੁ"])).toEqual([{ positions: [0, 1, 2], match: "compound" }]);
+  });
+
+  it("matches a term written split where the line joins it (line 139)", () => {
+    expect(alignTerms("ਕਰਿ ਭਖਸਾਰ ਨ ਖਾਹਿ".split(" "), ["ਭਖ ਸਾਰ"])).toEqual([{ positions: [1], match: "compound" }]);
+  });
+
+  it("prefers an exact match, and never joins more than three words", () => {
+    expect(alignTerms("ਭਖ ਸਾਰ ਭਖਸਾਰ".split(" "), ["ਭਖ ਸਾਰ"])).toEqual([{ positions: [0, 1], match: "exact" }]);
+    expect(alignTerms("ਕ ਖ ਗ ਘ".split(" "), ["ਕਖਗਘ"])).toEqual([null]);
+  });
+
+  it("doesn't match a term that only shares some of the letters", () => {
+    expect(alignTerms("ਭਖ ਸਾਰੁ".split(" "), ["ਭਖਸਾਰ"])).toEqual([null]);
+  });
 });

@@ -61,6 +61,9 @@ export type DraftFormLink = {
   definitionId: number | null;
 };
 
+/** How a pad-arth gloss sits on its line (041, 088): see lib/padarth/align.ts. */
+export type GlossMatch = "exact" | "gapped" | "via_base" | "compound";
+
 export type DraftPadarthGloss = {
   id: number;
   ordinal: number;
@@ -69,7 +72,7 @@ export type DraftPadarthGloss = {
   notes: string[];
   isPhrase: boolean;
   /** The line positions it is linked to (padarth_gloss_occurrences). Empty: unplaced. */
-  links: { position: number; match: "exact" | "gapped" | "via_base"; lexemeId: number | null }[];
+  links: { position: number; match: GlossMatch; lexemeId: number | null }[];
   caseEvidence: CaseEvidence[];
 };
 
@@ -129,7 +132,7 @@ export type PadarthCandidate = {
   term: string;
   text: string;
   notes: string[];
-  match: "exact" | "gapped" | "via_base";
+  match: GlossMatch;
   lexemeId: number | null;
 };
 
@@ -264,7 +267,10 @@ export function draftLine(input: DraftInput): DraftLine {
     defsByWord.set(d.wordId, [...(defsByWord.get(d.wordId) ?? []), d]);
   }
   const targetWord = new Map((input.mkPointerTargets ?? []).map((t) => [t.target, t.wordId]));
-  const single = input.padarth.filter((g) => !g.isPhrase && g.links.length > 0);
+  // A placed gloss is a word's when it covers one word, a phrase's when it covers several. That is
+  // the term's own spacing, except for a compound spaced differently from the line (#179).
+  const coversOne = (g: DraftPadarthGloss) => new Set(g.links.map((l) => l.position)).size === 1;
+  const single = input.padarth.filter((g) => g.links.length > 0 && coversOne(g));
 
   const words: DraftWord[] = tokens.map((t) => {
     const padarth = single.filter((g) => g.links.some((l) => l.position === t.position)).sort((a, b) => a.ordinal - b.ordinal);
@@ -339,7 +345,7 @@ export function draftLine(input: DraftInput): DraftLine {
         return i > 0 && p !== positions[i - 1] + 1 ? `… ${word}` : word;
       })
       .join(" ");
-  for (const g of input.padarth.filter((g) => g.isPhrase && g.links.length > 0).sort((a, b) => a.ordinal - b.ordinal)) {
+  for (const g of input.padarth.filter((g) => g.links.length > 0 && !coversOne(g)).sort((a, b) => a.ordinal - b.ordinal)) {
     const positions = [...new Set(g.links.map((l) => l.position))].sort((a, b) => a - b);
     const key = positions.join(",");
     const phrase = byKey.get(key) ?? { positions, surface: surface(positions), candidates: [], grammar: [] };
