@@ -511,3 +511,11 @@ service_role only). psql reported CREATE FUNCTION ×4 and CREATE TABLE ×3, the 
 REVOKE and GRANT, and NOTIFY; the two DROP TRIGGER IF EXISTS notices were expected on a first run. Read back after:
 tables `padarth_line_notes, padarth_pick_refs, padarth_picks`; functions `padarth_positions_ok, padarth_relink_refs,
 padarth_save_pick`.
+
+**086_padarth_commentary** — run 2026-11-07 on the self-hosted server in one transaction, the same way as 084
+(`git show origin/main:… | docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -1`), followed by
+`notify pgrst, 'reload schema'`. Kosh `086_padarth_commentary.sql` as merged (#375, #23): `padarth_commentary` (an
+introduction or a question set before a line; RLS on, no policies, no API-role grants) and its `updated_at` trigger.
+psql reported CREATE TABLE, COMMENT, DROP TRIGGER (the IF EXISTS notice was expected on a first run), CREATE TRIGGER,
+ALTER TABLE, REVOKE ×2 and NOTIFY. Checked after through the API: the anon key gets `42501 permission denied for table
+padarth_commentary` (was `42P01 does not exist`).
