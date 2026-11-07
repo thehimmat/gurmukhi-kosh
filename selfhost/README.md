@@ -281,6 +281,36 @@ ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && docker stats --no-stream && d
 `.github/workflows/uptime.yml` checks the API and the home page every 30 minutes, and `/api/health`
 daily at 08:00 UTC, which used to be the Vercel cron.
 
+### Migrations
+
+Apply a migration from GitHub, not a shell: **Actions → Apply migration → Run workflow** with the file
+name (`087_example.sql`), or
+
+```sh
+gh workflow run migrate.yml -R thehimmat/gurmukhi-kosh -f migration=087_example.sql
+```
+
+It runs `scripts/migrate.sh` on the server over its own SSH key, which can run that script and
+nothing else. The script takes a file name only, applies the file **from main** in one transaction
+(`psql -v ON_ERROR_STOP=1 -1`), reloads PostgREST's schema cache, and refuses a file that isn't on
+main or that `supabase/APPLIED.md` already records. psql's output lands in the run's summary; record
+it in `APPLIED.md` in a commit afterwards. Write and test the migration first (`tests/db/`).
+
+One-time setup (on your Mac):
+
+```sh
+ssh-keygen -t ed25519 -N "" -C github-migrate -f ~/.ssh/kosh-migrate
+```
+```sh
+echo "restrict,command=\"sh /opt/kosh/selfhost/scripts/migrate.sh\" $(cat ~/.ssh/kosh-migrate.pub)" | ssh ubuntu@141.148.39.45 'cat >> ~/.ssh/authorized_keys'
+```
+```sh
+gh secret set MIGRATE_SSH_KEY -R thehimmat/gurmukhi-kosh < ~/.ssh/kosh-migrate
+```
+
+It reuses the `DEPLOY_HOST` variable and `DEPLOY_KNOWN_HOSTS` secret. By hand, the same as the
+workflow: `ssh ubuntu@141.148.39.45 'sh /opt/kosh/selfhost/scripts/migrate.sh 087_example.sql'`.
+
 ### Oracle's idle-instance reclaim
 
 Oracle stops Always Free instances that it judges idle over 7 days. The criteria include low CPU,
