@@ -24,11 +24,18 @@ describe("proxy", () => {
     expect(cookie).toMatch(/Path=\/admin/);
   });
 
-  it("passes a /word page through with the key, setting the cookie", () => {
-    const res = proxy(req("/word/x?key=s3cret"));
-    expect(res.headers.get("location")).toBeNull();
-    expect(res.headers.get("x-middleware-next")).toBe("1");
+  it("redirects a /word page with the key to /admin/word, setting the cookie", () => {
+    const res = proxy(req("/word/x?key=s3cret&tab=usage"));
+    expect(res.status).toBe(303);
+    expect(res.headers.get("location")).toBe("https://kosh.internal/admin/word/x?tab=usage");
     expect(res.headers.get("set-cookie")).toMatch(/^kosh_admin=s3cret;/);
+  });
+
+  it("clears the cookie and leaves on /admin/logout", () => {
+    const res = proxy(req("/admin/logout"));
+    expect(res.status).toBe(303);
+    expect(res.headers.get("location")).toBe("https://kosh.internal/");
+    expect(res.headers.get("set-cookie")).toMatch(/^kosh_admin=;.*Path=\/admin/);
   });
 
   it("passes a wrong key through untouched, so the page answers 404", () => {

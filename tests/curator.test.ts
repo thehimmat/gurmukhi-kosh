@@ -5,7 +5,8 @@
  */
 
 import { afterEach, describe, expect, it } from "vitest";
-import { curatorDb, isCurator, publicOriginFilter, withCuratorKey } from "../lib/curator";
+import { curatorDb, isCurator, publicOriginFilter } from "../lib/curator";
+import { curatorHref } from "../lib/curator-href";
 import { supabase } from "../lib/supabase";
 
 const ORIGINAL = process.env.ADMIN_KEY;
@@ -33,20 +34,24 @@ describe("isCurator", () => {
   it("is true only for the exact key", () => {
     process.env.ADMIN_KEY = "s3cret";
     expect(isCurator("s3cret")).toBe(true);
+    expect(isCurator("s3cre")).toBe(false);
+    expect(isCurator("s3cretx")).toBe(false);
+    expect(isCurator("S3cret")).toBe(false);
   });
 });
 
-describe("withCuratorKey", () => {
+describe("curatorHref", () => {
   it("leaves the href alone outside curator mode", () => {
-    expect(withCuratorKey("/word/ਨਾਮੁ?tab=usage", null)).toBe("/word/ਨਾਮੁ?tab=usage");
+    expect(curatorHref("/word/ਨਾਮੁ?tab=usage", false)).toBe("/word/ਨਾਮੁ?tab=usage");
   });
 
-  it("appends the key to an existing query", () => {
-    expect(withCuratorKey("/word/x?tab=usage", "a b&c")).toBe("/word/x?tab=usage&key=a%20b%26c");
+  it("sends a curator's word link to /admin/word, with no key in it", () => {
+    expect(curatorHref("/word/x?tab=usage", true)).toBe("/admin/word/x?tab=usage");
   });
 
-  it("starts a query when there is none", () => {
-    expect(withCuratorKey("/admin/flags", "k")).toBe("/admin/flags?key=k");
+  it("leaves other links alone", () => {
+    expect(curatorHref("/admin/flags", true)).toBe("/admin/flags");
+    expect(curatorHref("/words", true)).toBe("/words");
   });
 });
 

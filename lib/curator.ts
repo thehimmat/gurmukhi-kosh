@@ -3,19 +3,23 @@ import { supabase, supabaseAdmin } from "./supabase";
 
 // Curator mode (#125). Public pages hide curation tooling (flag forms per row,
 // provenance pills outside the Sources tab, spelling caveats, methodology and
-// roadmap copy); opening a page with ?key=ADMIN_KEY shows it. Same key, same
-// check as the /admin/* pages.
+// roadmap copy); the curator's copies under /admin show it (/admin/word,
+// /admin/line), behind the admin cookie below.
 
+/** Whether `key` is the admin key. Compared in constant time for keys of the same length. */
 export function isCurator(key: string | null | undefined): boolean {
   const adminKey = process.env.ADMIN_KEY;
-  return !!adminKey && key === adminKey;
+  if (!adminKey || typeof key !== "string" || key.length !== adminKey.length) return false;
+  let diff = 0;
+  for (let i = 0; i < key.length; i++) diff |= key.charCodeAt(i) ^ adminKey.charCodeAt(i);
+  return diff === 0;
 }
 
 // The admin key in a cookie (#23). /admin pages and their server actions read it from an httpOnly
 // cookie scoped to /admin, so it stays out of their URLs, the access logs and action arguments.
-// proxy.ts swaps a ?key=ADMIN_KEY for the cookie. Public pages (/word) keep curator mode in the
-// URL: the CDN caches them by URL (next.config.ts), so a curator render must never share a URL
-// with a public one.
+// proxy.ts swaps a ?key=ADMIN_KEY for the cookie, and /admin/logout clears it. Public /word never
+// renders curator mode, since the CDN caches it by URL (next.config.ts): /word/<w>?key=… goes to
+// its curator copy, /admin/word/<w>.
 
 export const ADMIN_COOKIE = "kosh_admin";
 const ADMIN_COOKIE_DAYS = 30;
@@ -31,23 +35,18 @@ export function adminCookieOptions() {
 }
 
 /**
- * What the proxy does with a request's ?key: set the cookie when it is the admin key, and on an
- * /admin page also redirect to the same path and query without it.
+ * What the proxy does with a request's ?key: when it is the admin key, set the cookie and redirect
+ * to the same path and query without it; a /word page goes to its /admin/word copy.
  */
 export function adminKeyExchange(pathname: string, search: URLSearchParams): { setCookie: boolean; redirectTo: string | null } {
   const keys = search.getAll("key");
   if (keys.length !== 1 || !isCurator(keys[0])) return { setCookie: false, redirectTo: null };
-  if (pathname !== "/admin" && !pathname.startsWith("/admin/")) return { setCookie: true, redirectTo: null };
+  const target = pathname === "/word" || pathname.startsWith("/word/") ? `/admin${pathname}` : pathname;
+  if (target !== "/admin" && !target.startsWith("/admin/")) return { setCookie: true, redirectTo: null };
   const rest = new URLSearchParams(search);
   rest.delete("key");
   const query = rest.toString();
-  return { setCookie: true, redirectTo: query ? `${pathname}?${query}` : pathname };
-}
-
-/** Carry the curator key on an internal link so the mode survives navigation. */
-export function withCuratorKey(href: string, key: string | null): string {
-  if (!key) return href;
-  return `${href}${href.includes("?") ? "&" : "?"}key=${encodeURIComponent(key)}`;
+  return { setCookie: true, redirectTo: query ? `${target}?${query}` : target };
 }
 
 /**

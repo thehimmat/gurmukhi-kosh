@@ -61,6 +61,9 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
   return (
     <main className="padarth-page">
       <h1>Pad-arth builder</h1>
+      <p className="padarth-help">
+        <a href="/admin/logout">Log out</a>
+      </p>
       <div className="padarth-scope">
         <form method="get" action="/admin/padarth">
           {preview && <input type="hidden" name="view" value="preview" />}
@@ -131,7 +134,6 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
               key={lineIds.join(",")}
               lines={draft.lines}
               drafts={draft.drafts}
-              curatorKey={key}
               picks={saved?.picks ?? []}
               lineNotes={[...(saved?.lineNotes ?? new Map<number, string>())]}
               hints={hints}

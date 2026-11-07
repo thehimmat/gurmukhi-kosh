@@ -26,7 +26,7 @@ const draft = draftLine({
 });
 
 const html = renderToStaticMarkup(
-  createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ਸਚਿਆਰਾ ਹੋਈਐ ਕਿਵ ਕੂੜੈ ਤੁਟੈ ਪਾਲਿ ॥" }], drafts: [draft], curatorKey: "k&y" })
+  createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ਸਚਿਆਰਾ ਹੋਈਐ ਕਿਵ ਕੂੜੈ ਤੁਟੈ ਪਾਲਿ ॥" }], drafts: [draft] })
 );
 const decode = (s: string) =>
   s.replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
@@ -35,8 +35,9 @@ const text = decode(html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " "));
 describe("PadarthDraftView", () => {
   it("shows the line, then every word in order, each linking to its word page with the key", () => {
     expect(html).toContain("ਕਿਵ ਸਚਿਆਰਾ ਹੋਈਐ ਕਿਵ ਕੂੜੈ ਤੁਟੈ ਪਾਲਿ ॥");
-    expect(html.match(/href="\/word\/[^"]+"/g)).toHaveLength(7);
-    expect(html).toContain(`href="/word/${encodeURIComponent("ਕਿਵ")}?key=k%26y"`);
+    expect(html.match(/href="\/admin\/word\/[^"]+"/g)).toHaveLength(7);
+    // Curator mode on word pages lives under /admin, behind the cookie: the link carries no key.
+    expect(html).toContain(`href="/admin/word/${encodeURIComponent("ਕਿਵ")}"`);
     expect(text.indexOf("ਸਚਿਆਰਾ")).toBeLessThan(text.indexOf("ਹੋਈਐ"));
   });
 
@@ -60,7 +61,7 @@ describe("PadarthDraftView", () => {
     expect(text.match(/Glossed in a phrase below/g)?.length).toBe(2);
     expect(text).not.toContain("No gloss in the database");
     const bare = draftLine({ lineId: 1, tokens: [{ position: 0, wordId: 1, gurmukhi: "ੴ" }], definitions: [], formLinks: [], padarth: [], grammar: [] });
-    const out = renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 1, verse_id: 1, gurmukhi: "ੴ" }], drafts: [bare], curatorKey: "k" }));
+    const out = renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 1, verse_id: 1, gurmukhi: "ੴ" }], drafts: [bare] }));
     expect(out).toContain("No gloss in the database");
   });
 
@@ -88,7 +89,7 @@ describe("PadarthDraftView", () => {
       mkPointerTargets: [{ target: "ਮੰਞੁ", wordId: 50 }],
     });
     const out = decode(
-      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 2, verse_id: 2, gurmukhi: "ਮੰਞ ਕੁਚਜੀ" }], drafts: [d], curatorKey: "k" }))
+      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 2, verse_id: 2, gurmukhi: "ਮੰਞ ਕੁਚਜੀ" }], drafts: [d] }))
         .replace(/<[^>]+>/g, " ")
         .replace(/\s+/g, " ")
     );
@@ -100,7 +101,7 @@ describe("PadarthDraftView", () => {
   it("offers an introduction and a question before each line, open when one is written", () => {
     const render = (props: object) =>
       renderToStaticMarkup(
-        createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], curatorKey: "k", ...props })
+        createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], ...props })
       );
     const empty = render({});
     expect(empty).toContain("Introduction / question before this line");
@@ -113,7 +114,7 @@ describe("PadarthDraftView", () => {
 
   it("hides the commentary boxes and says why until migration 086 is applied", () => {
     const out = renderToStaticMarkup(
-      createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], curatorKey: "k", commentaryAvailable: false })
+      createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], commentaryAvailable: false })
     );
     expect(out).not.toContain("Introduction / question before this line");
     expect(out).toContain("need migration 086");

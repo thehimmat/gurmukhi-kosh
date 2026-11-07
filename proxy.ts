@@ -6,6 +6,12 @@ import { ADMIN_COOKIE, adminCookieOptions, adminKeyExchange } from "@/lib/curato
 // Location as a relative URL (router-utils/resolve-routes), so behind the gurmukhi-search shell's
 // rewrite the browser stays on the shell's host.
 export function proxy(request: NextRequest) {
+  // Log out: clear the cookie and leave the admin pages.
+  if (request.nextUrl.pathname === "/admin/logout") {
+    const out = NextResponse.redirect(new URL("/", request.url), 303);
+    out.cookies.set(ADMIN_COOKIE, "", { ...adminCookieOptions(), maxAge: 0 });
+    return out;
+  }
   const { setCookie, redirectTo } = adminKeyExchange(request.nextUrl.pathname, request.nextUrl.searchParams);
   if (!setCookie) return NextResponse.next();
   const response = redirectTo ? NextResponse.redirect(new URL(redirectTo, request.url), 303) : NextResponse.next();
