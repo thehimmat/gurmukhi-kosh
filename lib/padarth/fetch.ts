@@ -8,7 +8,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAllRows } from "../fetch-all-rows";
-import { draftLine, type DraftInput, type DraftLine, type DraftVariant } from "./draft";
+import { draftLine, type DraftCollocation, type DraftInput, type DraftLine, type DraftVariant } from "./draft";
 import { parseMkPointer } from "./mk-pointer";
 import { foldGurmukhi, foldSpelling } from "../gurmukhi-fold";
 
@@ -28,6 +28,15 @@ type DefinitionRow = {
   definition_text: string;
   definition_en: string | null;
   notes: string | null;
+  dict_sources: { code: string } | null;
+};
+type CollocationRow = {
+  id: number;
+  phrase_gurmukhi: string;
+  members: string[][];
+  gloss: string;
+  pos_raw: string | null;
+  origin: "compound" | "usage";
   dict_sources: { code: string } | null;
 };
 type FormLinkRow = {
@@ -74,6 +83,8 @@ export type DraftRows = {
   pointerTargets: { id: number; gurmukhi: string }[];
   /** Words sharing a fold key with a line word that has no dictionary row (definitions holds their senses). */
   variantWords: { id: number; gurmukhi: string }[];
+  /** Every dictionary phrase (087), or none before it is applied. */
+  collocations: CollocationRow[];
   padarth: PadarthRow[];
   grammar: GrammarRow[];
 };
@@ -125,6 +136,16 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
       .filter((w) => w.id !== wordId)
       .map((w) => ({ wordId, variantWordId: w.id, variant: w.gurmukhi, tier: foldSpelling(w.gurmukhi) === foldSpelling(gurmukhi) ? "spelling" : "ending" }));
   };
+  // One list for every line, so the draft's phrase index is built once (draft.ts).
+  const collocations: DraftCollocation[] = rows.collocations.map((c) => ({
+    id: c.id,
+    sourceCode: c.dict_sources?.code ?? "",
+    phrase: c.phrase_gurmukhi,
+    members: c.members,
+    gloss: c.gloss,
+    posRaw: c.pos_raw,
+    origin: c.origin,
+  }));
   const definitions = rows.definitions.map((d) => ({
     id: d.id,
     wordId: d.word_id,
@@ -195,6 +216,7 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
         grammar: grammar.filter((g) => wordIds.has(g.wordId)),
         mkPointerTargets,
         variants,
+        collocations,
       };
     });
 }
@@ -357,6 +379,7 @@ export async function fetchDraftRows(db: SupabaseClient, lines: LineRow[]): Prom
     variantWords.map((w) => w.id).filter((id) => !loaded.has(id)),
     (ids) => db.from("definitions").select("id, word_id, sense_number, definition_text, definition_en, notes, dict_sources(code)").in("word_id", ids).order("id")
   );
+  const collocations = await fetchCollocations(db);
   return {
     lines,
     occurrences,
@@ -365,9 +388,25 @@ export async function fetchDraftRows(db: SupabaseClient, lines: LineRow[]): Prom
     headwords,
     pointerTargets,
     variantWords,
+    collocations,
     padarth,
     grammar,
   };
+}
+
+/**
+ * Every dictionary phrase (087). Curator-only: the anon client gets none. Before 087 is applied
+ * the table is missing and the draft simply has no dictionary phrases.
+ */
+async function fetchCollocations(db: SupabaseClient): Promise<CollocationRow[]> {
+  try {
+    return await fetchAllRows<CollocationRow>("dict_collocations", () =>
+      db.from("dict_collocations").select("id, phrase_gurmukhi, members, gloss, pos_raw, origin, dict_sources(code)").order("id")
+    );
+  } catch (e) {
+    if (/does not exist|could not find|permission denied/i.test(String((e as Error).message))) return [];
+    throw e;
+  }
 }
 
 /** The draft for every line of a scope, in reading order. */

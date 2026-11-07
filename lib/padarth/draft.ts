@@ -19,7 +19,9 @@
 //     lowPriority, because they can collide with an unrelated word (ਦਰਿ "grind coarsely" against
 //     the locative of ਦਰੁ).
 //   - Phrases come after the words, and only phrases a source defines: Sahib Singh's multi-word
-//     entries today. A phrase's gloss is not repeated on its words.
+//     entries for this line, and Shackle's compounds and glossed phrases (087) wherever their words
+//     stand together in the line, matched by spelling (foldSpelling), never by ending. A phrase's
+//     gloss is not repeated on its words.
 //   - Grammar has three tiers (#23):
 //       stated  a scholar says it: Shackle's label for a linked form, an imported word_grammar
 //               row (Sahib Singh's only when he wrote it on this line), Mahan Kosh's part of speech
@@ -29,6 +31,7 @@
 
 import type { CaseEvidence } from "./case-evidence";
 import { parseMkPointer } from "./mk-pointer";
+import { foldSpelling } from "../gurmukhi-fold";
 
 export type DraftToken = { position: number; wordId: number; gurmukhi: string };
 
@@ -98,6 +101,20 @@ export type DraftInput = {
   mkPointerTargets?: { target: string; wordId: number }[];
   /** Other words that fold to the same key as a line word (lib/gurmukhi-fold.ts), definitions included above. */
   variants?: DraftVariant[];
+  /** A dictionary's glossed phrases (087), matched against the line here. */
+  collocations?: DraftCollocation[];
+};
+
+export type DraftCollocation = {
+  id: number;
+  sourceCode: string;
+  /** The phrase in Gurmukhi, as reverse-transliterated. */
+  phrase: string;
+  /** Per word, every spelling the source's romanisation allows. */
+  members: string[][];
+  gloss: string;
+  posRaw: string | null;
+  origin: "compound" | "usage";
 };
 
 /** A spelling variant of a line word: "spelling" folds equal under foldSpelling, "ending" only under foldGurmukhi. */
@@ -138,7 +155,17 @@ export type DefinitionCandidate = {
   lowPriority: boolean;
 };
 
-export type Candidate = PadarthCandidate | DefinitionCandidate;
+export type CollocationCandidate = {
+  kind: "collocation";
+  collocationId: number;
+  sourceCode: string;
+  term: string;
+  text: string;
+  posRaw: string | null;
+  origin: "compound" | "usage";
+};
+
+export type Candidate = PadarthCandidate | DefinitionCandidate | CollocationCandidate;
 
 export type GrammarAttribute = "pos" | "gender" | "number" | "gramCase" | "person" | "verbForm";
 
@@ -152,7 +179,7 @@ export type DraftPointer = { target: string; sense: number | null; resolved: boo
 
 export type DraftWord = DraftToken & { candidates: Candidate[]; grammar: GrammarNote[]; uncovered: boolean; pointers: DraftPointer[] };
 
-export type DraftPhrase = { positions: number[]; surface: string; candidates: PadarthCandidate[]; grammar: GrammarNote[] };
+export type DraftPhrase = { positions: number[]; surface: string; candidates: (PadarthCandidate | CollocationCandidate)[]; grammar: GrammarNote[] };
 
 export type DraftLine = { lineId: number; words: DraftWord[]; phrases: DraftPhrase[]; unplaced: DraftPadarthGloss[] };
 
@@ -320,7 +347,45 @@ export function draftLine(input: DraftInput): DraftLine {
     phrase.grammar.push(...caseClues(g));
     byKey.set(key, phrase);
   }
+  // A dictionary's phrases, wherever their words stand together in the line.
+  if (input.collocations?.length) {
+    const index = collocationIndex(input.collocations);
+    const keys = tokens.map((t) => foldSpelling(t.gurmukhi));
+    for (let i = 0; i < tokens.length; i++) {
+      for (const c of index.get(keys[i]) ?? []) {
+        const k = c.members.length;
+        if (i + k > tokens.length) continue;
+        let ok = true;
+        for (let j = 1; j < k && ok; j++) ok = c.folded[j].has(keys[i + j]);
+        if (!ok) continue;
+        const positions = tokens.slice(i, i + k).map((t) => t.position);
+        const key = positions.join(",");
+        const phrase = byKey.get(key) ?? { positions, surface: surface(positions), candidates: [], grammar: [] };
+        if (phrase.candidates.some((x) => x.kind === "collocation" && x.collocationId === c.id)) continue;
+        phrase.candidates.push({ kind: "collocation", collocationId: c.id, sourceCode: c.sourceCode, term: c.phrase, text: c.gloss, posRaw: c.posRaw, origin: c.origin });
+        byKey.set(key, phrase);
+      }
+    }
+  }
   const phrases = [...byKey.values()].sort((a, b) => a.positions[0] - b.positions[0] || a.positions.length - b.positions.length);
 
   return { lineId: input.lineId, words, phrases, unplaced: input.padarth.filter((g) => g.links.length === 0) };
+}
+
+type IndexedCollocation = DraftCollocation & { folded: Set<string>[] };
+const indexCache = new WeakMap<DraftCollocation[], Map<string, IndexedCollocation[]>>();
+
+/** Collocations by the spelling-folded forms of their first word, built once per list. */
+function collocationIndex(list: DraftCollocation[]): Map<string, IndexedCollocation[]> {
+  const cached = indexCache.get(list);
+  if (cached) return cached;
+  const index = new Map<string, IndexedCollocation[]>();
+  for (const c of list) {
+    if (c.members.length < 2) continue;
+    const folded = c.members.map((m) => new Set(m.map(foldSpelling)));
+    const entry = { ...c, folded };
+    for (const first of folded[0]) index.set(first, [...(index.get(first) ?? []), entry]);
+  }
+  indexCache.set(list, index);
+  return index;
 }

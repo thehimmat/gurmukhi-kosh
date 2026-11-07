@@ -101,6 +101,14 @@ describe("saveLineNote", () => {
   });
 });
 
+describe("savePick with a dictionary phrase", () => {
+  it("passes a collocation ref through to padarth_save_pick (087)", async () => {
+    const { savePick } = await import("../app/admin/padarth/actions");
+    await savePick({ ...good, refs: [{ kind: "collocation", id: 7 }] });
+    expect((calls[0].args[1] as { p_refs: unknown }).p_refs).toEqual([{ kind: "collocation", id: 7 }]);
+  });
+});
+
 describe("saveCommentary", () => {
   it("writes an introduction or a question for a line, and removes it when cleared", async () => {
     const { saveCommentary } = await import("../app/admin/padarth/actions");

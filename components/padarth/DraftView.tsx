@@ -77,6 +77,17 @@ function CandidateText({ c }: { c: Candidate }) {
       </>
     );
   }
+  if (c.kind === "collocation") {
+    return (
+      <>
+        <span>{c.text}</span>
+        {c.posRaw && <span className="padarth-en"> ({c.posRaw})</span>}{" "}
+        <span className="padarth-source">
+          {sourceLabel(c.sourceCode)}, {c.origin === "compound" ? "compound" : "usage note"} <span className="gurmukhi">{c.term}</span>
+        </span>
+      </>
+    );
+  }
   return (
     <>
       <span>{c.text}</span>

@@ -5,7 +5,7 @@
 
 import type { SavePickInput, RefChoice } from "@/app/admin/padarth/actions";
 import type { Candidate, DraftLine } from "./draft";
-import { pickStates, positionsKey, type SavedPick, type SavedRef } from "./picks";
+import { pickStates, positionsKey, refRowId, type SavedPick, type SavedRef } from "./picks";
 
 export type Item = { lineId: number; kind: "word" | "phrase"; positions: number[]; surface: string; candidates: Candidate[] };
 
@@ -14,7 +14,11 @@ export type ItemPick = { refs: RefChoice[]; override: string | null; note: strin
 export const itemKey = (lineId: number, positions: number[]) => `${lineId}|${positionsKey(positions)}`;
 
 export const choiceOf = (c: Candidate): RefChoice =>
-  c.kind === "padarth_gloss" ? { kind: "padarth_gloss", id: c.glossId } : { kind: "definition", id: c.definitionId };
+  c.kind === "padarth_gloss"
+    ? { kind: "padarth_gloss", id: c.glossId }
+    : c.kind === "collocation"
+      ? { kind: "collocation", id: c.collocationId }
+      : { kind: "definition", id: c.definitionId };
 
 const same = (a: RefChoice, b: RefChoice) => a.kind === b.kind && a.id === b.id;
 
@@ -41,14 +45,14 @@ export function initialPicks(drafts: DraftLine[], saved: SavedPick[]): Map<strin
       });
       // A ref whose row still exists but is no longer offered can be sent again as it is.
       for (const r of s.orphans) {
-        const id = r.refKind === "padarth_gloss" ? r.padarthGlossId : r.definitionId;
+        const id = refRowId(r);
         if (id !== null) refs.push({ kind: r.refKind, id });
       }
       out.set(itemKey(d.lineId, positions), {
         refs,
         override: s.pick.overrideText,
         note: s.pick.noteText,
-        orphans: s.orphans.filter((r) => (r.refKind === "padarth_gloss" ? r.padarthGlossId : r.definitionId) === null),
+        orphans: s.orphans.filter((r) => refRowId(r) === null),
       });
     }
   }

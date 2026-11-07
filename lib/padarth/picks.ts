@@ -10,11 +10,13 @@ import type { Candidate, DraftLine } from "./draft";
 
 export type SavedRef = {
   ordinal: number;
-  refKind: "padarth_gloss" | "definition";
+  refKind: "padarth_gloss" | "definition" | "collocation";
   sourceCode: string;
   /** null once the row is deleted, until padarth_relink_refs() finds it again. */
   padarthGlossId: number | null;
   definitionId: number | null;
+  /** A dictionary phrase (087); absent on refs read before it. */
+  collocationId?: number | null;
   snapshotTerm: string | null;
   snapshotText: string;
 };
@@ -39,10 +41,15 @@ export type PickState = {
 
 export type Hint = { lineId: number; text: string };
 
-export const candidateKey = (c: Candidate) => (c.kind === "padarth_gloss" ? `padarth_gloss:${c.glossId}` : `definition:${c.definitionId}`);
+export const candidateKey = (c: Candidate) =>
+  c.kind === "padarth_gloss" ? `padarth_gloss:${c.glossId}` : c.kind === "collocation" ? `collocation:${c.collocationId}` : `definition:${c.definitionId}`;
+
+/** The id of the row a saved ref names, or null once that row is gone. */
+export const refRowId = (r: SavedRef): number | null =>
+  r.refKind === "padarth_gloss" ? r.padarthGlossId : r.refKind === "collocation" ? (r.collocationId ?? null) : r.definitionId;
 
 const refKey = (r: SavedRef) => {
-  const id = r.refKind === "padarth_gloss" ? r.padarthGlossId : r.definitionId;
+  const id = refRowId(r);
   return id === null ? null : `${r.refKind}:${id}`;
 };
 
@@ -93,10 +100,11 @@ type PickRow = {
   note_text: string | null;
   padarth_pick_refs: {
     ordinal: number;
-    ref_kind: "padarth_gloss" | "definition";
+    ref_kind: "padarth_gloss" | "definition" | "collocation";
     source_code: string;
     padarth_gloss_id: number | null;
     definition_id: number | null;
+    collocation_id?: number | null;
     snapshot_term: string | null;
     snapshot_text: string;
   }[];
@@ -104,7 +112,13 @@ type PickRow = {
 
 const PICK_COLUMNS =
   "id, line_id, positions, surface_text, override_text, note_text," +
-  " padarth_pick_refs(ordinal, ref_kind, source_code, padarth_gloss_id, definition_id, snapshot_term, snapshot_text)";
+  " padarth_pick_refs(ordinal, ref_kind, source_code, padarth_gloss_id, definition_id, collocation_id, snapshot_term, snapshot_text)";
+/** The columns before 087, while it isn't applied yet. */
+const PICK_COLUMNS_084 = PICK_COLUMNS.replace(" collocation_id,", "");
+
+/** PostgREST and Postgres codes for a missing column or table: a migration not applied yet. */
+const NOT_APPLIED = new Set(["42703", "PGRST204", "PGRST205", "42P01"]);
+const notApplied = (e: unknown) => NOT_APPLIED.has(((e as { code?: string })?.code ?? "") as string) || /does not exist|could not find/i.test(String((e as Error)?.message ?? e));
 
 const toPick = (r: PickRow): SavedPick => ({
   id: r.id,
@@ -119,6 +133,7 @@ const toPick = (r: PickRow): SavedPick => ({
     sourceCode: x.source_code,
     padarthGlossId: x.padarth_gloss_id,
     definitionId: x.definition_id,
+    collocationId: x.collocation_id ?? null,
     snapshotTerm: x.snapshot_term,
     snapshotText: x.snapshot_text,
   })),
@@ -128,11 +143,23 @@ const CHUNK = 200;
 const chunks = <T>(xs: T[]) => Array.from({ length: Math.ceil(xs.length / CHUNK) }, (_, i) => xs.slice(i * CHUNK, (i + 1) * CHUNK));
 
 /** The picks and line notes on these lines (service-role client: these tables are the curator's). */
+/** Picks where `column` is one of `values`, reading the 087 columns when they exist. */
+async function selectPicks(db: SupabaseClient, label: string, column: "line_id" | "surface_text", values: (number | string)[], order: string): Promise<PickRow[]> {
+  const run = (columns: string) =>
+    fetchAllRows<PickRow>(label, () => db.from("padarth_picks").select(columns).in(column, values).order(order));
+  try {
+    return await run(PICK_COLUMNS);
+  } catch (e) {
+    if (!notApplied(e)) throw e;
+    return run(PICK_COLUMNS_084);
+  }
+}
+
 export async function fetchPicks(db: SupabaseClient, lineIds: number[]): Promise<{ picks: SavedPick[]; lineNotes: Map<number, string> }> {
   const picks: SavedPick[] = [];
   const lineNotes = new Map<number, string>();
   for (const ids of chunks(lineIds)) {
-    const rows = await fetchAllRows<PickRow>("padarth_picks", () => db.from("padarth_picks").select(PICK_COLUMNS).in("line_id", ids).order("id"));
+    const rows = await selectPicks(db, "padarth_picks", "line_id", ids, "id");
     picks.push(...rows.map(toPick));
     const notes = await fetchAllRows<{ line_id: number; note_text: string }>("padarth_line_notes", () =>
       db.from("padarth_line_notes").select("line_id, note_text").in("line_id", ids).order("line_id")
@@ -171,9 +198,7 @@ export async function fetchCommentary(db: SupabaseClient, lineIds: number[]): Pr
 export async function fetchHintPicks(db: SupabaseClient, surfaces: string[]): Promise<SavedPick[]> {
   const out: SavedPick[] = [];
   for (const part of chunks([...new Set(surfaces)])) {
-    const rows = await fetchAllRows<PickRow>("padarth_picks hints", () =>
-      db.from("padarth_picks").select(PICK_COLUMNS).in("surface_text", part).order("line_id")
-    );
+    const rows = await selectPicks(db, "padarth_picks hints", "surface_text", part, "line_id");
     out.push(...rows.map(toPick));
   }
   return out;
