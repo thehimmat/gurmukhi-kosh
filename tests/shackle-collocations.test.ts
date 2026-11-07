@@ -53,6 +53,12 @@ describe("usagePhrases", () => {
       [{ phrase: "ujjhaṛa pāi", gloss: "having caused to go astray" }],
     ],
     ["as uri dhāri, uridhāri [=URADHĀRI] 'fix in the heart'", [{ phrase: "uri dhāri", gloss: "fix in the heart" }]],
+    // Constructed from the dry run (#382): an apostrophe inside the gloss doesn't end it.
+    ["ahilā janamu gaṁvāi 'waste one's precious life'", [{ phrase: "ahilā janamu gaṁvāi", gloss: "waste one's precious life" }]],
+    // English words before a gloss aren't part of the phrase.
+    ["onama akkharu 'God', standing for oaṁkāru 'God'", [{ phrase: "onama akkharu", gloss: "God" }]],
+    // "to" is ਤੋ in Shackle's romanisation, so it stays in a phrase.
+    ["as ehu to 'this then'", [{ phrase: "ehu to", gloss: "this then" }]],
   ];
   it.each(cases)("%s", (notes, expected) => {
     expect(usagePhrases(notes)).toEqual(expected);

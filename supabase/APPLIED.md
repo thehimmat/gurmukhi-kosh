@@ -519,3 +519,12 @@ introduction or a question set before a line; RLS on, no policies, no API-role g
 psql reported CREATE TABLE, COMMENT, DROP TRIGGER (the IF EXISTS notice was expected on a first run), CREATE TRIGGER,
 ALTER TABLE, REVOKE ×2 and NOTIFY. Checked after through the API: the anon key gets `42501 permission denied for table
 padarth_commentary` (was `42P01 does not exist`).
+
+**087_shackle_collocations** — run 2026-11-07 on the self-hosted server through the Apply migration workflow (run 5,
+`selfhost/scripts/migrate.sh` from main at c66fd53: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`087_shackle_collocations.sql` as merged (#381, #163): `dict_collocations` (Shackle's glossed phrases; RLS on, no policies,
+no API-role grants) and a `collocation` ref kind for pad-arth picks, with `padarth_save_pick()` and `padarth_relink_refs()`
+extended to it. psql reported CREATE TABLE, COMMENT, CREATE INDEX, ALTER TABLE, REVOKE ×2, ALTER TABLE ×6 (the
+`padarth_pick_refs_collocation_check` IF EXISTS notice was expected on a first run), CREATE INDEX, CREATE FUNCTION ×2
+with their REVOKE and GRANT, and NOTIFY. Loaded after with `npm run ingest:shackle:collocations`: 1,112 phrases (179
+compounds, 933 from usage notes), 687 head words found.
