@@ -38,7 +38,7 @@ export type PlanInput = {
 
 export type PlannedLink = {
   occurrenceId: number;
-  match: "exact" | "gapped" | "via_base";
+  match: "exact" | "gapped" | "via_base" | "compound";
   /** The shared Shackle lexeme, for via_base links. */
   lexemeId: number | null;
 };

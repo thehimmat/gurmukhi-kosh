@@ -328,4 +328,18 @@ describe("draftLine", () => {
       ["collocation", "sound the drum"],
     ]);
   });
+
+  it("places a compound by the words it covers: several words make a phrase row, one word a word gloss (#179)", () => {
+    const d = draftLine(
+      input("ਝਿਲਿ ਮਿਲਿ ਕਾਰੁ ਭਖਸਾਰ", {
+        padarth: [
+          { id: 80, ordinal: 0, term: "ਝਿਲਿਮਿਲਿਕਾਰੁ", gloss: "ਚਮਕਾਰਾ", notes: [], isPhrase: false, links: [0, 1, 2].map((position) => ({ position, match: "compound" as const, lexemeId: null })), caseEvidence: [] },
+          { id: 81, ordinal: 1, term: "ਭਖ ਸਾਰ", gloss: "ਖਾਣ ਯੋਗ", notes: [], isPhrase: true, links: [{ position: 3, match: "compound", lexemeId: null }], caseEvidence: [] },
+        ],
+      })
+    );
+    expect(d.phrases.map((p) => [p.positions, p.candidates.map((c) => c.text)])).toEqual([[[0, 1, 2], ["ਚਮਕਾਰਾ"]]]);
+    expect(d.words[3].candidates).toMatchObject([{ kind: "padarth_gloss", text: "ਖਾਣ ਯੋਗ", match: "compound" }]);
+    expect(d.words.slice(0, 3).every((w) => w.candidates.length === 0)).toBe(true);
+  });
 });

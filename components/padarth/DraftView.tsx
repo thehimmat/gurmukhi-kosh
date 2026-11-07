@@ -65,6 +65,7 @@ function CandidateText({ c }: { c: Candidate }) {
       <>
         <span className="gurmukhi">{c.text}</span> <span className="padarth-source">{sourceLabel(c.sourceCode)}</span>
         {c.match === "via_base" && <span className="padarth-caveat"> through a Shackle paradigm (gloss written for ‘{c.term}’)</span>}
+        {c.match === "compound" && <span className="padarth-caveat"> spaced differently in the line (written ‘{c.term}’)</span>}
         {c.notes.length > 0 && (
           <ul className="padarth-notes">
             {c.notes.map((n, i) => (

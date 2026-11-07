@@ -8,7 +8,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAllRows } from "../fetch-all-rows";
-import { draftLine, type DraftCollocation, type DraftInput, type DraftLine, type DraftVariant } from "./draft";
+import { draftLine, type DraftCollocation, type GlossMatch, type DraftInput, type DraftLine, type DraftVariant } from "./draft";
 import { parseMkPointer } from "./mk-pointer";
 import { foldGurmukhi, foldSpelling } from "../gurmukhi-fold";
 
@@ -55,7 +55,7 @@ type PadarthRow = {
   gloss: string;
   notes: string[];
   is_phrase: boolean;
-  padarth_gloss_occurrences: { word_occurrence_id: number; match: "exact" | "gapped" | "via_base"; lexeme_id: number | null }[];
+  padarth_gloss_occurrences: { word_occurrence_id: number; match: GlossMatch; lexeme_id: number | null }[];
   padarth_case_evidence: { gram_case: string; marker: string; basis: string }[];
 };
 type GrammarRow = {
