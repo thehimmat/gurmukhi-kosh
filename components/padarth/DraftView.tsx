@@ -13,7 +13,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Candidate, DraftLine, GrammarNote } from "@/lib/padarth/draft";
 import type { LineRow } from "@/lib/padarth/fetch";
 import type { Commentary, Hint, SavedPick } from "@/lib/padarth/picks";
-import { withCuratorKey } from "@/lib/curator";
 import { choiceOf, flatItems, initialPicks, isChosen, itemKey, saveInput, toggleChoice, withText, type Item, type ItemPick } from "@/lib/padarth/builder-state";
 import { saveCommentary, saveLineNote, savePick } from "@/app/admin/padarth/actions";
 
@@ -113,7 +112,6 @@ type ItemProps = {
   focused: boolean;
   showAll: boolean;
   editing: "override" | "note" | null;
-  curatorKey: string;
   onFocus: () => void;
   onToggle: (c: Candidate) => void;
   onShowAll: () => void;
@@ -131,7 +129,7 @@ function ItemView(p: ItemProps) {
     <li id={id} className={p.focused ? "padarth-word padarth-focus" : "padarth-word"} aria-current={p.focused || undefined} onClick={p.onFocus}>
       <div className="padarth-item-head">
         {item.kind === "word" ? (
-          <a className="gurmukhi padarth-term" href={withCuratorKey(`/word/${encodeURIComponent(item.surface)}`, p.curatorKey)}>
+          <a className="gurmukhi padarth-term" href={`/admin/word/${encodeURIComponent(item.surface)}`}>
             {item.surface}
           </a>
         ) : (
@@ -297,8 +295,6 @@ function LineCommentary({ lineId, introduction, question }: { lineId: number; in
 export type PadarthDraftViewProps = {
   lines: LineRow[];
   drafts: DraftLine[];
-  /** Opens word pages in curator mode (?key: /word is cached by URL, so the cookie doesn't reach it). */
-  curatorKey: string;
   picks?: SavedPick[];
   lineNotes?: [number, string][];
   /** By the word's spelling: what was picked for it on lines outside this scope. */
@@ -311,7 +307,6 @@ export type PadarthDraftViewProps = {
 export function PadarthDraftView({
   lines,
   drafts,
-  curatorKey,
   picks = [],
   lineNotes = [],
   hints = [],
@@ -396,7 +391,6 @@ export function PadarthDraftView({
       focused: i === focus,
       showAll: showAll.has(key),
       editing: editing?.key === key ? editing.field : null,
-      curatorKey,
       onFocus: () => setFocus(i),
       onToggle: (c) => toggle(item, c),
       onShowAll: () => setShowAll((s) => new Set(s).add(key)),

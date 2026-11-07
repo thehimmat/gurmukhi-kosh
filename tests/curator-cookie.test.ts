@@ -2,8 +2,8 @@
  * The admin key travels in an httpOnly cookie scoped to /admin (#23 status: "Admin key in an
  * httpOnly cookie, so it stops appearing in URLs, logs and server-action arguments"). Opening any
  * /admin page with ?key=ADMIN_KEY swaps the key for the cookie and redirects to the same URL
- * without it. A /word page opened with the key keeps it in its URL (the CDN caches /word by URL,
- * next.config.ts) but also sets the cookie, so its links into /admin work without the key.
+ * without it. A /word page opened with the key goes to its curator copy, /admin/word, the same way:
+ * public /word never renders curator mode, since the CDN caches it by URL (next.config.ts).
  * Run: npm test
  */
 
@@ -21,8 +21,12 @@ describe("adminKeyExchange", () => {
     expect(adminKeyExchange("/admin/flags", q("key=s3cret"))).toEqual({ setCookie: true, redirectTo: "/admin/flags" });
   });
 
-  it("sets the cookie from a /word page but leaves its URL alone", () => {
-    expect(adminKeyExchange("/word/ਨਾਮੁ", q("tab=usage&key=s3cret"))).toEqual({ setCookie: true, redirectTo: null });
+  it("sends a /word page to its curator copy under /admin, setting the cookie", () => {
+    expect(adminKeyExchange("/word/ਨਾਮੁ", q("tab=usage&key=s3cret"))).toEqual({ setCookie: true, redirectTo: "/admin/word/ਨਾਮੁ?tab=usage" });
+  });
+
+  it("leaves a /word page without a valid key alone", () => {
+    expect(adminKeyExchange("/word/ਨਾਮੁ", q("key=nope"))).toEqual({ setCookie: false, redirectTo: null });
   });
 
   it("does nothing for a missing, wrong or repeated key", () => {

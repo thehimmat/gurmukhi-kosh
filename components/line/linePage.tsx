@@ -40,5 +40,5 @@ export async function adminLinePage(idParam: string, scope: Scope, keyParam: str
   if (!id || !key) notFound();
   const ctx = await fetchLineContext(id, scope, curatorDb(true));
   if (!ctx) notFound();
-  return <LineView ctx={ctx} curatorKey={key} />;
+  return <LineView ctx={ctx} curator />;
 }
