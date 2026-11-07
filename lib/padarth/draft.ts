@@ -10,6 +10,10 @@
 //       3. the senses of the headword Shackle links the form to, labelled with the link
 //       4. the senses of the entry a Mahan Kosh pointer row ("ਦੇਖੋ, ਮੰਞੁ.") sends the reader to,
 //          one hop, only the sense it numbers if it numbers one, labelled with the pointer
+//       5. only when 1–4 give no dictionary sense: the senses of the word's spelling variants
+//          (#377), first those that differ in spelling only (ਣ/ਨ, nasal signs, nukta), then those
+//          that also differ in vowel length or the final short matra, which carry grammar; each
+//          labelled with the variant
 //     Cross-reference-only rows ("see ਦਰੁ", "ਦੇਖੋ, ਮੰਞੁ.") are dropped: they are not glosses. Entries whose
 //     Gurmukhi was reverse-transliterated from Shackle's romanisation rank last and are marked
 //     lowPriority, because they can collide with an unrelated word (ਦਰਿ "grind coarsely" against
@@ -92,7 +96,12 @@ export type DraftInput = {
   grammar: DraftGrammarRow[];
   /** The words Mahan Kosh pointer rows name, where the corpus has them (definitions included above). */
   mkPointerTargets?: { target: string; wordId: number }[];
+  /** Other words that fold to the same key as a line word (lib/gurmukhi-fold.ts), definitions included above. */
+  variants?: DraftVariant[];
 };
+
+/** A spelling variant of a line word: "spelling" folds equal under foldSpelling, "ending" only under foldGurmukhi. */
+export type DraftVariant = { wordId: number; variantWordId: number; variant: string; tier: "spelling" | "ending" };
 
 export type PadarthCandidate = {
   kind: "padarth_gloss";
@@ -120,7 +129,12 @@ export type DefinitionCandidate = {
    * Set when the sense is another entry's: the headword a Shackle form link names (lexemeId set),
    * or the entry a Mahan Kosh "ਦੇਖੋ" row points to (lexemeId null).
    */
-  via: { headword: string; headwordWordId: number; lexemeId: number | null; link: "shackle_form" | "mk_pointer" } | null;
+  via: {
+    headword: string;
+    headwordWordId: number;
+    lexemeId: number | null;
+    link: "shackle_form" | "mk_pointer" | "spelling_variant" | "ending_variant";
+  } | null;
   lowPriority: boolean;
 };
 
@@ -268,7 +282,24 @@ export function draftLine(input: DraftInput): DraftLine {
       ...padarth.flatMap(caseClues),
     ];
 
-    const candidates: Candidate[] = [...padarth.map((g) => padarthCandidate(g, t.position)), ...own, ...viaBase, ...viaPointer];
+    // Spelling variants, only for a word the dictionaries give nothing for.
+    const viaVariant: DefinitionCandidate[] = [];
+    if (own.length + viaBase.length + viaPointer.length === 0) {
+      const mine = (input.variants ?? []).filter((v) => v.wordId === t.wordId && v.variantWordId !== t.wordId);
+      for (const tier of ["spelling", "ending"] as const) {
+        for (const v of mine.filter((m) => m.tier === tier).sort((a, b) => a.variant.localeCompare(b.variant))) {
+          for (const d of (defsByWord.get(v.variantWordId) ?? []).sort(byPriority)) {
+            if (seen.has(d.id)) continue;
+            seen.add(d.id);
+            viaVariant.push(
+              definitionCandidate(d, { headword: v.variant, headwordWordId: v.variantWordId, lexemeId: null, link: tier === "spelling" ? "spelling_variant" : "ending_variant" })
+            );
+          }
+        }
+      }
+    }
+
+    const candidates: Candidate[] = [...padarth.map((g) => padarthCandidate(g, t.position)), ...own, ...viaBase, ...viaPointer, ...viaVariant];
     return { ...t, candidates, grammar, uncovered: candidates.length === 0, pointers };
   });
 

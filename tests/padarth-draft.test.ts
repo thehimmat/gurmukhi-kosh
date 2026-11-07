@@ -251,4 +251,44 @@ describe("draftLine", () => {
     expect(d.words[0].candidates.map((c) => c.text)).toEqual([text]);
     expect(d.words[0].pointers).toEqual([]);
   });
+
+  it("offers spelling variants' senses only to a word with no sense of its own, spelling tier before ending tier", () => {
+    const d = draftLine(
+      input("ਨੀਸਾਣੁ ਗੁਣ ਸਭੁ", {
+        definitions: [
+          def(960, "shackle", "banner, mark"),
+          def(961, "shackle", "quality, virtue"),
+          def(962, "mahan_kosh", "ਗੁਣ (ਬਹੁਵਚਨ)"),
+          def(102, "shackle", "all"),
+          def(963, "shackle", "everyone"),
+        ],
+        variants: [
+          { wordId: 100, variantWordId: 960, variant: "ਨੀਸਾਨੁ", tier: "spelling" },
+          { wordId: 101, variantWordId: 961, variant: "ਗੁਣੁ", tier: "ending" },
+          { wordId: 101, variantWordId: 962, variant: "ਗੁਣਿ", tier: "spelling" },
+          { wordId: 102, variantWordId: 963, variant: "ਸਭ", tier: "ending" },
+        ],
+      })
+    );
+    expect(d.words[0].candidates).toMatchObject([
+      { kind: "definition", text: "banner, mark", wordId: 960, via: { headword: "ਨੀਸਾਨੁ", headwordWordId: 960, lexemeId: null, link: "spelling_variant" } },
+    ]);
+    expect(d.words[1].candidates.map((c) => [c.text, c.kind === "definition" && c.via?.link])).toEqual([
+      ["ਗੁਣ (ਬਹੁਵਚਨ)", "spelling_variant"],
+      ["quality, virtue", "ending_variant"],
+    ]);
+    // ਸਭੁ has a sense of its own, so its variant isn't offered.
+    expect(d.words[2].candidates.map((c) => c.text)).toEqual(["all"]);
+  });
+
+  it("doesn't offer variants when a Shackle form link already gives the word a sense", () => {
+    const d = draftLine(
+      input("ਹੋਵੈ", {
+        definitions: [def(900, "shackle", "become"), def(964, "shackle", "be")],
+        formLinks: [{ wordId: 100, lexemeId: 77, headwordWordId: 900, headword: "ਹੋਇ", sourceCode: "shackle", labelRaw: null, definitionId: null }],
+        variants: [{ wordId: 100, variantWordId: 964, variant: "ਹੋਵੇ", tier: "ending" }],
+      })
+    );
+    expect(d.words[0].candidates.map((c) => c.text)).toEqual(["become"]);
+  });
 });

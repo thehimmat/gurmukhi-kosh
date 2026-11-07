@@ -16,13 +16,21 @@
 
 // Retroflex → dental series, plus ੜ → ਰ (they alternate across spelling
 // variants; this is a fuzzy tier, ranked below exact matches).
-const CHAR_FOLD: Record<string, string> = {
+// The consonant and nasal folds are spelling only; the vowel folds also merge grammatical
+// endings (foldSpelling leaves them out).
+const SPELLING_FOLD: Record<string, string> = {
   "ਟ": "ਤ",
   "ਠ": "ਥ",
   "ਡ": "ਦ",
   "ਢ": "ਧ",
   "ਣ": "ਨ",
   "ੜ": "ਰ",
+  // Nasal signs: bindi and adak-bindi fold to tippi.
+  "ਂ": "ੰ",
+  "ਁ": "ੰ",
+};
+
+const VOWEL_FOLD: Record<string, string> = {
   // Long → short vowels, dependent then independent.
   "ੀ": "ਿ", // ੀ → ਿ
   "ੂ": "ੁ", // ੂ → ੁ
@@ -32,10 +40,9 @@ const CHAR_FOLD: Record<string, string> = {
   "ਊ": "ਉ",
   "ਐ": "ਏ",
   "ਔ": "ਓ",
-  // Nasal signs: bindi and adak-bindi fold to tippi.
-  "ਂ": "ੰ", // ਂ → ੰ
-  "ਁ": "ੰ", // ਁ → ੰ
 };
+
+const CHAR_FOLD: Record<string, string> = { ...SPELLING_FOLD, ...VOWEL_FOLD };
 
 // Dropped outright: nukta (ਖ਼→ਖ etc. — NFD decomposes U+0A59-5E first),
 // adhak (gemination), visarga (ਦੁਃਖ/ਦੁਖ), udaat/yakash, and joiners.
@@ -45,17 +52,29 @@ const DROP = /[਼ੱਃੑੵ‌‍]/g;
 // presence varies most across spellings and quotations.
 const FINAL_SHORT_MATRA = /[ੁਿ]$/;
 
-/** Folds Gurmukhi to the lossy search key. Non-Gurmukhi input folds to "". */
-export function foldGurmukhi(s: string): string {
-  const folded = Array.from(
+function fold(s: string, map: Record<string, string>): string {
+  return Array.from(
     s
       .normalize("NFD")
       .replace(DROP, "")
       // Keep only the Gurmukhi block plus space — punctuation, digits, and
       // Latin in a query must not poison the key.
-      .replace(/[^਀-੿ ]/g, "")
+      .replace(/[^\u0A00-\u0A7F ]/g, "")
       .trim(),
-    (ch) => CHAR_FOLD[ch] ?? ch
+    (ch) => map[ch] ?? ch
   ).join("");
-  return folded.replace(FINAL_SHORT_MATRA, "");
+}
+
+/** Folds Gurmukhi to the lossy search key. Non-Gurmukhi input folds to "". */
+export function foldGurmukhi(s: string): string {
+  return fold(s, CHAR_FOLD).replace(FINAL_SHORT_MATRA, "");
+}
+
+/**
+ * The stricter key the pad-arth's spelling-variant tier matches on (#377): consonant spellings
+ * (ਣ/ਨ, retroflex/dental, ੜ/ਰ), nasal signs and the dropped marks (nukta, adhak, visarga), but
+ * not vowel length or the final short matra, which carry grammar. Never looser than foldGurmukhi.
+ */
+export function foldSpelling(s: string): string {
+  return fold(s, SPELLING_FOLD);
 }

@@ -119,4 +119,32 @@ describe("PadarthDraftView", () => {
     expect(out).not.toContain("Introduction / question before this line");
     expect(out).toContain("need migration 086");
   });
+
+  it("labels a spelling variant's sense, and warns that an ending variant may differ in grammar", () => {
+    const d = draftLine({
+      lineId: 3,
+      tokens: [
+        { position: 0, wordId: 1, gurmukhi: "ਨੀਸਾਣੁ" },
+        { position: 1, wordId: 2, gurmukhi: "ਗੁਣ" },
+      ],
+      definitions: [
+        { id: 1, wordId: 50, sourceCode: "shackle", senseNumber: 1, text: "banner", textEn: null, notes: null },
+        { id: 2, wordId: 51, sourceCode: "shackle", senseNumber: 1, text: "virtue", textEn: null, notes: null },
+      ],
+      formLinks: [],
+      padarth: [],
+      grammar: [],
+      variants: [
+        { wordId: 1, variantWordId: 50, variant: "ਨੀਸਾਨੁ", tier: "spelling" },
+        { wordId: 2, variantWordId: 51, variant: "ਗੁਣੁ", tier: "ending" },
+      ],
+    });
+    const out = decode(
+      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 3, verse_id: 3, gurmukhi: "ਨੀਸਾਣੁ ਗੁਣ" }], drafts: [d] }))
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+    );
+    expect(out).toMatch(/banner.*spelling variant ਨੀਸਾਨੁ ?, Shackle/);
+    expect(out).toMatch(/virtue.*ending variant ਗੁਣੁ ?, Shackle.*ending may differ in grammar/);
+  });
 });
