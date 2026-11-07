@@ -10,7 +10,8 @@
  * Idempotent: deletes Shackle's collocations and reloads them, then reattaches saved pad-arth
  * picks to the re-created rows (padarth_relink_refs).
  *
- * Usage: npm run ingest:shackle:collocations [-- --dry-run]
+ * Usage: npm run ingest:shackle:collocations [-- --dry-run [--all]]
+ *   --all  with --dry-run, list every phrase (tab-separated: origin, roman, Gurmukhi, gloss), not 30
  */
 
 import { config } from "dotenv";
@@ -43,6 +44,10 @@ async function main() {
   console.log(`Read ${entries.length} entries; ${rows.length} phrases`, byOrigin);
 
   if (dryRun) {
+    if (getArg("all") !== undefined) {
+      for (const r of rows) console.log([r.origin, r.phraseRoman, r.phraseGurmukhi, r.gloss].join("\t"));
+      return;
+    }
     for (const r of rows.slice(0, 30)) console.log(`  [${r.origin}] ${r.phraseRoman}  →  ${r.phraseGurmukhi}  =  ${r.gloss}`);
     console.log("\nDry run: nothing written.");
     return;

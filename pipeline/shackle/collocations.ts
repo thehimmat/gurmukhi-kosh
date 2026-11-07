@@ -19,8 +19,16 @@ import type { GlossaryEntry } from "./types";
 /** A romanised Gurmukhi word: lower-case letters and diacritics, no dot, digit or bracket. */
 const ROMAN_WORD = /^[\p{Ll}\p{M}]+$/u;
 
-/** Words that introduce a phrase in Shackle's notes rather than belong to it. */
-const MARKERS = new Set(["as", "in", "only", "also", "and", "or", "the", "of", "with", "esp", "cf", "see", "comm", "sim", "sl", "int", "abs", "a", "p"]);
+/**
+ * Words that introduce a phrase in Shackle's notes rather than belong to it: his markers, and the
+ * English he writes around phrases ("standing for oaṁkāru"). None is a romanised Gurmukhi word he uses.
+ */
+const MARKERS = new Set([
+  ...["as", "in", "only", "also", "esp", "cf", "see", "comm", "sim", "sl", "int", "abs", "a", "p"],
+  // Not "to", "be" or "the": those spell ਤੋ, ਬੇ and ਥੇ in his romanisation.
+  ...["and", "or", "of", "with", "for", "from", "by", "on", "at", "an", "is", "not", "which", "who", "this", "that"],
+  ...["it", "its", "standing", "meaning", "used", "form", "forms", "word", "words", "phrase", "phrases", "sense"],
+]);
 
 const SUPERSCRIPT = /[⁰¹²³⁴⁵⁶⁷⁸⁹]/g;
 // A citation: a work's siglum with its hymn number, "MlV16", "AsV9.2", "Sl29".
@@ -52,7 +60,8 @@ export function usagePhrases(notes: string): { phrase: string; gloss: string }[]
   // never the phrase or its gloss.
   const text = notes.replace(/\[[^\]]*\]/g, " ");
   const out: { phrase: string; gloss: string }[] = [];
-  const gloss = /'([^']+)'/g;
+  // A gloss ends at a quote that isn't followed by a letter, so "one's" stays inside it.
+  const gloss = /'(.+?)'(?!\p{L})/gu;
   let from = 0;
   for (let m = gloss.exec(text); m; m = gloss.exec(text)) {
     const before = text
