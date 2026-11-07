@@ -2,6 +2,8 @@
 // Rows not yet picked show their top gloss, greyed and labelled, so gaps are easy to spot.
 
 import type { PreviewLine, PreviewRow } from "@/lib/padarth/preview";
+import { previewText } from "@/lib/padarth/preview-text";
+import { CopyText } from "./CopyText";
 
 function Row({ r }: { r: PreviewRow }) {
   const unpicked = r.status === "draft" || r.status === "uncovered";
@@ -28,6 +30,7 @@ export function PadarthPreview({ lines }: { lines: PreviewLine[] }) {
       <p className="padarth-help">
         {unpicked} of {all.length} rows not yet picked.
       </p>
+      <CopyText text={previewText(lines)} />
       {lines.map((l) => (
         <section key={l.lineId} className="padarth-preview-line">
           <p className="gurmukhi-lg">

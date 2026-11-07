@@ -358,3 +358,13 @@ a:hover {
 .padarth-preview-draft {
   color: var(--text-secondary);
 }
+
+.padarth-copy {
+  margin: 0 0 1rem;
+}
+.padarth-copy-box {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  font-family: inherit;
+}

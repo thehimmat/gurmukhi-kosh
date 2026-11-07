@@ -43,4 +43,8 @@ describe("PadarthPreview", () => {
   it("counts what is still unpicked", () => {
     expect(text).toContain("2 of 6 rows not yet picked");
   });
+
+  it("offers the preview as text to copy", () => {
+    expect(html).toMatch(/<button[^>]*>Copy as text<\/button>/);
+  });
 });
