@@ -4,7 +4,7 @@ import { adminKey } from "@/lib/curator-session";
 import { fetchDraft } from "@/lib/padarth/fetch";
 import { parseScope, scopeHref } from "@/lib/padarth/scope";
 import { PadarthDraftView } from "@/components/padarth/DraftView";
-import { fetchHintPicks, fetchPicks, hintsBySurface } from "@/lib/padarth/picks";
+import { fetchCommentary, fetchHintPicks, fetchPicks, hintsBySurface } from "@/lib/padarth/picks";
 import { buildPreview } from "@/lib/padarth/preview";
 import { PadarthPreview } from "@/components/padarth/Preview";
 
@@ -34,7 +34,9 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
   // Saved picks on these lines, and what was picked for the same words elsewhere (hints only).
   const lineIds = draft?.lines.map((l) => l.id) ?? [];
   const surfaces = draft?.drafts.flatMap((d) => d.words.map((w) => w.gurmukhi)) ?? [];
-  const [saved, hintPicks] = lineIds.length ? await Promise.all([fetchPicks(db, lineIds), fetchHintPicks(db, surfaces)]) : [null, []];
+  const [saved, hintPicks, said] = lineIds.length
+    ? await Promise.all([fetchPicks(db, lineIds), fetchHintPicks(db, surfaces), fetchCommentary(db, lineIds)])
+    : [null, [], { commentary: [], available: true }];
   const hints = [...hintsBySurface(hintPicks, new Set(lineIds))];
 
   const preview = params.view === "preview";
@@ -123,7 +125,7 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
           {draft.lines.length === 0 ? (
             <p>No lines here.</p>
           ) : preview ? (
-            <PadarthPreview lines={buildPreview(draft.lines, draft.drafts, saved?.picks ?? [], saved?.lineNotes ?? new Map())} />
+            <PadarthPreview lines={buildPreview(draft.lines, draft.drafts, saved?.picks ?? [], saved?.lineNotes ?? new Map(), said.commentary)} />
           ) : (
             <PadarthDraftView
               key={lineIds.join(",")}
@@ -133,6 +135,8 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
               picks={saved?.picks ?? []}
               lineNotes={[...(saved?.lineNotes ?? new Map<number, string>())]}
               hints={hints}
+              commentary={said.commentary}
+              commentaryAvailable={said.available}
             />
           )}
         </>

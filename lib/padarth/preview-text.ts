@@ -1,5 +1,7 @@
 // "Copy as text" (#23): the preview (lib/padarth/preview.ts) as Markdown-flavoured plain text in the
 // Japji document's shape, for pasting into slides until a slide app is chosen.
+//   *introduction*       before the line, if one is set (086)
+//   *Question:* text     before the line, if one is set
 //   **verse**            the line, bold
 //   - ਸ਼ਬਦ = gloss        one bullet per word, then the phrases; grammar in brackets, a note in italics
 //   *line note*          after the bullets
@@ -20,7 +22,10 @@ function bullet(r: PreviewRow): string {
 export function previewText(lines: PreviewLine[]): string {
   return lines
     .map((l) => {
-      const out = [`**${l.gurmukhi}**`, ""];
+      const out: string[] = [];
+      if (l.introduction) out.push(`*${l.introduction}*`, "");
+      if (l.question) out.push(`*Question:* ${l.question}`, "");
+      out.push(`**${l.gurmukhi}**`, "");
       out.push(...[...l.rows, ...l.phrases].map(bullet));
       if (l.note) out.push("", `*${l.note}*`);
       return out.join("\n") + "\n";

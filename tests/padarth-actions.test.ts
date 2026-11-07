@@ -13,12 +13,21 @@ const fakeDb = {
       calls.push({ op: `upsert ${table}`, args });
       return Promise.resolve({ error: null });
     },
-    delete: () => ({
-      eq: (...args: unknown[]) => {
-        calls.push({ op: `delete ${table}`, args });
-        return Promise.resolve({ error: null });
-      },
-    }),
+    // delete().eq(…).eq(…), recorded when awaited.
+    delete: () => {
+      const args: unknown[] = [];
+      const q = {
+        eq: (...a: unknown[]) => {
+          args.push(...a);
+          return q;
+        },
+        then: (resolve: (v: { error: null }) => unknown) => {
+          calls.push({ op: `delete ${table}`, args });
+          return Promise.resolve({ error: null }).then(resolve);
+        },
+      };
+      return q;
+    },
   }),
 };
 // The admin cookie the request carries.
@@ -89,5 +98,36 @@ describe("saveLineNote", () => {
     const { saveLineNote } = await import("../app/admin/padarth/actions");
     await expect(saveLineNote({ lineId: 9, text: "x" })).rejects.toThrow(/Unauthorized/);
     expect(calls).toEqual([]);
+  });
+});
+
+describe("saveCommentary", () => {
+  it("writes an introduction or a question for a line, and removes it when cleared", async () => {
+    const { saveCommentary } = await import("../app/admin/padarth/actions");
+    await saveCommentary({ lineId: 5, kind: "introduction", text: "  Purity cannot be had by bathing.  " });
+    await saveCommentary({ lineId: 9, kind: "question", text: "" });
+    expect(calls).toEqual([
+      {
+        op: "upsert padarth_commentary",
+        args: [{ line_id: 5, kind: "introduction", body_text: "Purity cannot be had by bathing.", chosen_by: "curator" }, { onConflict: "line_id,kind" }],
+      },
+      { op: "delete padarth_commentary", args: ["line_id", 9, "kind", "question"] },
+    ]);
+  });
+
+  it.each([
+    ["an unknown kind", { kind: "aside" }],
+    ["a bad line", { lineId: 0 }],
+    ["over-long text", { text: "x".repeat(5001) }],
+  ])("refuses %s", async (_label, patch) => {
+    const { saveCommentary } = await import("../app/admin/padarth/actions");
+    await expect(saveCommentary({ lineId: 5, kind: "question", text: "x", ...(patch as object) } as never)).rejects.toThrow();
+    expect(calls).toEqual([]);
+  });
+
+  it("refuses without the admin cookie", async () => {
+    cookie = undefined;
+    const { saveCommentary } = await import("../app/admin/padarth/actions");
+    await expect(saveCommentary({ lineId: 5, kind: "question", text: "x" })).rejects.toThrow(/Unauthorized/);
   });
 });

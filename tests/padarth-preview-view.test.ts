@@ -7,6 +7,8 @@ import type { PreviewLine } from "../lib/padarth/preview";
 const lines: PreviewLine[] = [
   {
     lineId: 5,
+    introduction: "Purity cannot be had by bathing.",
+    question: "How, then, does one become truthful?",
     gurmukhi: "ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥",
     rows: [
       { surface: "ਸੋਚੈ", text: "ਸੁਚਿ ਰੱਖਣ ਨਾਲ", status: "picked", grammar: [], note: null },
@@ -46,5 +48,10 @@ describe("PadarthPreview", () => {
 
   it("offers the preview as text to copy", () => {
     expect(html).toMatch(/<button[^>]*>Copy as text<\/button>/);
+  });
+
+  it("sets the introduction and the question before the verse", () => {
+    expect(text.indexOf("Purity cannot be had by bathing.")).toBeLessThan(text.indexOf("Question: How, then"));
+    expect(text.indexOf("Question: How, then")).toBeLessThan(text.indexOf("ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥"));
   });
 });

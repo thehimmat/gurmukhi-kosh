@@ -368,3 +368,15 @@ a:hover {
   margin-top: 0.5rem;
   font-family: inherit;
 }
+
+.padarth-commentary {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.padarth-commentary summary {
+  cursor: pointer;
+}
+.padarth-preview-commentary {
+  margin: 0.75rem 0 0.25rem;
+}

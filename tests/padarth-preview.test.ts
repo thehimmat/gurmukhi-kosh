@@ -87,4 +87,14 @@ describe("buildPreview", () => {
     const [q] = buildPreview([{ id: 6, verse_id: 6, gurmukhi: "ਸੋਚੈ" }], [d], [], new Map());
     expect(q.rows[0].grammar).toEqual(["singular", "verb"]);
   });
+
+  it("sets each line's introduction and question from the commentary", () => {
+    const [q] = buildPreview([line], [draft], [], new Map(), [
+      { lineId: 5, kind: "question", text: "How, then?" },
+      { lineId: 5, kind: "introduction", text: "Purity cannot be had by bathing." },
+      { lineId: 9, kind: "introduction", text: "another line's" },
+    ]);
+    expect(q).toMatchObject({ introduction: "Purity cannot be had by bathing.", question: "How, then?" });
+    expect(p).toMatchObject({ introduction: null, question: null });
+  });
 });
