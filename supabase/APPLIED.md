@@ -528,3 +528,10 @@ extended to it. psql reported CREATE TABLE, COMMENT, CREATE INDEX, ALTER TABLE, 
 `padarth_pick_refs_collocation_check` IF EXISTS notice was expected on a first run), CREATE INDEX, CREATE FUNCTION ×2
 with their REVOKE and GRANT, and NOTIFY. Loaded after with `npm run ingest:shackle:collocations`: 1,112 phrases (179
 compounds, 933 from usage notes), 687 head words found.
+
+**088_padarth_compound_match** — run 2026-11-07 on the self-hosted server through the Apply migration workflow (run 6,
+`selfhost/scripts/migrate.sh` from main at 9f33d03: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`088_padarth_compound_match.sql` as merged (#385, #179 item 4): `padarth_gloss_occurrences.match` also allows
+`'compound'`. psql reported ALTER TABLE ×2 and NOTIFY. Followed by `npm run ingest:padarth:glosses`: 124,809 glosses
+(124,593 entries, 216 notes), 137,872 links (was 136,989 at #179's first ingest), 24,779 case-evidence rows; entries linked
+92.0% (was 91.6%), 102 through a Shackle paradigm; 0 saved pick refs unlinked.
