@@ -51,3 +51,16 @@ export function scopeHref(scope: DraftScope): string {
   }
   return `/admin/padarth?${q}`;
 }
+
+/** The Google Slides export for a scope (app/admin/padarth/slides). */
+export function slidesHref(scope: DraftScope): string {
+  return scopeHref(scope).replace("/admin/padarth?", "/admin/padarth/slides?");
+}
+
+/** A scope's name, for a deck's title slide and its file name. */
+export function scopeTitle(scope: DraftScope, baniName?: string): string {
+  if (scope.kind === "paragraph") return `${baniName ?? `Bani ${scope.baniId}`}, paragraph ${scope.ordinal}`;
+  if (scope.kind === "ang") return `Ang ${scope.ang}`;
+  if (scope.kind === "shabad") return `Shabad ${scope.shabadId}`;
+  return `Passage ${scope.passageId}`;
+}

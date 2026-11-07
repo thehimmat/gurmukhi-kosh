@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { curatorDb } from "@/lib/curator";
 import { adminKey } from "@/lib/curator-session";
 import { fetchDraft } from "@/lib/padarth/fetch";
-import { parseScope, scopeHref } from "@/lib/padarth/scope";
+import { parseScope, scopeHref, slidesHref } from "@/lib/padarth/scope";
 import { PadarthDraftView } from "@/components/padarth/DraftView";
 import { fetchCommentary, fetchHintPicks, fetchPicks, hintsBySurface } from "@/lib/padarth/picks";
 import { buildPreview } from "@/lib/padarth/preview";
@@ -128,7 +128,7 @@ export default async function PadarthBuilderPage({ searchParams }: { searchParam
           {draft.lines.length === 0 ? (
             <p>No lines here.</p>
           ) : preview ? (
-            <PadarthPreview lines={buildPreview(draft.lines, draft.drafts, saved?.picks ?? [], saved?.lineNotes ?? new Map(), said.commentary)} />
+            <PadarthPreview lines={buildPreview(draft.lines, draft.drafts, saved?.picks ?? [], saved?.lineNotes ?? new Map(), said.commentary)} slidesHref={slidesHref(scope)} />
           ) : (
             <PadarthDraftView
               key={lineIds.join(",")}
