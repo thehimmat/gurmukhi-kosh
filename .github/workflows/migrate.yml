@@ -1,0 +1,61 @@
+name: Apply migration
+
+# Applies one file from supabase/migrations to the self-hosted database (selfhost/README.md,
+# "Migrations"). Run by hand from main: Actions → Apply migration → Run workflow, or
+#   gh workflow run migrate.yml -f migration=087_example.sql
+# The server side is selfhost/scripts/migrate.sh, the forced command of the MIGRATE_SSH_KEY key: it
+# accepts a file name and nothing else, takes the file from main, refuses one APPLIED.md already
+# records, and runs it in one transaction. Record the run in supabase/APPLIED.md afterwards.
+
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: File name in supabase/migrations, e.g. 087_example.sql
+        required: true
+        type: string
+
+# One at a time with deploys, so a migration never lands mid-deploy.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: ${{ vars.DEPLOY_HOST != '' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the migration
+        env:
+          MIGRATION: ${{ inputs.migration }}
+        run: |
+          printf '%s' "$MIGRATION" | grep -Eqx '[0-9]{3}_[a-z0-9_]+\.sql' || { echo "::error::Not a migration file name: $MIGRATION"; exit 1; }
+          test -f "supabase/migrations/$MIGRATION" || { echo "::error::$MIGRATION is not in supabase/migrations on main"; exit 1; }
+      - name: Apply on the server
+        env:
+          MIGRATION: ${{ inputs.migration }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          KEY: ${{ secrets.MIGRATE_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          (umask 077 && printf '%s\n' "$KEY" > ~/.ssh/id_ed25519)
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          set -o pipefail
+          ssh -o BatchMode=yes "$HOST" "$MIGRATION" 2>&1 | tee psql.txt
+      - name: Summary
+        if: always()
+        env:
+          MIGRATION: ${{ inputs.migration }}
+        run: |
+          {
+            echo "### $MIGRATION"
+            echo '```'
+            cat psql.txt 2>/dev/null || echo "(no output)"
+            echo '```'
+            echo "If it applied, record it in supabase/APPLIED.md (psql's output above is what the ledger quotes)."
+          } >> "$GITHUB_STEP_SUMMARY"
