@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { entryLink, secondaryGloss } from "../lib/definition-display";
+import { entryLink, secondaryGloss, splitPointerRows } from "../lib/definition-display";
 
 describe("secondaryGloss", () => {
   // #122: Shackle stores its English in definition_text AND definition_en
@@ -43,5 +43,33 @@ describe("entryLink", () => {
   it("gives no link for a source without a per-entry page", () => {
     expect(entryLink("shackle", "ਹਉਮੈ")).toBeNull();
     expect(entryLink("manual", "ਹਉਮੈ")).toBeNull();
+  });
+});
+
+// Mahan Kosh rows that only send the reader elsewhere ("ਦੇਖੋ, ਮੰਞੁ.") are not senses (#23).
+describe("splitPointerRows", () => {
+  const row = (id: number, definition_text: string) => ({ id, definition_text });
+
+  it("moves Mahan Kosh pointer-only rows out of the senses, keeping their targets once each", () => {
+    const { senses, pointers } = splitPointerRows("mahan_kosh", [
+      row(1, "ਮੈਂ. ਅਹੰ."),
+      row(2, "ਦੇਖੋ, ਮੰਞੁ."),
+      row(3, 'ਦੇਖੋ, ਕਰਣ ੧੧. "ਕਰਣ ਕਰੀਮ." (ਵਾਰ ਮਾਝ ਮਃ ੧)'),
+      row(4, "ਦੇਖੋ, ਮੰਞੁ"),
+    ]);
+    expect(senses.map((d) => d.id)).toEqual([1]);
+    expect(pointers).toEqual([
+      { target: "ਮੰਞੁ", sense: null },
+      { target: "ਕਰਣ", sense: 11 },
+    ]);
+  });
+
+  it("keeps a row with Mahan Kosh's own words after the pointer as a sense", () => {
+    const text = 'ਦੇਖੋ, ਦੁਲਹ. "ਦੂਲਹ ਪ੍ਰਭੁ." (ਮਾਰੂ ਨਾਮਦੇਵ) ਦੂਲਹ ਤੋਂ ਭਾਵ ਜੀਵ ਹੈ.';
+    expect(splitPointerRows("mahan_kosh", [row(1, text)])).toEqual({ senses: [row(1, text)], pointers: [] });
+  });
+
+  it("leaves other sources alone", () => {
+    expect(splitPointerRows("shackle", [row(1, "ਦੇਖੋ, ਮੰਞੁ.")])).toEqual({ senses: [row(1, "ਦੇਖੋ, ਮੰਞੁ.")], pointers: [] });
   });
 });
