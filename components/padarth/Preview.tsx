@@ -2,7 +2,7 @@
 // Rows not yet picked show their top gloss, greyed and labelled, so gaps are easy to spot.
 
 import type { PreviewLine, PreviewRow } from "@/lib/padarth/preview";
-import { previewText } from "@/lib/padarth/preview-text";
+import { previewHtml, previewText } from "@/lib/padarth/preview-text";
 import { CopyText } from "./CopyText";
 
 function Row({ r }: { r: PreviewRow }) {
@@ -22,7 +22,7 @@ function Row({ r }: { r: PreviewRow }) {
   );
 }
 
-export function PadarthPreview({ lines }: { lines: PreviewLine[] }) {
+export function PadarthPreview({ lines, slidesHref }: { lines: PreviewLine[]; slidesHref?: string }) {
   const all = lines.flatMap((l) => [...l.rows, ...l.phrases]);
   const unpicked = all.filter((r) => r.status === "draft" || r.status === "uncovered").length;
   return (
@@ -30,7 +30,7 @@ export function PadarthPreview({ lines }: { lines: PreviewLine[] }) {
       <p className="padarth-help">
         {unpicked} of {all.length} rows not yet picked.
       </p>
-      <CopyText text={previewText(lines)} />
+      <CopyText text={previewText(lines)} html={previewHtml(lines)} slidesHref={slidesHref} />
       {lines.map((l) => (
         <section key={l.lineId} className="padarth-preview-line">
           {l.introduction && (

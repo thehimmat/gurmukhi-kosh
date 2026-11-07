@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { previewText } from "../lib/padarth/preview-text";
+import { previewHtml, previewText } from "../lib/padarth/preview-text";
 import type { PreviewLine } from "../lib/padarth/preview";
 
 // "Copy as text" (#23): the preview as Markdown-flavoured plain text, in the Japji document's shape,
@@ -52,5 +52,25 @@ describe("previewText", () => {
   it("puts the introduction, then the question, before the verse", () => {
     const text = previewText([line({ introduction: "Purity cannot be had by bathing.", question: "How, then?", rows: [], phrases: [], note: null })]);
     expect(text).toBe("*Purity cannot be had by bathing.*\n\n*Question:* How, then?\n\n**ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥**\n\n");
+  });
+});
+
+// The same, as HTML, so pasting into Google Slides keeps the bold, italics and bullets.
+describe("previewHtml", () => {
+  it("writes the verse in bold, a list item per row, the line note in italics, and escapes text", () => {
+    const html = previewHtml([line({ note: "a <b> note", question: "How, then?" })]);
+    expect(html).toBe(
+      "<p><b>Question:</b> How, then?</p>" +
+        "<p><b>ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥</b></p>" +
+        "<ul>" +
+        "<li><b>ਸੋਚੈ</b> = ਸੁਚਿ ਰੱਖਣ ਨਾਲ</li>" +
+        "<li><b>ਸੋਚਿ</b> = purity <i>outer purity</i></li>" +
+        "<li><b>ਨ</b> =</li>" +
+        "<li><b>ਹੋਵਈ</b> = become (3 sg. subj. of ਹੋਇ)</li>" +
+        "<li><b>ੴ</b> =</li>" +
+        "<li><b>ਨ ਹੋਵਈ</b> = ਨਹੀਂ ਹੋ ਸਕਦੀ</li>" +
+        "</ul>" +
+        "<p><i>a &lt;b&gt; note</i></p>"
+    );
   });
 });

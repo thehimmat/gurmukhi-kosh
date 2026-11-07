@@ -32,3 +32,28 @@ export function previewText(lines: PreviewLine[]): string {
     })
     .join("\n");
 }
+
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/** The same content as previewText, as HTML: pasted into Google Slides it keeps bold, italics and bullets. */
+export function previewHtml(lines: PreviewLine[]): string {
+  return lines
+    .map((l) => {
+      let out = "";
+      if (l.introduction) out += `<p><i>${esc(l.introduction)}</i></p>`;
+      if (l.question) out += `<p><b>Question:</b> ${esc(l.question)}</p>`;
+      out += `<p><b>${esc(l.gurmukhi)}</b></p><ul>`;
+      for (const r of [...l.rows, ...l.phrases]) {
+        const chosen = r.status === "picked" || r.status === "override" ? r.text : null;
+        let item = `<b>${esc(r.surface)}</b> =`;
+        if (chosen) item += ` ${esc(chosen)}`;
+        if (chosen && r.grammar.length) item += ` (${esc(r.grammar.join("; "))})`;
+        if (r.note) item += ` <i>${esc(r.note)}</i>`;
+        out += `<li>${item}</li>`;
+      }
+      out += "</ul>";
+      if (l.note) out += `<p><i>${esc(l.note)}</i></p>`;
+      return out;
+    })
+    .join("");
+}

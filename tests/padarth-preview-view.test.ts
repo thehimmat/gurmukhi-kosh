@@ -54,4 +54,9 @@ describe("PadarthPreview", () => {
     expect(text.indexOf("Purity cannot be had by bathing.")).toBeLessThan(text.indexOf("Question: How, then"));
     expect(text.indexOf("Question: How, then")).toBeLessThan(text.indexOf("ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥"));
   });
+
+  it("links the Google Slides download when it has a scope", () => {
+    const out = renderToStaticMarkup(createElement(PadarthPreview, { lines, slidesHref: "/admin/padarth/slides?bani=2&p=4" }));
+    expect(out).toMatch(/<a href="\/admin\/padarth\/slides\?bani=2&amp;p=4" download="">Download for Google Slides \(\.pptx\)<\/a>/);
+  });
 });
