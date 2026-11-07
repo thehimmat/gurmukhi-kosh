@@ -142,6 +142,31 @@ export async function fetchPicks(db: SupabaseClient, lineIds: number[]): Promise
   return { picks, lineNotes };
 }
 
+export type CommentaryKind = "introduction" | "question";
+export type Commentary = { lineId: number; kind: CommentaryKind; text: string };
+
+/** PostgREST and Postgres codes for a missing table: migration 086 not applied yet. */
+const MISSING_TABLE = new Set(["PGRST205", "42P01"]);
+
+/**
+ * The introductions and questions set before these lines (086). `available` is false when the
+ * table isn't there yet, so the builder can say so instead of failing the whole page.
+ */
+export async function fetchCommentary(db: SupabaseClient, lineIds: number[]): Promise<{ commentary: Commentary[]; available: boolean }> {
+  const commentary: Commentary[] = [];
+  for (const ids of chunks(lineIds)) {
+    const { data, error } = await db.from("padarth_commentary").select("line_id, kind, body_text").in("line_id", ids).order("line_id");
+    if (error) {
+      if (MISSING_TABLE.has(error.code ?? "")) return { commentary: [], available: false };
+      throw new Error(`padarth_commentary: ${error.message}`);
+    }
+    for (const r of (data ?? []) as { line_id: number; kind: CommentaryKind; body_text: string }[]) {
+      commentary.push({ lineId: r.line_id, kind: r.kind, text: r.body_text });
+    }
+  }
+  return { commentary, available: true };
+}
+
 /** Picks of the same spellings on other lines, for hints. */
 export async function fetchHintPicks(db: SupabaseClient, surfaces: string[]): Promise<SavedPick[]> {
   const out: SavedPick[] = [];

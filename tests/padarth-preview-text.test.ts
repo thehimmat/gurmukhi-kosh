@@ -6,6 +6,8 @@ import type { PreviewLine } from "../lib/padarth/preview";
 // for pasting into a slide app until one is chosen.
 const line = (extra: Partial<PreviewLine> = {}): PreviewLine => ({
   lineId: 5,
+  introduction: null,
+  question: null,
   gurmukhi: "ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥",
   rows: [
     { surface: "ਸੋਚੈ", text: "ਸੁਚਿ ਰੱਖਣ ਨਾਲ", status: "picked", grammar: [], note: null },
@@ -45,5 +47,10 @@ describe("previewText", () => {
   it("separates lines with a blank line", () => {
     const text = previewText([line({ note: null, phrases: [] }), line({ lineId: 6, gurmukhi: "ਜੇ ਸੋਚੀ ਲਖ ਵਾਰ ॥", rows: [], phrases: [], note: null })]);
     expect(text).toContain("- ੴ =\n\n**ਜੇ ਸੋਚੀ ਲਖ ਵਾਰ ॥**\n");
+  });
+
+  it("puts the introduction, then the question, before the verse", () => {
+    const text = previewText([line({ introduction: "Purity cannot be had by bathing.", question: "How, then?", rows: [], phrases: [], note: null })]);
+    expect(text).toBe("*Purity cannot be had by bathing.*\n\n*Question:* How, then?\n\n**ਸੋਚੈ ਸੋਚਿ ਨ ਹੋਵਈ ॥**\n\n");
   });
 });

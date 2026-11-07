@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { draftLine } from "../lib/padarth/draft";
-import { candidateKey, pickStates, hintsBySurface, type SavedPick } from "../lib/padarth/picks";
+import { candidateKey, fetchCommentary, pickStates, hintsBySurface, type SavedPick } from "../lib/padarth/picks";
 
 const draft = draftLine({
   lineId: 9,
@@ -82,5 +82,24 @@ describe("hintsBySurface", () => {
       { lineId: 400, text: "be broken" },
       { lineId: 500, text: "breaks" },
     ]);
+  });
+});
+
+describe("fetchCommentary", () => {
+  const db = (result: { data: unknown; error: { code?: string; message: string } | null }) =>
+    ({ from: () => ({ select: () => ({ in: () => ({ order: () => Promise.resolve(result) }) }) }) }) as never;
+
+  it("maps the rows", async () => {
+    const out = await fetchCommentary(db({ data: [{ line_id: 5, kind: "introduction", body_text: "Intro" }], error: null }), [5]);
+    expect(out).toEqual({ commentary: [{ lineId: 5, kind: "introduction", text: "Intro" }], available: true });
+  });
+
+  it("reports the table as unavailable until migration 086 is applied, instead of failing", async () => {
+    const out = await fetchCommentary(db({ data: null, error: { code: "PGRST205", message: "Could not find the table" } }), [5]);
+    expect(out).toEqual({ commentary: [], available: false });
+  });
+
+  it("fails on any other error", async () => {
+    await expect(fetchCommentary(db({ data: null, error: { code: "57014", message: "timeout" } }), [5])).rejects.toThrow(/timeout/);
   });
 });

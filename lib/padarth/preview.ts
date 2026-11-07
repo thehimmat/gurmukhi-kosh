@@ -1,5 +1,6 @@
 // The pad-arth preview (#23): the saved picks laid out like the maintainer's Japji document, line
-// by line: the verse, then one row per word (`ਸ਼ਬਦ = gloss`), then the phrases, then the line note.
+// by line: any introduction and question set before it (086), the verse, then one row per word
+// (`ਸ਼ਬਦ = gloss`), then the phrases, then the line note.
 // Every word gets a row on every line, repeats included; thinning is an editing choice.
 //
 // A row's text, first that applies:
@@ -14,13 +15,22 @@
 
 import type { DraftLine, GrammarNote } from "./draft";
 import type { LineRow } from "./fetch";
-import { pickStates, positionsKey, type PickState, type SavedPick } from "./picks";
+import { pickStates, positionsKey, type Commentary, type PickState, type SavedPick } from "./picks";
 
 export type PreviewStatus = "override" | "picked" | "draft" | "uncovered";
 
 export type PreviewRow = { surface: string; text: string | null; status: PreviewStatus; grammar: string[]; note: string | null };
 
-export type PreviewLine = { lineId: number; gurmukhi: string; rows: PreviewRow[]; phrases: PreviewRow[]; note: string | null };
+export type PreviewLine = {
+  lineId: number;
+  /** Set before the line (086): an introduction, then a question. */
+  introduction: string | null;
+  question: string | null;
+  gurmukhi: string;
+  rows: PreviewRow[];
+  phrases: PreviewRow[];
+  note: string | null;
+};
 
 const PREVIEW_GRAMMAR_SOURCES = new Set(["shackle", "ss_padarth"]);
 
@@ -43,8 +53,15 @@ function row(surface: string, state: PickState | undefined, topText: string | nu
   return { ...base, text: null, status: "uncovered" };
 }
 
-export function buildPreview(lines: LineRow[], drafts: DraftLine[], picks: SavedPick[], lineNotes: Map<number, string>): PreviewLine[] {
+export function buildPreview(
+  lines: LineRow[],
+  drafts: DraftLine[],
+  picks: SavedPick[],
+  lineNotes: Map<number, string>,
+  commentary: Commentary[] = []
+): PreviewLine[] {
   const byId = new Map(lines.map((l) => [l.id, l]));
+  const said = (lineId: number, kind: Commentary["kind"]) => commentary.find((c) => c.lineId === lineId && c.kind === kind)?.text ?? null;
   return drafts.flatMap((d) => {
     const line = byId.get(d.lineId);
     if (!line) return [];
@@ -52,6 +69,8 @@ export function buildPreview(lines: LineRow[], drafts: DraftLine[], picks: Saved
     return [
       {
         lineId: d.lineId,
+        introduction: said(d.lineId, "introduction"),
+        question: said(d.lineId, "question"),
         gurmukhi: line.gurmukhi,
         rows: d.words.map((w) => row(w.gurmukhi, states.words.get(w.position), w.candidates[0]?.text ?? null, w.grammar)),
         phrases: d.phrases.map((p) => row(p.surface, states.phrases.get(positionsKey(p.positions)), p.candidates[0]?.text ?? null, p.grammar)),

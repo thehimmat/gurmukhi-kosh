@@ -96,4 +96,26 @@ describe("PadarthDraftView", () => {
     expect(out).not.toContain("ਦੇਖੋ, ਮੰਞੁ");
     expect(out).toMatch(/Mahan Kosh points to ਕੁਚੱਜੀ ?, which isn't in the corpus/);
   });
+
+  it("offers an introduction and a question before each line, open when one is written", () => {
+    const render = (props: object) =>
+      renderToStaticMarkup(
+        createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], curatorKey: "k", ...props })
+      );
+    const empty = render({});
+    expect(empty).toContain("Introduction / question before this line");
+    expect(empty).not.toMatch(/<details[^>]*open/);
+    const written = render({ commentary: [{ lineId: 9, kind: "question", text: "How, then?" }] });
+    expect(written).toMatch(/<details[^>]*open/);
+    expect(written).toContain("How, then?");
+    expect(written.indexOf("Introduction / question")).toBeLessThan(written.indexOf("ਕਿਵ ॥"));
+  });
+
+  it("hides the commentary boxes and says why until migration 086 is applied", () => {
+    const out = renderToStaticMarkup(
+      createElement(PadarthDraftView, { lines: [{ id: 9, verse_id: 9, gurmukhi: "ਕਿਵ ॥" }], drafts: [draft], curatorKey: "k", commentaryAvailable: false })
+    );
+    expect(out).not.toContain("Introduction / question before this line");
+    expect(out).toContain("need migration 086");
+  });
 });

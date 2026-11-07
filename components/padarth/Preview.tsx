@@ -33,6 +33,16 @@ export function PadarthPreview({ lines }: { lines: PreviewLine[] }) {
       <CopyText text={previewText(lines)} />
       {lines.map((l) => (
         <section key={l.lineId} className="padarth-preview-line">
+          {l.introduction && (
+            <p className="padarth-preview-commentary">
+              <em>{l.introduction}</em>
+            </p>
+          )}
+          {l.question && (
+            <p className="padarth-preview-commentary">
+              <em>Question:</em> {l.question}
+            </p>
+          )}
           <p className="gurmukhi-lg">
             <strong>{l.gurmukhi}</strong>
           </p>

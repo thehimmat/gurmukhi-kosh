@@ -61,6 +61,21 @@ export async function savePick(input: SavePickInput): Promise<{ pickId: number |
   return { pickId: (data as number | null) ?? null };
 }
 
+/** An introduction or a question set before a line (086); blank text removes it. */
+export async function saveCommentary(input: { lineId: number; kind: "introduction" | "question"; text: string }): Promise<void> {
+  await requireAdmin();
+  if (!isId(input.lineId)) throw new Error("Invalid line");
+  if (input.kind !== "introduction" && input.kind !== "question") throw new Error("Invalid kind");
+  const text = (checkText("commentary", input.text) ?? "").trim();
+  const db = curatorDb(true);
+  const { error } = text
+    ? await db
+        .from("padarth_commentary")
+        .upsert({ line_id: input.lineId, kind: input.kind, body_text: text, chosen_by: CHOSEN_BY }, { onConflict: "line_id,kind" })
+    : await db.from("padarth_commentary").delete().eq("line_id", input.lineId).eq("kind", input.kind);
+  if (error) throw new Error(`Saving the ${input.kind} failed: ${error.message}`);
+}
+
 export async function saveLineNote(input: { lineId: number; text: string }): Promise<void> {
   await requireAdmin();
   if (!isId(input.lineId)) throw new Error("Invalid line");

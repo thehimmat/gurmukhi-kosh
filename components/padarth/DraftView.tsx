@@ -12,10 +12,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Candidate, DraftLine, GrammarNote } from "@/lib/padarth/draft";
 import type { LineRow } from "@/lib/padarth/fetch";
-import type { Hint, SavedPick } from "@/lib/padarth/picks";
+import type { Commentary, Hint, SavedPick } from "@/lib/padarth/picks";
 import { withCuratorKey } from "@/lib/curator";
 import { choiceOf, flatItems, initialPicks, isChosen, itemKey, saveInput, toggleChoice, withText, type Item, type ItemPick } from "@/lib/padarth/builder-state";
-import { saveLineNote, savePick } from "@/app/admin/padarth/actions";
+import { saveCommentary, saveLineNote, savePick } from "@/app/admin/padarth/actions";
 
 const SOURCE_LABEL: Record<string, string> = {
   ss_padarth: "Sahib Singh",
@@ -247,12 +247,13 @@ function TextEdit({ label, initial, onDone, onCancel }: { label: string; initial
   );
 }
 
-function LineNote({ lineId, initial }: { lineId: number; initial: string }) {
+/** A note box that saves on blur: the line note, or an introduction or question before the line. */
+function NoteBox({ label, initial, save, className }: { label: string; initial: string; save: (text: string) => Promise<void>; className: string }) {
   const [status, setStatus] = useState<Status | undefined>();
   const last = useRef(initial);
   return (
-    <label className="padarth-line-note">
-      Line note{" "}
+    <label className={className}>
+      {label}{" "}
       <textarea
         defaultValue={initial}
         rows={2}
@@ -262,7 +263,7 @@ function LineNote({ lineId, initial }: { lineId: number; initial: string }) {
           if (text.trim() === last.current.trim()) return;
           setStatus("saving");
           try {
-            await saveLineNote({ lineId, text });
+            await save(text);
             last.current = text;
             setStatus("saved");
           } catch (err) {
@@ -277,6 +278,22 @@ function LineNote({ lineId, initial }: { lineId: number; initial: string }) {
   );
 }
 
+/** Introduction and question set before a line (086); open when either is written. */
+function LineCommentary({ lineId, introduction, question }: { lineId: number; introduction: string; question: string }) {
+  return (
+    <details className="padarth-commentary" open={!!(introduction || question) || undefined}>
+      <summary>Introduction / question before this line</summary>
+      <NoteBox
+        className="padarth-line-note"
+        label="Introduction"
+        initial={introduction}
+        save={(text) => saveCommentary({ lineId, kind: "introduction", text })}
+      />
+      <NoteBox className="padarth-line-note" label="Question" initial={question} save={(text) => saveCommentary({ lineId, kind: "question", text })} />
+    </details>
+  );
+}
+
 export type PadarthDraftViewProps = {
   lines: LineRow[];
   drafts: DraftLine[];
@@ -286,9 +303,22 @@ export type PadarthDraftViewProps = {
   lineNotes?: [number, string][];
   /** By the word's spelling: what was picked for it on lines outside this scope. */
   hints?: [string, Hint[]][];
+  commentary?: Commentary[];
+  /** False until migration 086 is applied: the commentary boxes are hidden and a notice shows. */
+  commentaryAvailable?: boolean;
 };
 
-export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNotes = [], hints = [] }: PadarthDraftViewProps) {
+export function PadarthDraftView({
+  lines,
+  drafts,
+  curatorKey,
+  picks = [],
+  lineNotes = [],
+  hints = [],
+  commentary = [],
+  commentaryAvailable = true,
+}: PadarthDraftViewProps) {
+  const said = (lineId: number, kind: Commentary["kind"]) => commentary.find((c) => c.lineId === lineId && c.kind === kind)?.text ?? "";
   const items = useMemo(() => flatItems(drafts), [drafts]);
   const [state, setState] = useState(() => initialPicks(drafts, picks));
   const [status, setStatus] = useState(new Map<string, Status>());
@@ -385,12 +415,18 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
       <p className="padarth-help">
         Tick the glosses that fit each line; each change saves at once. Keys: j/k move, 1–9 tick, a show all, e your wording, n note, Esc close.
       </p>
+      {!commentaryAvailable && (
+        <p className="padarth-caveat" role="alert">
+          Introductions and questions need migration 086 on the server; until then they can&apos;t be added.
+        </p>
+      )}
       {drafts.map((d) => {
         const line = byId.get(d.lineId);
         if (!line) return null;
         const phrasePositions = new Set(d.phrases.flatMap((p) => p.positions));
         return (
           <section key={d.lineId} className="padarth-line card">
+            {commentaryAvailable && <LineCommentary lineId={d.lineId} introduction={said(d.lineId, "introduction")} question={said(d.lineId, "question")} />}
             <p className="gurmukhi-lg padarth-verse">
               <a href={`/admin/line/${line.id}`}>{line.gurmukhi}</a>
             </p>
@@ -432,7 +468,7 @@ export function PadarthDraftView({ lines, drafts, curatorKey, picks = [], lineNo
                 </ul>
               </details>
             )}
-            <LineNote lineId={d.lineId} initial={notes.get(d.lineId) ?? ""} />
+            <NoteBox className="padarth-line-note" label="Line note" initial={notes.get(d.lineId) ?? ""} save={(text) => saveLineNote({ lineId: d.lineId, text })} />
           </section>
         );
       })}
