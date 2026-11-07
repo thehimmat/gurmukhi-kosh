@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { foldGurmukhi } from "../lib/gurmukhi-fold";
+import { foldGurmukhi, foldSpelling } from "../lib/gurmukhi-fold";
 
 const collide = (a: string, b: string) => expect(foldGurmukhi(a)).toBe(foldGurmukhi(b));
 const differ = (a: string, b: string) => expect(foldGurmukhi(a)).not.toBe(foldGurmukhi(b));
@@ -55,5 +55,28 @@ describe("foldGurmukhi", () => {
   it("ignores non-Gurmukhi input rather than poisoning the key", () => {
     expect(foldGurmukhi("abc123!")).toBe("");
     expect(foldGurmukhi("ਸਤਿ.")).toBe(foldGurmukhi("ਸਤਿ"));
+  });
+});
+
+// The stricter key for the pad-arth's spelling-variant tier (#377): the same word spelled
+// differently, never a different grammatical ending.
+describe("foldSpelling", () => {
+  it("folds consonant spellings, nasal signs and nukta", () => {
+    expect(foldSpelling("ਨੀਸਾਣੁ")).toBe(foldSpelling("ਨੀਸਾਨੁ"));
+    expect(foldSpelling("ਵਿਣੁ")).toBe(foldSpelling("ਵਿਨੁ"));
+    expect(foldSpelling("ਸਾਂਤਿ")).toBe(foldSpelling("ਸਾੰਤਿ"));
+    expect(foldSpelling("ਖ਼ਸਮ")).toBe(foldSpelling("ਖਸਮ"));
+  });
+
+  it("keeps vowel length and the final short matra, which carry grammar", () => {
+    expect(foldSpelling("ਗੁਣ")).not.toBe(foldSpelling("ਗੁਣੁ"));
+    expect(foldSpelling("ਸਭ")).not.toBe(foldSpelling("ਸਭੁ"));
+    expect(foldSpelling("ਕਰੀ")).not.toBe(foldSpelling("ਕਰਿ"));
+  });
+
+  it("is never looser than the search fold", () => {
+    for (const [a, b] of [["ਨੀਸਾਣੁ", "ਨੀਸਾਨੁ"], ["ਵਿਣੁ", "ਵਿਨੁ"]]) {
+      expect(foldGurmukhi(a)).toBe(foldGurmukhi(b));
+    }
   });
 });

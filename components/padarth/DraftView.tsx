@@ -82,7 +82,11 @@ function CandidateText({ c }: { c: Candidate }) {
       <span>{c.text}</span>
       {c.textEn && <span className="padarth-en"> — {c.textEn}</span>}{" "}
       <span className="padarth-source">
-        {c.via?.link === "mk_pointer" ? (
+        {c.via?.link === "spelling_variant" || c.via?.link === "ending_variant" ? (
+          <>
+            {c.via.link === "spelling_variant" ? "spelling" : "ending"} variant <span className="gurmukhi">{c.via.headword}</span>, {sourceLabel(c.sourceCode)}
+          </>
+        ) : c.via?.link === "mk_pointer" ? (
           <>
             <span className="gurmukhi">ਦੇਖੋ {c.via.headword}</span>, {sourceLabel(c.sourceCode)}
           </>
@@ -96,6 +100,7 @@ function CandidateText({ c }: { c: Candidate }) {
         {c.senseNumber !== null && ` §${c.senseNumber}`}
       </span>
       {c.lowPriority && <span className="padarth-caveat"> spelling rebuilt from Shackle&apos;s romanisation</span>}
+      {c.via?.link === "ending_variant" && <span className="padarth-caveat"> the ending may differ in grammar</span>}
     </>
   );
 }

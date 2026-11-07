@@ -19,6 +19,7 @@ const rows = (extra: Partial<DraftRows> = {}): DraftRows => ({
   formLinks: [],
   headwords: [],
   pointerTargets: [],
+  variantWords: [],
   padarth: [],
   grammar: [],
   ...extra,
@@ -129,5 +130,29 @@ describe("buildDraftInputs", () => {
     expect(l9.mkPointerTargets).toEqual([{ target: "ਤੁਟਣਾ", wordId: 850 }]);
     expect(l5.definitions).toEqual([]);
     expect(l5.mkPointerTargets).toEqual([]);
+  });
+
+  it("finds a line word's spelling variants by fold key, tiered, and brings in their senses", () => {
+    const inputs = buildDraftInputs(
+      rows({
+        // ਪਾਲਿ (13) has no definition of its own.
+        definitions: [
+          { id: 7, word_id: 870, sense_number: 1, definition_text: "wall", definition_en: null, notes: null, dict_sources: { code: "shackle" } },
+          { id: 8, word_id: 871, sense_number: 1, definition_text: "ridge", definition_en: null, notes: null, dict_sources: { code: "shackle" } },
+        ],
+        variantWords: [
+          { id: 870, gurmukhi: "ਪਾਲ" },
+          { id: 871, gurmukhi: "ਪਾਲੀ" },
+          { id: 872, gurmukhi: "ਕਿਵੈ" },
+        ],
+      })
+    );
+    const l9 = inputs[1];
+    expect(l9.variants).toEqual([
+      { wordId: 13, variantWordId: 870, variant: "ਪਾਲ", tier: "ending" },
+      { wordId: 13, variantWordId: 871, variant: "ਪਾਲੀ", tier: "ending" },
+    ]);
+    expect(l9.definitions.map((d) => d.id)).toEqual([7, 8]);
+    expect(inputs[0].variants).toEqual([]);
   });
 });

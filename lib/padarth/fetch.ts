@@ -8,8 +8,9 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAllRows } from "../fetch-all-rows";
-import { draftLine, type DraftInput, type DraftLine } from "./draft";
+import { draftLine, type DraftInput, type DraftLine, type DraftVariant } from "./draft";
 import { parseMkPointer } from "./mk-pointer";
+import { foldGurmukhi, foldSpelling } from "../gurmukhi-fold";
 
 export type DraftScope =
   | { kind: "ang"; sourceCode: string; ang: number }
@@ -71,6 +72,8 @@ export type DraftRows = {
   headwords: { id: number; gurmukhi: string }[];
   /** The words Mahan Kosh "ਦੇਖੋ" rows on the scope's words name (definitions holds their senses). */
   pointerTargets: { id: number; gurmukhi: string }[];
+  /** Words sharing a fold key with a line word that has no dictionary row (definitions holds their senses). */
+  variantWords: { id: number; gurmukhi: string }[];
   padarth: PadarthRow[];
   grammar: GrammarRow[];
 };
@@ -108,6 +111,20 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
       pointsAt.set(d.word_id, list);
     }
   }
+  // Spelling variants (#377), for words with no dictionary row and no Shackle form link.
+  const hasRows = new Set([...rows.definitions.map((d) => d.word_id), ...formLinks.map((f) => f.wordId)]);
+  const byFold = new Map<string, { id: number; gurmukhi: string }[]>();
+  for (const w of rows.variantWords) {
+    const key = foldGurmukhi(w.gurmukhi);
+    if (key) byFold.set(key, [...(byFold.get(key) ?? []), w]);
+  }
+  const variantsOf = (wordId: number, gurmukhi: string): DraftVariant[] => {
+    if (hasRows.has(wordId)) return [];
+    const key = foldGurmukhi(gurmukhi);
+    return (byFold.get(key) ?? [])
+      .filter((w) => w.id !== wordId)
+      .map((w) => ({ wordId, variantWordId: w.id, variant: w.gurmukhi, tier: foldSpelling(w.gurmukhi) === foldSpelling(gurmukhi) ? "spelling" : "ending" }));
+  };
   const definitions = rows.definitions.map((d) => ({
     id: d.id,
     wordId: d.word_id,
@@ -141,7 +158,13 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
       const wordIds = new Set(tokens.map((t) => t.wordId));
       const links = formLinks.filter((f) => wordIds.has(f.wordId));
       const mkPointerTargets = [...wordIds].flatMap((w) => pointsAt.get(w) ?? []);
-      const defWords = new Set([...wordIds, ...links.map((f) => f.headwordWordId), ...mkPointerTargets.map((t) => t.wordId)]);
+      const variants = [...new Map(tokens.map((t) => [t.wordId, t.gurmukhi])).entries()].flatMap(([id, g]) => variantsOf(id, g));
+      const defWords = new Set([
+        ...wordIds,
+        ...links.map((f) => f.headwordWordId),
+        ...mkPointerTargets.map((t) => t.wordId),
+        ...variants.map((v) => v.variantWordId),
+      ]);
       const padarth = rows.padarth
         .filter((g) => g.line_id === line.id)
         .map((g) => ({
@@ -171,6 +194,7 @@ export function buildDraftInputs(rows: DraftRows): DraftInput[] {
         padarth,
         grammar: grammar.filter((g) => wordIds.has(g.wordId)),
         mkPointerTargets,
+        variants,
       };
     });
 }
@@ -315,7 +339,35 @@ export async function fetchDraftRows(db: SupabaseClient, lines: LineRow[]): Prom
         .eq("dict_sources.code", "mahan_kosh")
         .order("id")
   );
-  return { lines, occurrences, definitions: [...definitions, ...targetDefinitions], formLinks, headwords, pointerTargets, padarth, grammar };
+  // Spelling variants (#377) of the words with no dictionary row and no form link, by fold key.
+  const covered = new Set([...definitions.map((d) => d.word_id), ...formLinks.map((f) => f.word_id)]);
+  const keys = [
+    ...new Set(occurrences.filter((o) => !covered.has(o.word_id)).map((o) => foldGurmukhi(o.words?.gurmukhi ?? "")).filter(Boolean)),
+  ];
+  const variantWords = (
+    await Promise.all(
+      chunks(keys).map((part) =>
+        fetchAllRows<{ id: number; gurmukhi: string }>("words", () => db.from("words").select("id, gurmukhi").in("search_fold", part).order("id"))
+      )
+    )
+  ).flat();
+  const loaded = new Set([...definitions, ...targetDefinitions].map((d) => d.word_id));
+  const variantDefinitions = await inChunks<DefinitionRow>(
+    "definitions",
+    variantWords.map((w) => w.id).filter((id) => !loaded.has(id)),
+    (ids) => db.from("definitions").select("id, word_id, sense_number, definition_text, definition_en, notes, dict_sources(code)").in("word_id", ids).order("id")
+  );
+  return {
+    lines,
+    occurrences,
+    definitions: [...definitions, ...targetDefinitions, ...variantDefinitions],
+    formLinks,
+    headwords,
+    pointerTargets,
+    variantWords,
+    padarth,
+    grammar,
+  };
 }
 
 /** The draft for every line of a scope, in reading order. */
