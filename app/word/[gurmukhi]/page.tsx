@@ -6,7 +6,8 @@ import { pageTitle } from "@/lib/site";
 import type { DefinitionWithSource, DictExample, Etymology, WordGrammarWithRule } from "@/lib/supabase";
 import { buildGrammarView, normalizePos, sourceDisplayLabel, type AttributeView, type AttributeReading } from "@/lib/grammar-view";
 import { asParsedSense, collectXrefTargets, nfdNormalize } from "@/lib/mahan-kosh-parsed";
-import { entryLink, secondaryGloss } from "@/lib/definition-display";
+import { entryLink, secondaryGloss, splitPointerRows } from "@/lib/definition-display";
+import { parseMkPointer } from "@/lib/padarth/mk-pointer";
 import { homographMark, seeTargets, splitShackleGloss } from "@/lib/shackle-display";
 import { curatorDb, isCurator, isPublicOrigin, withCuratorKey } from "@/lib/curator";
 import { DEFINITION_COLUMNS, fetchMorphVariants, fetchPosMap, fetchUsage, fetchWriterStats } from "@/lib/word-data";
@@ -249,7 +250,12 @@ export default async function WordPage({ params, searchParams }: Props) {
   // The citation sigla (siglum → work title) for this word's examples are
   // looked up alongside, not after: neither depends on the other (#201).
   const parsedSenses = definitions.map((d) => asParsedSense(d.parsed ?? null));
-  const xrefTargets = collectXrefTargets(parsedSenses);
+  // Mahan Kosh pointer-only rows ("ਦੇਖੋ, ਮੰਞੁ.") become one "ਦੇਖੋ" line of links (#23); their
+  // targets are checked here too.
+  const pointerTargets = definitions.flatMap((d) =>
+    (d.dict_sources as unknown as { code: string } | null)?.code === "mahan_kosh" ? (parseMkPointer(d.definition_text) ?? []).map((p) => p.target) : []
+  );
+  const xrefTargets = [...collectXrefTargets(parsedSenses), ...pointerTargets];
   const xrefVariants = [...new Set(xrefTargets.flatMap((t) => [t, t.normalize("NFC")]))];
   const siglaCodes = [...new Set(examples.map((x) => x.citation_siglum).filter((s): s is string => !!s))];
   const [{ data: xrefRows }, { data: siglaRows }, { data: curatorOnlyRows }] = await Promise.all([
@@ -483,7 +489,10 @@ export default async function WordPage({ params, searchParams }: Props) {
       {(tab === "overview" || tab === "meanings") && defsBySource.size > 0 && (
         <section style={{ marginBottom: "2.5rem" }}>
           <SectionHeading>Definitions</SectionHeading>
-          {Array.from(defsBySource.entries()).map(([code, { sourceName, language, provenance, reviewStatus, defs }]) => (
+          {Array.from(defsBySource.entries()).map(([code, { sourceName, language, provenance, reviewStatus, defs: rows }]) => {
+            // The curator sees every row, to flag it; the public sees pointers as one line.
+            const { senses: defs, pointers } = curator ? { senses: rows, pointers: [] } : splitPointerRows(code, rows);
+            return (
             <div key={code} style={{ marginBottom: "1.25rem" }}>
               {/* Source name */}
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -573,8 +582,27 @@ export default async function WordPage({ params, searchParams }: Props) {
                 </div>
                 );
               })}
+              {pointers.length > 0 && (
+                <p style={{ margin: "0.4rem 0 0", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+                  <span className="gurmukhi">ਦੇਖੋ</span>:{" "}
+                  {pointers.map((p, i) => {
+                    const label = p.sense === null ? p.target : `${p.target} §${p.sense}`;
+                    return (
+                      <span key={`${p.target}:${p.sense}`}>
+                        {i > 0 && ", "}
+                        {linkableXrefs.has(nfdNormalize(p.target)) ? (
+                          <a href={`/word/${encodeURIComponent(p.target)}`} className="gurmukhi">{label}</a>
+                        ) : (
+                          <span className="gurmukhi">{label}</span>
+                        )}
+                      </span>
+                    );
+                  })}
+                </p>
+              )}
             </div>
-          ))}
+            );
+          })}
         </section>
       )}
 
