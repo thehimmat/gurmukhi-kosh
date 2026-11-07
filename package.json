@@ -24,6 +24,7 @@
     "ingest:shackle:lookups": "tsx pipeline/shackle/load-lookups.ts",
     "ingest:shackle": "tsx pipeline/shackle/ingest.ts && tsx pipeline/shackle/ingest-form-links.ts",
     "ingest:shackle:forms": "tsx pipeline/shackle/ingest-form-links.ts",
+    "ingest:shackle:collocations": "tsx pipeline/shackle/ingest-collocations.ts",
     "ingest:translations": "tsx pipeline/translations/ingest.ts",
     "ingest:vishraam": "tsx pipeline/vishraam/ingest.ts",
     "ingest:passages": "tsx pipeline/passages/ingest.ts",
