@@ -291,4 +291,41 @@ describe("draftLine", () => {
     );
     expect(d.words[0].candidates.map((c) => c.text)).toEqual(["become"]);
   });
+
+  it("offers a Shackle phrase whose words stand together in the line, after the words, spelling-folded", () => {
+    const d = draftLine(
+      input("ਅੰਮ੍ਰਿਤ ਵੇਲਾ ਸਚੁ ਨਾਉ ਵਡਿਆਈ ਵੀਚਾਰੁ", {
+        collocations: [
+          { id: 7, sourceCode: "shackle", phrase: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ", members: [["ਅੰਮ੍ਰਿਤ"], ["ਵੇਲਾ"]], gloss: "the time of nectar, the hour before dawn", posRaw: "m.", origin: "compound" },
+          // Not consecutive in the line: not offered.
+          { id: 8, sourceCode: "shackle", phrase: "ਸਚੁ ਵਡਿਆਈ", members: [["ਸਚੁ"], ["ਵਡਿਆਈ"]], gloss: "true glory", posRaw: null, origin: "usage" },
+          // Any of a word's spellings matches.
+          { id: 9, sourceCode: "shackle", phrase: "ਵਡਿਆਈ ਵੀਚਾਰੁ", members: [["ਵਡਿਆਈ"], ["ਵੀਚਾਰੁ", "ਵੀਚਾਰ"]], gloss: "reflect on greatness", posRaw: null, origin: "usage" },
+        ],
+      })
+    );
+    expect(d.phrases.map((p) => [p.positions, p.surface])).toEqual([
+      [[0, 1], "ਅੰਮ੍ਰਿਤ ਵੇਲਾ"],
+      [[4, 5], "ਵਡਿਆਈ ਵੀਚਾਰੁ"],
+    ]);
+    expect(d.phrases[0].candidates).toEqual([
+      { kind: "collocation", collocationId: 7, sourceCode: "shackle", term: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ", text: "the time of nectar, the hour before dawn", posRaw: "m.", origin: "compound" },
+    ]);
+  });
+
+  it("matches a phrase across ਣ/ਨ, and puts it beside Sahib Singh's for the same words", () => {
+    const d = draftLine(
+      input("ਨੀਸਾਣੁ ਵਜਾਇ", {
+        padarth: [
+          { id: 70, ordinal: 0, term: "ਨੀਸਾਣੁ ਵਜਾਇ", gloss: "ਧੌਂਸਾ ਵਜਾ ਕੇ", notes: [], isPhrase: true, links: [0, 1].map((position) => ({ position, match: "exact" as const, lexemeId: null })), caseEvidence: [] },
+        ],
+        collocations: [{ id: 9, sourceCode: "shackle", phrase: "ਨੀਸਾਨੁ ਵਜਾਇ", members: [["ਨੀਸਾਨੁ"], ["ਵਜਾਇ"]], gloss: "sound the drum", posRaw: null, origin: "usage" }],
+      })
+    );
+    expect(d.phrases).toHaveLength(1);
+    expect(d.phrases[0].candidates.map((c) => [c.kind, c.text])).toEqual([
+      ["padarth_gloss", "ਧੌਂਸਾ ਵਜਾ ਕੇ"],
+      ["collocation", "sound the drum"],
+    ]);
+  });
 });

@@ -20,6 +20,7 @@ const rows = (extra: Partial<DraftRows> = {}): DraftRows => ({
   headwords: [],
   pointerTargets: [],
   variantWords: [],
+  collocations: [],
   padarth: [],
   grammar: [],
   ...extra,
@@ -154,5 +155,19 @@ describe("buildDraftInputs", () => {
     ]);
     expect(l9.definitions.map((d) => d.id)).toEqual([7, 8]);
     expect(inputs[0].variants).toEqual([]);
+  });
+
+  it("hands every line the same list of dictionary phrases, mapped", () => {
+    const inputs = buildDraftInputs(
+      rows({
+        collocations: [
+          { id: 7, phrase_gurmukhi: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ", members: [["ਅੰਮ੍ਰਿਤ"], ["ਵੇਲਾ"]], gloss: "the hour before dawn", pos_raw: "m.", origin: "compound", dict_sources: { code: "shackle" } },
+        ],
+      })
+    );
+    expect(inputs[0].collocations).toEqual([
+      { id: 7, sourceCode: "shackle", phrase: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ", members: [["ਅੰਮ੍ਰਿਤ"], ["ਵੇਲਾ"]], gloss: "the hour before dawn", posRaw: "m.", origin: "compound" },
+    ]);
+    expect(inputs[1].collocations).toBe(inputs[0].collocations);
   });
 });

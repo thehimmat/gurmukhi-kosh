@@ -8,7 +8,8 @@
 import { curatorDb } from "@/lib/curator";
 import { requireAdmin } from "@/lib/curator-session";
 
-export type RefChoice = { kind: "padarth_gloss" | "definition"; id: number };
+export type RefChoice = { kind: "padarth_gloss" | "definition" | "collocation"; id: number };
+const REF_KINDS: RefChoice["kind"][] = ["padarth_gloss", "definition", "collocation"];
 
 export type SavePickInput = {
   lineId: number;
@@ -42,7 +43,7 @@ export async function savePick(input: SavePickInput): Promise<{ pickId: number |
     throw new Error("Invalid positions");
   }
   if (typeof surface !== "string" || surface.trim() === "" || surface.length > 500) throw new Error("Invalid surface");
-  if (!Array.isArray(refs) || refs.length > 50 || !refs.every((r) => (r?.kind === "padarth_gloss" || r?.kind === "definition") && isId(r.id))) {
+  if (!Array.isArray(refs) || refs.length > 50 || !refs.every((r) => REF_KINDS.includes(r?.kind) && isId(r.id))) {
     throw new Error("Invalid refs");
   }
   const overrideText = checkText("override", input.overrideText);

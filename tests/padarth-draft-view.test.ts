@@ -147,4 +147,25 @@ describe("PadarthDraftView", () => {
     expect(out).toMatch(/banner.*spelling variant ਨੀਸਾਨੁ ?, Shackle/);
     expect(out).toMatch(/virtue.*ending variant ਗੁਣੁ ?, Shackle.*ending may differ in grammar/);
   });
+
+  it("shows a Shackle phrase on its phrase row, naming where in his entry it comes from", () => {
+    const d = draftLine({
+      lineId: 4,
+      tokens: [
+        { position: 0, wordId: 1, gurmukhi: "ਅੰਮ੍ਰਿਤ" },
+        { position: 1, wordId: 2, gurmukhi: "ਵੇਲਾ" },
+      ],
+      definitions: [],
+      formLinks: [],
+      padarth: [],
+      grammar: [],
+      collocations: [{ id: 7, sourceCode: "shackle", phrase: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ", members: [["ਅੰਮ੍ਰਿਤ"], ["ਵੇਲਾ"]], gloss: "the hour before dawn", posRaw: "m.", origin: "compound" }],
+    });
+    const out = decode(
+      renderToStaticMarkup(createElement(PadarthDraftView, { lines: [{ id: 4, verse_id: 4, gurmukhi: "ਅੰਮ੍ਰਿਤ ਵੇਲਾ" }], drafts: [d] }))
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+    );
+    expect(out).toMatch(/Phrases.*ਅੰਮ੍ਰਿਤ ਵੇਲਾ.*the hour before dawn \(m\.\) Shackle, compound ਅੰਮ੍ਰਿਤ ਵੇਲਾ/);
+  });
 });
