@@ -17,8 +17,8 @@ jobs:
   migration-rls-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Check migrations enable RLS on every created table
@@ -30,8 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
@@ -53,8 +53,8 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://141-148-39-45.sslip.io
       NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJndXJtdWtoaS1rb3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjEyMjUsImV4cCI6MjEwODQ4MTIyNX0.yWAh4km1An_ird8OcKxzzyjId7cVCVfZ0a5JDeoX8EA
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       # npm ci against the standalone lockfile, so CI and Vercel build the
