@@ -37,7 +37,7 @@ jobs:
     outputs:
       built: ${{ steps.changed.outputs.build }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
@@ -52,15 +52,15 @@ jobs:
           if VERCEL_GIT_PREVIOUS_SHA=$last node scripts/vercel-ignore.mjs; then build=false; else build=true; fi
           echo "build=$build" >> "$GITHUB_OUTPUT"
       - if: steps.changed.outputs.build == 'true'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - if: steps.changed.outputs.build == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
       - if: steps.changed.outputs.build == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/arm64
