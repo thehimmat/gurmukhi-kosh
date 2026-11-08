@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { deckBuffer, deckFileName, slidePlan } from "../lib/padarth/slides";
+import { LAYOUTS, deckBuffer, deckFileName, layoutFor, slidePlan } from "../lib/padarth/slides";
 import { scopeTitle, slidesHref } from "../lib/padarth/scope";
 import type { PreviewLine } from "../lib/padarth/preview";
 
@@ -51,11 +51,6 @@ describe("slidePlan", () => {
     expect(rows.find((r) => r.surface === "ਨ")?.gloss).toBeNull();
   });
 
-  it("shrinks the type for a line with many rows, so it fits the slide", () => {
-    const many = line({ rows: Array.from({ length: 14 }, (_, i) => ({ surface: `ਸ${i}`, text: "x", status: "picked" as const, grammar: [], note: null })) });
-    const size = (l: PreviewLine) => (slidePlan([l], "x")[1] as { fontSize: number }).fontSize;
-    expect(size(many)).toBeLessThan(size(line()));
-  });
 });
 
 describe("deckBuffer", () => {
@@ -80,5 +75,36 @@ describe("the export's link, title and file name", () => {
     expect(scopeTitle({ kind: "shabad", shabadId: 9 })).toBe("Shabad 9");
     expect(deckFileName("bani=2&p=4")).toBe("padarth-bani-2-paragraph-4.pptx");
     expect(deckFileName("ang=3&source=dasam_banidb_v2")).toBe("padarth-ang-3-source-dasam-banidb-v2.pptx");
+  });
+});
+
+// Each slide is built on a named layout with title/body placeholders, so a Google Slides theme
+// with layouts of the same names styles it on import (Slide → Edit theme).
+describe("layouts", () => {
+  it("names one layout per kind of slide", () => {
+    expect(LAYOUTS).toEqual({
+      title: "Pad-arth title",
+      line: "Pad-arth line",
+      question: "Pad-arth question",
+      introduction: "Pad-arth introduction",
+    });
+    expect(layoutFor({ kind: "question", text: "x" })).toBe("Pad-arth question");
+  });
+
+  it("writes the layouts into the file", async () => {
+    const buf = await deckBuffer([line()], "x");
+    // pptxgenjs adds its own default layout first: four of ours make five.
+    expect(buf.toString("latin1")).toContain("ppt/slideLayouts/slideLayout5.xml");
+  });
+
+  it("leaves the type size to the layout unless a long line has to shrink", () => {
+    const sizes = (l: PreviewLine) => (slidePlan([l], "x")[1] as { fontSize: number | null; verseSize: number | null });
+    expect(sizes(line())).toMatchObject({ fontSize: null, verseSize: null });
+    const long = line({
+      gurmukhi: "ਸਹਸ ਸਿਆਣਪਾ ਲਖ ਹੋਹਿ ਤ ਇਕ ਨ ਚਲੈ ਨਾਲਿ ਕਿਵ ਸਚਿਆਰਾ ਹੋਈਐ ਕਿਵ ਕੂੜੈ ਤੁਟੈ ਪਾਲਿ ॥",
+      rows: Array.from({ length: 14 }, (_, i) => ({ surface: `ਸ${i}`, text: "x", status: "picked" as const, grammar: [], note: null })),
+    });
+    expect(sizes(long).fontSize).toBeLessThan(28);
+    expect(sizes(long).verseSize).toBeLessThan(30);
   });
 });
