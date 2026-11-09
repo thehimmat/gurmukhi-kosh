@@ -134,8 +134,8 @@ describe("Caddy's config on the server", () => {
   it("mounts the config as directories, never single files", () => {
     const base = read("selfhost/docker-compose.yml");
     const apps = read("selfhost/docker-compose.apps.yml");
-    expect(base).toMatch(/^      - \.\/caddy:\/etc\/caddy:ro$/m);
-    expect(apps).toMatch(/^      - \.\/sites:\/etc\/caddy-sites:ro$/m);
+    expect(base).toMatch(/^ {6}- \.\/caddy:\/etc\/caddy:ro$/m);
+    expect(apps).toMatch(/^ {6}- \.\/sites:\/etc\/caddy-sites:ro$/m);
     expect(base + apps).not.toMatch(/Caddyfile:/);
   });
 });
