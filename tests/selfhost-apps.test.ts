@@ -137,17 +137,29 @@ describe("selfhost/Caddyfile", () => {
     expect(caddy).toMatch(/^import \/etc\/caddy\/sites\/\*\.caddy$/m);
   });
 
-  it("serves search.atthebunga.com only to Cloudflare (Origin CA cert plus Authenticated Origin Pulls)", () => {
+  it("defines Cloudflare's origin TLS once (Origin CA cert plus Authenticated Origin Pulls), before the sites load", () => {
+    const snippet = /^\(cloudflare_origin\) \{\n([\s\S]*?)^\}$/m.exec(caddy)?.[1] ?? "";
+    expect(snippet).toMatch(/tls \/certs\/origin\.pem \/certs\/origin\.key/);
+    expect(snippet).toMatch(/mode require_and_verify/);
+    expect(snippet).toMatch(/trust_pool file \/certs\/cloudflare-origin-pull-ca\.pem/);
+    expect(caddy.indexOf("(cloudflare_origin) {")).toBeLessThan(caddy.indexOf("import /etc/caddy/sites/"));
+  });
+
+  it("uses no deprecated client-auth field (trusted_ca_cert_file, deprecated since Caddy 2.8)", () => {
+    for (const f of ["selfhost/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy"]) {
+      expect(read(f), f).not.toMatch(/trusted_ca_cert_file/);
+    }
+  });
+
+  it("serves search.atthebunga.com only to Cloudflare", () => {
     const site = read("selfhost/sites/search.caddy");
-    expect(site).toMatch(/tls \/certs\/origin\.pem \/certs\/origin\.key/);
-    expect(site).toMatch(/mode require_and_verify/);
+    expect(site).toMatch(/^\timport cloudflare_origin$/m);
     expect(site).toMatch(/reverse_proxy search:3000/);
   });
 
   it("serves the radio stack (a separate Compose project) to Cloudflare and on a test name, without buffering audio", () => {
     const site = read("selfhost/sites/stream.caddy");
-    expect(site).toMatch(/^stream\.atthebunga\.com \{/m);
-    expect(site).toMatch(/mode require_and_verify/);
+    expect(site).toMatch(/^stream\.atthebunga\.com \{\n\timport cloudflare_origin$/m);
     expect(site).toMatch(/^radio\.\{\$SITE_ADDRESS\} \{/m);
     expect(site).toMatch(/reverse_proxy radio:3001/);
     expect(site).toMatch(/flush_interval -1/);

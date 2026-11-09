@@ -10,12 +10,7 @@
 
 # Proxied by Cloudflare in Full (strict) mode, like search.caddy, so CF-Connecting-IP can be trusted.
 stream.atthebunga.com {
-	tls /certs/origin.pem /certs/origin.key {
-		client_auth {
-			mode require_and_verify
-			trusted_ca_cert_file /certs/cloudflare-origin-pull-ca.pem
-		}
-	}
+	import cloudflare_origin
 	import radio
 }
 

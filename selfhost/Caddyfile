@@ -51,4 +51,17 @@
 	import api
 }
 
+# For sites proxied by Cloudflare in Full (strict) mode (sites/*.caddy): a Cloudflare Origin CA
+# certificate, and every connection must present Cloudflare's client certificate (Authenticated
+# Origin Pulls, Global), so nobody reaches them around Cloudflare. Defined here, before the sites
+# load, so the CA is named once; it expires 2029-11-01 (selfhost/README.md, "The apps").
+(cloudflare_origin) {
+	tls /certs/origin.pem /certs/origin.key {
+		client_auth {
+			mode require_and_verify
+			trust_pool file /certs/cloudflare-origin-pull-ca.pem
+		}
+	}
+}
+
 import /etc/caddy/sites/*.caddy
