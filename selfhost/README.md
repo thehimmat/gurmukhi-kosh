@@ -21,7 +21,7 @@ and the dashboard.
 |---|---|
 | `docker-compose.yml` | The three services. Postgres listens on localhost only. |
 | `docker-compose.server.yml` | On the server: Caddy on 80/443 with its own TLS certificate |
-| `Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token. The same API on `:8080` (HTTP, Docker network only) for the apps |
+| `caddy/Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token. The same API on `:8080` (HTTP, Docker network only) for the apps |
 | `docker-compose.apps.yml` | On the server: the two Next apps behind search.atthebunga.com ([The apps](#the-apps-searchatthebungacom)) |
 | `sites/search.caddy` | search.atthebunga.com → the search app, for Cloudflare only (Origin CA cert, Authenticated Origin Pulls) |
 | `sites/stream.caddy` | stream.atthebunga.com → the radio stack from google-home-radiocaster (`/opt/radio`), which shares only the `radio-edge` network with this gateway |

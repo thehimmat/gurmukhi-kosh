@@ -50,7 +50,9 @@ services:
       BACKUP_TOKEN: ${BACKUP_TOKEN:?set in selfhost/.env (openssl rand -hex 24)}
     ports: ["${GATEWAY_PORTS:-8000:8000}"]
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The folder, not the file: deploy.sh updates it with git, which replaces the file, and a
+      # single-file mount would keep showing the old one to `caddy reload`.
+      - ./caddy:/etc/caddy:ro
       - ./backups:/srv/backups:ro
       - caddy_data:/data
 
