@@ -23,7 +23,7 @@ services:
   gateway:
     networks: [default, radio-edge]
     volumes:
-      - ./sites:/etc/caddy/sites:ro
+      - ./sites:/etc/caddy-sites:ro
       - ./certs:/certs:ro
 
   kosh:

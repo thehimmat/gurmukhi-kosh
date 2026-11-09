@@ -126,15 +126,29 @@ describe("selfhost/docker-compose.apps.yml", () => {
   });
 });
 
-describe("selfhost/Caddyfile", () => {
-  const caddy = read("selfhost/Caddyfile");
+describe("Caddy's config on the server", () => {
+  // deploy.sh updates the files with git, which replaces each one, and then reloads Caddy. A bind
+  // mount of a single file keeps showing the replaced file until the container is recreated, so a
+  // reload read the old Caddyfile with the new sites (the #391 deploy failed that way). Directories
+  // show what is in them now.
+  it("mounts the config as directories, never single files", () => {
+    const base = read("selfhost/docker-compose.yml");
+    const apps = read("selfhost/docker-compose.apps.yml");
+    expect(base).toMatch(/^ {6}- \.\/caddy:\/etc\/caddy:ro$/m);
+    expect(apps).toMatch(/^ {6}- \.\/sites:\/etc\/caddy-sites:ro$/m);
+    expect(base + apps).not.toMatch(/Caddyfile:/);
+  });
+});
+
+describe("selfhost/caddy/Caddyfile", () => {
+  const caddy = read("selfhost/caddy/Caddyfile");
 
   it("serves the API on an internal port for the apps (http, Docker network only)", () => {
     expect(caddy).toMatch(/^:8080 \{/m);
   });
 
   it("loads extra sites (search.atthebunga.com) only where they're mounted", () => {
-    expect(caddy).toMatch(/^import \/etc\/caddy\/sites\/\*\.caddy$/m);
+    expect(caddy).toMatch(/^import \/etc\/caddy-sites\/\*\.caddy$/m);
   });
 
   it("defines Cloudflare's origin TLS once (Origin CA cert plus Authenticated Origin Pulls), before the sites load", () => {
@@ -142,11 +156,11 @@ describe("selfhost/Caddyfile", () => {
     expect(snippet).toMatch(/tls \/certs\/origin\.pem \/certs\/origin\.key/);
     expect(snippet).toMatch(/mode require_and_verify/);
     expect(snippet).toMatch(/trust_pool file \/certs\/cloudflare-origin-pull-ca\.pem/);
-    expect(caddy.indexOf("(cloudflare_origin) {")).toBeLessThan(caddy.indexOf("import /etc/caddy/sites/"));
+    expect(caddy.indexOf("(cloudflare_origin) {")).toBeLessThan(caddy.indexOf("import /etc/caddy-sites/"));
   });
 
   it("uses no deprecated client-auth field (trusted_ca_cert_file, deprecated since Caddy 2.8)", () => {
-    for (const f of ["selfhost/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy"]) {
+    for (const f of ["selfhost/caddy/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy"]) {
       expect(read(f), f).not.toMatch(/trusted_ca_cert_file/);
     }
   });

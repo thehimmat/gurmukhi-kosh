@@ -1,7 +1,8 @@
 # SITE_ADDRESS is ":8000" locally; on the server it's the API's domain, and Caddy fetches its TLS
 # certificate itself. ":8080" is the same API over plain HTTP for the apps on the VM, reachable only
 # on Docker's network (no port is published for it). Further sites, such as search.atthebunga.com,
-# are files in sites/ that docker-compose.apps.yml mounts; without them the glob matches nothing.
+# are files in ../sites/, which docker-compose.apps.yml mounts at /etc/caddy-sites; without them the
+# glob matches nothing.
 (api) {
 	# Supabase's gateway refuses any request whose apikey isn't one of the project's keys. Same here,
 	# so the API answers nobody who hasn't loaded one of the apps. Preflights carry no apikey.
@@ -64,4 +65,4 @@
 	}
 }
 
-import /etc/caddy/sites/*.caddy
+import /etc/caddy-sites/*.caddy
