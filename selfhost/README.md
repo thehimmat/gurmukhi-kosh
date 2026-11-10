@@ -25,6 +25,7 @@ and the dashboard.
 | `docker-compose.apps.yml` | On the server: the two Next apps behind search.atthebunga.com ([The apps](#the-apps-searchatthebungacom)) |
 | `sites/search.caddy` | search.atthebunga.com → the search app, for Cloudflare only (Origin CA cert, Authenticated Origin Pulls) |
 | `sites/stream.caddy` | stream.atthebunga.com → the radio stack from google-home-radiocaster (`/opt/radio`), which shares only the `radio-edge` network with this gateway |
+| `sites/pir.caddy` | pir.141-148-39-45.sslip.io → the PIR noise poller from pir-sound-tracker (`/opt/pir`), which shares only the `pir-edge` network with this gateway |
 | `sql/roles.sql` | Supabase's API roles and timeouts, plus `akhar_writer` (the annotation site); re-applied by setup |
 | `scripts/server-setup.sh` | One-time (re-runnable) VM setup: updates, firewall, Docker, swap, secrets, stack, backup timer |
 | `scripts/mint-keys.mjs` | A JWT secret plus anon and service keys signed with it |

@@ -160,7 +160,7 @@ describe("selfhost/caddy/Caddyfile", () => {
   });
 
   it("uses no deprecated client-auth field (trusted_ca_cert_file, deprecated since Caddy 2.8)", () => {
-    for (const f of ["selfhost/caddy/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy"]) {
+    for (const f of ["selfhost/caddy/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy", "selfhost/sites/pir.caddy"]) {
       expect(read(f), f).not.toMatch(/trusted_ca_cert_file/);
     }
   });
@@ -181,9 +181,23 @@ describe("selfhost/caddy/Caddyfile", () => {
 
   it("shares only the gateway with the radio stack, on a network of their own", () => {
     const compose = read("selfhost/docker-compose.apps.yml");
-    expect(compose).toMatch(/^ {2}gateway:\n {4}networks: \[default, radio-edge\]$/m);
+    expect(compose).toMatch(/^ {2}gateway:\n {4}networks: \[default, radio-edge, pir-edge\]$/m);
     expect(compose).toMatch(/^networks:\n {2}radio-edge:\n {4}name: radio-edge$/m);
     expect(compose.match(/radio-edge/g)).toHaveLength(3);
+  });
+
+  it("serves the PIR poller (thehimmat/pir-sound-tracker, its own Compose project) on its own name, WebSocket included", () => {
+    const site = read("selfhost/sites/pir.caddy");
+    expect(site).toMatch(/^pir\.\{\$SITE_ADDRESS\} \{/m);
+    expect(site).toMatch(/reverse_proxy pir-poller:8080/);
+    // Not a Cloudflare-only name: nothing proxies it, so it needs no origin certificate.
+    expect(site).not.toMatch(/import cloudflare_origin/);
+  });
+
+  it("shares only the gateway with the PIR poller, on a network of their own", () => {
+    const compose = read("selfhost/docker-compose.apps.yml");
+    expect(compose).toMatch(/^ {2}pir-edge:\n {4}name: pir-edge$/m);
+    expect(compose.match(/pir-edge/g)).toHaveLength(3);
   });
 });
 
