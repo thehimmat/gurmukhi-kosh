@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   // the app dir there either way.
   transpilePackages: ['@atthebunga/gurmukhi-input'],
 
-  // The VM runs this as a Docker image (Dockerfile, selfhost/docker-compose.apps.yml). Vercel
+  // The VM runs this as a Docker image (Dockerfile, atthebunga-server's compose.yml). Vercel
   // ignores the setting.
   output: "standalone",
 

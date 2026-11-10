@@ -1,4 +1,4 @@
-# The app as a standalone Next server for the VM (selfhost/docker-compose.apps.yml). Built for arm64
+# The app as a standalone Next server for the VM (atthebunga-server's compose.yml). Built for arm64
 # by .github/workflows/deploy.yml and pushed to ghcr.io/thehimmat/gurmukhi-kosh.
 FROM node:22-alpine AS build
 WORKDIR /app

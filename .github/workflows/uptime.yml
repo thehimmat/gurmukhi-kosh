@@ -1,6 +1,6 @@
 name: Uptime
 
-# Every 30 minutes: the self-hosted API's /health (selfhost/caddy/Caddyfile) answers 200 only when
+# Every 30 minutes: the self-hosted API's /health (atthebunga-server's sites/api.caddy) answers 200 only when
 # PostgREST is up and reaches the database, and the site's home page answers through Cloudflare.
 # Daily at 08:00 UTC: the dictionary's /api/health report (it replaced the Vercel cron). A failed run
 # is GitHub's email that something is down.

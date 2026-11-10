@@ -1,9 +1,11 @@
 # Self-hosted API (bridge off Supabase Free)
 
 The production database outgrew Supabase Free's 500 MB. Until the project can pay for Supabase Pro,
-it runs on a free Oracle Cloud VM as **Postgres 17 + PostgREST + Caddy**. That's the same REST server
-Supabase runs, behind a gateway that serves `/rest/v1` and checks the `apikey` header like
-Supabase's does. To the apps (this repo and gurmukhi-search, now on this VM too, and
+it runs on a free Oracle Cloud VM as **Postgres 17 + PostgREST**. That's the same REST server
+Supabase runs, behind a gateway (Caddy) that serves `/rest/v1` and checks the `apikey` header like
+Supabase's does. The gateway, the two apps and everything else on the VM's ports 80 and 443 are
+[thehimmat/atthebunga-server](https://github.com/thehimmat/atthebunga-server)'s (`/opt/infra`); this
+folder is the database half, and PostgREST shares exactly one network with that gateway (`api-edge`). To the apps (this repo and gurmukhi-search, now on this VM too, and
 gurmukhi-voice-search locally) only the URL and keys change. RLS, the search RPCs and `pg_trgm` work as they are.
 
 Not included, because none of the apps use them: Supabase Auth, Storage, Realtime, Edge Functions
@@ -19,21 +21,15 @@ and the dashboard.
 
 | File | What it does |
 |---|---|
-| `docker-compose.yml` | The three services. Postgres listens on localhost only. |
-| `docker-compose.server.yml` | On the server: Caddy on 80/443 with its own TLS certificate |
-| `caddy/Caddyfile` | `/rest/v1/*` → PostgREST for requests with a known apikey; `/health`; the latest backup behind a token. The same API on `:8080` (HTTP, Docker network only) for the apps |
-| `docker-compose.apps.yml` | On the server: the two Next apps behind search.atthebunga.com ([The apps](#the-apps-searchatthebungacom)) |
-| `sites/search.caddy` | search.atthebunga.com → the search app, for Cloudflare only (Origin CA cert, Authenticated Origin Pulls) |
-| `sites/stream.caddy` | stream.atthebunga.com → the radio stack from google-home-radiocaster (`/opt/radio`), which shares only the `radio-edge` network with this gateway |
-| `sites/pir.caddy` | pir.141-148-39-45.sslip.io → the PIR noise poller from pir-sound-tracker (`/opt/pir`), which shares only the `pir-edge` network with this gateway |
+| `docker-compose.yml` | Postgres (localhost only) and PostgREST, project `selfhost` (the volume is `selfhost_pgdata`) |
+| `docker-compose.local.yml` | Local development only: the gateway on `localhost:8000`, with atthebunga-server's `sites/api.caddy` |
 | `sql/roles.sql` | Supabase's API roles and timeouts, plus `akhar_writer` (the annotation site); re-applied by setup |
-| `scripts/server-setup.sh` | One-time (re-runnable) VM setup: updates, firewall, Docker, swap, secrets, stack, backup timer |
+| `scripts/db-setup.sh` | The database's half of server setup (re-runnable): checkout, secrets, network, stack, roles, backup timer |
 | `scripts/mint-keys.mjs` | A JWT secret plus anon and service keys signed with it |
 | `scripts/restore.sh` | Restore from a live Supabase dump (`--supabase`) or an encrypted backup (`--gpg`) |
 | `scripts/backup.sh` | Nightly encrypted dump, 14 days kept (`kosh-backup.timer`, 03:30 UTC) |
 | `scripts/compare.sh` | Row counts of every table, here vs another database |
 | `scripts/check.sh` | The test suite, run on the server against its own stack |
-| `scripts/deploy.sh` | Deploys one app (or only this folder's config); GitHub Actions' deploy key runs nothing else |
 | `scripts/replay-migrations.sh` | Rehearsal only: builds the schema from migrations instead of a dump |
 
 `tests/selfhost/gateway.test.ts` checks the stack behaves like Supabase. It runs only when
@@ -42,10 +38,15 @@ production data you care about, because it writes (and removes) fixture rows.
 
 ## Run it locally
 
+With a checkout of atthebunga-server next to this repo's folder (or `INFRA_DIR=` in `.env` pointing
+at one), for the gateway's config:
+
 ```sh
-{ echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)"; echo "AUTHENTICATOR_PASSWORD=$(openssl rand -hex 24)"
+{ echo "COMPOSE_FILE=docker-compose.yml:docker-compose.local.yml"
+  echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)"; echo "AUTHENTICATOR_PASSWORD=$(openssl rand -hex 24)"
   echo "BACKUP_TOKEN=$(openssl rand -hex 24)"; node selfhost/scripts/mint-keys.mjs; } > selfhost/.env
 chmod 600 selfhost/.env
+docker network create api-edge 2>/dev/null || true
 (cd selfhost && docker compose up -d)
 sh selfhost/scripts/replay-migrations.sh                        # or restore.sh
 set -a; . selfhost/.env; set +a
@@ -53,16 +54,18 @@ SELFHOST_URL=http://localhost:8000 SELFHOST_ANON_KEY=$ANON_KEY SELFHOST_SERVICE_
   npx vitest run tests/selfhost/
 ```
 
-Run Compose from inside `selfhost/`: it resolves `COMPOSE_FILE` (set in the server's `.env`) against
-the working directory.
+Run Compose from inside `selfhost/`: it resolves `COMPOSE_FILE` (set in your local `.env`) against
+the working directory. The server's `.env` sets none.
 
 ## Server setup
 
-From a machine that can SSH to the VM (one command per step; each prints a short result):
+The host (Docker, firewall, swap) and the gateway come first, from atthebunga-server's README ("A
+new server"). Then, from a machine that can SSH to the VM (one command per step; each prints a
+short result):
 
 ```sh
 # 1. Set up, or update to the latest code on this branch (safe to re-run; keeps existing secrets)
-ssh ubuntu@141.148.39.45 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/main/selfhost/scripts/server-setup.sh | bash -s -- 141-148-39-45.sslip.io'
+ssh ubuntu@141.148.39.45 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/main/selfhost/scripts/db-setup.sh | bash -s -- 141-148-39-45.sslip.io'
 
 # 2. Restore a fresh dump from Supabase into an empty database (prompts for the session-pooler URL)
 ssh -t ubuntu@141.148.39.45 'cd /opt/kosh && read -rsp "Supabase session pooler URL: " SUPABASE_DB_URL && echo && SUPABASE_DB_URL=$SUPABASE_DB_URL sh selfhost/scripts/restore.sh --supabase'
@@ -88,8 +91,8 @@ Then add that URL as the repository secret `KOSH_BACKUP_URL`, and run the workfl
 Restore one with `restore.sh --gpg` (on an empty database).
 
 To change the token (the file is encrypted either way, but the URL shouldn't circulate): set a new
-`BACKUP_TOKEN=` in `/opt/kosh/selfhost/.env`, run `docker compose up -d` in that folder, and update
-the `KOSH_BACKUP_URL` secret.
+`BACKUP_TOKEN=` in `/opt/kosh/selfhost/.env`, recreate the gateway
+(`sh /opt/infra/scripts/compose.sh up -d gateway`), and update the `KOSH_BACKUP_URL` secret.
 
 ## Uptime
 
@@ -142,148 +145,24 @@ them against the server leaves no rows.
 ## The apps (search.atthebunga.com)
 
 Since Nov 2026 the VM also serves the site, off Vercel Hobby (Oct 2026: crawlers on /word, /line and
-/ang used the team's whole Fluid CPU allowance, and every request, cached or not, counts toward
-Vercel's 1M CDN requests).
+/ang used the team's whole Fluid CPU allowance). The apps, their deploys, Cloudflare and the rollback
+to Vercel are documented in [atthebunga-server](https://github.com/thehimmat/atthebunga-server)'s
+README. What's this repo's:
 
-```
-visitor → Cloudflare (cache, bot rules) → Caddy :443 (sites/search.caddy) → search:3000
-                                                        search's rewrites → kosh:3000 (/word, /line, /ang, …)
-                               both apps → gateway:8080 → PostgREST → Postgres   (Docker network only)
-```
-
-- **Images:** `ghcr.io/thehimmat/gurmukhi-kosh` and `ghcr.io/thehimmat/gurmukhi-search`, standalone
-  Next servers built for arm64 by each repo's `.github/workflows/deploy.yml` (after CI on main here;
-  on every push to main in gurmukhi-search). Tags: `latest` and the commit SHA.
-- **Deploy:** the workflow SSHes in with a key whose only command is `scripts/deploy.sh`: update
-  /opt/kosh to main, pull the image, `docker compose up -d --wait`, reload Caddy. Then it purges
-  search.atthebunga.com from Cloudflare's cache, because cached pages name the old build's chunks.
-  A push that changes no app file (same rule as Vercel's, `scripts/vercel-ignore.mjs`) builds nothing
-  and only applies this folder's config.
-- **TLS:** Cloudflare in Full (strict) mode. Caddy holds a Cloudflare Origin CA certificate (15 years,
-  no renewals) and requires Cloudflare's client certificate (Authenticated Origin Pulls), so the
-  apps can't be reached around Cloudflare. The API on sslip.io keeps its Let's Encrypt certificate
-  and takes no client certificate (it's matched by name on the same port).
+- **The image** `ghcr.io/thehimmat/gurmukhi-kosh`, a standalone Next server built for arm64 by
+  `.github/workflows/deploy.yml` after CI on main (tags `latest` and the commit SHA). The workflow
+  then sends the deploy key the target `kosh`, or `kosh-db` when no app file changed (same rule as
+  Vercel's, `scripts/vercel-ignore.mjs`), and purges search.atthebunga.com from Cloudflare's cache.
 - **Next's cache (ISR):** regenerated /line and /ang pages are written inside the container, next to
-  the build's own pages (a volume there would hide them). They survive restarts and reboots and
-  start over on each deploy, as on Vercel. Cloudflare's cache does most of the work anyway.
-- **Memory (12 GB):** Postgres `shared_buffers` 3 GB (`effective_cache_size` 8 GB is only a planner
-  hint); each app capped at 768 MB with a 512 MB heap (about 80 MB idle); PostgREST and Caddy about
-  100 MB; 2 GB swap. Check with `docker stats --no-stream`. The whole database fits in
-  `shared_buffers`; `pg_prewarm`'s autoprewarm worker (`shared_preload_libraries`) saves the list of
-  cached blocks every 5 minutes and loads it back when Postgres starts. Otherwise the first searches
-  after a restart read `lines` from disk and can pass anon's 3 s timeout (gurmukhi-search#50). After a
-  restart, `docker compose logs db | grep autoprewarm` says how many blocks it loaded.
+  the build's own pages (a volume there would hide them). They survive restarts and start over on
+  each deploy, as on Vercel.
+- **Postgres's memory:** `shared_buffers` 3 GB of the VM's 12 GB (`effective_cache_size` 8 GB is only
+  a planner hint). The whole database fits; `pg_prewarm`'s autoprewarm worker saves the list of
+  cached blocks every 5 minutes and loads it back when Postgres starts, so the first searches after
+  a restart don't read `lines` from disk and pass anon's 3 s timeout (gurmukhi-search#50).
+  `docker compose logs db | grep autoprewarm` says how many blocks it loaded.
 
-### One-time setup
-
-1. **Cloudflare, zone atthebunga.com:**
-   - SSL/TLS → Overview: **Full (strict)**.
-   - SSL/TLS → Origin Server → Create Certificate: RSA, hostnames `*.atthebunga.com` and
-     `atthebunga.com`, 15 years. Copy the certificate, then:
-     ```sh
-     pbpaste | ssh ubuntu@141.148.39.45 'install -d -m 700 /opt/kosh/selfhost/certs && (umask 077 && cat > /opt/kosh/selfhost/certs/origin.pem)'
-     ```
-     Copy the private key and run the same with `origin.key`.
-   - SSL/TLS → Origin Server → Authenticated Origin Pulls → **Global: on** (Cloudflare's shared
-     client certificate; Zone-level and Per-hostname are for a certificate of your own). Any
-     Cloudflare zone presents that certificate, so this keeps out everything but Cloudflare, not
-     other Cloudflare accounts. Then fetch Cloudflare's CA for it:
-     ```sh
-     ssh ubuntu@141.148.39.45 'curl -fsS https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem -o /opt/kosh/selfhost/certs/cloudflare-origin-pull-ca.pem'
-     ```
-     The folder stays private to `ubuntu` (mode 700): Caddy runs as root in its container, so it reads
-     the files without wider permissions.
-   - My Profile → API Tokens → Create: permission Zone → Cache Purge → Purge, this zone only.
-2. **The server:** the apps in `COMPOSE_FILE`, and the curator key (prompted, never echoed; the same
-   `ADMIN_KEY` as in Vercel):
-   ```sh
-   ssh -t ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && sed -i "s|^COMPOSE_FILE=.*|COMPOSE_FILE=docker-compose.yml:docker-compose.server.yml:docker-compose.apps.yml|" .env && read -rsp "ADMIN_KEY: " k && echo && echo "ADMIN_KEY=$k" >> .env'
-   ```
-3. **The deploy key** (on your Mac). It can run `deploy.sh` and nothing else:
-   ```sh
-   ssh-keygen -t ed25519 -N "" -C github-deploy -f ~/.ssh/kosh-deploy
-   ```
-   ```sh
-   echo "restrict,command=\"sh /opt/kosh/selfhost/scripts/deploy.sh\" $(cat ~/.ssh/kosh-deploy.pub)" | ssh ubuntu@141.148.39.45 'cat >> ~/.ssh/authorized_keys'
-   ```
-4. **GitHub, both repos** (Settings → Secrets and variables → Actions):
-   - Variables: `DEPLOY_HOST` = `ubuntu@141.148.39.45`, `NEXT_PUBLIC_SUPABASE_URL` =
-     `https://141-148-39-45.sslip.io`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` = the server's `ANON_KEY`.
-   - Secrets: `DEPLOY_SSH_KEY` (`pbcopy < ~/.ssh/kosh-deploy`), `DEPLOY_KNOWN_HOSTS`
-     (`ssh-keygen -F 141.148.39.45 | grep -v '^#' | pbcopy`: the VM's host key as your own logins
-     already trust it, rather than whatever answers a fresh `ssh-keyscan`), `CLOUDFLARE_ZONE_ID` (zone Overview page),
-     `CLOUDFLARE_API_TOKEN`.
-5. **First images:** run Deploy by hand in gurmukhi-kosh, then in gurmukhi-search (Actions → Deploy →
-   Run workflow). The kosh run's deploy job fails, because the search image doesn't exist yet; the
-   search run then starts the whole stack. The packages come out public, like the repos. If a pull
-   is ever `denied`, check GitHub → your profile → Packages → the package → Package settings →
-   visibility.
-6. **Check on the VM, before any DNS change** (each prints a status code; expect 200s):
-   ```sh
-   ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && for p in / /word/%E0%A8%B8%E0%A8%A4%E0%A8%BF /ang/1 /line/1 /api/health; do docker compose exec -T kosh node -e "fetch(\"http://search:3000$p\").then(r=>console.log(r.status,\"$p\"))"; done'
-   ```
-7. **Cloudflare cache rules** (Caching → Cache Rules). Later rules override earlier ones, so the
-   bypass goes last:
-   1. *Dictionary pages*: `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/word/"))`
-      → Eligible for cache; Edge TTL: use cache-control header if present, bypass cache if not;
-      Browser TTL: respect origin. Cloudflare reads `CDN-Cache-Control` first (/word) and
-      `s-maxage` otherwise (/line, /ang).
-   2. *Curator URLs*: `http.host eq "search.atthebunga.com" and http.request.uri.query contains "key="`
-      → Bypass cache. (They also send `private, no-store`, so this is the second guard.)
-   **Bot Fight Mode stays off** (Security → Bots). On the Free plan no rule can exempt anything from
-   it, and it challenged GitHub's runners, so CI's production checks and the uptime checks never
-   reached the site. The cache rules above take crawler load off the VM instead; the AI-crawler
-   block and robots.txt stay on. In its place, the Free plan's one rate-limiting rule (Security →
-   WAF → Rate limiting rules): `http.host eq "search.atthebunga.com" and (starts_with(http.request.uri.path, "/word/") or starts_with(http.request.uri.path, "/line/") or starts_with(http.request.uri.path, "/ang/") or starts_with(http.request.uri.path, "/api/"))`,
-   counted per IP, more than 100 requests in 10 seconds → Block for 10 seconds.
-8. **Cut over:** Cloudflare DNS. `search` and `kosh` have no records of their own; the wildcard
-   `*.atthebunga.com` sends them to Vercel with the other subdomains. Add an **A record** for each,
-   `141.148.39.45`, **proxied**: a name's own record takes precedence over the wildcard, for that
-   name only. Leave the wildcard alone, and leave the domains on the Vercel projects.
-9. **Check:**
-   ```sh
-   for i in 1 2; do curl -sI https://search.atthebunga.com/word/%E0%A8%B8%E0%A8%A4%E0%A8%BF | grep -iE "^(cf-cache-status|x-vercel-cache)"; done
-   ```
-   The second line should say `cf-cache-status: HIT`, and no `x-vercel-cache` header should appear.
-   Then set the gurmukhi-kosh variable `SITE_URL` = `https://search.atthebunga.com` (uptime checks),
-   and re-run CI on main (its production checks use the public site).
-10. **After a stable week:** in Vercel, project gurmukhi-kosh, Production, set
-    `KOSH_REDIRECT_VERCEL_HOST=1` and redeploy, so crawlers that know gurmukhi-kosh.vercel.app go to
-    the public site through a routing redirect, which uses no function time. Also remove the Vercel
-    project's cron if Vercel still lists one (vercel.json no longer has it).
-
-### Rollback to Vercel
-
-Vercel keeps deploying main (now with nothing to serve), so it's a DNS switch:
-
-1. If `KOSH_REDIRECT_VERCEL_HOST` is set in Vercel, delete it and redeploy gurmukhi-kosh first; the
-   Vercel shell reaches the kosh zone through gurmukhi-kosh.vercel.app.
-2. Cloudflare DNS: delete the `search` and `kosh` A records. Both fall back to the wildcard, which
-   still points at Vercel; proxied, so it takes effect in seconds. Full (strict) and Authenticated
-   Origin Pulls work with Vercel as they are.
-3. Purge the cache (Caching → Configuration → Custom Purge → Hostname `search.atthebunga.com`).
-
-**Roll back one app on the VM** to an earlier image (the commit SHAs are the image tags):
-`KOSH_TAG=<sha>` or `SEARCH_TAG=<sha>` in `.env`, then `docker compose up -d`. Remove the line to
-follow `latest` again.
-
-### Day to day
-
-```sh
-# Logs (Next prints errors here)
-ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && docker compose logs --tail 100 search kosh'
-
-# Deploy by hand (your own key isn't limited to deploy.sh): kosh, search, or selfhost (config only)
-ssh ubuntu@141.148.39.45 'sh /opt/kosh/selfhost/scripts/deploy.sh kosh'
-
-# Memory and health
-ssh ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && docker stats --no-stream && docker compose ps'
-```
-
-`.github/workflows/uptime.yml` checks the API and the home page every 30 minutes, and `/api/health`
-daily at 08:00 UTC, which used to be the Vercel cron.
-
-### Migrations
+## Migrations
 
 Apply a migration from GitHub, not a shell: **Actions → Apply migration → Run workflow** with the file
 name (`087_example.sql`), or

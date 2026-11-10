@@ -1,0 +1,21 @@
+# Local development only: the API gateway on localhost:8000, as on the server, for the apps and
+# tests/selfhost/. Its config is atthebunga-server's sites/api.caddy, read from a sibling checkout
+# (INFRA_DIR, default ../../../atthebunga-server from this folder). Add it in selfhost/.env:
+#
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.local.yml
+services:
+  gateway:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    depends_on: [rest]
+    environment:
+      SITE_ADDRESS: ":8000"
+      ANON_KEY: ${ANON_KEY:?run selfhost/scripts/mint-keys.mjs}
+      SERVICE_KEY: ${SERVICE_KEY:?run selfhost/scripts/mint-keys.mjs}
+      AKHAR_KEY: ${AKHAR_KEY:?run selfhost/scripts/mint-keys.mjs}
+      BACKUP_TOKEN: ${BACKUP_TOKEN:?set in selfhost/.env (openssl rand -hex 24)}
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - ./local:/etc/caddy:ro
+      - ${INFRA_DIR:-../../../atthebunga-server}/sites:/etc/caddy-sites:ro
+      - ./backups:/srv/backups:ro
