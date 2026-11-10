@@ -21,7 +21,7 @@ x-app: &app
 
 services:
   gateway:
-    networks: [default, radio-edge]
+    networks: [default, radio-edge, pir-edge]
     volumes:
       - ./sites:/etc/caddy-sites:ro
       - ./certs:/certs:ro
@@ -45,8 +45,10 @@ services:
       SUPABASE_ANON_KEY: ${ANON_KEY}
       NODE_OPTIONS: --max-old-space-size=512
 
-# The radio stack (sites/stream.caddy) joins this one network, so it reaches the gateway and not
-# Postgres, PostgREST or the apps.
+# The radio stack (sites/stream.caddy) and the PIR poller (sites/pir.caddy) each join one network
+# of their own, so they reach the gateway and not Postgres, PostgREST, the apps or each other.
 networks:
   radio-edge:
     name: radio-edge
+  pir-edge:
+    name: pir-edge
