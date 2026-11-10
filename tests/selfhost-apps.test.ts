@@ -1,11 +1,10 @@
 /**
- * The apps on the VM (selfhost/README.md, "The apps"): both Next servers run as standalone Docker
- * images next to the database stack, reached through Cloudflare. Off Vercel Hobby after the Oct 2026
+ * The apps on the VM: both Next servers run as standalone Docker images from thehimmat/atthebunga-server,
+ * next to this repo's database stack (selfhost/), reached through Cloudflare. Off Vercel Hobby after the Oct 2026
  * pause (crawlers on /word, /line, /ang used most of the Fluid CPU allowance).
  * Run: npm test
  */
 
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -107,123 +106,47 @@ describe("production checks through Cloudflare", () => {
   });
 });
 
-describe("selfhost/docker-compose.apps.yml", () => {
-  const compose = read("selfhost/docker-compose.apps.yml");
+// The gateway, the apps and their Caddy config moved to thehimmat/atthebunga-server (#395), which
+// tests them itself. What stays here is the database's side of the contract with it.
+describe("selfhost/docker-compose.yml (the database: Postgres and PostgREST)", () => {
+  const compose = read("selfhost/docker-compose.yml");
 
-  it("runs both apps from GHCR images", () => {
-    expect(compose).toMatch(/image: ghcr\.io\/thehimmat\/gurmukhi-kosh:/);
-    expect(compose).toMatch(/image: ghcr\.io\/thehimmat\/gurmukhi-search:/);
+  it("pins the project name, so the volume stays selfhost_pgdata whatever the folder is called", () => {
+    expect(compose).toMatch(/^name: selfhost$/m);
   });
 
-  it("points both at the gateway's internal listener, not the public URL", () => {
-    expect(compose.match(/SUPABASE_URL: http:\/\/gateway:8080/g)).toHaveLength(2);
-    expect(compose.match(/SUPABASE_ANON_KEY: \$\{ANON_KEY\}/g)).toHaveLength(2);
+  it("runs only the database and PostgREST; the gateway and the apps are atthebunga-server's", () => {
+    const services = /^services:\n([\s\S]*?)^\S/m.exec(compose)?.[1] ?? "";
+    expect(services.match(/^ {2}[a-z-]+:$/gm)).toEqual(["  db:", "  rest:"]);
   });
 
-  it("caps each app's memory so Postgres keeps its share of the 12 GB", () => {
-    expect(compose).toMatch(/^x-app: &app\n(?: {2}.*\n)* {2}mem_limit: \d+[mg]$/m);
-    expect(compose.match(/^ {4}<<: \*app$/gm)).toHaveLength(2);
+  it("shares only PostgREST with the gateway, on the external api-edge network", () => {
+    expect(compose).toMatch(/^ {2}rest:\n(?: {4}.*\n)*? {4}networks: \[default, api-edge\]$/m);
+    expect(compose).toMatch(/^networks:\n {2}api-edge:\n {4}name: api-edge\n {4}external: true$/m);
+    const uses = compose.split("\n").filter((l) => /\bapi-edge\b/.test(l) && !l.trimStart().startsWith("#"));
+    expect(uses).toHaveLength(3);
   });
-});
 
-describe("Caddy's config on the server", () => {
-  // deploy.sh updates the files with git, which replaces each one, and then reloads Caddy. A bind
-  // mount of a single file keeps showing the replaced file until the container is recreated, so a
-  // reload read the old Caddyfile with the new sites (the #391 deploy failed that way). Directories
-  // show what is in them now.
-  it("mounts the config as directories, never single files", () => {
-    const base = read("selfhost/docker-compose.yml");
-    const apps = read("selfhost/docker-compose.apps.yml");
-    expect(base).toMatch(/^ {6}- \.\/caddy:\/etc\/caddy:ro$/m);
-    expect(apps).toMatch(/^ {6}- \.\/sites:\/etc\/caddy-sites:ro$/m);
-    expect(base + apps).not.toMatch(/Caddyfile:/);
+  it("leaves Caddy's certificate volume (now atthebunga-server's) undeclared, so `down -v` here can't delete it", () => {
+    const yaml = compose.split("\n").filter((l) => !l.trimStart().startsWith("#")).join("\n");
+    expect(yaml).not.toMatch(/caddy_data/);
   });
 });
 
-describe("selfhost/caddy/Caddyfile", () => {
-  const caddy = read("selfhost/caddy/Caddyfile");
-
-  it("serves the API on an internal port for the apps (http, Docker network only)", () => {
-    expect(caddy).toMatch(/^:8080 \{/m);
+describe("the server scripts after the split", () => {
+  it("db-setup.sh drops the old COMPOSE_FILE, which names compose files that are gone", () => {
+    expect(read("selfhost/scripts/db-setup.sh")).toContain("sed -i '/^COMPOSE_FILE=/d; /^GATEWAY_PORTS=/d'");
   });
 
-  it("loads extra sites (search.atthebunga.com) only where they're mounted", () => {
-    expect(caddy).toMatch(/^import \/etc\/caddy-sites\/\*\.caddy$/m);
+  it("rotate-service-key.sh recreates the gateway and kosh in atthebunga-server's project", () => {
+    expect(read("selfhost/scripts/rotate-service-key.sh")).toMatch(
+      /sh "\$\{INFRA_DIR:-\/opt\/infra\}\/scripts\/compose\.sh" up -d gateway kosh/
+    );
   });
 
-  it("defines Cloudflare's origin TLS once (Origin CA cert plus Authenticated Origin Pulls), before the sites load", () => {
-    const snippet = /^\(cloudflare_origin\) \{\n([\s\S]*?)^\}$/m.exec(caddy)?.[1] ?? "";
-    expect(snippet).toMatch(/tls \/certs\/origin\.pem \/certs\/origin\.key/);
-    expect(snippet).toMatch(/mode require_and_verify/);
-    expect(snippet).toMatch(/trust_pool file \/certs\/cloudflare-origin-pull-ca\.pem/);
-    expect(caddy.indexOf("(cloudflare_origin) {")).toBeLessThan(caddy.indexOf("import /etc/caddy-sites/"));
-  });
-
-  it("uses no deprecated client-auth field (trusted_ca_cert_file, deprecated since Caddy 2.8)", () => {
-    for (const f of ["selfhost/caddy/Caddyfile", "selfhost/sites/search.caddy", "selfhost/sites/stream.caddy", "selfhost/sites/pir.caddy"]) {
-      expect(read(f), f).not.toMatch(/trusted_ca_cert_file/);
-    }
-  });
-
-  it("serves search.atthebunga.com only to Cloudflare", () => {
-    const site = read("selfhost/sites/search.caddy");
-    expect(site).toMatch(/^\timport cloudflare_origin$/m);
-    expect(site).toMatch(/reverse_proxy search:3000/);
-  });
-
-  it("serves the radio stack (a separate Compose project) to Cloudflare and on a test name, without buffering audio", () => {
-    const site = read("selfhost/sites/stream.caddy");
-    expect(site).toMatch(/^stream\.atthebunga\.com \{\n\timport cloudflare_origin$/m);
-    expect(site).toMatch(/^radio\.\{\$SITE_ADDRESS\} \{/m);
-    expect(site).toMatch(/reverse_proxy radio:3001/);
-    expect(site).toMatch(/flush_interval -1/);
-  });
-
-  it("shares only the gateway with the radio stack, on a network of their own", () => {
-    const compose = read("selfhost/docker-compose.apps.yml");
-    expect(compose).toMatch(/^ {2}gateway:\n {4}networks: \[default, radio-edge, pir-edge\]$/m);
-    expect(compose).toMatch(/^networks:\n {2}radio-edge:\n {4}name: radio-edge$/m);
-    expect(compose.match(/radio-edge/g)).toHaveLength(3);
-  });
-
-  it("serves the PIR poller (thehimmat/pir-sound-tracker, its own Compose project) on its own name, WebSocket included", () => {
-    const site = read("selfhost/sites/pir.caddy");
-    expect(site).toMatch(/^pir\.\{\$SITE_ADDRESS\} \{/m);
-    expect(site).toMatch(/reverse_proxy pir-poller:8080/);
-    // Not a Cloudflare-only name: nothing proxies it, so it needs no origin certificate.
-    expect(site).not.toMatch(/import cloudflare_origin/);
-  });
-
-  it("shares only the gateway with the PIR poller, on a network of their own", () => {
-    const compose = read("selfhost/docker-compose.apps.yml");
-    expect(compose).toMatch(/^ {2}pir-edge:\n {4}name: pir-edge$/m);
-    expect(compose.match(/pir-edge/g)).toHaveLength(3);
-  });
-});
-
-describe("selfhost/scripts/deploy.sh", () => {
-  it("refuses anything but a known service (it's the deploy key's forced command)", () => {
-    for (const arg of ["", "db", "kosh; rm -rf /", "../kosh"]) {
-      let status = 0;
-      try {
-        execFileSync("sh", [join(root, "selfhost/scripts/deploy.sh")], {
-          env: { ...process.env, SSH_ORIGINAL_COMMAND: arg, KOSH_DEPLOY_DRY_RUN: "1" },
-          stdio: "pipe",
-        });
-      } catch (e) {
-        status = (e as { status: number }).status;
-      }
-      expect(status, `arg ${JSON.stringify(arg)}`).toBe(2);
-    }
-  });
-
-  it("accepts kosh, search and selfhost (config only)", () => {
-    for (const arg of ["kosh", "search", "selfhost"]) {
-      const out = execFileSync("sh", [join(root, "selfhost/scripts/deploy.sh")], {
-        env: { ...process.env, SSH_ORIGINAL_COMMAND: arg, KOSH_DEPLOY_DRY_RUN: "1" },
-        encoding: "utf8",
-      });
-      expect(out).toContain(`deploy ${arg}`);
-    }
+  it("deploys with atthebunga-server's targets: kosh for a new image, kosh-db otherwise", () => {
+    expect(read(".github/workflows/deploy.yml")).toContain(
+      "TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'kosh-db' }}"
+    );
   });
 });
