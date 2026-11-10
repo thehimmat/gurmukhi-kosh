@@ -1,10 +1,11 @@
 name: Deploy
 
 # After CI passes on main: build the app's arm64 image, push it to GHCR, and deploy it on the VM
-# (selfhost/README.md, "The apps"). A push that only touches data, pipelines, docs or tests
-# (scripts/vercel-ignore.mjs, judged since the last successful deploy) builds nothing and only
-# applies selfhost/ config. A new image ends with a Cloudflare purge of the site, since cached pages
-# name the old build's /_next and /kosh-static chunks, which the new image doesn't have.
+# (thehimmat/atthebunga-server runs it there). A push that only touches data, pipelines, docs or
+# tests (scripts/vercel-ignore.mjs, judged since the last successful deploy) builds nothing and only
+# applies the database's config (selfhost/, target kosh-db). A new image ends with a Cloudflare
+# purge of the site, since cached pages name the old build's /_next and /kosh-static chunks, which
+# the new image doesn't have.
 #
 # Turned on by the repository variable DEPLOY_HOST (ubuntu@141.148.39.45) and the secrets
 # DEPLOY_SSH_KEY and DEPLOY_KNOWN_HOSTS; the purge by CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_TOKEN.
@@ -86,8 +87,9 @@ jobs:
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
           HOST: ${{ vars.DEPLOY_HOST }}
-          # The deploy key's forced command (selfhost/scripts/deploy.sh) reads the target from this.
-          TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'selfhost' }}
+          # The deploy key's forced command (atthebunga-server's scripts/deploy.sh) reads the target
+          # from this.
+          TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'kosh-db' }}
         run: |
           install -m 700 -d ~/.ssh
           (umask 077 && printf '%s\n' "$KEY" > ~/.ssh/id_ed25519)

@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * The API's address. SUPABASE_URL is read at runtime, so on the VM the server reaches the gateway
- * over Docker's network (selfhost/docker-compose.apps.yml); NEXT_PUBLIC_SUPABASE_URL is inlined at
+ * over Docker's network (atthebunga-server's compose.yml); NEXT_PUBLIC_SUPABASE_URL is inlined at
  * build time and stays the fallback (Vercel, CI, local dev). Only server code queries the database.
  */
 export function supabaseUrl() {
