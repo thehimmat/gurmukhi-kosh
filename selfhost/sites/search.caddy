@@ -1,8 +1,0 @@
-# search.atthebunga.com (the gurmukhi-search shell, which hands the dictionary paths to the kosh app
-# over Docker's network) and kosh.atthebunga.com (the shell 308s it to search). Cloudflare proxies
-# both; cloudflare_origin (caddy/Caddyfile) keeps anyone from reaching the apps around Cloudflare's cache
-# and rate limit. Files in /certs: selfhost/README.md, "The apps".
-search.atthebunga.com, kosh.atthebunga.com {
-	import cloudflare_origin
-	reverse_proxy search:3000
-}
