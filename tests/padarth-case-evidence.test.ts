@@ -105,6 +105,41 @@ describe("caseEvidence", () => {
     expect(caseEvidence("ਜੋ ਉਸ 'ਨਾਂਵ' ਦਾ")).toEqual([]);
   });
 
+  // ਦੇਣਾ as a light verb ends a gloss with ਦੇ / ਦਿਆਂ, which are spelled like the
+  // genitive. Every segment-final ਦਿਆਂ in the pad-arth (65 of 65) is "I may
+  // give/put" (ਅਰਪਉ = ਮੈਂ ਭੇਟਾ ਕਰ ਦਿਆਂ), and a ਦੇ after a verb stem is the
+  // imperative (ਛੋਡਿ = ਛੱਡ ਦੇ). Neither says anything about case.
+  it("does not read the light verb ਦਿਆਂ as genitive", () => {
+    expect(caseEvidence("ਮੈਂ ਭੇਟਾ ਕਰ ਦਿਆਂ")).toEqual([]);
+    expect(caseEvidence("ਮੈਂ ਦੇ ਦਿਆਂ")).toEqual([]);
+  });
+
+  it("does not read an imperative ਦੇ after a verb stem as genitive", () => {
+    expect(caseEvidence("ਛੱਡ ਦੇ")).toEqual([]);
+    expect(caseEvidence("ਚੰਗੀ ਤਰ੍ਹਾਂ ਸਾੜ ਦੇ")).toEqual([]);
+    expect(caseEvidence("ਹਵਾਲੇ ਕਰ ਦੇ")).toEqual([]);
+  });
+
+  // "of this kind", "of many kinds", "equal to": the gloss renders an adjective
+  // (ਤ੍ਰਿਬਿਧਿ, ਬਹੁ ਭਾਂਤਿ, ਜੇਵਡੁ), not a word in the genitive.
+  it("does not read an adjectival 'of … kind' / 'equal' phrase as genitive", () => {
+    expect(caseEvidence("ਤਿੰਨ ਕਿਸਮ ਦੀ")).toEqual([]);
+    expect(caseEvidence("ਕਈ ਕਿਸਮਾਂ ਦੇ")).toEqual([]);
+    expect(caseEvidence("ਜੇਡਾ, ਬਰਾਬਰ ਦਾ")).toEqual([]);
+    expect(caseEvidence("ਇਸ ਤਰ੍ਹਾਂ ਦਾ")).toEqual([]);
+  });
+
+  it("still reads a real genitive (ਤਾ ਕੀ = ਉਸ ਪਰਮਾਤਮਾ ਦੀ)", () => {
+    expect(caseEvidence("ਉਸ ਪਰਮਾਤਮਾ ਦੀ")).toEqual([
+      { gramCase: "genitive", marker: "ਦੀ", basis: "ਉਸ ਪਰਮਾਤਮਾ ਦੀ" },
+    ]);
+  });
+
+  // ਸਰਪਰ = ਆਖ਼ਿਰ ਨੂੰ: the adverb "in the end", not an object.
+  it("does not read the idiom ਆਖ਼ਿਰ ਨੂੰ as objective", () => {
+    expect(caseEvidence("ਆਖ਼ਿਰ ਨੂੰ")).toEqual([]);
+  });
+
   it("handles an empty or punctuation-only gloss", () => {
     expect(caseEvidence("")).toEqual([]);
     expect(caseEvidence("।")).toEqual([]);

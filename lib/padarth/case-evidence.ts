@@ -62,7 +62,31 @@ const FINAL_MARKERS = new Map<string, PadarthCase>([
   ["ਦਾ", "genitive"],
   ["ਦੇ", "genitive"],
   ["ਦੀ", "genitive"],
-  ["ਦਿਆਂ", "genitive"],
+  // ਦਿਆਂ is deliberately absent: segment-final it is always the light verb
+  // "I may give/put" (ਅਰਪਉ = ਮੈਂ ਭੇਟਾ ਕਰ ਦਿਆਂ), 65 of 65 in the pad-arth.
+]);
+
+// Spelling key for the word lists below: NFC folds precomposed nukta letters
+// (ਖ਼) and the two ways of writing ਤਰ੍ਹਾਂ onto one form.
+const key = (word: string): string => word.normalize("NFC");
+const keySet = (words: string[]): ReadonlySet<string> => new Set(words.map(key));
+
+// A ਦੇ/ਦਾ/ਦੀ right after one of these stems is ਦੇਣਾ as a light verb, the
+// imperative "give / do it" (ਛੋਡਿ = ਛੱਡ ਦੇ; ਜਾਲੁ = ਸਾੜ ਦੇ), not a genitive. The
+// list is the stems the pad-arth actually ends a gloss with.
+const LIGHT_VERB_STEMS = keySet([
+  "ਕਰ", "ਸਾੜ", "ਛੱਡ", "ਛਡ", "ਤਿਆਗ", "ਕੱਢ", "ਪਾ", "ਬਣਾ", "ਮਿਲਾ", "ਵਿਖਾ",
+  "ਰੱਖ", "ਧਰ", "ਵੇਚ", "ਸੁੱਟ", "ਲਾ", "ਮਿਟਾ", "ਬਖ਼ਸ਼", "ਬਖਸ਼",
+]);
+
+// "of this kind / of many kinds / equal to": the gloss renders an adjective
+// (ਤ੍ਰਿਬਿਧਿ = ਤਿੰਨ ਕਿਸਮ ਦੀ; ਜੇਵਡੁ = ਬਰਾਬਰ ਦਾ), so the genitive belongs to the
+// Punjabi paraphrase, not to the headword.
+const ADJECTIVAL_GENITIVE_HEADS = keySet(["ਕਿਸਮ", "ਕਿਸਮਾਂ", "ਬਰਾਬਰ", "ਤਰ੍ਹਾਂ", "ਪ੍ਰਕਾਰ", "ਭਾਂਤ"]);
+
+// Adverbial idioms that end in a postposition: ਸਰਪਰ = ਆਖ਼ਿਰ ਨੂੰ ("in the end").
+const IDIOM_HEADS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ["ਨੂੰ", keySet(["ਆਖ਼ਿਰ", "ਆਖ਼ਰ", "ਆਖਿਰ", "ਆਖਰ", "ਅਖ਼ੀਰ", "ਅਖੀਰ"])],
 ]);
 
 /** ਹੇ opens a vocative gloss: ਦਾਤਾਰ = ਹੇ ਦੇਣਹਾਰ ਅਕਾਲ ਪੁਰਖ! */
@@ -139,7 +163,14 @@ function lastWordMarker(words: string[]): { gramCase: PadarthCase; marker: strin
   const last = words[words.length - 1];
   const gramCase = FINAL_MARKERS.get(last);
   if (!gramCase) return null;
+
+  const before = key(words[words.length - 2]);
+  if (IDIOM_HEADS.get(last)?.has(before)) return null;
   if (!GENITIVE.has(gramCase)) return { gramCase, marker: last };
+
+  // The segment ends in a verb or an adjectival paraphrase, so any earlier
+  // postposition governs a word inside the gloss: yield nothing.
+  if (LIGHT_VERB_STEMS.has(before) || ADJECTIVAL_GENITIVE_HEADS.has(before)) return null;
 
   // Trailing genitive: yield to a stronger marker earlier in the segment.
   for (let i = words.length - 2; i >= 1; i--) {
