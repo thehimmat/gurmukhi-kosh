@@ -37,6 +37,7 @@ yarn-error.log*
 pipeline/mahan-kosh/output/
 pipeline/etymology/output/
 pipeline/sikhri/output/
+pipeline/cologne/output/
 pipeline/manual/data/*.jsonl
 
 # vercel
