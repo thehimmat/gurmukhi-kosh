@@ -535,3 +535,10 @@ compounds, 933 from usage notes), 687 head words found.
 `'compound'`. psql reported ALTER TABLE ×2 and NOTIFY. Followed by `npm run ingest:padarth:glosses`: 124,809 glosses
 (124,593 entries, 216 notes), 137,872 links (was 136,989 at #179's first ingest), 24,779 case-evidence rows; entries linked
 92.0% (was 91.6%), 102 through a Shackle paradigm; 0 saved pick refs unlinked.
+
+**089_dict_entries** — run 2026-11-10 on the self-hosted server through the Apply migration workflow (run 7,
+`selfhost/scripts/migrate.sh` from main at 2b86472: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`089_dict_entries.sql` as merged (#403, #249 Phase 0): `dict_entries` (the raw entry layer, RLS by `source_rights`) and
+`dict_entry_links` (unreviewed links curator-only), with the `dict_entries_guard_ref` trigger and `link_dict_entries()`.
+psql reported CREATE TABLE ×2, CREATE INDEX ×6, CREATE FUNCTION ×2, CREATE TRIGGER, ALTER TABLE ×2, CREATE POLICY ×2,
+GRANT, REVOKE and NOTIFY (the DROP … IF EXISTS notices were expected on a first run). No entries loaded yet.
