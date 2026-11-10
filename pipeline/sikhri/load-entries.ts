@@ -1,5 +1,5 @@
 /**
- * Writes the SQL that loads SikhRI's crawls into dict_entries (migration 070), every entry whether or
+ * Writes the SQL that loads SikhRI's crawls into dict_entries (migration 089), every entry whether or
  * not the Kosh has the word. Curator-only until SikhRI gives guidance (source_rights 'sikhri', #40).
  *
  *   npx tsx pipeline/sikhri/load-entries.ts [--en=…/entries.jsonl] [--pa=…/entries-pa.jsonl] [--out=dir]

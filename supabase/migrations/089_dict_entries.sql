@@ -1,4 +1,4 @@
--- 070: the raw dictionary-entry layer (plan Phase 0, #249).
+-- 089: the raw dictionary-entry layer (plan Phase 0, #249).
 --
 -- `definitions` needs a word_id, so a dictionary entry for a word the Kosh hasn't seen can't be
 -- stored there. `dict_entries` holds every entry a dictionary prints, word or no word; new

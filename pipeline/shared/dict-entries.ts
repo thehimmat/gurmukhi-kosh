@@ -1,5 +1,5 @@
 /**
- * Loads a dictionary's entries into `dict_entries` (migration 070, plan Phase 0) as SQL, so a load
+ * Loads a dictionary's entries into `dict_entries` (migration 089, plan Phase 0) as SQL, so a load
  * runs the same way through the Supabase MCP `execute_sql`, `psql`, or a PGlite test.
  *
  * A source adapter turns its raw data into DictEntry rows; this module does the rest:

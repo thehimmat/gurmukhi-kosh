@@ -1,5 +1,5 @@
 /**
- * Migration 070 (plan Phase 0, #249): the raw dictionary-entry layer.
+ * Migration 089 (plan Phase 0, #249): the raw dictionary-entry layer.
  *
  * `dict_entries` holds every entry a dictionary prints, whether or not the Kosh has the word yet.
  * `dict_entry_links` joins an entry to a word (or lexeme). Links made by matching are unreviewed,
@@ -57,7 +57,7 @@ beforeAll(async () => {
   await load(db, "mahan_kosh", MAHAN_KOSH);
 }, 60_000);
 
-describe("070: loading entries", () => {
+describe("089: loading entries", () => {
   it("stores entries whether or not the Kosh has the word", async () => {
     const { rows } = await db.query<{ entry_ref: string }>(
       "select e.entry_ref from dict_entries e join dict_sources s on s.id = e.dict_source_id where s.code = 'sikhri'",
@@ -89,7 +89,7 @@ describe("070: loading entries", () => {
   });
 });
 
-describe("070: re-running a load", () => {
+describe("089: re-running a load", () => {
   it("keeps ids and refs, updates bodies, and drops entries the source no longer has", async () => {
     const d = await freshDb();
     await seedWords(d);
@@ -126,7 +126,7 @@ describe("070: re-running a load", () => {
   });
 });
 
-describe("070: visibility", () => {
+describe("089: visibility", () => {
   it("hides curator-only entries from anon and shows public ones", async () => {
     expect(refs(await asRole("anon", db, "select entry_ref from dict_entries"))).toEqual(["mahan_kosh:ਨਾਮੁ#1", "mahan_kosh:ਸਚਿ#1"]);
     expect(refs(await asRole("authenticated", db, "select entry_ref from dict_entries"))).toEqual(["mahan_kosh:ਨਾਮੁ#1", "mahan_kosh:ਸਚਿ#1"]);
@@ -164,7 +164,7 @@ describe("070: visibility", () => {
   });
 });
 
-describe("070: teardown", () => {
+describe("089: teardown", () => {
   it("is covered by the teardown script", () => {
     expect(BY_DICT_SOURCE_ID).toContain("dict_entries");
   });
@@ -179,5 +179,28 @@ describe("070: teardown", () => {
     const orphans = await d.query("select 1 from dict_entry_links l where not exists (select 1 from dict_entries e where e.id = l.entry_id)");
     expect(orphans.rows).toEqual([]);
     expect((await d.query("select 1 from dict_entry_links")).rows.length).toBe(3);
+  }, 60_000);
+});
+
+describe("089: a corpus ingest meets the stored entries", () => {
+  it("links only the new words it passes, against every source's entries", async () => {
+    const d = await freshDb();
+    await seedWords(d);
+    await load(d, "sikhri", SIKHRI);
+    await load(d, "mahan_kosh", MAHAN_KOSH);
+    const before = (await d.query("select 1 from dict_entry_links")).rows.length;
+
+    // A new scripture brings ਅਲਖੁ (SikhRI had it, no word yet) and ਹੁਕਮੁ (no dictionary has it).
+    await d.query("insert into words (id, gurmukhi, search_fold) values ($1, $2, $3), ($4, $5, $6)",
+      [9201, "ਅਲਖੁ", foldGurmukhi("ਅਲਖੁ"), 9202, "ਹੁਕਮੁ", foldGurmukhi("ਹੁਕਮੁ")]);
+    const { rows: [{ n }] } = await d.query<{ n: number }>("select link_dict_entries(null, array[9201, 9202]::bigint[]) as n");
+    expect(n).toBe(1);
+
+    const { rows } = await d.query<{ entry_ref: string; word_id: number; review_status: string }>(
+      `select e.entry_ref, l.word_id, l.review_status from dict_entry_links l
+         join dict_entries e on e.id = l.entry_id where l.word_id in (9201, 9202)`,
+    );
+    expect(rows).toEqual([{ entry_ref: "sikhri:wn2", word_id: 9201, review_status: "unreviewed" }]);
+    expect((await d.query("select 1 from dict_entry_links")).rows.length).toBe(before + 1);
   }, 60_000);
 });
