@@ -1,6 +1,11 @@
-# The Supabase-shaped API the apps talk to, without Supabase: Postgres 17, PostgREST (the same REST
-# server Supabase runs) and Caddy in front of it, serving /rest/v1 and checking the apikey header the
-# way Supabase's gateway does. supabase-js needs only a different URL and keys. See selfhost/README.md.
+# The Supabase-shaped database the apps talk to, without Supabase: Postgres 17 and PostgREST (the
+# same REST server Supabase runs). The gateway in front of it (Caddy: /rest/v1 for a known apikey,
+# like Supabase's gateway) lives in thehimmat/atthebunga-server and reaches PostgREST as `rest` on
+# the api-edge network. See selfhost/README.md.
+#
+# The name is pinned because the volumes are named after it (selfhost_pgdata): without it, Compose
+# would take the folder's name, and a checkout in another folder would start on an empty database.
+name: selfhost
 
 services:
   db:
@@ -37,25 +42,16 @@ services:
       PGRST_DB_POOL: "20"
       PGRST_ADMIN_SERVER_PORT: "3001" # /ready answers 200 once the database is reachable
       PGRST_DB_TX_END: commit-allow-override # lets a request ask for rollback (tests on a live server)
+    # Only PostgREST shares a network with the gateway, so Postgres stays out of its reach.
+    networks: [default, api-edge]
 
-  gateway:
-    image: caddy:2.8.4
-    restart: unless-stopped
-    depends_on: [rest]
-    environment:
-      SITE_ADDRESS: ${SITE_ADDRESS:-:8000}
-      ANON_KEY: ${ANON_KEY:?run selfhost/scripts/mint-keys.mjs}
-      SERVICE_KEY: ${SERVICE_KEY:?run selfhost/scripts/mint-keys.mjs}
-      AKHAR_KEY: ${AKHAR_KEY:?run selfhost/scripts/mint-keys.mjs}
-      BACKUP_TOKEN: ${BACKUP_TOKEN:?set in selfhost/.env (openssl rand -hex 24)}
-    ports: ["${GATEWAY_PORTS:-8000:8000}"]
-    volumes:
-      # The folder, not the file: deploy.sh updates it with git, which replaces the file, and a
-      # single-file mount would keep showing the old one to `caddy reload`.
-      - ./caddy:/etc/caddy:ro
-      - ./backups:/srv/backups:ro
-      - caddy_data:/data
-
+# selfhost_caddy_data (Caddy's certificates) is no longer declared here: atthebunga-server's gateway
+# uses it as an external volume, and leaving it out keeps a `down -v` here from deleting it.
 volumes:
   pgdata:
-  caddy_data:
+
+# Made by atthebunga-server's host-setup.sh (locally: docker network create api-edge).
+networks:
+  api-edge:
+    name: api-edge
+    external: true

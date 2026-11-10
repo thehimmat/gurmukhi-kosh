@@ -1,0 +1,3 @@
+# Local development only (docker-compose.local.yml): the API's site file from a sibling
+# atthebunga-server checkout, without the Cloudflare sites, which need its certificates.
+import /etc/caddy-sites/api.caddy
