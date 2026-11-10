@@ -542,3 +542,10 @@ compounds, 933 from usage notes), 687 head words found.
 `dict_entry_links` (unreviewed links curator-only), with the `dict_entries_guard_ref` trigger and `link_dict_entries()`.
 psql reported CREATE TABLE ×2, CREATE INDEX ×6, CREATE FUNCTION ×2, CREATE TRIGGER, ALTER TABLE ×2, CREATE POLICY ×2,
 GRANT, REVOKE and NOTIFY (the DROP … IF EXISTS notices were expected on a first run). No entries loaded yet.
+
+**090_cologne_mw_source** — run 2026-11-10 on the self-hosted server through the Apply migration workflow (run 8,
+`selfhost/scripts/migrate.sh` from main at 8aa6908: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`090_cologne_mw_source.sql` as merged (#407, #249 Phase 1, #273): registers `cologne_mw` (Monier-Williams 1899, Cologne
+csl-orig) in `dict_sources`, and in `source_rights` as curator-only, `open`, CC BY-SA 4.0. psql reported INSERT 0 1 ×2 and
+NOTIFY. Entries not loaded yet (`npm run load:cologne -- --dict=mw`; csl-orig 776f756 gives n = 286,525, checksum
+cfc7fdd338052a34145e864edcd541ea).
