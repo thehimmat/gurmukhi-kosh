@@ -144,6 +144,12 @@ describe("the server scripts after the split", () => {
     );
   });
 
+  it("check.sh trusts the root-run container's mount, so the tests that call git pass on the VM (#401)", () => {
+    expect(read("selfhost/scripts/check.sh")).toMatch(
+      /node:22 sh -c 'git config --global --add safe\.directory \/app && npm ci/
+    );
+  });
+
   it("deploys with atthebunga-server's targets: kosh for a new image, kosh-db otherwise", () => {
     expect(read(".github/workflows/deploy.yml")).toContain(
       "TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'kosh-db' }}"
