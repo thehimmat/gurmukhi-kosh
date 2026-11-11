@@ -561,3 +561,28 @@ cfc7fdd338052a34145e864edcd541ea).
 `091_cologne_sources.sql` as merged (#410, #249 Phase 1, #273): registers the other 13 Cologne csl-orig dictionaries in
 `dict_sources` and `source_rights`, all curator-only, CC BY-SA 4.0; `cologne_ap` and `cologne_bhs` rights pending, the
 rest open. psql reported INSERT 0 13 ×2 and NOTIFY. Entries not loaded yet.
+
+**sikhri + 13 Cologne dictionaries, entries** — loaded 2026-11-10 on the self-hosted server (data only, no migration)
+with `selfhost/scripts/load-entries.sh` from main at 86ebd1f (#412), which checked each source's n and checksum against
+its `expected.txt` and reported all OK (#249 Phases 0-1). Cologne from csl-orig 776f756; each expected.txt was also
+matched against an independent run of the loader in a clean checkout.
+
+| Code | n | checksum |
+|---|---|---|
+| sikhri (Oct 22 crawl, 3,269 EN + 5,213 PA lines; 5,273 links proposed) | 6,569 | 0f34690573e60dfa802a5b942d16f5bc |
+| cologne_mw72 | 55,390 | 8586ccb9b0a03081bd60d06036fd8b31 |
+| cologne_ap90 | 34,882 | 36527279ee8b908235317fca987910a5 |
+| cologne_ap | 90,856 | a211f171392a23acbb3ce0dc136ada6d |
+| cologne_md | 20,749 | a0f501b7b5a388330b599fc4182ae14a |
+| cologne_ben | 25,062 | 5e028c64129f76e7359930f1829cdc38 |
+| cologne_cae | 40,069 | 6ab15b01df009fad9ea302ffcb2efd9a |
+| cologne_vei | 3,834 | 059b2f924977c1c679fe00dc29b458d4 |
+| cologne_pwg | 123,366 | b0ddaef0efad5f8cf8f31ae624b875cc |
+| cologne_gra | 12,785 | d9981b8f2bd3371fda3f46c6de9513b3 |
+| cologne_vcp | 50,135 | 78a368fdbc8c028212e3fbad1a25f321 |
+| cologne_skd | 42,531 | b1b779fff8a257cdc4ad9f3695d73259 |
+| cologne_shs | 47,326 | 77d22baa0257acd9e8c69d1434be8465 |
+| cologne_bhs | 17,839 | db0ef34174838527d522d0af379ab422 |
+
+All links are unreviewed (curator-only); all sources remain curator-only (SikhRI pending permission; Cologne CC BY-SA
+4.0, #273). With MW 1899 above, dict_entries holds 15 sources, 857,918 entries.
