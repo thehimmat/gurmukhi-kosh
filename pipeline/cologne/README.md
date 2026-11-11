@@ -26,14 +26,19 @@ the Kosh carries share-alike data. `pending` means the printed text itself may s
 
 ## Load
 
+From your Mac, in this repo (csl-orig cloned beside it):
+
 ```sh
-git clone --depth 1 https://github.com/sanskrit-lexicon/csl-orig ../csl-orig
-npm run load:cologne -- --dict=mw --csl=../csl-orig
+git clone --depth 1 https://github.com/sanskrit-lexicon/csl-orig ../csl-orig   # once
+dicts="mw72 ap90 ap md ben cae vei pwg gra vcp skd shs bhs"
+for d in $dicts; do npm run -s load:cologne -- --dict=$d --csl=../csl-orig; done
+sh selfhost/scripts/load-entries.sh $(for d in $dicts; do echo pipeline/cologne/output/$d; done)
 ```
 
-This writes `pipeline/cologne/output/mw/0001.sql…` and `verify.sql`. Run them in order with psql
-against the database, then `verify.sql`: n and checksum must match the printed ones. Re-running is
-safe. Write down the csl-orig commit it prints in `supabase/APPLIED.md` with the load.
+The loader writes `pipeline/cologne/output/<id>/` (numbered SQL, `verify.sql`, `expected.txt`);
+`load-entries.sh` sends each to the server over SSH, checks n and checksum, and stops at the first
+mismatch. Re-running is safe. Write down the csl-orig commit the loader prints in
+`supabase/APPLIED.md` with the load.
 
 ## Linking
 

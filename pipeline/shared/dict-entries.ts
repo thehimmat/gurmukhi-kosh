@@ -12,6 +12,8 @@
  * Teardown stays per source: `npm run teardown -- --source=<code>` removes the entries too.
  */
 import { createHash } from "node:crypto";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { foldGurmukhi } from "../../lib/gurmukhi-fold";
 
 export type DictEntry = {
@@ -121,4 +123,23 @@ export function dictEntriesVerifySql(code: string): string {
   return `select count(*)::int as n,
   coalesce(md5(string_agg(entry_ref || chr(31) || body_raw, chr(30) order by entry_ref || chr(31) || body_raw collate "C")), md5('')) as checksum
 from dict_entries where dict_source_id = ${source(code)}`;
+}
+
+/**
+ * Writes a load to `out` for selfhost/scripts/load-entries.sh: 0001.sql… in order, verify.sql, and
+ * expected.txt (`n|checksum`, as `psql -tA` prints verify.sql's row), so the script can check itself.
+ */
+export function writeLoadDir(
+  out: string,
+  code: string,
+  entries: DictEntry[],
+  opts: { batchSize?: number } = {},
+): { statements: string[]; checksum: string } {
+  const load = dictEntriesLoadSql(code, entries, opts);
+  fs.mkdirSync(out, { recursive: true });
+  for (const f of fs.readdirSync(out)) if (/^\d+\.sql$/.test(f)) fs.rmSync(path.join(out, f)); // a smaller re-run
+  load.statements.forEach((s, i) => fs.writeFileSync(path.join(out, `${String(i + 1).padStart(4, "0")}.sql`), s + "\n"));
+  fs.writeFileSync(path.join(out, "verify.sql"), dictEntriesVerifySql(code) + ";\n");
+  fs.writeFileSync(path.join(out, "expected.txt"), `${entries.length}|${load.checksum}\n`);
+  return load;
 }

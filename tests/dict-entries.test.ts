@@ -118,3 +118,21 @@ describe("sikhriEntries", () => {
     expect(rows).toEqual([]);
   });
 });
+
+describe("writeLoadDir", () => {
+  it("writes the numbered statements, verify.sql and the expected n and checksum for the load script", async () => {
+    const fs = await import("fs");
+    const os = await import("os");
+    const path = await import("path");
+    const { writeLoadDir } = await import("../pipeline/shared/dict-entries");
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), "load-"));
+    const entries = [entry("sikhri:a", "one"), entry("sikhri:b", "two"), entry("sikhri:c", "three")];
+
+    const { statements, checksum } = writeLoadDir(out, "sikhri", entries, { batchSize: 2 });
+
+    const sqlFiles = fs.readdirSync(out).filter((f) => f.endsWith(".sql")).sort();
+    expect(sqlFiles).toEqual([...statements.map((_, i) => `${String(i + 1).padStart(4, "0")}.sql`), "verify.sql"]);
+    expect(fs.readFileSync(path.join(out, "expected.txt"), "utf-8")).toBe(`3|${checksum}\n`);
+    expect(checksum).toBe(entriesChecksum(entries));
+  });
+});
