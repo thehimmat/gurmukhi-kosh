@@ -555,3 +555,9 @@ cfc7fdd338052a34145e864edcd541ea).
 (#249 Phase 1, #407). `verify.sql` returned n = 286,525, checksum cfc7fdd338052a34145e864edcd541ea, as expected.
 `link_dict_entries('cologne_mw')` proposed 65,041 links, all unreviewed (curator-only). The source stays curator-only
 (CC BY-SA 4.0, #273).
+
+**091_cologne_sources** — run 2026-11-10 on the self-hosted server through the Apply migration workflow (run 9,
+`selfhost/scripts/migrate.sh` from main at 4134e9e: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`091_cologne_sources.sql` as merged (#410, #249 Phase 1, #273): registers the other 13 Cologne csl-orig dictionaries in
+`dict_sources` and `source_rights`, all curator-only, CC BY-SA 4.0; `cologne_ap` and `cologne_bhs` rights pending, the
+rest open. psql reported INSERT 0 13 ×2 and NOTIFY. Entries not loaded yet.
