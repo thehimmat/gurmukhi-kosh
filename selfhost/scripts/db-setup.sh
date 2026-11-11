@@ -29,7 +29,7 @@ if [ ! -f "$env_file" ]; then
     echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)"
     echo "AUTHENTICATOR_PASSWORD=$(openssl rand -hex 24)"
     echo "PG_SHARED_BUFFERS=3GB"
-    echo "PG_EFFECTIVE_CACHE_SIZE=8GB"
+    echo "PG_EFFECTIVE_CACHE_SIZE=6GB"
     echo "SITE_ADDRESS=$site"
     sudo docker run --rm -v "$dir/selfhost/scripts:/s:ro" node:22-alpine node /s/mint-keys.mjs
   } >> "$env_file"
