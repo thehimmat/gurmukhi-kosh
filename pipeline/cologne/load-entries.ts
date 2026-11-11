@@ -12,7 +12,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { execFileSync } from "child_process";
 import { getArg } from "../shared/utils";
-import { dictEntriesLoadSql, dictEntriesVerifySql } from "../shared/dict-entries";
+import { writeLoadDir } from "../shared/dict-entries";
 import { parseCsl } from "./parse";
 import { cologneEntries } from "./entries";
 import { COLOGNE_CODES } from "./codes";
@@ -27,11 +27,7 @@ function main() {
 
   const file = path.join(csl, "v02", dict, `${dict}.txt`);
   const entries = cologneEntries(code, parseCsl(fs.readFileSync(file, "utf-8")));
-  const { statements, checksum } = dictEntriesLoadSql(code, entries, { batchSize: 1000 });
-
-  fs.mkdirSync(out, { recursive: true });
-  statements.forEach((s, i) => fs.writeFileSync(path.join(out, `${String(i + 1).padStart(4, "0")}.sql`), s + "\n"));
-  fs.writeFileSync(path.join(out, "verify.sql"), dictEntriesVerifySql(code) + ";\n");
+  const { statements, checksum } = writeLoadDir(out, code, entries, { batchSize: 1000 });
 
   let commit = "unknown";
   try {
