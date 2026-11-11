@@ -67,8 +67,10 @@ short result):
 # 1. Set up, or update to the latest code on this branch (safe to re-run; keeps existing secrets)
 ssh ubuntu@141.148.39.45 'curl -fsSL https://raw.githubusercontent.com/thehimmat/gurmukhi-kosh/main/selfhost/scripts/db-setup.sh | bash -s -- 141-148-39-45.sslip.io'
 
-# 2. Restore a fresh dump from Supabase into an empty database (prompts for the session-pooler URL)
-ssh -t ubuntu@141.148.39.45 'cd /opt/kosh && read -rsp "Supabase session pooler URL: " SUPABASE_DB_URL && echo && SUPABASE_DB_URL=$SUPABASE_DB_URL sh selfhost/scripts/restore.sh --supabase'
+# 2. Restore a backup into the empty database (prompts for the passphrase). First copy a
+#    kosh-YYYY-MM-DD.dump.gpg to /opt/kosh: from the old server's selfhost/backups/, or a backup
+#    workflow artifact (supabase/BACKUP.md).
+ssh -t ubuntu@141.148.39.45 'cd /opt/kosh && read -rsp "Backup passphrase: " BACKUP_PASSPHRASE && echo && BACKUP_PASSPHRASE=$BACKUP_PASSPHRASE sh selfhost/scripts/restore.sh --gpg kosh-YYYY-MM-DD.dump.gpg'
 
 # 3. Run the test suite on the server against its own stack
 ssh ubuntu@141.148.39.45 'cd /opt/kosh && sh selfhost/scripts/check.sh'
@@ -100,32 +102,18 @@ To change the token (the file is encrypted either way, but the URL shouldn't cir
 `KOSH_API_URL` is set (`https://141-148-39-45.sslip.io`). `/health` is 200 only when PostgREST is up
 and reaches the database. A failed run is GitHub's email that the API is down.
 
-## Cutover from Supabase
+## History: the move off Supabase
 
-Writes are rare (no flags since September, curator writes only during ingests), so there's no
-write freeze: check nothing changed since the restore, switch, check again.
+Production moved from Supabase (project `brczghxvpfikezsevbkh`) to this server on 2026-10-28, by
+restoring a live dump (`restore.sh --supabase`), checking it with `compare.sh`, and switching the
+apps' URL and keys. Supabase was paused on 2026-11-11 (#419) once nothing used it. It can be
+restored from its dashboard until about 2027-02-09; after that only its backup download remains.
+`restore.sh --supabase` and `compare.sh` still work against it while it's restored.
 
-1. **Nothing changed since the restore:** `compare.sh` against Supabase reports every table the
-   same. If not, restore again (empty the database first: `cd /opt/kosh/selfhost && docker compose
-   down && docker volume rm selfhost_pgdata && docker compose up -d`).
-   ```sh
-   ssh -t ubuntu@141.148.39.45 'cd /opt/kosh && read -rsp "Supabase session pooler URL: " OTHER_DB_URL && echo && OTHER_DB_URL=$OTHER_DB_URL sh selfhost/scripts/compare.sh'
-   ```
-2. **Vercel**, projects `gurmukhi-kosh` and `gurmukhi-search` (Settings → Environment Variables,
-   Production and Preview), then redeploy each (Deployments → ⋯ → Redeploy; `NEXT_PUBLIC_` values
-   are baked in at build time):
-   - `NEXT_PUBLIC_SUPABASE_URL` = `https://141-148-39-45.sslip.io`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = the server's `ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (gurmukhi-kosh only) = the server's `SERVICE_KEY`, from
-     `ssh ubuntu@141.148.39.45 'grep ^SERVICE_KEY= /opt/kosh/selfhost/.env | cut -d= -f2'`
-3. **Check:** the sites work, Supabase's API logs go quiet, and `compare.sh` still matches.
-4. **Local `.env.local`** files (pipelines, gurmukhi-voice-search): the same three values.
-5. **akhar annotation site** (Vercel project `akhar-annotate`, repo gurmukhi-akhar-ocr): see
-   [The akhar annotation site](#the-akhar-annotation-site).
-
-**Rollback:** put the Supabase values back in Vercel (Supabase dashboard → Settings → API) and
-redeploy. Supabase is left untouched, so it's exactly as it was at cutover; anything written to the
-server since would need copying back (`compare.sh` lists which tables).
+Rolling the apps back to Vercel now means a fresh build there (Redeploy, not Promote of an old
+deployment, whose values point at Supabase), still talking to this server's API. Vercel holds the
+URL and anon key; `SUPABASE_SERVICE_ROLE_KEY` (gurmukhi-kosh, for `/admin/flags`) is deliberately not
+set there and would need adding from the server's `SERVICE_KEY` at that point.
 
 ## The akhar annotation site
 
