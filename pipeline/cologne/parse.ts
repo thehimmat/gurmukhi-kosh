@@ -2,7 +2,7 @@
  * Cologne Digital Sanskrit Dictionaries' source format (github.com/sanskrit-lexicon/csl-orig,
  * `v02/<dict>/<dict>.txt`). Every record is
  *
- *   <L>id<pc>page,col<k1>headword<k2>headword with hyphens[<h>homograph]<e>level
+ *   <L>id<pc>page,col<k1>headword<k2>headword with hyphens[<h>homograph][<e>level]
  *   …body lines…
  *   <LEND>
  *
@@ -25,7 +25,7 @@ export type CslRecord = {
   text: string;
 };
 
-const HEAD = /^<L>([^<]+)<pc>([^<]*)<k1>([^<]+)<k2>([^<]*)(?:<h>([^<]*))?<e>(.*)$/;
+const HEAD = /^<L>([^<]+)<pc>([^<]*)<k1>([^<]+)<k2>([^<]*)(?:<h>([^<]*))?(?:<e>(.*))?$/;
 
 export function parseCsl(source: string): CslRecord[] {
   const out: CslRecord[] = [];
@@ -37,7 +37,7 @@ export function parseCsl(source: string): CslRecord[] {
       if (!line.startsWith("<L>")) continue; // the file's header and blank lines
       const m = HEAD.exec(line);
       if (!m) throw new Error(`unreadable record header: ${line.slice(0, 80)}`);
-      cur = { L: m[1], pc: m[2], k1: m[3], k2: m[4], h: m[5] ?? null, e: m[6].trim(), text: "" };
+      cur = { L: m[1], pc: m[2], k1: m[3], k2: m[4], h: m[5] ?? null, e: (m[6] ?? "").trim(), text: "" };
       body = [];
     } else if (line.startsWith("<LEND>")) {
       // csl-orig has the odd stray character after the marker (mw L196225: `<LEND><`)
