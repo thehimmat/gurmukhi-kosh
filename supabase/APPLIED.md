@@ -593,3 +593,10 @@ All links are unreviewed (curator-only); all sources remain curator-only (SikhRI
 their three expression indexes; `link_dict_entries` with the two new tiers. psql reported ALTER TABLE ×2, CREATE FUNCTION
 ×3, CREATE INDEX ×3, then `link_dict_entries()` = 844,854 links added across all loaded sources (all unreviewed,
 curator-only), and NOTIFY. A replay on the 14 Cologne dictionaries had predicted loose 733,203 + stem 72,457.
+
+**mk_* catch-up from Supabase** — run 2026-11-11 on the self-hosted server (data only, no migration). `compare.sh`
+against Supabase found every table here equal or ahead except the Mahan Kosh collation tables: runs 51-55 (2026-10-28,
+after the 10-27 restore) with their 28 alignments and 28 discrepancies existed only on Supabase. They were exported from
+Supabase as one transaction (`json_populate_recordset`, `on conflict (id) do nothing`, sequences moved past the max ids)
+and piped to the db container's psql: INSERT 0 5, INSERT 0 28, INSERT 0 28, COMMIT. mk_runs / mk_alignments /
+mk_discrepancies now 54 / 398 / 401, as on Supabase. Supabase holds nothing the server lacks; it can be paused.
