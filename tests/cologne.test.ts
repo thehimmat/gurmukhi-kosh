@@ -64,6 +64,12 @@ describe("parseCsl", () => {
     expect(recs.map((r) => [r.L, r.text])).toEqual([["1", "text"], ["2", "more"]]);
   });
 
+  it("reads a header with no <e> level, as every dictionary but MW writes it", () => {
+    const [r] = parseCsl("<L>1<pc>0001-a<k1>a<k2>a<h>1\ntext\n<LEND>");
+    expect([r.L, r.pc, r.k1, r.h, r.e]).toEqual(["1", "0001-a", "a", "1", ""]);
+    expect(cologneEntries("cologne_ap90", [r])[0].parsed).not.toHaveProperty("parent");
+  });
+
   it("refuses a record with no <LEND>", () => {
     expect(() => parseCsl("<L>1<pc>1,1<k1>a<k2>a<e>1\ntext")).toThrow(/LEND/);
   });

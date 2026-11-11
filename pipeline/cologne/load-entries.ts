@@ -6,7 +6,7 @@
  *
  * Run the numbered files in order (psql), then verify.sql: its n and checksum must equal the ones
  * printed here. Re-running is safe: entries upsert by entry_ref. The source must be registered first
- * (090 for mw); each further dictionary gets its own code and migration.
+ * (090 for mw, 091 for the rest); see codes.ts.
  */
 import * as fs from "fs";
 import * as path from "path";
@@ -15,9 +15,8 @@ import { getArg } from "../shared/utils";
 import { dictEntriesLoadSql, dictEntriesVerifySql } from "../shared/dict-entries";
 import { parseCsl } from "./parse";
 import { cologneEntries } from "./entries";
+import { COLOGNE_CODES } from "./codes";
 
-// csl-orig dictionary id → our dict_sources code. Add a line (and a migration) per dictionary.
-const COLOGNE_CODES: Record<string, string> = { mw: "cologne_mw" };
 
 function main() {
   const dict = getArg("dict") ?? "mw";
