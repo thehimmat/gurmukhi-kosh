@@ -549,3 +549,9 @@ GRANT, REVOKE and NOTIFY (the DROP … IF EXISTS notices were expected on a firs
 csl-orig) in `dict_sources`, and in `source_rights` as curator-only, `open`, CC BY-SA 4.0. psql reported INSERT 0 1 ×2 and
 NOTIFY. Entries not loaded yet (`npm run load:cologne -- --dict=mw`; csl-orig 776f756 gives n = 286,525, checksum
 cfc7fdd338052a34145e864edcd541ea).
+
+**cologne_mw entries** — loaded 2026-11-10 on the self-hosted server (data only, no migration): `npm run load:cologne --
+--dict=mw` from main at 2a90073 against csl-orig 776f756, the 290 statements piped to the db container's psql over SSH
+(#249 Phase 1, #407). `verify.sql` returned n = 286,525, checksum cfc7fdd338052a34145e864edcd541ea, as expected.
+`link_dict_entries('cologne_mw')` proposed 65,041 links, all unreviewed (curator-only). The source stays curator-only
+(CC BY-SA 4.0, #273).
