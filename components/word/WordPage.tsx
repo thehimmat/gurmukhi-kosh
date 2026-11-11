@@ -16,6 +16,8 @@ import { ProvenanceBadge } from "@/components/word/ProvenanceBadge";
 import { ParsedSenseChips } from "@/components/word/ParsedSenseChips";
 import { TabNav } from "@/components/word/TabNav";
 import { FlagForm } from "@/components/word/FlagForm";
+import { DictionaryEntries } from "@/components/word/DictionaryEntries";
+import { dictEntryGroups, fetchDictEntryLinks } from "@/lib/dict-entry-view";
 import { wordSpan } from "@/lib/word-highlight";
 
 // The word page, shared by /word/<w> (public) and /admin/word/<w> (curator mode, behind the admin
@@ -172,7 +174,7 @@ export async function WordPage({ encoded, tab = "overview", page: pageParam, cur
 
   // Sibling inflected forms (overview) and the Usage tab's data need only the
   // word id, so they join this batch rather than waiting for it (#201).
-  const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult, morphForms, usageData] = await Promise.all([
+  const [defsResult, etymResult, occsResult, examplesResult, corpusStatsResult, morphForms, usageData, dictLinks] = await Promise.all([
     // Definitions with source info (parsed = structured Mahan Kosh layer, #34)
     needsDefs
       ? db
@@ -238,6 +240,9 @@ export async function WordPage({ encoded, tab = "overview", page: pageParam, cur
     // Usage tab: common phrases (bigrams) + statistical collocations + writer
     // breakdown (lib/word-data.ts — shared with the JSON API).
     tab === "usage" ? Promise.all([fetchUsage(wordId, 15, db), fetchWriterStats(wordId, 8, db)]) : Promise.resolve(null),
+
+    // Dictionaries tab (curator only): every dictionary entry linked to the word (089, 092).
+    curator && tab === "dictionaries" ? fetchDictEntryLinks(db, wordId) : Promise.resolve([]),
   ]);
 
   const definitions = (defsResult.data ?? []) as unknown as DefinitionWithSource[];
@@ -1076,6 +1081,14 @@ export async function WordPage({ encoded, tab = "overview", page: pageParam, cur
           </nav>
         )}
       </section>
+      )}
+
+      {/* ── Dictionaries (curator only): linked dictionary entries ── */}
+      {curator && tab === "dictionaries" && (
+        <section style={{ marginBottom: "2.5rem" }}>
+          <SectionHeading>Dictionaries</SectionHeading>
+          <DictionaryEntries groups={dictEntryGroups(dictLinks)} />
+        </section>
       )}
 
       {/* ── 7. Sources & provenance (sources tab) ── */}

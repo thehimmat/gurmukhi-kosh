@@ -5,6 +5,7 @@
 import { describe, it, expect } from "vitest";
 import { slp1ToGurmukhi } from "../pipeline/cologne/slp1-gurmukhi";
 import { parseCsl, plainBody } from "../pipeline/cologne/parse";
+import { cologneGloss } from "../lib/cologne-gloss";
 import { cologneEntries } from "../pipeline/cologne/entries";
 
 describe("slp1ToGurmukhi", () => {
@@ -102,5 +103,26 @@ describe("cologneEntries (Monier-Williams 1899)", () => {
     expect(entries[0].parsed).toEqual({ k1: "a", k2: "a", h: "1", e: "1", iast: "a", plain: "1. a ¦ the first letter of the alphabet" });
     // a continuation sense (e 1A) belongs to the entry before it
     expect((entries[1].parsed as { parent: string }).parent).toBe("cologne_mw:L1");
+  });
+});
+
+describe("cologneGloss: a readable gloss from any csl-orig body", () => {
+  it.each([
+    // MW: <s> Sanskrit, accents dropped; a continuation record's leading ¦ goes
+    ["<hom>1.</hom> <s>nA/ma</s> ¦ ind. by name", "1. nāma — ind. by name"],
+    ["¦ indeed, certainly, really", "indeed, certainly, really"],
+    // Apte: {#…#} Sanskrit, {%…%} italic, {@…@} bold, hard-wrapped lines
+    ["{#nAman#}¦ {%n.%} {@1@} A name,\nappellation, personal name (opp. {#gotra#});", "nāman — n. 1 A name, appellation, personal name (opp. gotra);"],
+    // PWG: German, page marker, <ls> and <lex>
+    ["{#a/cCinna#}¦ <lex>adj.</lex> {%nicht zerrissen%}: <ls>ṚV. 10,133,7</ls>. [Page1-0064]", "acchinna — adj. nicht zerrissen: ṚV. 10,133,7."],
+    // Grassmann/Edgerton: {@…@} already in IAST, a <div> marker
+    ["{@apā́kṛti,@}¦ <ab>f.</ab>, {%Fernhaltung%}\n<div n=\"TS\">-im {667,2}.", "apā́kṛti, — f., Fernhaltung -im {667,2}."],
+  ])("%s", (body, gloss) => {
+    expect(cologneGloss(body)).toBe(gloss);
+  });
+
+  it("writes an all-Sanskrit kosh (Śabdakalpadruma, Vācaspatyam) in Devanagari, rejoining broken words", () => {
+    expect(cologneGloss("ativAdaH¦, puM, (ati + vad + BAve GaY .) aBi-\nvAdaH . paruzoktiH ..", "devanagari"))
+      .toBe("अतिवादः, पुं, (अति + वद् + भावे घञ् ।) अभिवादः । परुषोक्तिः ॥");
   });
 });

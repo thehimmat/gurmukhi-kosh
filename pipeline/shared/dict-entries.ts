@@ -6,7 +6,7 @@
  *   1. delete the source's entries that are no longer in the data (their links cascade);
  *   2. upsert the rest by entry_ref, in batches, so ids and refs survive a re-run;
  *   3. drop unreviewed auto-links whose headword no longer matches;
- *   4. propose links to Kosh words (link_dict_entries).
+ *   4. propose links to Kosh words (link_dict_entries: exact, fold, loose, stem; 092).
  * Afterwards, dictEntriesVerifySql compares what landed with entriesChecksum.
  *
  * Teardown stays per source: `npm run teardown -- --source=<code>` removes the entries too.
@@ -107,11 +107,13 @@ on conflict (entry_ref) do update set
   // An unreviewed auto-link whose entry no longer matches its word goes; reviewed links stay.
   statements.push(`delete from dict_entry_links l using dict_entries e, words w
  where l.entry_id = e.id and w.id = l.word_id and e.dict_source_id = ${src}
-   and l.review_status = 'unreviewed' and l.match_method in ('exact', 'fold')
+   and l.review_status = 'unreviewed' and l.match_method in ('exact', 'fold', 'loose', 'stem')
    and not coalesce(
      (l.match_method = 'exact' and w.gurmukhi = e.headword_gurmukhi)
      or (l.match_method = 'fold' and w.search_fold = e.search_fold
-         and not exists (select 1 from words x where x.gurmukhi = e.headword_gurmukhi)),
+         and not exists (select 1 from words x where x.gurmukhi = e.headword_gurmukhi))
+     or (l.match_method = 'loose' and dict_loose_key(w.search_fold) = dict_loose_key(e.search_fold))
+     or (l.match_method = 'stem' and dict_loose_key(w.search_fold) = dict_stem_key(e.search_fold, e.headword_native)),
      false);`);
 
   statements.push(`select link_dict_entries(${q(code)});`);
