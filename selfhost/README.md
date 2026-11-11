@@ -90,7 +90,10 @@ ssh -t ubuntu@141.148.39.45 'cd /opt/kosh/selfhost && read -rsp "Backup passphra
 ```
 
 Then add that URL as the repository secret `KOSH_BACKUP_URL`, and run the workflow once by hand.
-Restore one with `restore.sh --gpg` (on an empty database).
+Restore one with `restore.sh --gpg` (on an empty database). For a restore drill into a scratch
+database next to the live one, run `create extension pg_trgm with schema public` in it first: the
+dump doesn't carry the extension, and without it the 6 trigram indexes fail (#422). Filter the TOC
+the way `restore.sh` does (drop `SCHEMA - public` and the `supabase_admin` default ACLs).
 
 To change the token (the file is encrypted either way, but the URL shouldn't circulate): set a new
 `BACKUP_TOKEN=` in `/opt/kosh/selfhost/.env`, recreate the gateway
