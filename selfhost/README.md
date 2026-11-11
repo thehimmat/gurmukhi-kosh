@@ -11,7 +11,7 @@ gurmukhi-voice-search locally) only the URL and keys change. RLS, the search RPC
 Not included, because none of the apps use them: Supabase Auth, Storage, Realtime, Edge Functions
 and the dashboard.
 
-- **Server:** Oracle VM `kosh-db` (Ashburn, Ampere A1, 4 OCPU / 24 GB, Ubuntu 24.04), `141.148.39.45`
+- **Server:** Oracle VM `kosh-db` (Ashburn, Ampere A1, 2 OCPU / 12 GB, the Always Free A1 allowance, Ubuntu 24.04), `141.148.39.45`
 - **API:** `https://141-148-39-45.sslip.io` (sslip.io resolves the name to the IP; swap in a real
   domain by re-running setup with it, then updating the apps' URL)
 - **Code and secrets on the server:** `/opt/kosh` (`main`; re-running setup updates it); secrets in
@@ -147,7 +147,7 @@ README. What's this repo's:
 - **Next's cache (ISR):** regenerated /line and /ang pages are written inside the container, next to
   the build's own pages (a volume there would hide them). They survive restarts and start over on
   each deploy, as on Vercel.
-- **Postgres's memory:** `shared_buffers` 3 GB of the VM's 24 GB (`effective_cache_size` 8 GB is only
+- **Postgres's memory:** `shared_buffers` 3 GB of the VM's 12 GB (`effective_cache_size` 6 GB is only
   a planner hint). The whole database fits; `pg_prewarm`'s autoprewarm worker saves the list of
   cached blocks every 5 minutes and loads it back when Postgres starts, so the first searches after
   a restart don't read `lines` from disk and pass anon's 3 s timeout (gurmukhi-search#50).
