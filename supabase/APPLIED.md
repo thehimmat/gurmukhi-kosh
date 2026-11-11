@@ -586,3 +586,10 @@ matched against an independent run of the loader in a clean checkout.
 
 All links are unreviewed (curator-only); all sources remain curator-only (SikhRI pending permission; Cologne CC BY-SA
 4.0, #273). With MW 1899 above, dict_entries holds 15 sources, 857,918 entries.
+
+**092_dict_loose_links** — run 2026-11-11 on the self-hosted server through the Apply migration workflow (run 10,
+`selfhost/scripts/migrate.sh` from main at cbdc496: one transaction, ~5 min, then `notify pgrst, 'reload schema'`). Kosh
+`092_dict_loose_links.sql` as merged (#416, #249): `match_method` gains loose/stem; `dict_loose_key`, `dict_stem_key` and
+their three expression indexes; `link_dict_entries` with the two new tiers. psql reported ALTER TABLE ×2, CREATE FUNCTION
+×3, CREATE INDEX ×3, then `link_dict_entries()` = 844,854 links added across all loaded sources (all unreviewed,
+curator-only), and NOTIFY. A replay on the 14 Cologne dictionaries had predicted loose 733,203 + stem 72,457.
