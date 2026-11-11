@@ -30,9 +30,10 @@ From your Mac, in this repo (csl-orig cloned beside it):
 
 ```sh
 git clone --depth 1 https://github.com/sanskrit-lexicon/csl-orig ../csl-orig   # once
-dicts="mw72 ap90 ap md ben cae vei pwg gra vcp skd shs bhs"
-for d in $dicts; do npm run -s load:cologne -- --dict=$d --csl=../csl-orig; done
-sh selfhost/scripts/load-entries.sh $(for d in $dicts; do echo pipeline/cologne/output/$d; done)
+for d in mw72 ap90 ap md ben cae vei pwg gra vcp skd shs bhs; do
+  npm run -s load:cologne -- --dict=$d --csl=../csl-orig
+done
+sh selfhost/scripts/load-entries.sh pipeline/cologne/output/{mw72,ap90,ap,md,ben,cae,vei,pwg,gra,vcp,skd,shs,bhs}
 ```
 
 The loader writes `pipeline/cologne/output/<id>/` (numbered SQL, `verify.sql`, `expected.txt`);
