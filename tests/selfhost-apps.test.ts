@@ -150,6 +150,21 @@ describe("the server scripts after the split", () => {
     );
   });
 
+  // The dump (public/akhar/supabase_migrations) doesn't carry the pg_trgm extension, so a restore into
+  // a database that lacks it fails on the 6 trigram indexes (#422).
+  it("restore.sh creates pg_trgm before pg_restore", () => {
+    const s = read("selfhost/scripts/restore.sh");
+    const ext = s.indexOf("create extension if not exists pg_trgm with schema public");
+    expect(ext).toBeGreaterThan(-1);
+    expect(ext).toBeLessThan(s.indexOf("pg_restore -U postgres"));
+  });
+
+  it("the restore docs say to create pg_trgm first in a fresh database", () => {
+    for (const doc of ["supabase/BACKUP.md", "selfhost/README.md"]) {
+      expect(read(doc)).toContain("create extension pg_trgm with schema public");
+    }
+  });
+
   it("deploys with atthebunga-server's targets: kosh for a new image, kosh-db otherwise", () => {
     expect(read(".github/workflows/deploy.yml")).toContain(
       "TARGET: ${{ needs.image.outputs.built == 'true' && 'kosh' || 'kosh-db' }}"

@@ -44,6 +44,9 @@ esac
 # Everything except the public schema itself (every database has it already) and Supabase's
 # default privileges for its own supabase_admin role, which doesn't exist here and creates nothing.
 compose exec -T db sh -c 'pg_restore --list /tmp/kosh.dump | grep -v -e " SCHEMA - public " -e "DEFAULT ACL .* supabase_admin" > /tmp/kosh.toc'
+# The dump doesn't carry the pg_trgm extension, and the trigram indexes need it (#422). The stack's
+# roles.sql creates it already; this keeps the restore working if it ever didn't.
+compose exec -T db psql -U postgres -d postgres -qc "create extension if not exists pg_trgm with schema public"
 # --no-owner: everything belongs to `postgres` here. Grants are kept: they are what lets anon read.
 # Errors are collected, not fatal, so one missing role doesn't stop the restore; they're printed
 # at the end and the script fails if there were any.

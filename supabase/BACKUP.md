@@ -29,7 +29,9 @@ and that `pg_restore` can read it.
 
 1. Download the artifact from the run (Actions → the run → Artifacts) and unzip it.
 2. Decrypt: `gpg --decrypt kosh-YYYY-MM-DD.dump.gpg > kosh.dump` (it asks for the passphrase).
-3. Restore into an empty database, Postgres 17 or later:
+3. Restore into an empty database, Postgres 17 or later. The dump doesn't carry the `pg_trgm`
+   extension, so create it first or the 6 trigram indexes fail:
+   `psql "$TARGET_DB_URL" -c "create extension pg_trgm with schema public"`, then
    `pg_restore --no-owner --dbname "$TARGET_DB_URL" kosh.dump`
    Onto the self-hosted stack, use `selfhost/scripts/restore.sh --gpg` instead: it handles roles and
    reloads PostgREST. On a new Supabase project the roles `anon`, `authenticated` and `service_role` already exist and
