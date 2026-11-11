@@ -11,6 +11,8 @@ const TABS = [
   { id: 'usage', label: 'Usage' },
   { id: 'occurrences', label: 'Occurrences' },
   { id: 'sources', label: 'Sources' },
+  // Curator only: dictionary entries linked to the word, mostly unreviewed (089, 092).
+  { id: 'dictionaries', label: 'Dictionaries', curatorOnly: true },
 ];
 
 interface TabNavProps {
@@ -31,7 +33,7 @@ export function TabNav({ gurmukhi, currentTab = 'overview', curator = false }: T
         overflowX: 'auto',
       }}
     >
-      {TABS.map((tab) => {
+      {TABS.filter((tab) => curator || !('curatorOnly' in tab)).map((tab) => {
         const isActive = currentTab === tab.id;
         const href = curatorHref(`/word/${encodeURIComponent(gurmukhi)}?tab=${tab.id}`, curator);
         return (

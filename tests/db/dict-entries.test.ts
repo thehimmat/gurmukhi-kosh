@@ -111,7 +111,12 @@ describe("089: re-running a load", () => {
     const { rows } = await d.query<{ word_id: number; review_status: string }>(
       "select word_id, review_status from dict_entry_links order by word_id",
     );
-    expect(rows).toEqual([{ word_id: 9101, review_status: "approved" }, { word_id: 9102, review_status: "unreviewed" }]);
+    // ਸਚੁ links exactly; ਸਚ joins it through the loose tier (092), which links variants even beside an exact word.
+    expect(rows).toEqual([
+      { word_id: 9101, review_status: "approved" },
+      { word_id: 9102, review_status: "unreviewed" },
+      { word_id: 9103, review_status: "unreviewed" },
+    ]);
   }, 60_000);
 
   it("keeps entry refs immutable", async () => {
