@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
 
-# Serialize runs per ref. The suite shares one Supabase project, and the test
+# Serialize runs per ref. The suite shares one production database, and the test
 # job queries it live; merging several PRs at once previously started three
 # concurrent main runs whose count queries timed each other out. Queue them
 # instead (never cancel: a skipped run on main is an unverified deploy).

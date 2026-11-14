@@ -1,7 +1,7 @@
-# Self-hosted API (bridge off Supabase Free)
+# Self-hosted API (the production database)
 
-The production database outgrew Supabase Free's 500 MB. Until the project can pay for Supabase Pro,
-it runs on a free Oracle Cloud VM as **Postgres 17 + PostgREST**. That's the same REST server
+The production database outgrew Supabase Free's 500 MB and moved here; this is its long-term home. It
+runs on a free Oracle Cloud VM as **Postgres 17 + PostgREST**. That's the same REST server
 Supabase runs, behind a gateway (Caddy) that serves `/rest/v1` and checks the `apikey` header like
 Supabase's does. The gateway, the two apps and everything else on the VM's ports 80 and 443 are
 [thehimmat/atthebunga-server](https://github.com/thehimmat/atthebunga-server)'s (`/opt/infra`); this
@@ -206,7 +206,10 @@ Two differences from Supabase, both harmless: no `safeupdate`, so an UPDATE/DELE
 is allowed here but not on Supabase (write migrations for the stricter one), and no `supabase_admin`
 role.
 
-## Later: moving to Supabase Pro or a VPS
+## Growing or moving
 
-Take a backup (or `pg_dump` the server over an SSH tunnel), restore it into the new host
-(supabase/BACKUP.md), and swap the URL and keys in the apps again. Nothing in the apps changes.
+To scale up, resize the VM on Oracle (more OCPU and memory; past the Always Free allowance that's
+paid) and raise `PG_SHARED_BUFFERS` / `PG_EFFECTIVE_CACHE_SIZE` in `.env` to match (Postgres's
+memory, above). To move to another host, take a backup (or `pg_dump` the
+server over an SSH tunnel), restore it there (supabase/BACKUP.md), and swap the URL and keys in the
+apps. Nothing in the apps changes.
