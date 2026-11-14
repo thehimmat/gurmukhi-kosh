@@ -1,4 +1,8 @@
-# Applied-migration ledger — shared Supabase project `brczghxvpfikezsevbkh`
+# Applied-migration ledger — the shared production database
+
+Production is the self-hosted Postgres on the Oracle VM (`selfhost/`) since 2026-10-28. Before that
+it was the Supabase project `brczghxvpfikezsevbkh` (paused 2026-11-11, #419); entries up to the
+cutover were applied there.
 
 Three repos have historically applied migrations to this one database: **gurmukhi-kosh**
 (this repo, `supabase/migrations/001..031`), **gurmukhi-search** (`001..007`), and
@@ -12,12 +16,13 @@ that (#101).
    `supabase/migrations/` with the next `NNN_` number, even when the motivating feature
    lives in gurmukhi-search or gurmukhi-voice-search. Sibling repos add no new migration
    files.
-2. **Apply through the Supabase MCP `apply_migration`** (or the Supabase CLI) so the
-   server-side ledger (`supabase_migrations.schema_migrations`) records it, using the
-   file's exact name. Then append a row to the table below in the same commit.
-3. **The server ledger is the authority on applied order** (timestamp versions; readable
-   via the MCP `list_migrations`). This file is its in-repo mirror plus the
-   file-to-ledger reconciliation.
+2. **Apply through the Apply migration workflow** (Actions → Apply migration, or
+   `gh workflow run migrate.yml -f migration=NNN_name.sql`; `selfhost/README.md`, Migrations).
+   It runs the file from main in one transaction and refuses one this file already records.
+   Then add an entry below, quoting psql's output, in a reviewed commit.
+3. **This file is the authority on applied order since the cutover.** The workflow doesn't
+   write `supabase_migrations.schema_migrations`; that table (still in the database and its
+   backups) holds the Supabase-era ledger, which the reconciliation below mirrors.
 4. Sibling repos' historical migrations are vendored read-only under
    `supabase/migrations-imported/<repo>/` so CI's RLS gate lints everything that shaped
    this database. They are records of what ran, not scripts to re-run. The UNFILED entries'
