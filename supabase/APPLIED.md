@@ -605,3 +605,9 @@ after the 10-27 restore) with their 28 alignments and 28 discrepancies existed o
 Supabase as one transaction (`json_populate_recordset`, `on conflict (id) do nothing`, sequences moved past the max ids)
 and piped to the db container's psql: INSERT 0 5, INSERT 0 28, INSERT 0 28, COMMIT. mk_runs / mk_alignments /
 mk_discrepancies now 54 / 398 / 401, as on Supabase. Supabase holds nothing the server lacks; it can be paused.
+
+**093_scan_texts** — run 2026-11-21 on the self-hosted server through the Apply migration workflow (run 44921663319,
+`selfhost/scripts/migrate.sh` from main at c62352d: one transaction, then `notify pgrst, 'reload schema'`). Kosh
+`093_scan_texts.sql` as merged (#427): the `scan_text_layer` source_rights row (curator); `scan_texts`, `scan_pages`,
+`scan_lines`, `scan_units`, `scan_unit_lines` with RLS on and all grants revoked from anon/authenticated; two indexes.
+psql reported INSERT 0 1, CREATE TABLE ×5, CREATE INDEX ×2, ALTER TABLE ×5, REVOKE, NOTIFY.
