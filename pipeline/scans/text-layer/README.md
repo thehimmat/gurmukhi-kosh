@@ -13,14 +13,26 @@ page images are served only to the admin cookie.
    `translations/<slug>.jsonl`, if any. Each unit is linked to the transcription lines it was
    taken from (`match.ts`); all 429 Garab Ganjani and 365 Chanakya Niti Darpan units link.
 
-2. **Render the page images** on the Mac, where the PDFs are, and copy them to the server:
+2. **Render the page images** and put them in `SCAN_IMAGE_ROOT` on the server (`/opt/kosh/scans`,
+   mounted read-only into the app by atthebunga-server). The Mac has no poppler or Pillow, so render
+   on the VM in a throwaway container, from PDFs copied up from Drive:
 
-       python3 pipeline/scans/text-layer/render-pages.py "<pdf>" garab-ganjani-teeka ~/scan-images
-       rsync -av ~/scan-images/garab-ganjani-teeka ubuntu@141.148.39.45:/opt/kosh/scans/
+       rsync -a "<pdf>" pipeline/scans/text-layer/render-pages.py ubuntu@141.148.39.45:scan-render/
+       ssh ubuntu@141.148.39.45 'cd ~/scan-render && docker run --rm --cpus 1 --memory 1g \
+         -v "$HOME/scan-render:/w" -v /opt/kosh/scans:/out python:3.12-slim sh -c \
+         "apt-get update -qq && apt-get install -y -qq poppler-utils && pip install -q pillow \
+          && python3 /w/render-pages.py /w/<file>.pdf <slug> /out && chown -R $(id -u):$(id -g) /out"'
+       ssh ubuntu@141.148.39.45 'rm -rf ~/scan-render; docker rmi python:3.12-slim'
 
-   The app reads them from `SCAN_IMAGE_ROOT` (`<root>/<slug>/NNNN.webp`, PDF page numbers).
+   About 5 s a page on one core (Garab Ganjani, 180 pages: ~15 min; 22 MB). Pass `$(id -u)` from
+   the VM's shell as above: uid 1000 there is `opc`, not `ubuntu`. With poppler and Pillow
+   installed, `render-pages.py` also runs anywhere, followed by `rsync -av <outdir>/<slug>
+   ubuntu@141.148.39.45:/opt/kosh/scans/`.
 
-3. Open `/admin/scans`.
+3. Open `/admin/scans` (with the server's `ADMIN_KEY`, from `/opt/infra/.env`).
+
+Loaded so far (2026-11-21): garab-ganjani-teeka (180 pp, 429 units) and chanaka-niti-darpan (98 pp,
+365 units), with images.
 
 Not yet: line boxes on the page images (`scan_lines.bbox`), which light up a unit's lines on the
 image too. The viewer already draws them where present.
