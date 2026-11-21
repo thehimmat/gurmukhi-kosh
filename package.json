@@ -47,7 +47,8 @@
     "lockfile:refresh": "npm install --package-lock-only --workspaces=false --no-audit --no-fund",
     "lint": "eslint .",
     "test": "vitest run tests/",
-    "load:cologne": "tsx pipeline/cologne/load-entries.ts"
+    "load:cologne": "tsx pipeline/cologne/load-entries.ts",
+    "load:scan-text": "tsx pipeline/scans/text-layer/load.ts"
   },
   "dependencies": {
     "@atthebunga/gurmukhi-input": "1.3.0",
